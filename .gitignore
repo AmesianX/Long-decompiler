@@ -1,3 +1,13 @@
+# possible common used build directory names
+build/
+builddir/
+
+# lsp cache
+.ccls-cache
+
+# compile_commands.json for lsp
+compile_commands.json
+
 # Prerequisites
 *.d
 

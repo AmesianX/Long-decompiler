@@ -1,0 +1,23 @@
+# conditional compilation flags
+option('terminal', type : 'boolean', value : false, 
+    description : 'Turn on terminal support for console mode')
+option('statistics', type : 'boolean', value : false,
+    description : 'Turn on collection of cover and cast statistics')
+option('rulecompile', type : 'boolean', value : false,
+    description : 'Allow user defined dynamic rules')
+
+# debug compilation flags
+option('cpui_debug', type : 'boolean', value : false,
+    description : 'this is the one controlling switch for all the other debug switches')
+option('opaction_debug', type : 'boolean', value : false,
+    description : 'Turn on all the action tracing facilities')
+option('mergemulti_debug', type : 'boolean', value : false,
+    description : 'Check for MULTIEQUAL and INDIRECT intersections')
+option('blockconsistent_debug', type : 'boolean', value : false,
+    description : 'Check that block graph structure is consistent')
+option('dfsverify_debug', type : 'boolean', value : false,
+    description : 'make sure that block ordering algorithm produces a true dfs of the dominator tree')
+
+# architecture, to allow build for 32-bit from 64-bit linux 
+option('arch', type : 'string', value : 'x86_64',
+    description : 'target architecture, x86_64 or x86 (only usable under linux)')
