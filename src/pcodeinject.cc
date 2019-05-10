@@ -16,6 +16,7 @@
 #include "pcodeinject.hh"
 #include "architecture.hh"
 
+namespace GhidraDec {
 /// \brief Read in an \<input> or \<output> XML tag describing an injection parameter
 ///
 /// \param el is the XML element
@@ -321,4 +322,5 @@ int4 PcodeInjectLibrary::restoreXmlInject(const string &src,const string &nm,int
   getPayload(injectid)->restoreXml(el);
   registerInject(injectid);
   return injectid;
+}
 }

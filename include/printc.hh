@@ -22,6 +22,8 @@
 #include "printlanguage.hh"
 #include "comment.hh"
 
+namespace GhidraDec {
+
 class FuncProto;
 class JumpTable;
 
@@ -286,5 +288,7 @@ public:
   virtual void opCpoolRefOp(const PcodeOp *op);
   virtual void opNewOp(const PcodeOp *op);
 };
+
+}
 
 #endif

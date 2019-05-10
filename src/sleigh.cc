@@ -15,6 +15,7 @@
  */
 #include "sleigh.hh"
 #include "loadimage.hh"
+namespace GhidraDec {
 
 PcodeCacher::PcodeCacher(void)
 
@@ -685,4 +686,5 @@ void Sleigh::allowContextSet(bool val) const
 
 {
   cache->allowSet(val);
+}
 }

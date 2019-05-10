@@ -15,6 +15,7 @@
  */
 #include "subflow.hh"
 
+namespace GhidraDec {
 int4 SubvariableFlow::doesOrSet(PcodeOp *orop,uintb mask)
 
 {  // Return index of constant if OR op sets bits in mask, otherwise -1
@@ -2088,3 +2089,4 @@ void SubfloatFlow::doReplacement(void)
   }
 }
 
+}

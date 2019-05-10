@@ -21,6 +21,8 @@
 #include "comment.hh"
 #include "ghidra_arch.hh"
 
+namespace GhidraDec {
+
 /// \brief An implementation of CommentDatabase backed by a Ghidra client
 ///
 /// Comment information about particular functions is obtained by querying
@@ -39,8 +41,8 @@ public:
     cache.clearType(fad,tp);
   }
   virtual void addComment(uint4 tp,const Address &fad,
-			  const Address &ad,const string &txt);
-  virtual bool addCommentNoDuplicate(uint4 tp,const Address &fad,const Address &ad,const string &txt);
+			  const Address &ad,const std::string &txt);
+  virtual bool addCommentNoDuplicate(uint4 tp,const Address &fad,const Address &ad,const std::string &txt);
   virtual void deleteComment(Comment *com) {
     throw LowlevelError("deleteComment unimplemented"); }
   virtual CommentSet::const_iterator beginComment(const Address &fad) const;
@@ -50,5 +52,7 @@ public:
   virtual void restoreXml(const Element *el,const AddrSpaceManager *trans) {
     throw LowlevelError("commentdb::restoreXml unimplemented"); }
 };
+
+}
 
 #endif

@@ -16,6 +16,7 @@
 #include "callgraph.hh"
 #include "funcdata.hh"
 
+namespace GhidraDec {
 void CallGraphEdge::saveXml(ostream &s) const
 
 {
@@ -469,3 +470,4 @@ void CallGraph::restoreXml(const Element *el)
   }
 }
 
+}

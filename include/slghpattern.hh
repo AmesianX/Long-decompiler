@@ -18,6 +18,8 @@
 
 #include "context.hh"
 
+namespace GhidraDec {
+
 // A mask/value pair viewed as two bitstreams
 class PatternBlock {
   int4 offset;			// Offset to non-zero byte of mask
@@ -167,5 +169,7 @@ public:
   virtual void saveXml(ostream &s) const;
   virtual void restoreXml(const Element *el);
 };
+
+} // GhidraDec
 
 #endif

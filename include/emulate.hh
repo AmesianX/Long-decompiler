@@ -22,6 +22,8 @@
 #include "memstate.hh"
 #include "translate.hh"
 
+namespace GhidraDec {
+
 class Emulate;			// Forward declaration
 
 /// \brief A collection of breakpoints for the emulator
@@ -544,5 +546,7 @@ inline Address EmulatePcodeCache::getExecuteAddress(void) const
     - PcodeOpRaw   and
     - VarnodeData
  */
+
+}
 
 #endif

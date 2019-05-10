@@ -19,6 +19,8 @@
 #include "ruleaction.hh"
 #include "funcdata.hh"
 
+namespace GhidraDec {
+
 class SplitVarnode {
   Varnode *lo;			// Least significant piece of the double precision object
   Varnode *hi;			// Most significant piece of the double precision object
@@ -311,5 +313,7 @@ public:
   virtual int4 applyOp(PcodeOp *op,Funcdata &data);
   static PcodeOp *noWriteConflict(PcodeOp *op1,PcodeOp *op2,AddrSpace *spc);
 };
+
+} // GhidraDec
 
 #endif

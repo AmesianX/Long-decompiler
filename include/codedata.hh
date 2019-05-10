@@ -18,6 +18,8 @@
 
 #include "ifacedecomp.hh"
 
+namespace GhidraDec {
+
 class IfaceCodeDataCapability : public IfaceCapability {
   static IfaceCodeDataCapability ifaceCodeDataCapability;	// Singleton instance
   IfaceCodeDataCapability(void);	// Singleton
@@ -191,5 +193,7 @@ class IfcCodeDataDumpTargetHits : public IfaceCodeDataCommand {
 public:
   virtual void execute(istream &s);
 };
+
+}
 
 #endif

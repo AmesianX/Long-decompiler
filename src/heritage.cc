@@ -17,6 +17,7 @@
 #include "funcdata.hh"
 #include "prefersplit.hh"
 
+namespace GhidraDec {
 /// Update disjoint cover making sure (addr,size) is contained in a single element
 /// and return iterator to this element. Pass back \b intersect value:
 ///   - 0 if the only intersection is with range from the same pass
@@ -1837,4 +1838,5 @@ void Heritage::clear(void)
   clearInfoList();
   maxdepth = -1;
   pass = 0;
+}
 }

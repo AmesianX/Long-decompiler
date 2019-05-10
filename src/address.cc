@@ -16,6 +16,7 @@
 #include "address.hh"
 #include "translate.hh"
 
+namespace GhidraDec {
 ostream &operator<<(ostream &s,const SeqNum &sq)
 
 {
@@ -862,4 +863,6 @@ int4 power2Divide(int4 n,uint8 divisor,uint8 &q,uint8 &r)
     r = fullpower[0];
   }
   return 0;
+}
+
 }

@@ -20,6 +20,8 @@
 
 #include "database.hh"
 
+namespace GhidraDec {
+
 class AddressSorter {
   Address addr;
   Address useaddr;
@@ -151,4 +153,5 @@ public:
   void addRecommendName(const Address &addr,const Address &usepoint,const string &nm,int4 sz);
 };
 
+}
 #endif

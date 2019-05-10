@@ -16,6 +16,7 @@
 #include "opbehavior.hh"
 #include "translate.hh"
 
+namespace GhidraDec {
 /// This routine generates a vector of OpBehavior objects indexed by opcode
 /// \param inst is the vector of behaviors to be filled
 /// \param trans is the translator object needed by the floating point behaviors
@@ -725,3 +726,4 @@ uintb OpBehaviorSubpiece::evaluateBinary(int4 sizeout,int4 sizein,uintb in1,uint
   return res;
 }
 
+}

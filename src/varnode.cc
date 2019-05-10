@@ -16,6 +16,7 @@
 #include "varnode.hh"
 #include "funcdata.hh"
 
+namespace GhidraDec {
 /// Compare by location then by definition.
 /// This is the same as the normal varnode compare, but we distinguish identical frees by their
 /// pointer address.  Thus varsets defined with this comparison act like multisets for free varnodes
@@ -1560,3 +1561,4 @@ Varnode *findContiguousWhole(Funcdata &data,Varnode *vn1,Varnode *vn2)
   return (Varnode *)0;
 }
 
+}

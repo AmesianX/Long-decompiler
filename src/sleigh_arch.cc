@@ -16,6 +16,7 @@
 #include "sleigh_arch.hh"
 #include "inject_sleigh.hh"
 
+namespace GhidraDec {
 Sleigh *SleighArchitecture::last_sleigh = (Sleigh *)0;
 int4 SleighArchitecture::last_languageindex;
 vector<LanguageDescription> SleighArchitecture::description;
@@ -468,4 +469,5 @@ void SleighArchitecture::shutdown(void)
     last_sleigh = (Sleigh *)0;
   }
   // description.clear();  // static vector is destroyed by the normal exit handler
+}
 }

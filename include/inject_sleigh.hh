@@ -19,6 +19,8 @@
 #include "pcodeinject.hh"
 #include "sleigh.hh"
 
+namespace GhidraDec {
+
 class InjectContextSleigh : public InjectContext {
 public:
   PcodeCacher cacher;
@@ -105,4 +107,5 @@ public:
   virtual const vector<OpBehavior *> &getBehaviors(void);
 };
 
+}
 #endif

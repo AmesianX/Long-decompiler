@@ -16,6 +16,7 @@
 #include "userop.hh"
 #include "funcdata.hh"
 
+namespace GhidraDec {
 void InjectedUserOp::restoreXml(const Element *el)
 
 {
@@ -555,4 +556,5 @@ void UserOpManage::manualCallOtherFixup(const string &useropname,const string &o
     delete op;
     throw err;
   }
+}
 }

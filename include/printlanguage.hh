@@ -23,6 +23,9 @@
 #include "cast.hh"
 #include "prettyprint.hh"
 
+
+namespace GhidraDec {
+
 class PrintLanguage;
 
 /// \brief Base class for high-level language capabilities
@@ -541,5 +544,7 @@ public:
   static int4 mostNaturalBase(uintb val); 			///< Determine the most natural base for an integer
   static void formatBinary(ostream &s,uintb val);		///< Print a number in binary form
 };
+
+}
 
 #endif

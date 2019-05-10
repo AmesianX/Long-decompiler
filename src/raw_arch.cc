@@ -15,6 +15,7 @@
  */
 #include "raw_arch.hh"
 
+namespace GhidraDec {
 // Constructing this object registers the capability
 RawBinaryArchitectureCapability RawBinaryArchitectureCapability::rawBinaryArchitectureCapability;
 
@@ -121,4 +122,5 @@ void RawBinaryArchitecture::restoreXml(DocumentStorage &store)
     store.registerTag(*iter);
     SleighArchitecture::restoreXml(store);
   }
+}
 }

@@ -21,6 +21,7 @@
 #include "error.hh"
 #include "opcodes.hh"
 
+namespace GhidraDec {
 class Translate;		// Forward declaration
 
 /// This exception is thrown when emulation evaluation of an operator fails for some reason.
@@ -503,4 +504,5 @@ public:
 };
 
 
+}
 #endif

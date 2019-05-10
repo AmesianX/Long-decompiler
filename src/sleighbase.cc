@@ -15,6 +15,7 @@
  */
 #include "sleighbase.hh"
 
+namespace GhidraDec {
 SleighBase::SleighBase(void)
 
 {
@@ -228,4 +229,5 @@ void SleighBase::restoreXml(const Element *el)
   symtab.restoreXml(*iter,this);
   root = (SubtableSymbol *)symtab.getGlobalScope()->findSymbol("instruction");
   buildXrefs();
+}
 }

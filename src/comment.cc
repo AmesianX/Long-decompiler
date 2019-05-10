@@ -16,6 +16,7 @@
 #include "comment.hh"
 #include "funcdata.hh"
 
+namespace GhidraDec {
 /// \param tp is the set of properties to associate with the comment (or 0 for no properties)
 /// \param fad is the Address of the function containing the comment
 /// \param ad is the Address of the instruction associated with the comment
@@ -394,4 +395,5 @@ void CommentSorter::setupHeader(uint4 headerType)
   start = commmap.lower_bound(subsort);
   subsort.pos = 0xffffffff;
   opstop = commmap.upper_bound(subsort);
+}
 }

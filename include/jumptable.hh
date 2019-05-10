@@ -21,6 +21,8 @@
 #include "emulateutil.hh"
 #include "rangeutil.hh"
 
+namespace GhidraDec {
+
 class EmulateFunction;
 
 struct JumptableThunkError : public LowlevelError { // Thunk that looks like a jumptable
@@ -407,5 +409,7 @@ public:
   void saveXml(ostream &s) const;
   void restoreXml(const Element *el);
 };  
+
+}
 
 #endif

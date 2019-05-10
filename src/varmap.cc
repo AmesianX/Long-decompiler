@@ -16,6 +16,7 @@
 #include "varmap.hh"
 #include "funcdata.hh"
 
+namespace GhidraDec {
 AddressSorter::AddressSorter(const Address &ad,const Address &use,int4 sz) : addr(ad), useaddr(use)
 
 {
@@ -1026,4 +1027,5 @@ void ScopeLocal::addRecommendName(const Address &addr,const Address &usepoint,co
 
 { // Add a recommended name for a local symbol
   name_recommend[ AddressSorter(addr,usepoint,sz) ] = nm;
+}
 }

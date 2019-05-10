@@ -19,6 +19,8 @@
 #include "pcodecompile.hh"
 #include "sleighbase.hh"
 
+namespace GhidraDec {
+
 // Classes for compiling a standalone snippet of pcode, given an existing sleigh language
 
 struct IdentRec {
@@ -93,5 +95,6 @@ public:
   void addOperand(const string &name,int4 index);
 };
 
+}
 
 #endif

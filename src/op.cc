@@ -16,6 +16,7 @@
 #include "op.hh"
 #include "funcdata.hh"
 
+namespace GhidraDec {
 /// Constructor for the \b iop space.
 /// There is only one such space, and it is considered internal
 /// to the model, i.e. the Translate engine should never generate
@@ -1044,4 +1045,5 @@ bool functionalDifference(Varnode *vn1,Varnode *vn2,int4 depth)
     if (functionalDifference(op1->getIn(i),op2->getIn(i),depth))
       return true;
   return false;
+}
 }

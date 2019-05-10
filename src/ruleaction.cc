@@ -18,6 +18,8 @@
 #include "subflow.hh"
 #include "rangeutil.hh"
 
+namespace GhidraDec {
+
 /// \class RuleEarlyRemoval
 /// \brief Get rid of unused PcodeOp objects where we can guarantee the output is unused
 int4 RuleEarlyRemoval::applyOp(PcodeOp *op,Funcdata &data)
@@ -8019,4 +8021,6 @@ int4 RuleThreeWayCompare::applyOp(PcodeOp *op,Funcdata &data)
     return 0;
   }
   return 1;
+}
+
 }

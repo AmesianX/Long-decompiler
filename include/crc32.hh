@@ -21,6 +21,7 @@
 
 #include "types.h"
 
+namespace GhidraDec {
 extern uint4 crc32tab[];	///< Table for quickly computing a 32-bit Cyclic Redundacy Check (CRC)
 
 /// \brief Feed 8 bits into a CRC register
@@ -30,5 +31,6 @@ extern uint4 crc32tab[];	///< Table for quickly computing a 32-bit Cyclic Redund
 /// \return the new value of the register
 inline uint4 crc_update(uint4 reg,uint4 val) {
   return crc32tab[(reg ^ val)&0xff] ^ (reg>>8); }
+}
 
 #endif

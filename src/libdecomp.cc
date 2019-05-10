@@ -15,6 +15,7 @@
  */
 #include "libdecomp.hh"
 
+namespace GhidraDec {
 void startDecompilerLibrary(const char *sleighhome)
 
 {
@@ -53,3 +54,4 @@ void shutdownDecompilerLibrary(void)
 {
 }
 
+}

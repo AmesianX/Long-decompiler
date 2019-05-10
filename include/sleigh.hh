@@ -18,6 +18,7 @@
 
 #include "sleighbase.hh"
 
+namespace GhidraDec {
 class LoadImage;
 
 struct RelativeRecord {
@@ -467,4 +468,5 @@ public:
 
   
  */
+}
 #endif

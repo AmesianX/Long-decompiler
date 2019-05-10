@@ -17,6 +17,7 @@
 #include "op.hh"
 #include "database.hh"
 
+namespace GhidraDec {
 /// The new instance starts off with no associate Symbol and all properties marked as \e dirty.
 /// \param vn is the single Varnode member
 HighVariable::HighVariable(Varnode *vn)
@@ -368,3 +369,4 @@ int4 HighVariable::instanceIndex(const Varnode *vn) const
 //   }
 //   return vn;
 // }
+}

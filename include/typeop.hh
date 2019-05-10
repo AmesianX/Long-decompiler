@@ -24,6 +24,9 @@
 #include "opbehavior.hh"
 #include "printlanguage.hh"
 
+
+namespace GhidraDec {
+
 class PcodeOp;
 class Translate;
 
@@ -777,4 +780,6 @@ public:
   virtual void push(PrintLanguage *lng,const PcodeOp *op) const { lng->opNewOp(op); }
   virtual void printRaw(ostream &s,const PcodeOp *op);
 };
+
+}
 #endif

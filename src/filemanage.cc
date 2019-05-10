@@ -29,6 +29,7 @@ extern "C" {
 }
 #endif
 
+namespace GhidraDec {
 // Path name separator
 #ifdef _WINDOWS
 char FileManage::separator = '\\';
@@ -380,4 +381,6 @@ string FileManage::discoverGhidraRoot(const char *argv0)
       return root;
   }
   return "";
+}
+
 }

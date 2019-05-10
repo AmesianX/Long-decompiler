@@ -18,6 +18,7 @@
 #include "sleigh_arch.hh"
 #include "loadimage.hh"
 
+namespace GhidraDec {
 /// \brief Extension point for building an Architecture that reads in raw images
 class RawBinaryArchitectureCapability : public ArchitectureCapability {
   static RawBinaryArchitectureCapability rawBinaryArchitectureCapability;	///< The singleton instance
@@ -43,4 +44,5 @@ public:
   RawBinaryArchitecture(const string &fname,const string &targ,ostream *estream);	///< Constructor
   virtual ~RawBinaryArchitecture(void) {}
 };
+}
 

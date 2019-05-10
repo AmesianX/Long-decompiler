@@ -21,6 +21,8 @@
 
 #include "emulateutil.hh"
 
+namespace GhidraDec {
+
 class Architecture;
 
 /// \brief An input or output parameter to a p-code injection payload
@@ -245,5 +247,7 @@ public:
   /// \return the array of OpBehavior objects indexed by op-code
   virtual const vector<OpBehavior *> &getBehaviors(void)=0;
 };
+
+} // GhidraDec
 
 #endif

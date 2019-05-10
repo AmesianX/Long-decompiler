@@ -22,6 +22,7 @@
 #include "emulate.hh"
 #include <iostream>
 
+namespace GhidraDec {
 // These are the bytes for an example x86 binary
 // These bytes are loaded at address 0x80483b4
 static uint1 myprog[] = {
@@ -390,3 +391,4 @@ int main(int argc,char **argv)
 -a- GNU's Binary File Descriptor library (libbfd) is available in the files
 -a- "loadimage_bfd.hh" and "loadimage_bfd.cc"
  */
+}

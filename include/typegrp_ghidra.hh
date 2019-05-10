@@ -22,6 +22,8 @@
 #include "type.hh"
 #include "ghidra_arch.hh"
 
+namespace GhidraDec {
+
 /// \brief An implementation of the TypeFactory interface, query a Ghidra client for data-type information
 ///
 /// Requests for a specific data-type name and id are marshaled to the Ghidra client,
@@ -34,5 +36,7 @@ public:
   TypeFactoryGhidra(ArchitectureGhidra *g) : TypeFactory(g) {}	///< Constructor
   virtual ~TypeFactoryGhidra(void) {}
 };
+
+}
 
 #endif

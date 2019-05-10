@@ -16,6 +16,7 @@
 #include "loadimage_xml.hh"
 #include "translate.hh"
 
+namespace GhidraDec {
 /// \param f is the (path to the) underlying XML file
 /// \param el is the parsed form of the file
 LoadImageXml::LoadImageXml(const string &f,const Element *el) : LoadImage(f)
@@ -282,4 +283,5 @@ void LoadImageXml::adjustVma(long adjust)
     newsymbol[newaddr] = (*iter2).second;
   }
   addrtosymbol = newsymbol;
+}
 }

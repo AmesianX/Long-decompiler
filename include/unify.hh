@@ -19,6 +19,7 @@
 
 #include "funcdata.hh"
 
+namespace GhidraDec {
 class UnifyCPrinter;
 
 class UnifyDatatype {
@@ -706,4 +707,5 @@ public:
 // vlo1 -> oloadd(+) <- vtmp( != vlo1)( == vlo2);
 // oloadd -> vreslo;
 
+}
 #endif

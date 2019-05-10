@@ -16,6 +16,8 @@
  */
 #include "typegrp_ghidra.hh"
 
+namespace GhidraDec {
+
 Datatype *TypeFactoryGhidra::findById(const string &n,uint8 id)
 
 {
@@ -33,4 +35,5 @@ Datatype *TypeFactoryGhidra::findById(const string &n,uint8 id)
   ct = restoreXmlType(doc->getRoot()); // Parse ghidra's type
   delete doc;
   return ct;
+}
 }

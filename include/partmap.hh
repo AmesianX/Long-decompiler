@@ -21,6 +21,8 @@
 
 #include <map>
 
+namespace GhidraDec {
+
 /// \brief A map from a linear space to value objects
 ///
 /// The partmap is a template class taking:
@@ -194,7 +196,6 @@ template<typename _linetype,typename _valuetype>
     after = (*enditer).first;
     return defaultvalue;
   }
-#endif
 
 #if 0
 
@@ -225,5 +226,10 @@ int main(int argc,char **argv)
     ++iter;
   }
 }
+
 #endif
 
+} // namespace GhidraDec
+
+
+#endif

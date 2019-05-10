@@ -23,7 +23,13 @@
 #include <cmath>
 #endif
 
-vector<ArchitectureCapability *> ArchitectureCapability::thelist;
+#include <string>
+#include <map>
+#include <vector>
+
+namespace GhidraDec {
+
+std::vector<ArchitectureCapability *> ArchitectureCapability::thelist;
 
 const uint4 ArchitectureCapability::majorversion = 3;
 const uint4 ArchitectureCapability::minorversion = 4;
@@ -38,7 +44,7 @@ void ArchitectureCapability::initialize(void)
 /// Given a specific file, find an ArchitectureCapability that can handle it.
 /// \param filename is the path to the file
 /// \return an ArchitectureCapability that can handle it or NULL
-ArchitectureCapability *ArchitectureCapability::findCapability(const string &filename)
+ArchitectureCapability *ArchitectureCapability::findCapability(const std::string &filename)
 
 {
   for(uint4 i=0;i<thelist.size();++i) {
@@ -117,7 +123,7 @@ Architecture::Architecture(void)
   stats = new Statistics();
 #endif
 #ifdef OPACTION_DEBUG
-  debugstream = (ostream *)0;
+  debugstream = (std::ostream *)0;
 #endif
 }
 
@@ -125,7 +131,7 @@ Architecture::Architecture(void)
 Architecture::~Architecture(void)
 
 {				// Delete anything that was allocated
-  vector<TypeOp *>::iterator iter;
+  std::vector<TypeOp *>::iterator iter;
   TypeOp *t_op;
 
   for(iter=inst.begin();iter!=inst.end();++iter) {
@@ -144,7 +150,7 @@ Architecture::~Architecture(void)
   delete stats;
 #endif
 
-  map<string,ProtoModel *>::const_iterator piter;
+  std::map<std::string,ProtoModel *>::const_iterator piter;
   for(piter=protoModels.begin();piter!=protoModels.end();++piter)
     delete (*piter).second;
 
@@ -169,10 +175,10 @@ Architecture::~Architecture(void)
 /// The model must exist or an exception is thrown.
 /// \param nm is the name
 /// \return the matching model
-ProtoModel *Architecture::getModel(const string &nm) const
+ProtoModel *Architecture::getModel(const std::string &nm) const
 
 {
-  map<string,ProtoModel *>::const_iterator iter;
+  std::map<std::string,ProtoModel *>::const_iterator iter;
 
   iter = protoModels.find(nm);
   if (iter==protoModels.end())
@@ -182,10 +188,10 @@ ProtoModel *Architecture::getModel(const string &nm) const
 
 /// \param nm is the name of the model
 /// \return \b true if this Architecture supports a model with that name
-bool Architecture::hasModel(const string &nm) const
+bool Architecture::hasModel(const std::string &nm) const
 
 { // Does this architecture have a prototype model of this name
-  map<string,ProtoModel *>::const_iterator iter;
+  std::map<std::string,ProtoModel *>::const_iterator iter;
 
   iter = protoModels.find(nm);
   return (iter != protoModels.end());
@@ -222,7 +228,7 @@ AddrSpace *Architecture::getSpaceBySpacebase(const Address &loc,int4 size) const
 /// The default model is used whenever an explicit model is not known
 /// or can't be determined.
 /// \param nm is the name of the model to set
-void Architecture::setDefaultModel(const string &nm)
+void Architecture::setDefaultModel(const std::string &nm)
 
 {
   defaultfp = getModel(nm);
@@ -258,7 +264,7 @@ void Architecture::readLoaderSymbols(void)
 /// For all registered p-code opcodes, return the corresponding OpBehavior object.
 /// The object pointers are provided in a list indexed by OpCode.
 /// \param behave is the list to be populated
-void Architecture::collectBehaviors(vector<OpBehavior *> &behave) const
+void Architecture::collectBehaviors(std::vector<OpBehavior *> &behave) const
 
 {
   behave.resize(inst.size(), (OpBehavior *)0);
@@ -303,7 +309,7 @@ void Architecture::setPrototype(const PrototypePieces &pieces)
 /// In addition to selecting the main PrintLanguage object, this triggers
 /// configuration of the cast strategy and p-code op behaviors.
 /// \param nm is the name of the language
-void Architecture::setPrintLanguage(const string &nm)
+void Architecture::setPrintLanguage(const std::string &nm)
 
 {
   for(int4 i=0;i<(int4)printlist.size();++i) {
@@ -317,7 +323,7 @@ void Architecture::setPrintLanguage(const string &nm)
   if (capa == (PrintLanguageCapability *)0)
     throw LowlevelError("Unknown print language: "+nm);
   bool printxml = print->emitsXml(); // Copy settings for current print language
-  ostream *t = print->getOutputStream();
+  std::ostream *t = print->getOutputStream();
   print = capa->buildLanguage(this);
   print->setOutputStream(t);	// Restore settings from previous language
   print->getCastStrategy()->setTypeFactory(types);
@@ -365,7 +371,7 @@ void Architecture::restoreFlowOverride(const Element *el)
 
 /// Write the current state of all types, symbols, functions, etc. an XML stream
 /// \param s is the output stream
-void Architecture::saveXml(ostream &s) const
+void Architecture::saveXml(std::ostream &s) const
 
 {
   s << "<save_state";
@@ -424,7 +430,7 @@ void Architecture::restoreXml(DocumentStorage &store)
 /// a function name based on its address
 /// \param addr is the address of the function
 /// \param name will hold the constructed name
-void Architecture::nameFunction(const Address &addr,string &name) const
+void Architecture::nameFunction(const Address &addr,std::string &name) const
 
 {
   ostringstream defname;
@@ -442,7 +448,7 @@ void Architecture::nameFunction(const Address &addr,string &name) const
 /// \param truncSize is the (possibly truncated) size of the register that fits the space
 /// \param isreversejustified is \b true if small variables are justified opposite of endianness
 /// \param stackGrowth is \b true if a stack implemented in this space grows in the negative direction
-void Architecture::addSpacebase(AddrSpace *basespace,const string &nm,const VarnodeData &ptrdata,
+void Architecture::addSpacebase(AddrSpace *basespace,const std::string &nm,const VarnodeData &ptrdata,
 				int4 truncSize,bool isreversejustified,bool stackGrowth)
 
 {
@@ -609,7 +615,7 @@ void Architecture::initializeSegments(void)
 void Architecture::parseDynamicRule(const Element *el)
 
 {
-  string rulename,groupname,enabled;
+  std::string rulename,groupname,enabled;
   for(int4 i=0;i<el->getNumAttributes();++i) {
     if (el->getAttributeName(i) == "name")
       rulename = el->getAttributeValue(i);
@@ -804,7 +810,7 @@ void Architecture::parseStackPointer(const Element *el)
   bool isreversejustify = false;
   int4 numattr = el->getNumAttributes();
   for(int4 i=0;i<numattr;++i) {
-    const string &attr( el->getAttributeName(i) );
+    const std::string &attr( el->getAttributeName(i) );
     if (attr == "reversejustify")
       isreversejustify = xml_readbool(el->getAttributeValue(i));
     else if (attr == "growth")
@@ -870,7 +876,7 @@ void Architecture::parseFuncPtrAlign(const Element *el)
 void Architecture::parseSpacebase(const Element *el)
 
 {
-  const string &namestring(el->getAttributeValue("name"));
+  const std::string &namestring(el->getAttributeValue("name"));
   const VarnodeData &point(translate->getRegister(el->getAttributeValue("register")));
   AddrSpace *basespace = getSpaceByName(el->getAttributeValue("space"));
   if (basespace == (AddrSpace *)0)
@@ -900,7 +906,7 @@ void Architecture::parseNoHighPtr(const Element *el)
 void Architecture::parsePreferSplit(const Element *el)
 
 {
-  string style = el->getAttributeValue("style");
+  std::string style = el->getAttributeValue("style");
   if (style != "inhalf")
     throw LowlevelError("Unknown prefersplit style: "+style);
   const List &list(el->getChildren());
@@ -922,7 +928,7 @@ void Architecture::parseAggressiveTrim(const Element *el)
 {
   int4 sz = el->getNumAttributes();
   for(int4 i=0;i<sz;++i) {
-    const string &nm( el->getAttributeName(i) );
+    const std::string &nm( el->getAttributeName(i) );
     if (nm == "signext") {
       aggressive_ext_trim = xml_readbool(el->getAttributeValue(i));
     }
@@ -976,7 +982,7 @@ void Architecture::parseProcessorConfig(DocumentStorage &store)
 void Architecture::parseCompilerConfig(DocumentStorage &store)
 
 {
-  vector<const Element *> globaltags;
+  std::vector<const Element *> globaltags;
   const Element *el = store.getTag("compiler_spec");
   if (el == (const Element *)0)
     throw LowlevelError("No compiler configuration tag found");
@@ -984,7 +990,7 @@ void Architecture::parseCompilerConfig(DocumentStorage &store)
   List::const_iterator iter;
 
   for(iter=list.begin();iter!=list.end();++iter) {
-    const string &elname( (*iter)->getName() );
+    const std::string &elname( (*iter)->getName() );
     if (elname == "default_proto")
       parseDefaultProto(*iter);
     else if (elname == "prototype")
@@ -1044,7 +1050,7 @@ void Architecture::parseCompilerConfig(DocumentStorage &store)
       throw LowlevelError("No default prototype specified");
   }
   // We must have a __thiscall calling convention
-  map<string,ProtoModel *>::iterator miter = protoModels.find("__thiscall");
+  std::map<std::string,ProtoModel *>::iterator miter = protoModels.find("__thiscall");
   if (miter == protoModels.end()) { // If __thiscall doesn't exist we clone it off of the default
     ProtoModel *thismodel = new ProtoModel("__thiscall",*defaultfp);
     protoModels["__thiscall"] = thismodel;
@@ -1123,7 +1129,7 @@ Address SegmentedResolver::resolve(uintb val,int4 sz,const Address &point)
   // (as with near pointers)
     if (segop->getResolve().space != (AddrSpace *)0) {
       uintb base = glb->context->getTrackedValue(segop->getResolve(),point);
-      vector<uintb> seginput;
+      std::vector<uintb> seginput;
       seginput.push_back(val);
       seginput.push_back(base);
       val = segop->execute(seginput);
@@ -1134,7 +1140,7 @@ Address SegmentedResolver::resolve(uintb val,int4 sz,const Address &point)
     int4 outersz = segop->getBaseSize();
     uintb base = (val >> 8*innersz) & calc_mask(outersz);
     val = val & calc_mask(innersz);
-    vector<uintb> seginput;
+    std::vector<uintb> seginput;
     seginput.push_back(val);
     seginput.push_back(base);
     val = segop->execute(seginput);
@@ -1208,7 +1214,7 @@ void Statistics::process(const Funcdata &data)
 
 /// Complete calculations on running sums then print them to a stream
 /// \param s is the output stream
-void Statistics::printResults(ostream &s)
+void Statistics::printResults(std::ostream &s)
 
 {
   s << "Number of functions: " << dec << numfunc << endl;
@@ -1233,3 +1239,4 @@ void Statistics::printResults(ostream &s)
 }
 
 #endif
+}

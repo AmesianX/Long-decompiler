@@ -15,6 +15,7 @@
  */
 #include "paramid.hh"
 
+namespace GhidraDec {
 // NOTES FROM 20121206 W/Decompiler-Man
 // direct reads is for all opcodes, with special for these:
 // BRANCH is direct read on input0.  No direct write.
@@ -276,4 +277,5 @@ void ParamIDAnalysis::savePretty( ostream &s,bool moredetail ) const
     pm.savePretty( s, moredetail );
   }
   s << "\n";
+}
 }

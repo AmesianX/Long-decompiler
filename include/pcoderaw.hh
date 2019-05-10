@@ -21,6 +21,8 @@
 #include "address.hh"
 #include "opbehavior.hh"
 
+namespace GhidraDec {
+
 /// \brief Data defining a specific memory location
 ///
 /// Within the decompiler's model of a processor, any register,
@@ -215,6 +217,8 @@ inline VarnodeData *PcodeOpRaw::getInput(int4 i) const
 
 {
   return in[i];
+}
+
 }
 
 #endif

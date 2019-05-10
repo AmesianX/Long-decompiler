@@ -21,6 +21,8 @@
 #include "sleigh_arch.hh"
 #include "loadimage_bfd.hh"
 
+namespace GhidraDec {
+
 /// \brief Extension point for building a GNU BFD capable Architecture
 class BfdArchitectureCapability : public ArchitectureCapability {
   static BfdArchitectureCapability bfdArchitectureCapability;		///< The singleton instance
@@ -46,3 +48,5 @@ public:
   BfdArchitecture(const string &fname,const string &targ,ostream *estream);	///< Constructor
   virtual ~BfdArchitecture(void) {}
 };
+
+} // GhidraDec

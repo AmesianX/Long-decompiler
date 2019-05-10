@@ -20,6 +20,8 @@
 
 #include "op.hh"
 
+namespace GhidraDec {
+
 /// \brief A class for manipulating integer value ranges.
 ///
 /// The idea is to have a representation of common sets of
@@ -111,4 +113,5 @@ inline char CircleRange::encodeRangeOverlaps(uintb op1left, uintb op1right, uint
   return arrange[val];
 }
 
+}
 #endif

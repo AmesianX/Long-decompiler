@@ -15,6 +15,7 @@
  */
 #include "emulate.hh"
 
+namespace GhidraDec {
 /// Any time the emulator is about to execute a user-defined pcode op with the given name,
 /// the indicated breakpoint is invoked first. The break table does \e not assume responsibility
 /// for freeing the breakpoint object.
@@ -453,4 +454,7 @@ void EmulatePcodeCache::executeInstruction(void)
   do {
     executeCurrentOp();
   } while(!instruction_start);
+
+}
+
 }

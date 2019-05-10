@@ -22,6 +22,10 @@
 #include "pcoderaw.hh"
 #include "partmap.hh"
 
+#include <vector>
+#include <iostream>
+
+namespace GhidraDec {
 /// \brief Description of a context variable within the disassembly context \e blob
 ///
 /// Disassembly context is stored as individual (integer) values packed into a sequence of words. This class
@@ -69,9 +73,9 @@ struct TrackedContext {
   VarnodeData loc;	///< Storage details of the register being tracked
   uintb val;		///< The value of the register
   void restoreXml(const Element *el,const AddrSpaceManager *manage);	///< Restore \b this from an XML stream
-  void saveXml(ostream &s) const;					///< Save \b this to an XML stream
+  void saveXml(std::ostream &s) const;					///< Save \b this to an XML stream
 };
-typedef vector<TrackedContext> TrackedSet;		///< A set of tracked registers and their values (at one code point)
+typedef std::vector<TrackedContext> TrackedSet;		///< A set of tracked registers and their values (at one code point)
 
 /// \brief An interface to a database of disassembly/decompiler \b context information
 ///
@@ -107,7 +111,7 @@ typedef vector<TrackedContext> TrackedSet;		///< A set of tracked registers and 
 /// a list of TrackedContext objects.
 class ContextDatabase {
 protected:
-  static void saveTracked(ostream &s,const Address &addr,const TrackedSet &vec);
+  static void saveTracked(std::ostream &s,const Address &addr,const TrackedSet &vec);
   static void restoreTracked(const Element *el,const AddrSpaceManager *manage,TrackedSet &vec);
 
   /// \brief Retrieve the context variable description object by name
@@ -136,7 +140,7 @@ protected:
   /// \param addr2 is (1 past) the last address of the range or is invalid
   /// \param num is the word index for the context value that will be set
   /// \param mask is a mask of the value being set (within its word)
-  virtual void getRegionForSet(vector<uintm *> &res,const Address &addr1,
+  virtual void getRegionForSet(std::vector<uintm *> &res,const Address &addr1,
 			       const Address &addr2,int4 num,uintm mask)=0;
 
   /// \brief Grab the context blob(s) starting at the given address up to the first point of change
@@ -148,7 +152,7 @@ protected:
   /// \param addr is the starting address of the regions to fetch
   /// \param num is the word index for the specific context value being set
   /// \param mask is a mask of the context value being set (within its word)
-  virtual void getRegionToChangePoint(vector<uintm *> &res,const Address &addr,int4 num,uintm mask)=0;
+  virtual void getRegionToChangePoint(std::vector<uintm *> &res,const Address &addr,int4 num,uintm mask)=0;
 
   /// \brief Retrieve the memory region holding all default context values
   ///
@@ -221,7 +225,7 @@ public:
   /// \brief Serialize the entire database to an XML stream
   ///
   /// \param s is the output stream
-  virtual void saveXml(ostream &s) const=0;
+  virtual void saveXml(std::ostream &s) const=0;
 
   /// \brief Restore the state of \b this database object from a serialized XML stream
   ///
@@ -274,13 +278,13 @@ class ContextInternal : public ContextDatabase {
   map<string,ContextBitRange> variables;		///< Map from context variable name to description object
   partmap<Address,FreeArray> database;			///< Partition map of context blobs (FreeArray)
   partmap<Address,TrackedSet> trackbase;		///< Partition map of tracked register sets
-  void saveContext(ostream &s,const Address &addr,const uintm *vec) const;
+  void saveContext(std::ostream &s,const Address &addr,const uintm *vec) const;
   void restoreContext(const Element *el,const Address &addr1,const Address &addr2);
   virtual ContextBitRange &getVariable(const string &nm);
   virtual const ContextBitRange &getVariable(const string &nm) const;
-  virtual void getRegionForSet(vector<uintm *> &res,const Address &addr1,
+  virtual void getRegionForSet(std::vector<uintm *> &res,const Address &addr1,
 			       const Address &addr2,int4 num,uintm mask);
-  virtual void getRegionToChangePoint(vector<uintm *> &res,const Address &addr,int4 num,uintm mask);
+  virtual void getRegionToChangePoint(std::vector<uintm *> &res,const Address &addr,int4 num,uintm mask);
   virtual uintm *getDefaultValue(void) { return database.defaultValue().array; }
   virtual const uintm *getDefaultValue(void) const { return database.defaultValue().array; }
 public:
@@ -296,7 +300,7 @@ public:
   virtual const TrackedSet &getTrackedSet(const Address &addr) const { return trackbase.getValue(addr); }
   virtual TrackedSet &createSet(const Address &addr1,const Address &addr2);
 
-  virtual void saveXml(ostream &s) const;
+  virtual void saveXml(std::ostream &s) const;
   virtual void restoreXml(const Element *el,const AddrSpaceManager *manage);
   virtual void restoreFromSpec(const Element *el,const AddrSpaceManager *manage);
 };
@@ -322,4 +326,5 @@ public:
   void setContext(const Address &addr1,const Address &addr2,int4 num,uintm mask,uintm value);
 };
 
+}
 #endif

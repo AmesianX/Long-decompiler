@@ -21,6 +21,8 @@
 
 #include "op.hh"
 
+namespace GhidraDec {
+
 class JoinRecord;
 
 /// \brief Exception thrown when a prototype can't be modeled properly
@@ -1454,4 +1456,5 @@ inline bool EffectRecord::operator!=(const EffectRecord &op2) const
   return (type != op2.type);
 }
 
+}
 #endif

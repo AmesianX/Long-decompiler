@@ -22,6 +22,7 @@
 #include "translate.hh"
 #include "ghidra_arch.hh"
 
+namespace GhidraDec {
 /// \brief An implementation of Translate that queries a Ghidra client for p-code information
 ///
 /// This class provides:
@@ -55,4 +56,5 @@ public:
     throw LowlevelError("Cannot dump assembly through this interface"); }
 };
 
+}
 #endif

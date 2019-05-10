@@ -16,6 +16,7 @@
 #include "architecture.hh"
 #include "emulateutil.hh"
 
+namespace GhidraDec {
 /// \param g is the Architecture providing the LoadImage
 EmulatePcodeOp::EmulatePcodeOp(Architecture *g)
 
@@ -390,4 +391,5 @@ uintb EmulateSnippet::getTempValue(uintb offset) const
   if (iter == tempValues.end())
     return 0;
   return (*iter).second;
+}
 }

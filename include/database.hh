@@ -27,6 +27,7 @@
 #include "partmap.hh"
 #include "rangemap.hh"
 
+namespace GhidraDec {
 class Architecture;
 class Funcdata;
 class Scope;
@@ -842,5 +843,6 @@ public:
   void restoreXml(const Element *el);				///< Recover the whole database from XML
   void restoreXmlScope(const Element *el,Scope *new_scope);	///< Register and fill out a single Scope from XML
 };
+}
 
 #endif

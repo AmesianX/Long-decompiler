@@ -16,6 +16,7 @@
 #include "funcdata.hh"
 #include "flow.hh"
 
+namespace GhidraDec {
 // Funcdata members pertaining directly to blocks
 
 /// A description of each block in the current structure hierarchy is
@@ -995,4 +996,5 @@ void Funcdata::spliceBlockBasic(BlockBasic *bl)
   bl->mergeRange(outbl);	// Update the address cover
   bblocks.spliceBlock(bl);
   structureReset();
+}
 }

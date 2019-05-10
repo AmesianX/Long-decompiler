@@ -21,6 +21,7 @@
 
 #include "varnode.hh"
 
+namespace GhidraDec {
 class Symbol;
 
 /// \brief A high-level variable modeled as a list of low-level variables, each written once
@@ -125,4 +126,5 @@ public:
   static bool compareJustLoc(const Varnode *a,const Varnode *b);	///< Compare based on storage location
 };
 
+}
 #endif

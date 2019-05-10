@@ -21,6 +21,8 @@
 
 #include "type.hh"
 
+namespace GhidraDec {
+
 class Varnode;
 class PcodeOp;
 class FlowBlock;
@@ -770,5 +772,7 @@ public:
   virtual bool emitsXml(void) const { return lowlevel->emitsXml(); }
   void setXML(bool val);	///< Toggle whether the low-level emitter emits XML markup or not
 };
+
+}
 
 #endif

@@ -15,6 +15,7 @@
  */
 #include "interface.hh"
 
+namespace GhidraDec {
 vector<IfaceCapability *> IfaceCapability::thelist;
 
 void IfaceCapability::initialize(void)
@@ -444,4 +445,5 @@ void IfcEcho::execute(istream &s)
   while(s.get(c))
     status->fileoptr->put(c);
   *status->fileoptr << endl;
+}
 }

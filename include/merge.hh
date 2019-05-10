@@ -21,6 +21,8 @@
 
 #include "op.hh"
 
+namespace GhidraDec {
+
 /// \brief A record for caching a Cover intersection test between two HighVariable objects
 ///
 /// This is just a pair of HighVariable objects that can be used as a map key. The main
@@ -153,4 +155,5 @@ inline bool Merge::compareHighByBlock(const HighVariable *a,const HighVariable *
   return (result < 0);
 }
 
+}
 #endif

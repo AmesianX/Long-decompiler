@@ -15,6 +15,7 @@
  */
 #include "cpool_ghidra.hh"
 
+namespace GhidraDec {
 ConstantPoolGhidra::ConstantPoolGhidra(ArchitectureGhidra *g)
 
 {
@@ -63,4 +64,5 @@ void ConstantPoolGhidra::restoreXml(const Element *el,TypeFactory &typegrp)
 
 {
   throw LowlevelError("Cannot access constant pool with this method");
+}
 }

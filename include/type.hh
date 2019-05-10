@@ -21,6 +21,8 @@
 
 #include "address.hh"
 
+namespace GhidraDec {
+
 /// Print a hex dump of a data buffer to stream
 extern void print_data(ostream &s,uint1 *buffer,int4 size,const Address &baseaddr);
 //extern void print_char(ostream &s,int4 onechar);
@@ -445,5 +447,7 @@ public:
   void setCoreType(const string &name,int4 size,type_metatype meta,bool chartp);	///< Create a core data-type
   void cacheCoreTypes(void);				///< Cache common types
 };
+
+}
 
 #endif

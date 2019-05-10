@@ -21,6 +21,8 @@
 
 #include "jumptable.hh"
 
+namespace GhidraDec {
+
 class BlockBasic;		// Forward declarations
 class BlockList;
 class BlockCopy;
@@ -785,6 +787,8 @@ inline bool BlockSwitch::CaseOrder::compare(const CaseOrder &a,const CaseOrder &
   if (a.label != b.label)
     return (a.label < b.label);
   return (a.depth < b.depth);
+}
+
 }
 
 #endif

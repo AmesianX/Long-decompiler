@@ -27,6 +27,8 @@
 #include "rulecompile.hh"
 #endif
 
+namespace GhidraDec {
+
 class IfaceDecompCapability : public IfaceCapability {
   static IfaceDecompCapability ifaceDecompCapability;		// Singleton instance
   IfaceDecompCapability(void);	// Singleton
@@ -590,5 +592,7 @@ public:
 };
 
 #endif
+
+} // GhidraDec
 
 #endif

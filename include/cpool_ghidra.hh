@@ -21,6 +21,7 @@
 
 #include "ghidra_arch.hh"
 
+namespace GhidraDec {
 /// \brief An implementation of ConstantPool using a Ghidra client as the backing storage
 ///
 /// The actual CPoolRecord objects are cached locally, but new queries are placed
@@ -41,4 +42,5 @@ public:
   virtual void restoreXml(const Element *el,TypeFactory &typegrp);
 };
 
+}
 #endif

@@ -15,6 +15,7 @@
  */
 #include "slghpattern.hh"
 
+namespace GhidraDec {
 uintm DisjointPattern::getMask(int4 startbit,int4 size,bool context) const
 
 {
@@ -1013,4 +1014,5 @@ void OrPattern::restoreXml(const Element *el)
     orlist.push_back(pat);
     ++iter;
   }
+}
 }

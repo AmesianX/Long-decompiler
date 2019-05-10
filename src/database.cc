@@ -17,6 +17,7 @@
 #include "funcdata.hh"
 #include <ctype.h>
 
+namespace GhidraDec {
 /// This SymbolEntry is unintegrated. An address or hash must be provided
 /// either directly or via restoreXml().
 /// \param sym is the Symbol \b this will be a map for
@@ -2873,4 +2874,5 @@ void Database::restoreXmlScope(const Element *el,Scope *new_scope)
     throw LowlevelError("Bad parent scope");
   attachScope(new_scope,par_scope);
   new_scope->restoreXml(el);
+}
 }

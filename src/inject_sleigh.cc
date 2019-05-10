@@ -17,6 +17,7 @@
 #include "pcodeparse.hh"
 #include "architecture.hh"
 
+namespace GhidraDec {
 InjectContextSleigh::~InjectContextSleigh(void)
 
 {
@@ -439,4 +440,5 @@ int4 PcodeInjectLibrarySleigh::manualCallOtherFixup(const string &name,const str
   payload->parsestring = snippet;
   registerInject(injectid);
   return injectid;
+}
 }

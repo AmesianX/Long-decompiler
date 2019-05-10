@@ -32,6 +32,8 @@
 #include "options.hh"
 #include "prefersplit.hh"
 
+namespace GhidraDec {
+
 #ifdef CPUI_STATISTICS
 /// \brief Class for collecting statistics while processing over multiple functions
 ///
@@ -298,5 +300,7 @@ inline bool Architecture::highPtrPossible(const Address &loc,int4 size) const {
   if (loc.getSpace()->getType() == IPTR_INTERNAL) return false;
   return !nohighptr.inRange(loc,size);
 }
+
+} // GhidraDec
 
 #endif

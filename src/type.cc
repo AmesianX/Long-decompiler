@@ -16,6 +16,8 @@
 #include "type.hh"
 #include "funcdata.hh"
 
+namespace GhidraDec {
+
 // Some default routines for displaying data
 
 /// Display an array of bytes as a hex dump at a given address.
@@ -24,7 +26,7 @@
 /// \param buffer is a pointer to the bytes
 /// \param size is the number of bytes
 /// \param baseaddr is the address of the first byte in the buffer
-void print_data(ostream &s,uint1 *buffer,int4 size,const Address &baseaddr)
+void print_data(std::ostream &s,uint1 *buffer,int4 size,const Address &baseaddr)
 
 {
   int4 i;
@@ -66,7 +68,7 @@ void print_data(ostream &s,uint1 *buffer,int4 size,const Address &baseaddr)
 /// Print a raw description of the type to stream. Intended for debugging.
 /// Not intended to produce parsable C.
 /// \param s is the output stream
-void Datatype::printRaw(ostream &s) const
+void Datatype::printRaw(std::ostream &s) const
 
 {
   if (name.size()>0)
@@ -225,7 +227,7 @@ type_metatype string2metatype(const string &metastring)
 /// For composite data-types, the description goes down one level, describing
 /// the component types only by reference.
 /// \param s is the stream to write to
-void Datatype::saveXml(ostream &s) const
+void Datatype::saveXml(std::ostream &s) const
 
 {
   s << "<type";
@@ -236,7 +238,7 @@ void Datatype::saveXml(ostream &s) const
 /// Write out basic data-type properties (name,size,id) as XML attributes.
 /// This routine presumes the initial tag is already written to the stream.
 /// \param s is the stream to write to
-void Datatype::saveXmlBasic(ostream &s) const
+void Datatype::saveXmlBasic(std::ostream &s) const
 
 {
   a_v(s,"name",name);
@@ -254,7 +256,7 @@ void Datatype::saveXmlBasic(ostream &s) const
 /// Write a simple reference to \b this data-type as an XML \<typeref> tag,
 /// which only encodes the name and id.
 /// \param s is the stream to write to
-void Datatype::saveXmlRef(ostream &s) const
+void Datatype::saveXmlRef(std::ostream &s) const
 
 {				// Save just a name reference if possible
   if ((id!=0)&&(metatype != TYPE_VOID)) {
@@ -326,7 +328,7 @@ uint8 Datatype::hashName(const string &nm)
   return res;
 }
 
-void TypeChar::saveXml(ostream &s) const
+void TypeChar::saveXml(std::ostream &s) const
 
 {
   s << "<type";
@@ -362,7 +364,7 @@ TypeUnicode::TypeUnicode(const string &nm,int4 sz,type_metatype m)
   setflags();			// Set special unicode UTF flags
 }
 
-void TypeUnicode::saveXml(ostream &s) const
+void TypeUnicode::saveXml(std::ostream &s) const
 
 {
   s << "<type";
@@ -371,13 +373,13 @@ void TypeUnicode::saveXml(ostream &s) const
   s << "/>";
 }
 
-void TypeVoid::saveXml(ostream &s) const
+void TypeVoid::saveXml(std::ostream &s) const
 
 {
   s << "<void/>";
 }
 
-void TypePointer::printRaw(ostream &s) const
+void TypePointer::printRaw(std::ostream &s) const
 
 {
   ptrto->printRaw(s);
@@ -416,7 +418,7 @@ int4 TypePointer::compareDependency(const Datatype &op) const
   return (ptrto < tp->ptrto) ? -1 : 1; // Compare the absolute pointers
 }
 
-void TypePointer::saveXml(ostream &s) const
+void TypePointer::saveXml(std::ostream &s) const
 
 {
   s << "<type";
@@ -443,7 +445,7 @@ void TypePointer::restoreXml(const Element *el,TypeFactory &typegrp)
     flags = ptrto->getInheritable();
 }
 
-void TypeArray::printRaw(ostream &s) const
+void TypeArray::printRaw(std::ostream &s) const
 
 {
   arrayof->printRaw(s);
@@ -504,7 +506,7 @@ Datatype *TypeArray::getSubEntry(int4 off,int4 sz,int4 *newoff,int4 *el) const
   return arrayof;
 }
 
-void TypeArray::saveXml(ostream &s) const
+void TypeArray::saveXml(std::ostream &s) const
 
 {
   s << "<type";
@@ -671,7 +673,7 @@ int4 TypeEnum::compareDependency(const Datatype &op) const
   return 0;
 }
 
-void TypeEnum::saveXml(ostream &s) const
+void TypeEnum::saveXml(std::ostream &s) const
 
 {
   s << "<type";
@@ -861,7 +863,7 @@ int4 TypeStruct::compareDependency(const Datatype &op) const
   return 0;
 }
 
-void TypeStruct::saveXml(ostream &s) const
+void TypeStruct::saveXml(std::ostream &s) const
 
 {
   s << "<type";
@@ -957,7 +959,7 @@ TypeCode::~TypeCode(void)
     delete proto;
 }
 
-void TypeCode::printRaw(ostream &s) const
+void TypeCode::printRaw(std::ostream &s) const
 
 {
   if (name.size()>0)
@@ -1077,7 +1079,7 @@ int4 TypeCode::compareDependency(const Datatype &op) const
   return 0;
 }
 
-void TypeCode::saveXml(ostream &s) const
+void TypeCode::saveXml(std::ostream &s) const
 
 {
   s << "<type";
@@ -1170,7 +1172,7 @@ Address TypeSpacebase::getAddress(uintb off,int4 sz,const Address &point) const
   return glb->resolveConstant(spaceid,off,sz,point);
 }
 
-void TypeSpacebase::saveXml(ostream &s) const
+void TypeSpacebase::saveXml(std::ostream &s) const
 
 {
   s << "<type";
@@ -1952,7 +1954,7 @@ Datatype *TypeFactory::restoreXmlTypeWithCodeFlags(const Element *el,bool hasThi
 
 /// All data-types, in dependency order, are written out to an XML stream
 /// \param s is the output stream
-void TypeFactory::saveXml(ostream &s) const
+void TypeFactory::saveXml(std::ostream &s) const
 
 {
   vector<Datatype *> deporder;
@@ -1983,7 +1985,7 @@ void TypeFactory::saveXml(ostream &s) const
 /// Any data-type within this container marked as "core" will
 /// be written to an XML \<coretypes> stream.
 /// \param s is the output stream
-void TypeFactory::saveXmlCoreTypes(ostream &s) const
+void TypeFactory::saveXmlCoreTypes(std::ostream &s) const
 
 {
   DatatypeSet::const_iterator iter;
@@ -2234,4 +2236,6 @@ void TypeFactory::parseEnumConfig(const Element *el)
     enumtype = TYPE_INT;
   else
     enumtype = TYPE_UINT;
+}
+
 }

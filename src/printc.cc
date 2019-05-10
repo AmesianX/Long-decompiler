@@ -16,6 +16,7 @@
 #include "printc.hh"
 #include "funcdata.hh"
 
+namespace GhidraDec {
 // Operator tokens for expressions
 //                        token #in prec assoc   optype       space bump
 OpToken PrintC::scope = { "::", 2, 70, true, OpToken::binary, 0, 0, (OpToken *)0 };
@@ -2847,4 +2848,5 @@ string PrintC::genericTypeName(const Datatype *ct)
   }
   s << dec << ct->getSize();
   return s.str();
+}
 }

@@ -22,7 +22,7 @@
 #include <vector>
 #include <string>
 
-using namespace std;
+namespace GhidraDec {
 
 /// \brief Class for automatically registering extension points to the decompiler
 ///
@@ -34,7 +34,7 @@ using namespace std;
 /// will ensure that the initialize() method is called on each extension, allowing it
 /// to complete its integration.
 class CapabilityPoint {
-  static vector<CapabilityPoint *> &getList(void);	///< Retrieve the list of extension point singletons
+  static std::vector<CapabilityPoint *> &getList(void);	///< Retrieve the list of extension point singletons
 protected:
   CapabilityPoint(void);		///< Construct extension capability exactly once
 public:
@@ -48,5 +48,6 @@ public:
   static void initializeAll(void);	///< Finish initialization for all extension points
 };
 
+} // GhidraDec
 
 #endif

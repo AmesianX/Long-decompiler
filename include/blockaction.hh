@@ -21,6 +21,8 @@
 
 #include "action.hh"
 
+namespace GhidraDec {
+
 /// \brief Class for holding an edge while the underlying graph is being manipulated
 ///
 /// The original FlowBlock nodes that define the end-points of the edge may get
@@ -341,5 +343,7 @@ public:
   }
   virtual int4 apply(Funcdata &data);
 };
+
+}
 
 #endif

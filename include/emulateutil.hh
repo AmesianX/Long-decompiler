@@ -22,6 +22,8 @@
 #include "emulate.hh"
 #include "op.hh"
 
+namespace GhidraDec {
+
 /// \brief Emulation based on (existing) PcodeOps and Varnodes.
 ///
 /// This is still an abstract class.  It does most of the work of emulating
@@ -171,5 +173,7 @@ public:
   uintb getVarnodeValue(VarnodeData *vn) const;
   uintb getTempValue(uintb offset) const;
 };
+
+}
 
 #endif

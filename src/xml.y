@@ -24,6 +24,9 @@
 
 #include <iostream>
 #include <string>
+#include <map>
+
+namespace GhidraDec {
 
 class XmlScan {
 public:
@@ -41,8 +44,8 @@ public:
 	       CommandBraceToken = 266 };
 private:
   mode curmode;
-  istream &s;
-  string *lvalue;		// Current string being built
+  std::istream &s;
+  std::string *lvalue;		// Current std::string being built
   int4 lookahead[4];
   int4 pos;
   bool endofstream;		// Has end of stream been reached
@@ -78,23 +81,23 @@ private:
   int4 scanName(void);
   int4 scanSName(void);
 public:
-  XmlScan(istream &t);
+  XmlScan(std::istream &t);
   ~XmlScan(void);
   void setmode(mode m) { curmode = m; }
   int4 nexttoken(void);		// Interface for bison
-  string *lval(void) { string *ret = lvalue; lvalue = (string *)0; return ret; }
+  std::string *lval(void) { std::string *ret = lvalue; lvalue = (std::string *)0; return ret; }
 };
 
 struct NameValue {
-  string *name;
-  string *value;
+  std::string *name;
+  std::string *value;
 };
 
 extern int yylex(void);
 extern int yyerror(const char *str);
-extern void print_content(const string &str);
-extern int4 convertEntityRef(const string &ref);
-extern int4 convertCharRef(const string &ref);
+extern void print_content(const std::string &str);
+extern int4 convertEntityRef(const std::string &ref);
+extern int4 convertCharRef(const std::string &ref);
 static XmlScan *global_scan;
 static ContentHandler *handler;
 extern int yydebug;
@@ -102,7 +105,7 @@ extern int yydebug;
 
 %union {
   int4 i;
-  string *str;
+  std::string *str;
   Attributes *attr;
   NameValue *pair;
 }
@@ -125,10 +128,10 @@ whitespace: ' '
 S: whitespace
    | S whitespace ;
 
-attsinglemid: '\'' { $$ = new string; global_scan->setmode(XmlScan::AttValueSingleMode); }
+attsinglemid: '\'' { $$ = new std::string; global_scan->setmode(XmlScan::AttValueSingleMode); }
 	      | attsinglemid ATTVALUE { $$ = $1; *$$ += *$2; delete $2; global_scan->setmode(XmlScan::AttValueSingleMode); }
 	      | attsinglemid Reference { $$ = $1; *$$ += $2; global_scan->setmode(XmlScan::AttValueSingleMode); };
-attdoublemid: '"' { $$ = new string; global_scan->setmode(XmlScan::AttValueDoubleMode); }
+attdoublemid: '"' { $$ = new std::string; global_scan->setmode(XmlScan::AttValueDoubleMode); }
 	      | attdoublemid ATTVALUE { $$ = $1; *$$ += *$2; delete $2; global_scan->setmode(XmlScan::AttValueDoubleMode); }
 	      | attdoublemid Reference { $$ = $1; *$$ += $2; global_scan->setmode(XmlScan::AttValueDoubleMode); };
 AttValue: attsinglemid '\'' { $$ = $1; }
@@ -183,7 +186,7 @@ ETag: etagbrace NAME '>' { $$ = $2; }
 content: { global_scan->setmode(XmlScan::CharDataMode); }
 	 | content CHARDATA { print_content( *$2 ); delete $2; global_scan->setmode(XmlScan::CharDataMode); }
 	 | content element { global_scan->setmode(XmlScan::CharDataMode); }
-	 | content Reference { string *tmp=new string(); *tmp += $2; print_content(*tmp); delete tmp; global_scan->setmode(XmlScan::CharDataMode); }
+	 | content Reference { std::string *tmp=new std::string(); *tmp += $2; print_content(*tmp); delete tmp; global_scan->setmode(XmlScan::CharDataMode); }
 	 | content CDSect { print_content( *$2 ); delete $2; global_scan->setmode(XmlScan::CharDataMode); }
 	 | content PI { global_scan->setmode(XmlScan::CharDataMode); }
 	 | content Comment { global_scan->setmode(XmlScan::CharDataMode); };
@@ -197,11 +200,11 @@ CharRef: charrefstart CHARREF ';' { $$ = $2; };
 EntityRef: refstart NAME ';' { $$ = $2; };
 %%
 
-XmlScan::XmlScan(istream &t) : s(t)
+XmlScan::XmlScan(std::istream &t) : s(t)
 
 {
   curmode = SingleMode;
-  lvalue = (string *)0;
+  lvalue = (std::string *)0;
   pos = 0;
   endofstream = false;
   getxmlchar(); getxmlchar(); getxmlchar(); getxmlchar(); // Fill lookahead buffer
@@ -216,7 +219,7 @@ XmlScan::~XmlScan(void)
 void XmlScan::clearlvalue(void)
 
 {
-  if (lvalue != (string *)0)
+  if (lvalue != (std::string *)0)
     delete lvalue;
 }
 
@@ -235,7 +238,7 @@ int4 XmlScan::scanCharData(void)
 
 {				// look for '<' '&' or ']]>'
   clearlvalue();
-  lvalue = new string();
+  lvalue = new std::string();
   
   while(next(0) != -1) {
     if (next(0) == '<') break;
@@ -255,7 +258,7 @@ int4 XmlScan::scanCData(void)
 
 {				// Look for "]]>" and non-Char
   clearlvalue();
-  lvalue = new string();
+  lvalue = new std::string();
 
   while(next(0) != -1) {
     if (next(0)==']')
@@ -273,7 +276,7 @@ int4 XmlScan::scanCharRef(void)
 {
   int4 v;
   clearlvalue();
-  lvalue = new string();
+  lvalue = new std::string();
   if (next(0) == 'x') {
     *lvalue += getxmlchar();
     while(next(0) != -1) {
@@ -304,7 +307,7 @@ int4 XmlScan::scanAttValue(int4 quote)
 
 {
   clearlvalue();
-  lvalue = new string();
+  lvalue = new std::string();
   while(next(0) != -1) {
     if (next(0) == quote) break;
     if (next(0) == '<') break;
@@ -320,7 +323,7 @@ int4 XmlScan::scanComment(void)
 
 {
   clearlvalue();
-  lvalue = new string();
+  lvalue = new std::string();
 
   while(next(0) != -1) {
     if (next(0)=='-')
@@ -336,7 +339,7 @@ int4 XmlScan::scanName(void)
 
 {				// Scan a Name or return single non-name character
   clearlvalue();
-  lvalue = new string();
+  lvalue = new std::string();
 
   if (!isInitialNameChar(next(0)))
     return scanSingle();
@@ -357,7 +360,7 @@ int4 XmlScan::scanSName(void)
     getxmlchar();
   }
   clearlvalue();
-  lvalue = new string();
+  lvalue = new std::string();
   if (!isInitialNameChar(next(0))) {	// First non-whitespace is not Name char
     if (whitecount > 0)
       return ' ';
@@ -426,7 +429,7 @@ int4 XmlScan::nexttoken(void)
   return -1;
 }
 
-void print_content(const string &str)
+void print_content(const std::string &str)
 
 {
   uint4 i;
@@ -443,7 +446,7 @@ void print_content(const string &str)
     handler->characters(str.c_str(),0,str.size());  
 }
 
-int4 convertEntityRef(const string &ref)
+int4 convertEntityRef(const std::string &ref)
 
 {
   if (ref == "lt") return '<';
@@ -454,7 +457,7 @@ int4 convertEntityRef(const string &ref)
   return -1;
 }
 
-int4 convertCharRef(const string &ref)
+int4 convertCharRef(const std::string &ref)
 
 {
   uint4 i;
@@ -495,7 +498,7 @@ int yyerror(const char *str)
   return 0;
 }
 
-int4 xml_parse(istream &i,ContentHandler *hand,int4 dbg)
+int4 xml_parse(std::istream &i,ContentHandler *hand,int4 dbg)
 
 {
 #if YYDEBUG
@@ -511,8 +514,8 @@ int4 xml_parse(istream &i,ContentHandler *hand,int4 dbg)
   return res;
 }
 
-void TreeHandler::startElement(const string &namespaceURI,const string &localName,
-			       const string &qualifiedName,const Attributes &atts)
+void TreeHandler::startElement(const std::string &namespaceURI,const std::string &localName,
+			       const std::string &qualifiedName,const Attributes &atts)
 {
   Element *newel = new Element(cur);
   cur->addChild(newel);
@@ -522,8 +525,8 @@ void TreeHandler::startElement(const string &namespaceURI,const string &localNam
     newel->addAttribute(atts.getLocalName(i),atts.getValue(i));
 }
 
-void TreeHandler::endElement(const string &namespaceURI,const string &localName,
-			     const string &qualifiedName)
+void TreeHandler::endElement(const std::string &namespaceURI,const std::string &localName,
+			     const std::string &qualifiedName)
 {
   cur = cur->getParent();
 }
@@ -543,7 +546,7 @@ Element::~Element(void)
     delete *iter;
 }
 
-const string &Element::getAttributeValue(const string &nm) const
+const std::string &Element::getAttributeValue(const std::string &nm) const
 
 {
   for(uint4 i=0;i<attr.size();++i)
@@ -561,7 +564,7 @@ DocumentStorage::~DocumentStorage(void)
   }
 }
 
-Document *DocumentStorage::parseDocument(istream &s)
+Document *DocumentStorage::parseDocument(std::istream &s)
 
 {
   doclist.push_back((Document *)0);
@@ -569,10 +572,10 @@ Document *DocumentStorage::parseDocument(istream &s)
   return doclist.back();
 }
 
-Document *DocumentStorage::openDocument(const string &filename)
+Document *DocumentStorage::openDocument(const std::string &filename)
 
 { // Open and parse an XML file, return Document object
-  ifstream s(filename.c_str());
+  std::ifstream s(filename.c_str());
   if (!s)
     throw XmlError("Unable to open xml document "+filename);
   Document *res = parseDocument(s);
@@ -586,10 +589,10 @@ void DocumentStorage::registerTag(const Element *el)
   tagmap[el->getName()] = el;
 }
 
-const Element *DocumentStorage::getTag(const string &nm) const
+const Element *DocumentStorage::getTag(const std::string &nm) const
 
 { // Retrieve a registered tag by name
-  map<string,const Element *>::const_iterator iter;
+  std::map<std::string,const Element *>::const_iterator iter;
 
   iter = tagmap.find(nm);
   if (iter != tagmap.end())
@@ -597,7 +600,7 @@ const Element *DocumentStorage::getTag(const string &nm) const
   return (const Element *)0;
 }
 
-Document *xml_tree(istream &i)
+Document *xml_tree(std::istream &i)
 
 {
   Document *doc = new Document();
@@ -609,7 +612,7 @@ Document *xml_tree(istream &i)
   return doc;
 }
 
-void xml_escape(ostream &s,const char *str)
+void xml_escape(std::ostream &s,const char *str)
 
 {				// Escape xml tag indicators
   while(*str!='\0') {
@@ -625,4 +628,5 @@ void xml_escape(ostream &s,const char *str)
       s << *str;
     str++;
   }
+}
 }

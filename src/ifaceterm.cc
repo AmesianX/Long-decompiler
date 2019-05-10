@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 #include "ifaceterm.hh"
+namespace GhidraDec {
 
 IfaceTerm::IfaceTerm(const string &prmpt,istream &is,ostream &os)
   : IfaceStatus(prmpt,is,os)
@@ -229,3 +230,4 @@ void IfaceTerm::readLine(string &line)
   } while(val != '\n');
 }
 
+}

@@ -15,6 +15,7 @@
  */
 #include "comment_ghidra.hh"
 
+namespace GhidraDec {
 CommentDatabaseGhidra::CommentDatabaseGhidra(ArchitectureGhidra *g)
   : CommentDatabase()
 {
@@ -80,3 +81,4 @@ CommentSet::const_iterator CommentDatabaseGhidra::endComment(const Address &fad)
   return cache.endComment(fad);
 }
 
+}

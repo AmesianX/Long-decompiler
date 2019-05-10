@@ -22,6 +22,8 @@
 
 #include "varnode.hh"
 
+namespace GhidraDec {
+
 /// \brief An edge between a Varnode and a PcodeOp
 ///
 /// A DynamicHash is defined on a sub-graph of the data-flow, and this defines an edge
@@ -94,4 +96,5 @@ public:
   static uint4 transtable[];				///< Translation of op-codes to hash values
 };
 
+}
 #endif

@@ -23,6 +23,7 @@
 #include "architecture.hh"
 #include "sleigh.hh"
 
+namespace GhidraDec {
 /// \brief Contents of a \<compiler> tag in a .ldefs file
 ///
 /// This class describes a compiler specification file as referenced by the Sleigh language subsystem.
@@ -123,4 +124,5 @@ public:
   static FileManage specpaths;					///< Known directories that contain .ldefs files.
 };
 
+}
 #endif

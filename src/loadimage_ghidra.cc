@@ -15,6 +15,7 @@
  */
 #include "loadimage_ghidra.hh"
 
+namespace GhidraDec {
 LoadImageGhidra::LoadImageGhidra(ArchitectureGhidra *g)
   : LoadImage("ghidra_progam")
 
@@ -48,4 +49,5 @@ void LoadImageGhidra::adjustVma(long adjust)
 
 {
   throw LowlevelError("Cannot adjust GHIDRA virtual memory");
+}
 }

@@ -15,14 +15,15 @@
  */
 #include "capability.hh"
 
-/// Access static vector of CapabilityPoint objects that are registered during static initialization
+namespace GhidraDec {
+/// Access static std::vector of CapabilityPoint objects that are registered during static initialization
 /// The list itself is created once on the first call to this method
 /// \e after all the static initializers have run
 /// \return the list of registered extensions
-vector<CapabilityPoint *> &CapabilityPoint::getList(void)
+std::vector<CapabilityPoint *> &CapabilityPoint::getList(void)
 
 {
-  static vector<CapabilityPoint *> thelist;	// This gets allocated exactly once on first call
+  static std::vector<CapabilityPoint *> thelist;	// This gets allocated exactly once on first call
   return thelist;
 }
 
@@ -38,7 +39,7 @@ CapabilityPoint::CapabilityPoint(void)
 void CapabilityPoint::initializeAll(void)
 
 {
-  vector<CapabilityPoint *> &list( getList() );
+  std::vector<CapabilityPoint *> &list( getList() );
   for(int4 i=0;i<list.size();++i) {
     CapabilityPoint *ptr = list[i];
     ptr->initialize();
@@ -46,3 +47,4 @@ void CapabilityPoint::initializeAll(void)
   list.clear();
 }
 
+}

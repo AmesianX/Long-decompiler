@@ -17,6 +17,9 @@
 #include "funcdata.hh"
 #include "crc32.hh"
 
+
+namespace GhidraDec {
+
 // Table for how to hash opcodes, lumps certain operators (i.e. ADD SUB PTRADD PTRSUB) into one hash
 // zero indicates the operator should be skipped
 uint4 DynamicHash::transtable[] = {
@@ -530,4 +533,6 @@ void DynamicHash::clearTotalPosition(uint8 &h)
   val <<= 49;
   val = ~val;
   h &= val;
+}
+
 }

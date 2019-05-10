@@ -27,6 +27,7 @@
 #include <iostream>
 #include <csignal>
 
+namespace GhidraDec {
 class GhidraCommand;
 
 /// \brief Registration point and dispatcher for commands sent to the decompiler
@@ -235,4 +236,5 @@ extern void turn_on_debugging(Funcdata *fd);
 extern void turn_off_debugging(Funcdata *fd);
 #endif
 
+}
 #endif

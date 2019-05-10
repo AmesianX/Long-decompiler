@@ -25,6 +25,9 @@
 #ifndef __MYTYPES__
 #define __MYTYPES__
 
+
+namespace GhidraDec {
+
 #if defined( __sparc )
 #define HOST_ENDIAN 1
 #if defined( __sparcv9 )
@@ -245,5 +248,7 @@ CPUI_DEBUG        --    This is the ONE debug switch that should be passed in
 //# define MERGEMULTI_DEBUG
 //# define VARBANK_DEBUG
 #endif
+
+}
 
 #endif

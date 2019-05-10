@@ -18,11 +18,15 @@
 
 #include "coreaction.hh"
 
+#include <string>
+
+namespace GhidraDec {
+
 /// Specify the name, group, and properties of the Action
 /// \param f is the collection of property flags
 /// \param nm is the Action name
 /// \param g is the Action group
-Action::Action(uint4 f,const string &nm,const string &g)
+Action::Action(uint4 f,const std::string &nm,const std::string &g)
 
 {
   flags = f;
@@ -1112,3 +1116,5 @@ Action *ActionDatabase::deriveAction(const string &baseaction, const string &grp
   registerAction(grp,newact);
   return newact;
 }
+
+} // namespace GhidraDec

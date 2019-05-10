@@ -16,6 +16,10 @@
 #include "opcodes.hh"
 #include "types.h"
 
+#include <string>
+
+namespace GhidraDec {
+
 /// \brief Names of operations associated with their opcode number
 ///
 /// Some of the names have been replaced with special placeholder
@@ -53,7 +57,7 @@ static const int4 opcode_indices[] = {
 };
 
 /// \param opc is an OpCode value
-/// \return the name of the operation as a string
+/// \return the name of the operation as a std::string
 const char *get_opname(OpCode opc)
 
 {
@@ -62,7 +66,7 @@ const char *get_opname(OpCode opc)
 
 /// \param nm is the name of an operation
 /// \return the corresponding OpCode value
-OpCode get_opcode(const string &nm)
+OpCode get_opcode(const std::string &nm)
 
 {
   int4 min = 1;			// Don't include BLANK
@@ -129,4 +133,5 @@ OpCode get_booleanflip(OpCode opc,bool &reorder)
     break;
   }
   return CPUI_MAX;
+}
 }

@@ -15,6 +15,7 @@
  */
 #include "override.hh"
 #include "funcdata.hh"
+namespace GhidraDec {
 
 void Override::clear(void)
 
@@ -442,4 +443,5 @@ uint4 Override::stringToType(const string &nm)
   else if (nm == "return")
     return Override::RETURN;
   return Override::NONE;
+}
 }

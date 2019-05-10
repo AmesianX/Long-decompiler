@@ -28,6 +28,8 @@
 
 #include "space.hh"
 
+namespace GhidraDec {
+
 class AddrSpaceManager;
 
 /// \brief A low-level machine address for labelling bytes and data.
@@ -502,5 +504,7 @@ extern void mult64to128(uint8 *res,uint8 x,uint8 y);
 extern void unsignedSubtract128(uint8 *a,uint8 *b);
 extern int4 unsignedCompare128(uint8 *a,uint8 *b);
 extern int4 power2Divide(int4 n,uint8 divisor,uint8 &q,uint8 &r);
+
+} // GhidraDec
 
 #endif

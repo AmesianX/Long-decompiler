@@ -21,6 +21,8 @@
 
 #include "printc.hh"
 
+namespace GhidraDec {
+
 /// \brief Factory and static initializer for the "java-language" back-end to the decompiler
 ///
 /// The singleton adds itself to the list of possible back-end languages for the decompiler
@@ -68,4 +70,6 @@ public:
   virtual void opCallind(const PcodeOp *op);
   virtual void opCpoolRefOp(const PcodeOp *op);
 };
+
+}
 #endif

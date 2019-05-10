@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 #include "inject_ghidra.hh"
+namespace GhidraDec {
 
 void InjectContextGhidra::saveXml(ostream &s) const
 
@@ -217,4 +218,5 @@ int4 PcodeInjectLibraryGhidra::manualCallOtherFixup(const string &name,const str
 						    const vector<string> &inname,const string &snippet)
 {
   return 0;	 // We don't have to do anything
+}
 }

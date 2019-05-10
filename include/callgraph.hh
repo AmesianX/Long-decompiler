@@ -18,6 +18,8 @@
 
 #include "address.hh"
 
+namespace GhidraDec {
+
 // Forward declarations
 class Architecture;
 class Funcdata;
@@ -119,5 +121,7 @@ public:
   void saveXml(ostream &s) const;
   void restoreXml(const Element *el);
 };
+
+}
 
 #endif

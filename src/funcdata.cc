@@ -16,6 +16,7 @@
 #include "funcdata.hh"
 //#include <fstream>
 
+namespace GhidraDec {
 /// \param nm is the (base) name of the function
 /// \param scope is Symbol scope associated with the function
 /// \param addr is the entry address for the function
@@ -945,3 +946,4 @@ void Funcdata::debugPrintRange(int4 i) const
 
 #endif
 
+}

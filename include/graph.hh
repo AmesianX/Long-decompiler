@@ -16,6 +16,8 @@
  */
 #include "funcdata.hh"
 
+namespace GhidraDec {
 extern void dump_dataflow_graph(Funcdata &data,ostream &s);
 extern void dump_controlflow_graph(const string &name,const BlockGraph &graph,ostream &s);
 extern void dump_dom_graph(const string &name,const BlockGraph &graph,ostream &s);
+}

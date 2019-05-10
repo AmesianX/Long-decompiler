@@ -21,6 +21,7 @@
 
 #include "database.hh"
 
+namespace GhidraDec {
 class FuncCallSpecs;		// Forward declaration
 
 /// \brief A container of commands that override the decompiler's default behavior for a single function
@@ -81,4 +82,5 @@ public:
   static uint4 stringToType(const string &nm);		///< Convert a string to a flow override type
 };
 
+}
 #endif

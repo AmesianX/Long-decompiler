@@ -15,6 +15,7 @@
  */
 #include "pcodecompile.hh"
 
+namespace GhidraDec {
 ExprTree::ExprTree(VarnodeTpl *vn)
 
 {
@@ -775,3 +776,4 @@ VarnodeTpl *PcodeCompile::addressOf(VarnodeTpl *var,uint4 size)
   return res;
 }
 
+}

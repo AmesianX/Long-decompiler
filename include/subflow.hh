@@ -18,6 +18,8 @@
 
 #include "funcdata.hh"
 
+namespace GhidraDec {
+
 // Structures for splitting big varnodes carrying smaller logical
 // variables.  Given a root within the syntax tree and dimensions
 // of a logical variable, this class traces the flow of this
@@ -229,5 +231,7 @@ public:
   bool doTrace(void);
   void doReplacement(void);
 };
+
+}
 
 #endif

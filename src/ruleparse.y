@@ -17,6 +17,9 @@
 #ifdef CPUI_RULECOMPILE
 #include "rulecompile.hh"
 
+
+namespace GhidraDec {
+
 #define YYERROR_VERBOSE
 
 extern RuleCompile *rulecompile;
@@ -272,6 +275,8 @@ int ruleparseerror(const char *s)
 {
   rulecompile->ruleError(s);
   return 0;
+}
+
 }
 
 #endif

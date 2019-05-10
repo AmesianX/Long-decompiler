@@ -16,6 +16,7 @@
 #include "funcdata.hh"
 #include "flow.hh"
 
+namespace GhidraDec {
 // Funcdata members pertaining directly to ops
 
 /// \param op is the given PcodeOp
@@ -1274,4 +1275,5 @@ void cseEliminateList(Funcdata &data,vector< pair<uintm,PcodeOp *> > &list,vecto
     liter1++;
     liter2++;
   }
+}
 }

@@ -15,6 +15,7 @@
  */
 #include "condexe.hh"
 
+namespace GhidraDec {
 ConditionMarker::ConditionMarker(void)
 
 {
@@ -1084,4 +1085,5 @@ int4 RuleOrPredicate::applyOp(PcodeOp *op,Funcdata &data)
   data.opSetInput(op,newvn,0);
   data.opSetOpcode(op,CPUI_COPY);
   return 1;
+}
 }

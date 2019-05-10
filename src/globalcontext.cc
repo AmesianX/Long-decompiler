@@ -15,6 +15,8 @@
  */
 #include "globalcontext.hh"
 
+namespace GhidraDec {
+
 /// Bits within the whole context blob are labeled starting with 0 as the most significant bit
 /// in the first word in the sequence. The new context value must be contained within a single
 /// word.
@@ -32,7 +34,7 @@ ContextBitRange::ContextBitRange(int4 sbit,int4 ebit)
 
 /// The register storage and value are serialized as a \<set> tag.
 /// \param s is the output stream
-void TrackedContext::saveXml(ostream &s) const
+void TrackedContext::saveXml(std::ostream &s) const
 
 {
   s << "<set";
@@ -51,7 +53,7 @@ void TrackedContext::restoreXml(const Element *el,const AddrSpaceManager *manage
   Address addr = Address::restoreXml(el,manage,size);
   
   istringstream s(el->getAttributeValue("val"));
-  s.unsetf(ios::dec | ios::hex | ios::oct);
+  s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
   s >> val;
 
   loc.space = addr.getSpace();
@@ -66,7 +68,7 @@ void TrackedContext::restoreXml(const Element *el,const AddrSpaceManager *manage
 /// \param s is the output stream
 /// \param addr is the specific address we have tracked values for
 /// \param vec is the list of tracked values
-void ContextDatabase::saveTracked(ostream &s,const Address &addr,
+void ContextDatabase::saveTracked(std::ostream &s,const Address &addr,
 				  const TrackedSet &vec)
 {
   if (vec.empty()) return;
@@ -321,7 +323,7 @@ ContextInternal::FreeArray &ContextInternal::FreeArray::operator=(const FreeArra
 /// \param s is the output stream
 /// \param addr is the address of the split point where the blob is valid
 /// \param vec is the array of words holding the blob values
-void ContextInternal::saveContext(ostream &s,const Address &addr,
+void ContextInternal::saveContext(std::ostream &s,const Address &addr,
 				  const uintm *vec) const
 {
   s << "<context_pointset";
@@ -358,7 +360,7 @@ void ContextInternal::restoreContext(const Element *el,const Address &addr1,cons
   while(iter != list.end()) {
     const Element *subel = *iter;
     istringstream s(subel->getAttributeValue("val"));
-    s.unsetf(ios::dec | ios::hex | ios::oct);
+    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
     uintm val;
     s >> val;
     ContextBitRange &var(getVariable(subel->getAttributeValue("name")));
@@ -487,7 +489,7 @@ TrackedSet &ContextInternal::createSet(const Address &addr1,const Address &addr2
   return res;
 }
 
-void ContextInternal::saveXml(ostream &s) const
+void ContextInternal::saveXml(std::ostream &s) const
 
 {
   if (database.empty() && trackbase.empty()) return;
@@ -629,3 +631,4 @@ void ContextCache::setContext(const Address &addr1,const Address &addr2,int4 num
     curspace = (AddrSpace *)0;	// Invalidate cache
 }
 
+}

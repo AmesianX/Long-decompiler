@@ -22,6 +22,8 @@
 #include "pcodeinject.hh"
 #include "ghidra_arch.hh"
 
+namespace GhidraDec {
+
 /// \brief An injection context that can be serialized and sent to the Ghidra client
 ///
 /// This adds the capability to wrap up the context data in \<context> XML tag
@@ -90,5 +92,7 @@ public:
   virtual InjectContext &getCachedContext(void) { return contextCache; }
   virtual const vector<OpBehavior *> &getBehaviors(void);
 };
+
+}
 
 #endif

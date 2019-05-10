@@ -15,6 +15,9 @@
  */
 #include "double.hh"
 
+
+namespace GhidraDec {
+
 SplitVarnode::SplitVarnode(int4 sz,uintb v)
 
 {				// Construct a double precision constant
@@ -2974,4 +2977,6 @@ int4 RuleDoubleLoad::applyOp(PcodeOp *op,Funcdata &data)
   data.opSetInput(op,vnout,0);
 
   return 1;
+}
+
 }

@@ -20,6 +20,7 @@
 
 #include "typeop.hh"
 
+namespace GhidraDec {
 /// \brief Space for storing internal PcodeOp pointers as addresses
 ///
 /// It is convenient and efficient to replace the formally encoded
@@ -302,4 +303,5 @@ extern int4 functionalEqualityLevel(Varnode *vn1,Varnode *vn2,Varnode **res1,Var
 extern bool functionalEquality(Varnode *vn1,Varnode *vn2);
 extern bool functionalDifference(Varnode *vn1,Varnode *vn2,int4 depth);
 
+}
 #endif

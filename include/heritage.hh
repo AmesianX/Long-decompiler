@@ -22,6 +22,8 @@
 
 #include "block.hh"
 
+namespace GhidraDec {
+
 /// Container holding the stack system for the renaming algorithm.  Every disjoint address
 /// range (indexed by its initial address) maps to its own Varnode stack.
 typedef map<Address,vector<Varnode *> > VariableStack;
@@ -206,5 +208,7 @@ public:
   void rename(void);
   void heritage(void);				    ///< Perform one pass of heritage
 };
+
+} // namespace GhidraDec
 
 #endif

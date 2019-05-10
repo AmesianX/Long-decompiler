@@ -17,6 +17,8 @@
 #include "prefersplit.hh"
 #include "funcdata.hh"
 
+namespace GhidraDec {
+
 bool PreferSplitRecord::operator<(const PreferSplitRecord &op2) const
 
 {
@@ -623,4 +625,6 @@ void PreferSplitManager::splitAdditional(void)
 	splitTemporary(&inst);
     }
   }
+}
+
 }

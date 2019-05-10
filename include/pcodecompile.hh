@@ -18,6 +18,8 @@
 
 #include "slghsymbol.hh"
 
+namespace GhidraDec {
+
 struct StarQuality {
   ConstTpl id;
   uint4 size;
@@ -88,5 +90,7 @@ public:
   static void fillinZero(OpTpl *op,const vector<OpTpl *> &ops);
   static bool propagateSize(ConstructTpl *ct);
 };
+
+} // GhidraDec
 
 #endif

@@ -21,6 +21,8 @@
 
 #include "funcdata.hh"
 
+namespace GhidraDec {
+
 /// \brief A class for generating the control-flow structure for a single function
 ///
 /// Control-flow for the function is generated in two phases:  the method generateOps() produces
@@ -163,5 +165,7 @@ public:
   bool isFlowForInline(void) const { return ((flags & flow_forinline)!=0); }	///< Is \b this flow to be in-lined
   bool doesJumpRecord(void) const { return ((flags & record_jumploads)!=0); }	///< Should jump table structure be recorded
 };
+
+}
 
 #endif

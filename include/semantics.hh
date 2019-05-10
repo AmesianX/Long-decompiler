@@ -18,6 +18,7 @@
 
 #include "context.hh"
 
+namespace GhidraDec {
 // We remap these opcodes for internal use during pcode generation
 
 #define BUILD CPUI_MULTIEQUAL
@@ -207,4 +208,5 @@ public:
   virtual void appendCrossBuild(OpTpl *bld,int4 secnum)=0;
 };
 
+}
 #endif

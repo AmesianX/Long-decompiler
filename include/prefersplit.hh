@@ -18,6 +18,9 @@
 #define __PREFERSPLIT__
 
 #include "varnode.hh"
+
+namespace GhidraDec {
+
 class Funcdata;			// Forward declaration
 
 struct PreferSplitRecord {
@@ -66,5 +69,7 @@ public:
   void split(void);
   void splitAdditional(void);
 };
+
+}
 
 #endif

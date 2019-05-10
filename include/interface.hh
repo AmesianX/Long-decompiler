@@ -42,7 +42,9 @@
 #include <sstream>
 #include <cstdio>
 
-using namespace std;
+//using namespace std;
+
+namespace GhidraDec {
 
 struct IfaceError {
   string explain;		// Explanatory string
@@ -191,5 +193,7 @@ class IfcEcho : public IfaceBaseCommand {
 public:
   virtual void execute(istream &s);
 };
+
+}
 
 #endif

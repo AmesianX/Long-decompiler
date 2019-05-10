@@ -15,6 +15,7 @@
  */
 #include "prettyprint.hh"
 #include "funcdata.hh"
+namespace GhidraDec {
 
 const char *EmitXml::highlight[] = { "color=\"keyword\"",
 					      "color=\"comment\"",
@@ -1212,4 +1213,5 @@ void EmitPrettyPrint::setMaxLineSize(int4 val)
   tokqueue.setMax(3*val);
   spaceremain = maxlinesize;
   clear();
+}
 }

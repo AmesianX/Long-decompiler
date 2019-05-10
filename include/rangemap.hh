@@ -43,6 +43,7 @@
 #include <set>
 #include <list>
 
+namespace GhidraDec {
 template<typename _recordtype>
 class rangemap {
   // A class for describing a disjoint partition
@@ -367,4 +368,5 @@ rangemap<_recordtype>::find_overlap(linetype point,linetype end) const
   return tree.end();
 }
 
+}
 #endif

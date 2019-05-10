@@ -17,6 +17,7 @@
 #include "rulecompile.hh"
 #include "ruleparse.hh"
 
+namespace GhidraDec {
 RuleCompile *rulecompile;
 extern int4 ruleparsedebug;
 extern int4 ruleparseparse(void);
@@ -883,6 +884,7 @@ RuleGeneric *RuleGeneric::build(const string &nm,const string &gp,const string &
   return res;
 }
 
+}
 #endif
 
 /* 

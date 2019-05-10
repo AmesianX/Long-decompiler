@@ -18,6 +18,7 @@
 #include "flow.hh"
 #include "printc.hh"
 
+namespace GhidraDec {
 /// If the parameter is "on" return \b true, if "off" return \b false.
 /// Any other value causes an exception.
 /// \param p is the parameter
@@ -768,4 +769,5 @@ string OptionToggleRule::apply(Architecture *glb,const string &p1,const string &
     res += " rule";
   }
   return res;
+}
 }

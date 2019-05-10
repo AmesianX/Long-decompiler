@@ -17,9 +17,16 @@
 #include "flow.hh"
 #include "blockaction.hh"
 
+#include <vector>
+
+namespace GhidraDec {
+
 #ifdef OPACTION_DEBUG
 
 #include "ifacedecomp.hh"
+
+
+
 
 static IfaceStatus *ghidra_dcp = (IfaceStatus *)0;
 
@@ -33,7 +40,7 @@ void turn_on_debugging(Funcdata *fd)
     IfaceCapability::registerAllCommands(ghidra_dcp);
   }
   // Check if debug script exists
-  ifstream is("ghidracom.txt");
+  std::ifstream is("ghidracom.txt");
   if (!is) return;
   is.close();
   
@@ -59,9 +66,9 @@ void turn_off_debugging(Funcdata *fd)
 
 #endif
 
-vector<ArchitectureGhidra *> archlist; // List of architectures currently running
+std::vector<ArchitectureGhidra *> archlist; // List of architectures currently running
 
-map<string,GhidraCommand *> GhidraCapability::commandmap; // List of commands we can receive from Ghidra proper
+std::map<std::string,GhidraCommand *> GhidraCapability::commandmap; // List of commands we can receive from Ghidra proper
 
 // Constructing the singleton registers the capability
 GhidraDecompCapability GhidraDecompCapability::ghidraDecompCapability;
@@ -121,7 +128,7 @@ int4 GhidraCommand::doit(void)
     rawAction();
   }
   catch(XmlError &err) {
-    string errmsg;
+    std::string errmsg;
     errmsg = "XML processing error: " + err.explain;
     ghidra->printMessage( errmsg );
   }
@@ -130,12 +137,12 @@ int4 GhidraCommand::doit(void)
     return status;			// Abort sending any results
   }
   catch(RecovError &err) {
-    string errmsg;
+    std::string errmsg;
     errmsg = "Recoverable Error: " + err.explain;
     ghidra->printMessage( errmsg );
   }
   catch(LowlevelError &err) {
-    string errmsg;
+    std::string errmsg;
     errmsg = "Low-level Error: " + err.explain;
     ghidra->printMessage( errmsg );
   }
@@ -338,7 +345,7 @@ void StructureGraph::rawAction(void)
 
 {
   BlockGraph resultgraph;
-  vector<FlowBlock *> rootlist;
+  std::vector<FlowBlock *> rootlist;
 
   resultgraph.buildCopy(ingraph);
   resultgraph.structureLoops(rootlist);
@@ -458,14 +465,14 @@ void SetOptions::sendResult(void)
 int4 GhidraCapability::readCommand(istream &sin,ostream &out)
 
 {
-  string function;
+  std::string function;
   int4 type;
 
   do {
     type = ArchitectureGhidra::readToAnyBurst(sin); // Align ourselves
   } while(type != 2);
   ArchitectureGhidra::readStringStream(sin,function);
-  map<string,GhidraCommand *>::const_iterator iter;
+  std::map<std::string,GhidraCommand *>::const_iterator iter;
   iter = commandmap.find(function);
   if (iter == commandmap.end()) {
     out.write("\000\000\001\006",4); // Command response header
@@ -482,7 +489,7 @@ int4 GhidraCapability::readCommand(istream &sin,ostream &out)
 void GhidraCapability::shutDown(void)
 
 {
-  map<string,GhidraCommand *>::iterator iter;
+  std::map<std::string,GhidraCommand *>::iterator iter;
   for(iter=commandmap.begin();iter!=commandmap.end();++iter)
     delete (*iter).second;
 }
@@ -499,15 +506,17 @@ void GhidraDecompCapability::initialize(void)
   commandmap["setOptions"] = new SetOptions();
 }
 
+} // GhidraDec
+
 int main(int argc,char **argv)
 
 {
-  signal(SIGSEGV, &ArchitectureGhidra::segvHandler);  // Exit on SEGV errors
-  CapabilityPoint::initializeAll();
-  int4 status = 0;
+  signal(SIGSEGV, &GhidraDec::ArchitectureGhidra::segvHandler);  // Exit on SEGV errors
+  GhidraDec::CapabilityPoint::initializeAll();
+  GhidraDec::int4 status = 0;
   while(status == 0) {
-    status = GhidraCapability::readCommand(cin,cout);
+    status = GhidraDec::GhidraCapability::readCommand(cin,cout);
   }
-  GhidraCapability::shutDown();
+  GhidraDec::GhidraCapability::shutDown();
 }
 

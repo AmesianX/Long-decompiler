@@ -22,6 +22,7 @@
 #include "error.hh"
 #include "xml.hh"
 
+namespace GhidraDec {
 class Architecture;
 
 /// \brief Base class for options classes that affect the configuration of the Architecture object
@@ -252,4 +253,5 @@ public:
   virtual string apply(Architecture *glb,const string &p1,const string &p2,const string &p3) const;
 };
 
+}
 #endif

@@ -16,6 +16,7 @@
 #include "merge.hh"
 #include "funcdata.hh"
 
+namespace GhidraDec {
 /// This instance assumes the identity of the given Varnode and the defining index is
 /// cached to facilitate quick sorting.
 /// \param v is the given Varnode
@@ -1139,4 +1140,5 @@ bool Merge::mergeTest(HighVariable *high,vector<HighVariable *> &tmplist)
   }
   tmplist.push_back(high);
   return true;
+}
 }

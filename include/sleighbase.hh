@@ -21,6 +21,7 @@
 #include "translate.hh"
 #include "slghsymbol.hh"
 
+namespace GhidraDec {
 /// \brief Common core of classes that read or write SLEIGH specification files natively.
 ///
 /// This class represents what's in common across the SLEIGH infrastructure between:
@@ -54,4 +55,5 @@ public:
   void saveXml(ostream &s) const;	///< Write out the SLEIGH specification as an XML \<sleigh> tag.
 };
 
+}
 #endif

@@ -20,6 +20,7 @@
 
 #include "type.hh"
 
+namespace GhidraDec {
 class PcodeOp;
 class FlowBlock;
 class Varnode;
@@ -89,4 +90,5 @@ public:
   map<int4,CoverBlock>::const_iterator end(void) const { return cover.end(); }		///< Get end of CoverBlocks
 };
 
+}
 #endif

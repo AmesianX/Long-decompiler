@@ -21,6 +21,7 @@
 #include "loadimage.hh"
 #include "ghidra_arch.hh"
 
+namespace GhidraDec {
 class ArchitectureGhidra;
 
 /// \brief An implementation of the LoadImage interface using a Ghidra client as the back-end
@@ -39,4 +40,5 @@ public:
   virtual void adjustVma(long adjust);
 };
 
+}
 #endif

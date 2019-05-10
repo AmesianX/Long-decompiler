@@ -24,7 +24,8 @@
 #include <sstream>
 #include <fstream>
 
-using namespace std;
+//using namespace std;
+namespace GhidraDec {
 
 class FileManage {
   vector<string> pathlist;	// List of paths to search for files
@@ -45,5 +46,7 @@ public:
   static bool isAbsolutePath(const string &full) { if (full.empty()) return false; return (full[0] == separator); }
   static string discoverGhidraRoot(const char *argv0);
 };
+
+}
 
 #endif

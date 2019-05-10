@@ -16,6 +16,7 @@
 #include "cast.hh"
 #include "op.hh"
 
+namespace GhidraDec {
 /// Sets the TypeFactory used to produce data-types for the arithmeticOutputStandard() method
 /// \param t is the TypeFactory
 void CastStrategy::setTypeFactory(TypeFactory *t)
@@ -372,4 +373,5 @@ bool CastStrategyJava::isZextCast(Datatype *outtype,Datatype *intype) const
   if ((intype->getSize()==1)&&(inmeta==TYPE_INT)) return false;	// cast is not zext for byte
   if (intype->getSize()>=4) return false;		// cast is not zext for int and long
   return true;
+}
 }

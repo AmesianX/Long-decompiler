@@ -16,6 +16,7 @@
 #include "jumptable.hh"
 #include "emulate.hh"
 #include "flow.hh"
+namespace GhidraDec {
 
 void LoadTable::saveXml(ostream &s) const
 
@@ -2338,4 +2339,5 @@ bool JumpTable::checkForMultistage(Funcdata *fd)
     return true;
   }
   return false;
+}
 }

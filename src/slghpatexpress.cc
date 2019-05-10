@@ -16,6 +16,7 @@
 #include "slghpatexpress.hh"
 #include "sleighbase.hh"
 
+namespace GhidraDec {
 int4 TokenPattern::resolveTokens(const TokenPattern &tok1,const TokenPattern &tok2)
 
 {				// Use the token lists to decide how the two patterns
@@ -1646,3 +1647,4 @@ void EquationRightEllipsis::operandOrder(Constructor *ct,vector<OperandSymbol *>
   eq->operandOrder(ct,order);	// List operands
 }
 
+}

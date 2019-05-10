@@ -23,6 +23,8 @@ extern "C" {
 }
 #endif
 
+namespace GhidraDec {
+
 class IfaceTerm : public IfaceStatus {
 #ifdef __TERMINAL__
   bool is_terminal;		// True if the input stream is a terminal
@@ -35,3 +37,5 @@ public:
   IfaceTerm(const string &prmpt,istream &is,ostream &os);
   virtual ~IfaceTerm(void);
 };
+
+} // GhidraDec

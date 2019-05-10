@@ -21,6 +21,8 @@
 
 #include "address.hh"
 
+namespace GhidraDec {
+
 /// \brief Exception indicating data was not available
 ///
 /// This exception is thrown when a request for load image
@@ -223,5 +225,7 @@ inline void LoadImage::getReadonly(RangeList &list) const {
 /// \param ptr points to where the resulting bytes will be stored
 /// \param size is the number of bytes to retrieve from the image
 /// \param addr is the starting address of the bytes to retrieve
+//
+}
 
 #endif

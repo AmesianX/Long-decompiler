@@ -20,6 +20,7 @@
 #define yywrap() 1
 #define YY_SKIP_YYWRAP
 
+namespace GhidraDec {
 /* If we are building don't include unistd.h */
 /* flex provides us with this macro for turning it off */
 #ifdef _WIN32
@@ -670,3 +671,4 @@ with   { BEGIN(pattern); withsection = 1; slgh->calcContextLayout(); return WITH
           slgh->parseFileFinished();
         }
 
+}

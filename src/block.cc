@@ -17,6 +17,7 @@
 #include "block.hh"
 #include "funcdata.hh"
 
+namespace GhidraDec {
 /// The edge is saved assuming we already know what block we are in
 /// \param s is the output stream
 void BlockEdge::saveXml(ostream &s) const
@@ -3166,4 +3167,5 @@ FlowBlock *BlockMap::createBlock(const string &name)
   FlowBlock *bl = resolveBlock(bt);
   sortlist.push_back(bl);
   return bl;
+}
 }

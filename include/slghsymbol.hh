@@ -19,6 +19,8 @@
 #include "semantics.hh"
 #include "slghpatexpress.hh"
 
+namespace GhidraDec {
+
 class SleighBase;		// Forward declaration
 class SleighSymbol {
   friend class SymbolTable;
@@ -614,4 +616,6 @@ public:
   virtual symbol_type getType(void) const { return label_symbol; }
 };
 
+
+} // GhidraDec
 #endif

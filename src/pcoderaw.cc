@@ -16,6 +16,8 @@
 #include "pcoderaw.hh"
 #include "translate.hh"
 
+namespace GhidraDec {
+
 /// Build this VarnodeData from an \b \<addr\> tag
 /// \param el is the parsed tag
 /// \param manage is the address space manager
@@ -42,3 +44,4 @@ void VarnodeData::restoreXml(const Element *el,const AddrSpaceManager *manage)
   }
 }
 
+}

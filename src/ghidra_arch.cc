@@ -22,6 +22,7 @@
 #include "cpool_ghidra.hh"
 #include "inject_ghidra.hh"
 
+namespace GhidraDec {
 /// Catch the signal so the OS doesn't pop up a dialog
 /// \param sig is the OS signal (should always be SIGSEGV)
 void ArchitectureGhidra::segvHandler(int4 sig)
@@ -726,4 +727,5 @@ ArchitectureGhidra::ArchitectureGhidra(const string &pspec,const string &cspec,c
   sendsyntaxtree = true;	// Default to sending everything
   sendCcode = true;
   sendParamMeasures = false;
+}
 }

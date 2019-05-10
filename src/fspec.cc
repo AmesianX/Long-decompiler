@@ -16,6 +16,7 @@
 #include "fspec.hh"
 #include "funcdata.hh"
 
+namespace GhidraDec {
 void ParamEntry::resolveJoin(void)
 
 {
@@ -4721,4 +4722,5 @@ void FuncCallSpecs::countMatchingCalls(const vector<FuncCallSpecs *> &qlst)
   num = i - lastChange;
   for(;lastChange<i;++lastChange)
     copyList[lastChange]->matchCallCount = num;
+}
 }

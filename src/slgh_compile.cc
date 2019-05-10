@@ -17,6 +17,7 @@
 #include "filemanage.hh"
 #include <csignal>
 
+namespace GhidraDec {
 SleighCompile *slgh;		// Global pointer to sleigh object for use with parser
 #ifdef YYDEBUG
 extern int yydebug;		// Global debugging state for parser
@@ -2866,4 +2867,5 @@ int main(int argc,char **argv)
     }
   }
   return retval;
+}
 }

@@ -22,6 +22,8 @@
 #include "error.hh"
 #include "xml.hh"
 
+namespace GhidraDec {
+
 /// \brief Fundemental address space types
 ///
 /// Every address space must be one of the following core types
@@ -473,5 +475,7 @@ inline int4 AddrSpace::addressToByteInt(int4 val,uint4 ws) {
 /// \return the scaled offset
 inline int4 AddrSpace::byteToAddressInt(int4 val,uint4 ws) {
   return val/ws;
+}
+
 }
 #endif

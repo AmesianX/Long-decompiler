@@ -16,6 +16,7 @@
 #include "coreaction.hh"
 #include "condexe.hh"
 #include "double.hh"
+namespace GhidraDec {
 
 /// \brief A stack equation
 struct StackEqn {
@@ -4704,4 +4705,5 @@ void universal_action(Architecture *conf)
   act->addAction( new ActionFinalStructure("blockrecovery") );
   act->addAction( new ActionPrototypeWarnings("protorecovery") );
   act->addAction( new ActionStop("base") );
+}
 }

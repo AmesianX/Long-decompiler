@@ -20,6 +20,7 @@ extern "C" {
 #include "pcodeparse.hh"
 #include "blockaction.hh"
 
+namespace GhidraDec {
 // Constructing this registers the capability
 IfaceDecompCapability IfaceDecompCapability::ifaceDecompCapability;
 
@@ -2693,4 +2694,5 @@ void IfcSource::execute(istream &s)
 
   s >> filename;
   status->pushScript(filename,filename+"> ");
+}
 }

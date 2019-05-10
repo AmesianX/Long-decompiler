@@ -16,6 +16,8 @@
 #include "ghidra_translate.hh"
 #include "funcdata.hh"
 
+namespace GhidraDec {
+
 /// \brief Associate a Varnode with a register name
 ///
 /// \param nm is the register name
@@ -172,3 +174,5 @@ void GhidraTranslate::restoreXml(const Element *el)
   }
 }
 
+
+}

@@ -18,6 +18,7 @@
 
 #include "funcdata.hh"
 
+namespace GhidraDec {
 class ParamMeasure {
 public:
   enum ParamIDIO {
@@ -72,4 +73,5 @@ public:
   void savePretty( ostream &s, bool moredetail ) const;
 };
 
+}
 #endif //ifndef __CPUI_PARAMID__

@@ -15,6 +15,7 @@
  */
 #include "translate.hh"
 
+namespace GhidraDec {
 /// Read a \<truncate_space> XML tag to configure \b this object
 /// \param el is the XML element
 void TruncationTag::restoreXml(const Element *el)
@@ -817,4 +818,5 @@ const uint1 *PcodeEmit::restorePackedOp(const Address &addr,const uint1 *ptr,con
   ptr += 1;			// Consume the end tag
   dump(addr,(OpCode)opcode,outptr,invar,isize);
   return ptr;
+}
 }

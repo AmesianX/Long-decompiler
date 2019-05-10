@@ -16,7 +16,8 @@
  */
 #include "graph.hh"
 
-static void print_varnode_vertex(Varnode *vn,ostream &s)
+namespace GhidraDec {
+static void print_varnode_vertex(Varnode *vn,std::ostream &s)
 
 {
   PcodeOp *op;
@@ -42,7 +43,7 @@ static void print_varnode_vertex(Varnode *vn,ostream &s)
   vn->setMark();
 }
   
-static void print_op_vertex(PcodeOp *op,ostream &s)
+static void print_op_vertex(PcodeOp *op,std::ostream &s)
 
 {
   s << dec << 'o' << op->getTime() << ' ';
@@ -63,7 +64,7 @@ static void print_op_vertex(PcodeOp *op,ostream &s)
   s << endl;
 }
 
-static void dump_varnode_vertex(Funcdata &data,ostream &s)
+static void dump_varnode_vertex(Funcdata &data,std::ostream &s)
 
 {
   list<PcodeOp *>::const_iterator oiter;
@@ -112,7 +113,7 @@ static void dump_varnode_vertex(Funcdata &data,ostream &s)
   }
 }
  
-static void dump_op_vertex(Funcdata &data,ostream &s)
+static void dump_op_vertex(Funcdata &data,std::ostream &s)
 
 {   
   list<PcodeOp *>::const_iterator oiter;
@@ -136,7 +137,7 @@ static void dump_op_vertex(Funcdata &data,ostream &s)
   s << "*END_COLUMNS\n";
 }
 
-static void print_edges(PcodeOp *op,ostream &s)
+static void print_edges(PcodeOp *op,std::ostream &s)
 
 {
   Varnode *vn;
@@ -168,7 +169,7 @@ static void print_edges(PcodeOp *op,ostream &s)
   }
 }
 
-static void dump_edges(Funcdata &data,ostream &s)
+static void dump_edges(Funcdata &data,std::ostream &s)
 
 {   
   list<PcodeOp *>::const_iterator oiter;
@@ -190,7 +191,7 @@ static void dump_edges(Funcdata &data,ostream &s)
   s << "*END_COLUMNS\n";
 }
 
-void dump_dataflow_graph(Funcdata &data,ostream &s)
+void dump_dataflow_graph(Funcdata &data,std::ostream &s)
 
 {
   s << "*CMD=NewGraphWindow, WindowName=" << data.getName() << "-dataflow;\n";
@@ -293,7 +294,7 @@ void dump_dataflow_graph(Funcdata &data,ostream &s)
   dump_edges(data,s);
 }
 
-static void print_block_vertex(FlowBlock *bl,ostream &s)
+static void print_block_vertex(FlowBlock *bl,std::ostream &s)
 
 {
   s << ' ' << dec << bl->sizeOut();
@@ -304,14 +305,14 @@ static void print_block_vertex(FlowBlock *bl,ostream &s)
   s << endl;
 }
 
-static void print_block_edge(FlowBlock *bl,ostream &s)
+static void print_block_edge(FlowBlock *bl,std::ostream &s)
 
 {
   for(int4 i=0;i<bl->sizeIn();++i)
     s << dec << bl->getIn(i)->getIndex() << ' ' << bl->getIndex() << endl;
 }
 
-static void dump_block_vertex(const BlockGraph &graph,ostream &s,bool falsenode)
+static void dump_block_vertex(const BlockGraph &graph,std::ostream &s,bool falsenode)
 
 {
   s << "\n\n// Add Vertices\n";
@@ -332,7 +333,7 @@ static void dump_block_vertex(const BlockGraph &graph,ostream &s,bool falsenode)
   s << "*END_COLUMNS\n";
 }
 
-static void dump_block_edges(const BlockGraph &graph,ostream &s)
+static void dump_block_edges(const BlockGraph &graph,std::ostream &s)
 
 {
   s << "\n\n// Add Edges\n";
@@ -347,7 +348,7 @@ static void dump_block_edges(const BlockGraph &graph,ostream &s)
   s << "*END_COLUMNS\n";
 }
 
-static void print_dom_edge(FlowBlock *bl,ostream &s,bool falsenode)
+static void print_dom_edge(FlowBlock *bl,std::ostream &s,bool falsenode)
 
 {
   FlowBlock *dom = bl->getImmedDom();
@@ -358,7 +359,7 @@ static void print_dom_edge(FlowBlock *bl,ostream &s,bool falsenode)
     s << "-1 " << dec << bl->getIndex() << endl;
 }
 
-static void dump_dom_edges(const BlockGraph &graph,ostream &s,bool falsenode)
+static void dump_dom_edges(const BlockGraph &graph,std::ostream &s,bool falsenode)
 
 {
   s << "\n\n// Add Edges\n";
@@ -373,7 +374,7 @@ static void dump_dom_edges(const BlockGraph &graph,ostream &s,bool falsenode)
   s << "*END_COLUMNS\n";
 }
 
-static void dump_block_attributes(ostream &s)
+static void dump_block_attributes(std::ostream &s)
 
 {
   s << "\n// Attributes\n";
@@ -407,7 +408,7 @@ static void dump_block_attributes(ostream &s)
   s << "        Name=Index;\n\n";
 }
 
-static void dump_block_properties(ostream &s)
+static void dump_block_properties(std::ostream &s)
 
 {
   s << "\n// AutomaticArrangement\n";
@@ -469,7 +470,7 @@ static void dump_block_properties(ostream &s)
   s << "  NorthWest=();\n";
 }
 
-void dump_controlflow_graph(const string &name,const BlockGraph &graph,ostream &s)
+void dump_controlflow_graph(const string &name,const BlockGraph &graph,std::ostream &s)
 
 {
   s << "*CMD=NewGraphWindow, WindowName=" << name << "-controlflow;\n";
@@ -480,7 +481,7 @@ void dump_controlflow_graph(const string &name,const BlockGraph &graph,ostream &
   dump_block_edges(graph,s);
 }
 
-void dump_dom_graph(const string &name,const BlockGraph &graph,ostream &s)
+void dump_dom_graph(const string &name,const BlockGraph &graph,std::ostream &s)
 
 {
   int4 count = 0;
@@ -495,4 +496,5 @@ void dump_dom_graph(const string &name,const BlockGraph &graph,ostream &s)
   dump_block_attributes(s);
   dump_block_vertex(graph,s,falsenode);
   dump_dom_edges(graph,s,falsenode);
+}
 }

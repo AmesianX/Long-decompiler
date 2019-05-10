@@ -17,6 +17,7 @@
  */
 #include "bfd_arch.hh"
 
+namespace GhidraDec {
 // Constructing this object registers capability
 BfdArchitectureCapability BfdArchitectureCapability::bfdArchitectureCapability;
 
@@ -167,4 +168,5 @@ void BfdArchitecture::restoreXml(DocumentStorage &store)
     store.registerTag(*iter);
     SleighArchitecture::restoreXml(store);
   }
+}
 }

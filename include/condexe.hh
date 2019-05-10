@@ -20,6 +20,7 @@
 
 #include "funcdata.hh"
 
+namespace GhidraDec {
 /// \brief A helper class for describing the similarity of the boolean condition between 2 CBRANCH operations
 ///
 /// This class determines if two CBRANCHs share the same condition.  It also determines if the conditions
@@ -234,4 +235,5 @@ public:
   virtual int4 applyOp(PcodeOp *op,Funcdata &data);
 };
 
+}
 #endif

@@ -18,6 +18,8 @@
 
 #include "slghpattern.hh"
 
+namespace GhidraDec {
+
 class TokenPattern {
   Pattern *pattern;
   vector<Token *> toklist;
@@ -471,4 +473,5 @@ public:
   virtual void operandOrder(Constructor *ct,vector<OperandSymbol *> &order) const;
 };
 
+} // namespace GhidraDec
 #endif

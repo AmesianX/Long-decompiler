@@ -22,6 +22,7 @@
 #include "pcoderaw.hh"
 #include "loadimage.hh"
 
+namespace GhidraDec {
 /// \brief Memory storage/state for a single AddressSpace
 ///
 /// Class for setting and getting memory values within a space
@@ -202,4 +203,5 @@ inline uintb MemoryState::getValue(const VarnodeData *vn) const
   return getValue(vn->space,vn->offset,vn->size);
 }
 
+}
  #endif

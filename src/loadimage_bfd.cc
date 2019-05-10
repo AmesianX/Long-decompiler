@@ -17,6 +17,8 @@
  */
 #include "loadimage_bfd.hh"
 
+
+namespace GhidraDec {
 int4 LoadImageBfd::bfdinit = 0;	// Global initialization variable
 
 LoadImageBfd::LoadImageBfd(const string &f,const string &t) : LoadImage(f)
@@ -297,4 +299,5 @@ void LoadImageBfd::getReadonly(RangeList &list) const
       list.insertRange(spaceid,start,stop);
     }
   }
+}
 }

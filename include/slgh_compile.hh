@@ -21,6 +21,7 @@
 
 // High-level control of the sleigh compilation process
 
+namespace GhidraDec {
 struct RtlPair {
   ConstructTpl *section;	// A p-code section
   SymbolScope *scope;		// and its associated symbol scope
@@ -289,3 +290,4 @@ public:
 
 extern SleighCompile *slgh;
 extern int yydebug;
+}

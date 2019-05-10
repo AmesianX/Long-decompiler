@@ -21,6 +21,7 @@
 
 #include "type.hh"
 
+namespace GhidraDec {
 /// \brief A description of a byte-code object referenced by a constant
 ///
 /// Byte-code languages can make use of objects that the \e system knows about
@@ -197,4 +198,5 @@ public:
   virtual void restoreXml(const Element *el,TypeFactory &typegrp);
 };
 
+}
 #endif

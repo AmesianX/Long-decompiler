@@ -16,6 +16,7 @@
 %{
 #include "slgh_compile.hh"
 
+namespace GhidraDec {
 #define YYERROR_VERBOSE
 
   extern SleighCompile *slgh;
@@ -579,4 +580,6 @@ int yyerror(const char *s)
 {
   slgh->reportError(s,true);
   return 0;
+}
+
 }

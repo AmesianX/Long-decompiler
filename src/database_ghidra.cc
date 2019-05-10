@@ -16,6 +16,7 @@
 #include "database_ghidra.hh"
 #include "funcdata.hh"
 
+namespace GhidraDec {
 /// \param g is the Architecture and connection to the Ghidra client
 ScopeGhidra::ScopeGhidra(ArchitectureGhidra *g)
   : Scope("",g)
@@ -401,4 +402,5 @@ SymbolEntry *ScopeGhidraNamespace::addMapInternal(Symbol *sym,uint4 exfl,const A
   res = ScopeInternal::addMapInternal(sym,exfl,addr,off,sz,uselim);
   glb->symboltab->addRange(this,res->getAddr().getSpace(),res->getFirst(),res->getLast());
   return res;
+}
 }

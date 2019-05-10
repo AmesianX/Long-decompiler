@@ -16,6 +16,7 @@
 #include "space.hh"
 #include "translate.hh"
 
+namespace GhidraDec {
 /// Calculate \e highest based on \e addressSize, and \e wordsize.
 void AddrSpace::calcScaleMask(void)
 
@@ -702,4 +703,5 @@ void OverlaySpace::restoreXml(const Element *el)
     setFlags(big_endian);
   if (baseSpace->hasPhysical())
     setFlags(hasphysical);
+}
 }

@@ -21,6 +21,9 @@
 
 #include "address.hh"
 
+
+namespace GhidraDec {
+
 class FlowBlock;
 class PcodeOp;
 class Funcdata;
@@ -243,5 +246,7 @@ public:
   bool hasNext(void) const { return (start!=opstop); }	///< Return \b true if there are more comments to emit in the current set
   Comment *getNext(void) const { Comment *res=(*start).second; ++start; return res; }	///< Advance to the next comment
 };
+
+}
 
 #endif

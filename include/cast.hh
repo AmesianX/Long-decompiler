@@ -21,6 +21,8 @@
 
 #include "type.hh"
 
+namespace GhidraDec {
+
 class Varnode;
 class PcodeOp;
 
@@ -169,5 +171,7 @@ public:
   virtual Datatype *castStandard(Datatype *reqtype,Datatype *curtype,bool care_uint_int,bool care_ptr_uint) const;
   virtual bool isZextCast(Datatype *outtype,Datatype *intype) const;
 };
+
+}
 
 #endif

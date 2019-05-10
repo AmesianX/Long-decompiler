@@ -15,6 +15,8 @@
  */
 #include "loadimage.hh"
 
+namespace GhidraDec {
+
 /// This is a convenience method wrapped around the core
 /// loadFill() routine.  It automatically allocates an array
 /// of the desired size, and then fills it with load image data.
@@ -109,4 +111,7 @@ void RawLoadImage::loadFill(uint1 *ptr,int4 size,const Address &addr)
     addr.printRaw(errmsg);
     throw DataUnavailError(errmsg.str());
   }
+
+}
+
 }

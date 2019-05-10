@@ -21,6 +21,7 @@
 #include "pcoderaw.hh"
 #include "cover.hh"
 
+namespace GhidraDec {
 class HighVariable;
 
 class Varnode;		// Forward declaration
@@ -365,4 +366,5 @@ public:
 bool contiguous_test(Varnode *vn1,Varnode *vn2);	///< Test if Varnodes are pieces of a whole
 Varnode *findContiguousWhole(Funcdata &data,Varnode *vn1,
 				  Varnode *vn2);	///< Retrieve the whole Varnode given pieces
+}
 #endif

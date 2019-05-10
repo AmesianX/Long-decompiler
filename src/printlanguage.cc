@@ -17,6 +17,7 @@
 #include "printlanguage.hh"
 #include "funcdata.hh"
 
+namespace GhidraDec {
 vector<PrintLanguageCapability *> PrintLanguageCapability::thelist;
 
 /// This retrieves the capability with its \b isdefault field set or
@@ -880,4 +881,5 @@ void PrintLanguage::formatBinary(ostream &s,uintb val)
       s << '0';
     mask >>= 1;
   }
+}
 }

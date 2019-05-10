@@ -15,6 +15,7 @@
  */
 #include "rangeutil.hh"
 
+namespace GhidraDec {
 const char CircleRange::arrange[] = "gcgbegdagggggggeggggcgbggggggggcdfgggggggegdggggbgggfggggcgbegda";
 
 void CircleRange::calcStepShift(void)
@@ -851,4 +852,5 @@ int4 CircleRange::translate2Op(OpCode &opc,uintb &c,int4 &cslot) const
     return 0;
   }
   return 2;			// Cannot represent
+}
 }

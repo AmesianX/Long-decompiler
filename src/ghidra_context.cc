@@ -15,6 +15,7 @@
  */
 #include "ghidra_context.hh"
 
+namespace GhidraDec {
 const TrackedSet &ContextGhidra::getTrackedSet(const Address &addr) const
 
 {
@@ -26,4 +27,5 @@ const TrackedSet &ContextGhidra::getTrackedSet(const Address &addr) const
   restoreTracked(root,glb,cache);
   delete doc;
   return cache;
+}
 }

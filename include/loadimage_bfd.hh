@@ -24,6 +24,9 @@
 #include "config_bfd.h"
 //#include <bfd.h>
 
+
+namespace GhidraDec {
+
 struct ImportRecord {
   string dllname;
   string funcname;
@@ -65,5 +68,7 @@ public:
   virtual string getArchType(void) const;
   virtual void adjustVma(long adjust);
 };
+
+}
 
 #endif

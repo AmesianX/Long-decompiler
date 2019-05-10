@@ -17,6 +17,7 @@
 #define __CPUI_RULE_COMPILE__
 
 #include "unify.hh"
+namespace GhidraDec {
 
 class RuleLexer {
   static int4 identlist[256];	// 1 is identifier, 2 is digit, 4=namechar
@@ -198,5 +199,6 @@ public:
   ']'
 
  */
+}
 
 #endif

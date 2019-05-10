@@ -22,6 +22,7 @@
 #include "globalcontext.hh"
 #include "ghidra_arch.hh"
 
+namespace GhidraDec {
 /// \brief An implementation of a ContextDatabase obtaining context information via a Ghidra client
 ///
 /// This only implements the tracked register parts of the interface. In fact, this only implements
@@ -72,4 +73,5 @@ public:
     throw LowlevelError("getTrackedDefault should not be called for GHIDRA"); }
 };
 
+}
 #endif

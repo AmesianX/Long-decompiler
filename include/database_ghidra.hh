@@ -22,6 +22,8 @@
 #include "database.hh"
 #include "ghidra_arch.hh"
 
+namespace GhidraDec {
+
 /// \brief An implementation of the Scope interface by querying a Ghidra client for Symbol information
 ///
 /// This object is generally instantiated once for an executable and
@@ -131,4 +133,6 @@ public:
     : ScopeInternal(nm,g) {}		///< Constructor
 };
 
+
+} // namespace GhidraDec
 #endif

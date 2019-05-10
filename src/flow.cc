@@ -15,6 +15,7 @@
  */
 #include "flow.hh"
 
+namespace GhidraDec {
 /// Prepare for tracing flow for a new function.
 /// The Funcdata object and references to its internal containers must be explicitly given.
 /// \param d is the new function to trace
@@ -1385,4 +1386,5 @@ void FlowInfo::checkMultistageJumptables(void)
     if (jt->checkForMultistage(&data))
       tablelist.push_back(jt->getIndirectOp());
   }  
+}
 }

@@ -15,6 +15,7 @@
  */
 #include "xml_arch.hh"
 
+namespace GhidraDec {
 // Constructing the singleton registers the capability
 XmlArchitectureCapability XmlArchitectureCapability::xmlArchitectureCapability;
 
@@ -138,4 +139,5 @@ void XmlArchitecture::restoreXml(DocumentStorage &store)
     store.registerTag(*iter);
     SleighArchitecture::restoreXml(store);
   }
+}
 }

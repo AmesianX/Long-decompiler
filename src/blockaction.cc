@@ -16,6 +16,7 @@
 #include "blockaction.hh"
 #include "funcdata.hh"
 
+namespace GhidraDec {
 /// Retrieve the current edge (as a \e top FlowBlock and the index of the outgoing edge).
 /// If the end-points have been collapsed together, this returns NULL.
 /// The top and bottom nodes of the edge are updated to FlowBlocks in the current collapsed graph.
@@ -2340,4 +2341,5 @@ int4 ActionNodeJoin::apply(Funcdata &data)
     
   }
   return 0;
+}
 }

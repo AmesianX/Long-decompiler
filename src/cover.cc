@@ -16,6 +16,7 @@
 #include "cover.hh"
 #include "block.hh"
 
+namespace GhidraDec {
 /// PcodeOp objects and a CoverBlock start/stop boundaries have
 /// a natural ordering that can be used to tell if a PcodeOp falls
 /// between boundary points and if CoverBlock objects intersect.
@@ -559,4 +560,5 @@ void Cover::print(ostream &s) const
     (*iter).second.print(s);
     s << endl;
   }
+}
 }

@@ -16,6 +16,7 @@
 #include "slghsymbol.hh"
 #include "sleighbase.hh"
 #include <cmath>
+namespace GhidraDec {
 
 SleighSymbol *SymbolScope::addSymbol(SleighSymbol *a)
 
@@ -2541,4 +2542,5 @@ ContextChange *ContextCommit::clone(void) const
   res->mask = mask;
   res->num = num;
   return res;
+}
 }

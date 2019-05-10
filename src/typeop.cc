@@ -17,10 +17,15 @@
 #include "funcdata.hh"
 #include <cmath>
 
+#include <vector>
+#include <string>
+
+namespace GhidraDec {
+
 /// \param inst will hold the array of TypeOp objects, indexed on op-code
 /// \param tlst is the corresponding TypeFactory for the Architecture
 /// \param trans is the Translate object for floating-point formats
-void TypeOp::registerInstructions(vector<TypeOp *> &inst,TypeFactory *tlst,
+void TypeOp::registerInstructions(std::vector<TypeOp *> &inst,TypeFactory *tlst,
 				  const Translate *trans)
 {
   inst.insert(inst.end(),CPUI_MAX,(TypeOp *)0);
@@ -106,7 +111,7 @@ void TypeOp::registerInstructions(vector<TypeOp *> &inst,TypeFactory *tlst,
 /// depending on the specific language.
 /// \param inst is the array of TypeOp information objects
 /// \param val is set to \b true for Java operators, \b false for C operators
-void TypeOp::selectJavaOperators(vector<TypeOp *> &inst,bool val)
+void TypeOp::selectJavaOperators(std::vector<TypeOp *> &inst,bool val)
 
 {
   if (val) {
@@ -268,7 +273,7 @@ Datatype *TypeOpBinary::getInputLocal(const PcodeOp *op,int4 slot) const
   return tlst->getBase(op->getIn(slot)->getSize(),metain);
 }
 
-void TypeOpBinary::printRaw(ostream &s,const PcodeOp *op)
+void TypeOpBinary::printRaw(std::ostream &s,const PcodeOp *op)
 
 {
   op->getOut()->printRaw(s);
@@ -290,7 +295,7 @@ Datatype *TypeOpUnary::getInputLocal(const PcodeOp *op,int4 slot) const
   return tlst->getBase(op->getIn(slot)->getSize(),metain);
 }
 
-void TypeOpUnary::printRaw(ostream &s,const PcodeOp *op)
+void TypeOpUnary::printRaw(std::ostream &s,const PcodeOp *op)
 
 {
   op->getOut()->printRaw(s);
@@ -310,7 +315,7 @@ Datatype *TypeOpFunc::getInputLocal(const PcodeOp *op,int4 slot) const
   return tlst->getBase(op->getIn(slot)->getSize(),metain);
 }
 
-void TypeOpFunc::printRaw(ostream &s,const PcodeOp *op)
+void TypeOpFunc::printRaw(std::ostream &s,const PcodeOp *op)
 
 {
   op->getOut()->printRaw(s);
@@ -344,7 +349,7 @@ Datatype *TypeOpCopy::getOutputToken(const PcodeOp *op,CastStrategy *castStrateg
   return op->getIn(0)->getHigh()->getType();
 }
 
-void TypeOpCopy::printRaw(ostream &s,const PcodeOp *op)
+void TypeOpCopy::printRaw(std::ostream &s,const PcodeOp *op)
 
 {
   op->getOut()->printRaw(s);
@@ -406,7 +411,7 @@ Datatype *TypeOpLoad::getOutputToken(const PcodeOp *op,CastStrategy *castStrateg
   return op->getOut()->getHigh()->getType();
 }
 
-void TypeOpLoad::printRaw(ostream &s,const PcodeOp *op)
+void TypeOpLoad::printRaw(std::ostream &s,const PcodeOp *op)
 
 {
   op->getOut()->printRaw(s);
@@ -440,7 +445,7 @@ Datatype *TypeOpStore::getInputCast(const PcodeOp *op,int4 slot,const CastStrate
   return tlst->getTypePointer(op->getIn(1)->getSize(),reqtype,spc->getWordSize());
 }
 
-void TypeOpStore::printRaw(ostream &s,const PcodeOp *op)
+void TypeOpStore::printRaw(std::ostream &s,const PcodeOp *op)
 
 {
   s << "*(";
@@ -458,7 +463,7 @@ TypeOpBranch::TypeOpBranch(TypeFactory *t) : TypeOp(t,CPUI_BRANCH,"goto")
   behave = new OpBehavior(CPUI_BRANCH,false,true); // Dummy behavior
 }
 
-void TypeOpBranch::printRaw(ostream &s,const PcodeOp *op)
+void TypeOpBranch::printRaw(std::ostream &s,const PcodeOp *op)
 
 {
   s << name << ' ';
@@ -484,7 +489,7 @@ Datatype *TypeOpCbranch::getInputLocal(const PcodeOp *op,int4 slot) const
   return tlst->getTypePointer(op->getIn(0)->getSize(),td,spc->getWordSize()); // First parameter is code pointer
 }
 
-void TypeOpCbranch::printRaw(ostream &s,const PcodeOp *op)
+void TypeOpCbranch::printRaw(std::ostream &s,const PcodeOp *op)
 
 {
   s << name << ' ';
@@ -504,7 +509,7 @@ TypeOpBranchind::TypeOpBranchind(TypeFactory *t) : TypeOp(t,CPUI_BRANCHIND,"swit
   behave = new OpBehavior(CPUI_BRANCHIND,false,true); // Dummy behavior
 }
 
-void TypeOpBranchind::printRaw(ostream &s,const PcodeOp *op)
+void TypeOpBranchind::printRaw(std::ostream &s,const PcodeOp *op)
 
 {
   s << name << ' ';
@@ -518,7 +523,7 @@ TypeOpCall::TypeOpCall(TypeFactory *t) : TypeOp(t,CPUI_CALL,"call")
   behave = new OpBehavior(CPUI_CALL,false,true); // Dummy behavior
 }
 
-void TypeOpCall::printRaw(ostream &s,const PcodeOp *op)
+void TypeOpCall::printRaw(std::ostream &s,const PcodeOp *op)
 
 {
   if (op->getOut() != (Varnode *)0) {
@@ -630,7 +635,7 @@ Datatype *TypeOpCallind::getOutputLocal(const PcodeOp *op) const
   return ct;
 }
 
-void TypeOpCallind::printRaw(ostream &s,const PcodeOp *op)
+void TypeOpCallind::printRaw(std::ostream &s,const PcodeOp *op)
 
 {
   if (op->getOut() != (Varnode *)0) {
@@ -657,7 +662,7 @@ TypeOpCallother::TypeOpCallother(TypeFactory *t) : TypeOp(t,CPUI_CALLOTHER,"sysc
   behave = new OpBehavior(CPUI_CALLOTHER,false,true); // Dummy behavior
 }
 
-void TypeOpCallother::printRaw(ostream &s,const PcodeOp *op)
+void TypeOpCallother::printRaw(std::ostream &s,const PcodeOp *op)
 
 {
   if (op->getOut() != (Varnode *)0) {
@@ -743,7 +748,7 @@ TypeOpReturn::TypeOpReturn(TypeFactory *t) : TypeOp(t,CPUI_RETURN,"return")
   behave = new OpBehavior(CPUI_RETURN,false,true); // Dummy behavior
 }
 
-void TypeOpReturn::printRaw(ostream &s,const PcodeOp *op)
+void TypeOpReturn::printRaw(std::ostream &s,const PcodeOp *op)
 
 {
   s << name;
@@ -1162,7 +1167,7 @@ TypeOpIntSright::TypeOpIntSright(TypeFactory *t)
   behave = new OpBehaviorIntSright();
 }
 
-void TypeOpIntSright::printRaw(ostream &s,const PcodeOp *op)
+void TypeOpIntSright::printRaw(std::ostream &s,const PcodeOp *op)
 
 {
   op->getOut()->printRaw(s);
@@ -1445,7 +1450,7 @@ TypeOpMulti::TypeOpMulti(TypeFactory *t) : TypeOp(t,CPUI_MULTIEQUAL,"?")
   behave = new OpBehavior(CPUI_MULTIEQUAL,false,true); // Dummy behavior
 }
 
-void TypeOpMulti::printRaw(ostream &s,const PcodeOp *op)
+void TypeOpMulti::printRaw(std::ostream &s,const PcodeOp *op)
 
 {
   op->getOut()->printRaw(s);
@@ -1483,7 +1488,7 @@ Datatype *TypeOpIndirect::getInputLocal(const PcodeOp *op,int4 slot) const
   return tlst->getTypePointer(op->getIn(0)->getSize(),ct,spc->getWordSize()); // Second parameter is code pointer
 }
 
-void TypeOpIndirect::printRaw(ostream &s,const PcodeOp *op)
+void TypeOpIndirect::printRaw(std::ostream &s,const PcodeOp *op)
 
 {
   op->getOut()->printRaw(s);
@@ -1558,7 +1563,7 @@ TypeOpCast::TypeOpCast(TypeFactory *t) : TypeOp(t,CPUI_CAST,"(cast)")
   behave = new OpBehavior(CPUI_CAST,false,true); // Dummy behavior
 }
 
-void TypeOpCast::printRaw(ostream &s,const PcodeOp *op)
+void TypeOpCast::printRaw(std::ostream &s,const PcodeOp *op)
 
 {
   op->getOut()->printRaw(s);
@@ -1603,7 +1608,7 @@ Datatype *TypeOpPtradd::getInputCast(const PcodeOp *op,int4 slot,const CastStrat
   return TypeOp::getInputCast(op,slot,castStrategy);
 }
 
-void TypeOpPtradd::printRaw(ostream &s,const PcodeOp *op)
+void TypeOpPtradd::printRaw(std::ostream &s,const PcodeOp *op)
 
 {
   op->getOut()->printRaw(s);
@@ -1664,7 +1669,7 @@ Datatype *TypeOpPtrsub::getOutputToken(const PcodeOp *op,CastStrategy *castStrat
   return TypeOp::getOutputToken(op,castStrategy);
 }
 
-void TypeOpPtrsub::printRaw(ostream &s,const PcodeOp *op)
+void TypeOpPtrsub::printRaw(std::ostream &s,const PcodeOp *op)
 
 {
   op->getOut()->printRaw(s);
@@ -1681,7 +1686,7 @@ TypeOpSegment::TypeOpSegment(TypeFactory *t) : TypeOp(t,CPUI_SEGMENTOP,"segmento
   behave = new OpBehavior(CPUI_SEGMENTOP,false,true); // Dummy behavior
 }
 
-void TypeOpSegment::printRaw(ostream &s,const PcodeOp *op)
+void TypeOpSegment::printRaw(std::ostream &s,const PcodeOp *op)
 
 {
   if (op->getOut() != (Varnode *)0) {
@@ -1726,7 +1731,7 @@ TypeOpCpoolref::TypeOpCpoolref(TypeFactory *t) : TypeOp(t,CPUI_CPOOLREF,"cpoolre
 Datatype *TypeOpCpoolref::getOutputLocal(const PcodeOp *op) const
 
 {
-  vector<uintb> refs;
+  std::vector<uintb> refs;
   for(int4 i=1;i<op->numInput();++i)
     refs.push_back(op->getIn(i)->getOffset());
   const CPoolRecord *rec = cpool->getRecord(refs);
@@ -1743,7 +1748,7 @@ Datatype *TypeOpCpoolref::getInputLocal(const PcodeOp *op,int4 slot) const
   return tlst->getBase(op->getIn(slot)->getSize(),TYPE_INT);
 }
 
-void TypeOpCpoolref::printRaw(ostream &s,const PcodeOp *op)
+void TypeOpCpoolref::printRaw(std::ostream &s,const PcodeOp *op)
 
 {
   if (op->getOut() != (Varnode *)0) {
@@ -1751,7 +1756,7 @@ void TypeOpCpoolref::printRaw(ostream &s,const PcodeOp *op)
     s << " = ";
   }
   s << getOperatorName(op);
-  vector<uintb> refs;
+  std::vector<uintb> refs;
   for(int4 i=1;i<op->numInput();++i)
     refs.push_back(op->getIn(i)->getOffset());
   const CPoolRecord *rec = cpool->getRecord(refs);
@@ -1773,7 +1778,7 @@ TypeOpNew::TypeOpNew(TypeFactory *t) : TypeOp(t,CPUI_NEW,"new")
   behave = new OpBehavior(CPUI_NEW,false,true);		// Dummy behavior
 }
 
-void TypeOpNew::printRaw(ostream &s,const PcodeOp *op)
+void TypeOpNew::printRaw(std::ostream &s,const PcodeOp *op)
 
 {
   if (op->getOut() != (Varnode *)0) {
@@ -1788,4 +1793,6 @@ void TypeOpNew::printRaw(ostream &s,const PcodeOp *op)
     op->getIn(i)->printRaw(s);
   }
   s << ')';
+}
+
 }

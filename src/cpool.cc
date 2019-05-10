@@ -15,6 +15,7 @@
  */
 #include "cpool.hh"
 
+namespace GhidraDec {
 /// Save the constant pool object description as a \<cpoolrec> tag.
 /// \param s is the output stream
 void CPoolRecord::saveXml(ostream &s) const
@@ -245,4 +246,5 @@ void ConstantPoolInternal::restoreXml(const Element *el,TypeFactory &typegrp)
     CPoolRecord *newrec = createRecord(refs);
     newrec->restoreXml(subel,typegrp);
   }
+}
 }

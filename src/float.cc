@@ -19,6 +19,8 @@
 #include <cmath>
 #include "address.hh"
 
+namespace GhidraDec {
+
 #if defined(_WINDOWS) && !defined(INFINITY)
 
 // Some definitions for Windows floating point stuff
@@ -556,7 +558,7 @@ uintb FloatFormat::opRound(uintb a) const
 
 /// Write the format out to a \<floatformat> XML tag.
 /// \param s is the output stream
-void FloatFormat::saveXml(ostream &s) const
+void FloatFormat::saveXml(std::ostream &s) const
 
 {
   s << "<floatformat";
@@ -577,40 +579,41 @@ void FloatFormat::restoreXml(const Element *el)
 
 {
   {
-    istringstream s(el->getAttributeValue("size"));
-    s.unsetf(ios::dec | ios::hex | ios::oct);
+	std::istringstream s(el->getAttributeValue("size"));
+    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
     s >> size;
   }
   {
     istringstream s(el->getAttributeValue("signpos"));
-    s.unsetf(ios::dec | ios::hex | ios::oct);
+    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
     s >> signbit_pos;
   }
   {
     istringstream s(el->getAttributeValue("fracpos"));
-    s.unsetf(ios::dec | ios::hex | ios::oct);
+    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
     s >> frac_pos;
   }
   {
     istringstream s(el->getAttributeValue("fracsize"));
-    s.unsetf(ios::dec | ios::hex | ios::oct);
+    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
     s >> frac_size;
   }
   {
     istringstream s(el->getAttributeValue("exppos"));
-    s.unsetf(ios::dec | ios::hex | ios::oct);
+    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
     s >> exp_pos;
   }
   {
     istringstream s(el->getAttributeValue("expsize"));
-    s.unsetf(ios::dec | ios::hex | ios::oct);
+    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
     s >> exp_size;
   }
   {
     istringstream s(el->getAttributeValue("bias"));
-    s.unsetf(ios::dec | ios::hex | ios::oct);
+    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
     s >> bias;
   }
   jbitimplied = xml_readbool(el->getAttributeValue("jbitimplied"));
   maxexponent = (1<<exp_size)-1;
+}
 }

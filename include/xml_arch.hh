@@ -18,6 +18,7 @@
 #include "sleigh_arch.hh"
 #include "loadimage_xml.hh"
 
+namespace GhidraDec {
 /// \brief Extension for building an XML format capable Architecture
 class XmlArchitectureCapability : public ArchitectureCapability {
   static XmlArchitectureCapability xmlArchitectureCapability;		///< The singleton instance
@@ -42,3 +43,4 @@ public:
   XmlArchitecture(const string &fname,const string &targ,ostream *estream);	///< Constructor
   virtual ~XmlArchitecture(void) {}
 };
+}

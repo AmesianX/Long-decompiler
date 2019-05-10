@@ -24,6 +24,8 @@
 #include "pcoderaw.hh"
 #include "float.hh"
 
+namespace GhidraDec {
+
 // Some errors specific to the translation unit
 
 /// \brief Exception for encountering unimplemented pcode
@@ -565,6 +567,8 @@ inline int4 Translate::getAlignment(void) const {
 /// \return the first allocatable offset
 inline uintm Translate::getUniqueBase(void) const {
   return unique_base;
+}
+
 }
 
 #endif

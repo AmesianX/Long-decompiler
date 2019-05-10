@@ -21,6 +21,9 @@
 
 #include "xml.hh"
 
+
+namespace GhidraDec {
+
 /// \brief Encoding information for a single floating-point format
 ///
 /// This class supports manipulation of a single floating-point encoding.
@@ -88,8 +91,9 @@ public:
   uintb opInt2Float(uintb a,int4 sizein) const;		///< Convert integer to floating-point
   uintb opFloat2Float(uintb a,const FloatFormat &outformat) const;	///< Convert between floating-point precisions
 
-  void saveXml(ostream &s) const;			///< Save the format to an XML stream
+  void saveXml(std::ostream &s) const;			///< Save the format to an XML stream
   void restoreXml(const Element *el);			///< Restore the format from XML
 };
 
+}
 #endif

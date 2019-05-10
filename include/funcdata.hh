@@ -25,6 +25,7 @@
 #include "merge.hh"
 #include "dynamic.hh"
 
+namespace GhidraDec {
 class FlowInfo;
 
 /// \brief Container for data structures associated with a single function
@@ -604,4 +605,5 @@ extern PcodeOp *cseElimination(Funcdata &data,PcodeOp *op1,PcodeOp *op2);
 extern void cseEliminateList(Funcdata &data,vector< pair<uintm,PcodeOp *> > &list,
 			     vector<Varnode *> &outlist);
 
+}
 #endif
