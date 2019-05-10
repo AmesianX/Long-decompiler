@@ -91,7 +91,7 @@ PrintLanguage *PrintCCapability::buildLanguage(Architecture *glb)
 
 /// \param g is the Architecture owning this c-language emitter
 /// \param nm is the name assigned to this emitter
-PrintC::PrintC(Architecture *g,const string &nm) : PrintLanguage(g,nm)
+PrintC::PrintC(Architecture *g,const std::string &nm) : PrintLanguage(g,nm)
 
 {
   option_NULL = false;
@@ -193,7 +193,7 @@ void PrintC::pushTypeStart(const Datatype *ct,bool noident)
 
   if (ct->getName().size()==0) {	// Check for anonymous type
     // We could support a struct or enum declaration here
-    string name = genericTypeName(ct);
+    std::string name = genericTypeName(ct);
     pushOp(tok,(const PcodeOp *)0);
     pushAtom(Atom(name,typetoken,EmitXml::type_color,ct));
   }
@@ -292,7 +292,7 @@ void PrintC::opFunc(const PcodeOp *op)
   pushOp(&function_call,op);
   // Using function syntax but don't markup the name as
   // a normal function call
-  string nm = op->getOpcode()->getOperatorName(op);
+  std::string nm = op->getOpcode()->getOperatorName(op);
   pushAtom(Atom(nm,optoken,EmitXml::no_color,op));
   if (op->numInput() > 0) {
     for(int4 i=0;i<op->numInput()-1;++i)
@@ -440,7 +440,7 @@ void PrintC::opCall(const PcodeOp *op)
   if (callpoint->getSpace()->getType()==IPTR_FSPEC) {
     FuncCallSpecs *fc = FuncCallSpecs::getFspecFromConst(callpoint->getAddr());
     if (fc->getName().size()==0) {
-      string name = genericFunctionName(fc->getEntryAddress());
+      std::string name = genericFunctionName(fc->getEntryAddress());
       pushAtom(Atom(name,functoken,EmitXml::funcname_color,op,(const Funcdata *)0));
     }
     else
@@ -491,7 +491,7 @@ void PrintC::opCallind(const PcodeOp *op)
 void PrintC::opCallother(const PcodeOp *op)
 
 {
-  string nm = op->getOpcode()->getOperatorName(op);
+  std::string nm = op->getOpcode()->getOperatorName(op);
   pushOp(&function_call,op);
   pushAtom(Atom(nm,optoken,EmitXml::funcname_color,op));
   if (op->numInput() > 1) {
@@ -524,7 +524,7 @@ void PrintC::opConstructor(const PcodeOp *op,bool withNew)
   if (dt->getMetatype() == TYPE_PTR) {
     dt = ((TypePointer *)dt)->getPtrTo();
   }
-  string name = dt->getName();
+  std::string name = dt->getName();
   pushOp(&function_call,op);
   pushAtom(Atom(name,optoken,EmitXml::funcname_color,op));
   // implied vn's pushed on in reverse order for efficiency
@@ -546,7 +546,7 @@ void PrintC::opConstructor(const PcodeOp *op,bool withNew)
 void PrintC::opReturn(const PcodeOp *op)
 
 {
-  string nm;
+  std::string nm;
   switch(op->getHaltType()) {
   default:			// The most common case, plain return
   // FIXME:  This routine shouldn't emit directly
@@ -687,7 +687,7 @@ void PrintC::opPtrsub(const PcodeOp *op)
   if (ct->getMetatype() == TYPE_STRUCT) {
     uintb suboff = op->getIn(1)->getOffset();	// How far into container
     suboff = AddrSpace::addressToByte(suboff,ptype->getWordSize());
-    string fieldname;
+    std::string fieldname;
     Datatype *fieldtype;
     int4 fieldoffset;
     int4 newoff;
@@ -696,7 +696,7 @@ void PrintC::opPtrsub(const PcodeOp *op)
       if (ct->getSize() <= suboff)
 	throw LowlevelError("PTRSUB out of bounds into struct");
       // Try to match the Ghidra's default field name from DataTypeComponent.getDefaultFieldName
-      ostringstream s;
+	  std::ostringstream s;
       s << "field_0x" << hex << suboff;
       fieldname = s.str();
       fieldtype = (Datatype *)0;
@@ -854,7 +854,7 @@ void PrintC::opCpoolRefOp(const PcodeOp *op)
     switch(rec->getTag()) {
     case CPoolRecord::string_literal:
       {
-	ostringstream str;
+		std::ostringstream str;
 	int4 len = rec->getByteDataLength();
 	if (len > 2048)
 	  len = 2048;
@@ -923,7 +923,7 @@ void PrintC::opNewOp(const PcodeOp *op)
       // Array allocation form
       pushOp(&new_op,op);
       pushAtom(Atom("new",optoken,EmitXml::keyword_color,op,outvn));
-      string name;
+      std::string name;
       if (outvn == (const Varnode *)0) {	// Its technically possible, for new result to be unused
 	name = "<unused>";
       }
@@ -1002,7 +1002,7 @@ void PrintC::push_integer(uintb val,int4 sz,bool sign,
     displayFormat = (PrintLanguage::mostNaturalBase(val)==16) ? Symbol::force_hex : Symbol::force_dec;
   }
 
-  ostringstream t;
+  std::ostringstream t;
   if (print_negsign)
     t << '-';
   if (displayFormat == Symbol::force_hex)
@@ -1052,7 +1052,7 @@ void PrintC::push_integer(uintb val,int4 sz,bool sign,
 /// \param op is the PcodeOp using the value
 void PrintC::push_float(uintb val,int4 sz,const Varnode *vn,const PcodeOp *op)
 {
-  ostringstream t;
+  std::ostringstream t;
 
   const FloatFormat *format = glb->translate->getFloatFormat(sz);
   if (format == (const FloatFormat *)0) {
@@ -1073,9 +1073,9 @@ void PrintC::push_float(uintb val,int4 sz,const Varnode *vn,const PcodeOp *op)
     }
     else {
       if ((mods & force_scinote)!=0)
-	t.setf( ios::scientific ); // Set to scientific notation
+	t.setf( std::ios::scientific ); // Set to scientific notation
       else
-	t.setf( ios::fixed );	// Otherwise use fixed notation
+	t.setf( std::ios::fixed );	// Otherwise use fixed notation
       t.precision(8);		// Number of digits of precision
       t << floatval;
     }
@@ -1086,7 +1086,7 @@ void PrintC::push_float(uintb val,int4 sz,const Varnode *vn,const PcodeOp *op)
     pushAtom(Atom(t.str(),vartoken,EmitXml::const_color,op,vn));
 }
 
-void PrintC::printUnicode(ostream &s,int4 onechar) const
+void PrintC::printUnicode(std::ostream &s,int4 onechar) const
 
 {
   if (unicodeNeedsEscape(onechar)) {
@@ -1176,12 +1176,12 @@ bool PrintC::doEmitWideCharPrefix(void) const
   return true;
 }
 
-/// \brief Check if the byte buffer has a (unicode) string terminator
+/// \brief Check if the byte buffer has a (unicode) std::string terminator
 ///
 /// \param buffer is the byte buffer
 /// \param size is the number of bytes in the buffer
 /// \param charsize is the presumed size (in bytes) of character elements
-/// \return \b true if a string terminator is found
+/// \return \b true if a std::string terminator is found
 bool PrintC::hasCharTerminator(uint1 *buffer,int4 size,int4 charsize)
 
 {
@@ -1202,16 +1202,16 @@ bool PrintC::hasCharTerminator(uint1 *buffer,int4 size,int4 charsize)
 #define STR_LITERAL_BUFFER_INCREMENT 32
 
 
-/// \brief Print a quoted (unicode) string at the given address.
+/// \brief Print a quoted (unicode) std::string at the given address.
 ///
-/// Data for the string is obtained directly from the LoadImage.  The bytes are checked
+/// Data for the std::string is obtained directly from the LoadImage.  The bytes are checked
 /// for appropriate unicode encoding and the presence of a terminator. If all these checks
-/// pass, the string is emitted.
+/// pass, the std::string is emitted.
 /// \param s is the output stream to print to
-/// \param addr is the address of the string data within the LoadImage
+/// \param addr is the address of the std::string data within the LoadImage
 /// \param charsize is the number of bytes in an encoded element (i.e. UTF8, UTF16, or UTF32)
-/// \return \b true if a proper string was found and printed to the stream
-bool PrintC::printCharacterConstant(ostream &s,const Address &addr,int4 charsize) const
+/// \return \b true if a proper std::string was found and printed to the stream
+bool PrintC::printCharacterConstant(std::ostream &s,const Address &addr,int4 charsize) const
 
 {
   uint1 buffer[STR_LITERAL_BUFFER_MAXSIZE+4]; // Additional buffer for get_codepoint skip readahead
@@ -1238,7 +1238,7 @@ bool PrintC::printCharacterConstant(ostream &s,const Address &addr,int4 charsize
       s << 'L';			// Print symbol indicating wide character
     s << '"';
     if (!escapeCharacterData(s,buffer,curBufferSize,charsize,bigend))
-      s << "...\" /* TRUNCATED STRING LITERAL */";
+      s << "...\" /* TRUNCATED std::string LITERAL */";
     else s << '"';
      
     res = true;
@@ -1259,7 +1259,7 @@ bool PrintC::printCharacterConstant(ostream &s,const Address &addr,int4 charsize
 void PrintC::pushCharConstant(uintb val,const TypeChar *ct,const Varnode *vn,const PcodeOp *op)
 
 {
-  ostringstream t;
+  std::ostringstream t;
   if ((ct->getSize()==1)&&(val >= 0x80)) {
     // For byte characters, the encoding is assumed to be ASCII, UTF-8, or some other
     // code-page that extends ASCII. At 0x80 and above, we cannot treat the value as a
@@ -1292,7 +1292,7 @@ void PrintC::pushEnumConstant(uintb val,const TypeEnum *ct,
 				 const Varnode *vn,
 				 const PcodeOp *op)
 {
-  vector<string> valnames;
+  vector<std::string> valnames;
 
   bool complement = ct->getMatches(val,valnames);
   if (valnames.size() > 0) {
@@ -1305,21 +1305,21 @@ void PrintC::pushEnumConstant(uintb val,const TypeEnum *ct,
   }
   else {
     push_integer(val,ct->getSize(),false,vn,op);
-    //    ostringstream s;
+    //    std::ostringstream s;
     //    s << "BAD_ENUM(0x" << hex << val << ")";
     //    pushAtom(Atom(s.str(),vartoken,EmitXml::const_color,op,vn));
   }
 }
 
-/// \brief Attempt to push a quoted string representing a given constant pointer onto the RPN stack
+/// \brief Attempt to push a quoted std::string representing a given constant pointer onto the RPN stack
 ///
-/// Check if the constant pointer refers to character data that can be emitted as a quoted string.
-/// If so push the string, if not return \b false to indicate a token was not pushed
+/// Check if the constant pointer refers to character data that can be emitted as a quoted std::string.
+/// If so push the std::string, if not return \b false to indicate a token was not pushed
 /// \param val is the value of the given constant pointer
 /// \param ct is the pointer data-type attached to the value
 /// \param vn is the Varnode holding the value
 /// \param op is the PcodeOp using the value
-/// \return \b true if a quoted string was pushed to the RPN stack
+/// \return \b true if a quoted std::string was pushed to the RPN stack
 bool PrintC::pushPtrCharConstant(uintb val,const TypePointer *ct,const Varnode *vn,const PcodeOp *op)
 
 {
@@ -1328,12 +1328,12 @@ bool PrintC::pushPtrCharConstant(uintb val,const TypePointer *ct,const Varnode *
   Address stringaddr = glb->resolveConstant(spc,val,ct->getSize(),op->getAddr());
   if (stringaddr.isInvalid()) return false;
   if (!glb->symboltab->getGlobalScope()->isReadOnly(stringaddr,1,Address()))
-    return false;	     // Check that string location is readonly
+    return false;	     // Check that std::string location is readonly
 
-  ostringstream str;
+  std::ostringstream str;
   Datatype *subct = ct->getPtrTo();
   if (!printCharacterConstant(str,stringaddr,subct->getSize()))
-    return false;		// Can we get a nice ASCII string
+    return false;		// Can we get a nice ASCII std::string
 
   pushAtom(Atom(str.str(),vartoken,EmitXml::const_color,op,vn));
   return true;
@@ -1515,7 +1515,7 @@ void PrintC::pushAnnotation(const Varnode *vn,const PcodeOp *op)
     }
   }
   else {
-    string regname = glb->translate->getRegisterName(vn->getSpace(),vn->getOffset(),size);
+    std::string regname = glb->translate->getRegisterName(vn->getSpace(),vn->getOffset(),size);
     if (regname.empty()) {
       Datatype *ct = glb->types->getBase(size,TYPE_UINT);
       pushConstant(AddrSpace::byteToAddress(vn->getOffset(),vn->getSpace()->getWordSize()),ct,vn,op);
@@ -1535,7 +1535,7 @@ void PrintC::pushSymbol(const Symbol *sym,const Varnode *vn,const PcodeOp *op)
     if (subct->isCharPrint()) {
       SymbolEntry *entry = sym->getFirstWholeMap();
       if (entry != (SymbolEntry *)0) {
-	ostringstream s;
+		std::ostringstream s;
 	if (printCharacterConstant(s,entry->getAddr(),subct->getSize())) {
 	  pushAtom(Atom(s.str(),vartoken,EmitXml::const_color,op,vn));
 	  return;
@@ -1556,7 +1556,7 @@ void PrintC::pushSymbol(const Symbol *sym,const Varnode *vn,const PcodeOp *op)
 void PrintC::pushUnnamedLocation(const Address &addr,
 				   const Varnode *vn,const PcodeOp *op)
 {
-  ostringstream s;
+  std::ostringstream s;
   s << addr.getSpace()->getName();
   addr.printRaw(s);
   pushAtom(Atom(s.str(),vartoken,EmitXml::var_color,op,vn));
@@ -1600,7 +1600,7 @@ void PrintC::pushPartialSymbol(const Symbol *sym,int4 off,int4 sz,
 	stack.push_back(PartialSymbolEntry());
 	PartialSymbolEntry &entry( stack.back() );
 	entry.token = &subscript;
-	ostringstream s;
+	std::ostringstream s;
 	s << dec << el;
 	entry.fieldname = s.str();
 	entry.field = (const TypeField *)0;
@@ -1621,7 +1621,7 @@ void PrintC::pushPartialSymbol(const Symbol *sym,int4 off,int4 sz,
       stack.push_back(PartialSymbolEntry());
       PartialSymbolEntry &entry(stack.back());
       entry.token = &object_member;
-      ostringstream s;
+	  std::ostringstream s;
       if (sz == 0)
 	sz = ct->getSize() - off;
       // Special notation for subpiece which is neither
@@ -1662,7 +1662,7 @@ void PrintC::pushMismatchSymbol(const Symbol *sym,int4 off,int4 sz,
 
   // We prepend an underscore to indicate a close
   // but not quite match
-    string name = '_'+sym->getName();
+    std::string name = '_'+sym->getName();
     pushAtom(Atom(name,vartoken,EmitXml::var_color,op,vn));
   }
   else
@@ -1711,7 +1711,7 @@ void PrintC::emitStructDefinition(const TypeStruct *ct)
 void PrintC::emitEnumDefinition(const TypeEnum *ct)
 
 {
-  map<uintb,string>::const_iterator iter;
+  map<uintb,std::string>::const_iterator iter;
 
   if (ct->getName().size()==0) {
     clear();
@@ -1884,7 +1884,7 @@ void PrintC::adjustTypeOperators(void)
   TypeOp::selectJavaOperators(glb->inst,false);
 }
 
-void PrintC::setCommentStyle(const string &nm)
+void PrintC::setCommentStyle(const std::string &nm)
 
 {
   if ((nm=="c")||
@@ -1900,8 +1900,8 @@ void PrintC::setCommentStyle(const string &nm)
 bool PrintC::isCharacterConstant(const uint1 *buf,int4 size,int4 charsize) const
 
 {
-  // Return true if this looks like a c-string
-  // If the string is encoded in UTF8 or ASCII, we get (on average) a bit of check
+  // Return true if this looks like a c-std::string
+  // If the std::string is encoded in UTF8 or ASCII, we get (on average) a bit of check
   // per character.  For UTF16, the surrogate reserved area gives at least some check.
   if (buf == (const uint1 *)0) return false;
   bool bigend = glb->translate->isBigEndian();
@@ -2660,7 +2660,7 @@ void PrintC::emitLabel(const FlowBlock *bl)
       }
     }
   }
-  ostringstream lb;
+  std::ostringstream lb;
   if (bb->isJoined())
     lb << "joined_";
   else if (bb->isDuplicated())
@@ -2808,10 +2808,10 @@ void PrintC::emitBlockSwitch(const BlockSwitch *bl)
 ///
 /// \param addr is the entry point address of the function
 /// \return the generated name
-string PrintC::genericFunctionName(const Address &addr)
+std::string PrintC::genericFunctionName(const Address &addr)
 
 {
-  ostringstream s;
+  std::ostringstream s;
 
   s << "func_";
   addr.printRaw(s);
@@ -2822,10 +2822,10 @@ string PrintC::genericFunctionName(const Address &addr)
 ///
 /// \param ct is the given data-type
 /// \return the generated name
-string PrintC::genericTypeName(const Datatype *ct)
+std::string PrintC::genericTypeName(const Datatype *ct)
 
 {
-  ostringstream s;
+  std::ostringstream s;
   switch(ct->getMetatype()) {
   case TYPE_INT:
     s << "unkint";

@@ -102,12 +102,12 @@ void OpFollow::restoreXml(const Element *el)
     if (el->getAttributeName(i) == "code") continue;
     else if (el->getAttributeName(i) == "value") {
       istringstream s(el->getAttributeValue(i));
-      s.unsetf(ios::dec | ios::hex | ios::oct);
+      s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
       s >> val;
     }
     else if (el->getAttributeName(i) == "slot") {
       istringstream s(el->getAttributeValue(i));
-      s.unsetf(ios::dec | ios::hex | ios::oct);
+      s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
       s >> slot;
     }
     else
@@ -208,12 +208,12 @@ void SegmentOp::restoreXml(const Element *el)
     if (nm == "space") continue;
     else if (nm == "baseinsize") {
       istringstream s(el->getAttributeValue(i));
-      s.unsetf(ios::dec | ios::hex | ios::oct);
+      s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
       s >> baseinsize;
     }
     else if (nm == "innerinsize") {
       istringstream s1(el->getAttributeValue(i));
-      s1.unsetf(ios::dec | ios::hex | ios::oct);
+      s1.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
       s1 >> innerinsize;
     }
     else if (nm == "farpointer")

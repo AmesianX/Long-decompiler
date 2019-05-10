@@ -18,7 +18,7 @@
 #include "flow.hh"
 namespace GhidraDec {
 
-void LoadTable::saveXml(ostream &s) const
+void LoadTable::saveXml(std::ostream &s) const
 
 {
   s << "<loadtable";
@@ -32,22 +32,22 @@ void LoadTable::saveXml(ostream &s) const
 void LoadTable::restoreXml(const Element *el,Architecture *glb)
 
 {
-  istringstream s1(el->getAttributeValue("size"));	
-  s1.unsetf(ios::dec | ios::hex | ios::oct);
+  std::istringstream s1(el->getAttributeValue("size"));	
+  s1.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
   s1 >> size;
-  istringstream s2(el->getAttributeValue("num"));	
-  s2.unsetf(ios::dec | ios::hex | ios::oct);
+  std::istringstream s2(el->getAttributeValue("num"));	
+  s2.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
   s2 >> num;
   const List &list( el->getChildren() );
   List::const_iterator iter = list.begin();
   addr = Address::restoreXml( *iter, glb);
 }
 
-void LoadTable::collapseTable(vector<LoadTable> &table)
+void LoadTable::collapseTable(std::vector<LoadTable> &table)
 
 { // Assuming -table- is sorted, collapse sequential LoadTable entries into single LoadTable entries
   if (table.empty()) return;
-  vector<LoadTable>::iterator iter,lastiter;
+  std::vector<LoadTable>::iterator iter,lastiter;
   int4 count = 1;
   iter = table.begin();
   lastiter = iter;
@@ -141,7 +141,7 @@ uintb EmulateFunction::getVarnodeValue(Varnode *vn) const
   // this is just part of the label
   if (vn->isConstant())
     return vn->getOffset();
-  map<Varnode *,uintb>::const_iterator iter;
+  std::map<Varnode *,uintb>::const_iterator iter;
   iter = varnodeMap.find(vn);
   if (iter != varnodeMap.end())
     return (*iter).second;	// We have seen this varnode before
@@ -202,13 +202,13 @@ uintb EmulateFunction::emulatePath(uintb val,const PathMeld &pathMeld,
   return getVarnodeValue(invn);
 }
 
-void EmulateFunction::collectLoadPoints(vector<LoadTable> &res) const
+void EmulateFunction::collectLoadPoints(std::vector<LoadTable> &res) const
 
 {
   if (loadpoints.empty()) return;
   bool issorted = true;
-  vector<LoadTable>::const_iterator iter;
-  vector<LoadTable>::iterator lastiter;
+  std::vector<LoadTable>::const_iterator iter;
+  std::vector<LoadTable>::iterator lastiter;
 
   iter = loadpoints.begin();
   res.push_back( *iter );	// Copy the first entry
@@ -359,7 +359,7 @@ bool JumpModelTrivial::recoverModel(Funcdata *fd,PcodeOp *indop,uint4 matchsize,
   return ((size != 0)&&(size<=matchsize));
 }
 
-void JumpModelTrivial::buildAddresses(Funcdata *fd,PcodeOp *indop,vector<Address> &addresstable,vector<LoadTable> *loadpoints) const
+void JumpModelTrivial::buildAddresses(Funcdata *fd,PcodeOp *indop,std::vector<Address> &addresstable,std::vector<LoadTable> *loadpoints) const
 
 {
   addresstable.clear();
@@ -370,7 +370,7 @@ void JumpModelTrivial::buildAddresses(Funcdata *fd,PcodeOp *indop,vector<Address
   }
 }
 
-void JumpModelTrivial::buildLabels(Funcdata *fd,vector<Address> &addresstable,vector<uintb> &label,const JumpModel *orig) const
+void JumpModelTrivial::buildLabels(Funcdata *fd,std::vector<Address> &addresstable,std::vector<uintb> &label,const JumpModel *orig) const
 
 {
   for(uint4 i=0;i<addresstable.size();++i)
@@ -457,8 +457,8 @@ uintb JumpBasic::backup2Switch(Funcdata *fd,uintb output,Varnode *outvn,Varnode 
 void JumpBasic::findDeterminingVarnodes(PcodeOp *op,int4 slot)
 
 {
-  vector<PcodeOp *> path;
-  vector<int4> slotpath;
+  std::vector<PcodeOp *> path;
+  std::vector<int4> slotpath;
   PcodeOp *curop;
   Varnode *curvn;
   bool firstpoint = false;	// Have not seen likely switch variable yet
@@ -660,12 +660,12 @@ Varnode *GuardRecord::quasiCopy(Varnode *vn,int4 &bitsPreserved,bool noWholeValu
   return vn;
 }
 
-void PathMeld::internalIntersect(vector<int4> &parentMap)
+void PathMeld::internalIntersect(std::vector<int4> &parentMap)
 
 { // Calculate intersection of new path (marked vn's) with old path (commonVn)
   // Put intersection back into commonVn
   // Calculate parentMap : from old commonVn index to new commonVn index
-  vector<Varnode *> newVn;
+  std::vector<Varnode *> newVn;
   int4 lastIntersect = -1;
   for(int4 i=0;i<commonVn.size();++i) {
     Varnode *vn = commonVn[i];
@@ -689,7 +689,7 @@ void PathMeld::internalIntersect(vector<int4> &parentMap)
   }
 }
 
-int4 PathMeld::meldOps(const vector<PcodeOp *> &path,int4 cutOff,const vector<int4> &parentMap)
+int4 PathMeld::meldOps(const std::vector<PcodeOp *> &path,int4 cutOff,const std::vector<int4> &parentMap)
 
 { // Meld old ops (opMeld) with new ops (path), updating rootVn with new commonVn order
   // Ops should remain in (reverse) execution order
@@ -708,7 +708,7 @@ int4 PathMeld::meldOps(const vector<PcodeOp *> &path,int4 cutOff,const vector<in
   }
 
   // Do a merge sort, keeping ops in execution order
-  vector<RootedOp> newMeld;
+  std::vector<RootedOp> newMeld;
   int4 curRoot = -1;
   int4 meldPos = 0;				// Ops moved from old opMeld into newMeld
   const BlockBasic *lastBlock = (const BlockBasic *)0;
@@ -777,7 +777,7 @@ void PathMeld::set(const PathMeld &op2)
   opMeld = op2.opMeld;
 }
 
-void PathMeld::set(const vector<PcodeOp *> &path,const vector<int4> &slot)
+void PathMeld::set(const std::vector<PcodeOp *> &path,const std::vector<int4> &slot)
 
 {
   for(int4 i=0;i<path.size();++i) {
@@ -790,7 +790,7 @@ void PathMeld::set(const vector<PcodeOp *> &path,const vector<int4> &slot)
 
 void PathMeld::set(PcodeOp *op,Varnode *vn)
 
-{ // Set a single varnode and op as the path
+{ // set a single varnode and op as the path
   commonVn.push_back(vn);
   opMeld.push_back(RootedOp(op,0));
 }
@@ -812,17 +812,17 @@ void PathMeld::clear(void)
   opMeld.clear();
 }
 
-void PathMeld::meld(vector<PcodeOp *> &path,vector<int4> &slot)
+void PathMeld::meld(std::vector<PcodeOp *> &path,std::vector<int4> &slot)
 
 { // Meld the new -path- into our collection of paths
   // making sure all ops that split from the main path intersection eventually rejoin
-  vector<int4> parentMap;
+  std::vector<int4> parentMap;
 
   for(int4 i=0;i<path.size();++i) {
     Varnode *vn = path[i]->getIn(slot[i]);
     vn->setMark();		// Mark varnodes in the new path, so its easy to see intersection
   }
-  internalIntersect(parentMap);	// Calculate varnode intersection, and map from old intersection -> new
+  internalIntersect(parentMap);	// Calculate varnode intersection, and std::map from old intersection -> new
   int4 cutOff = -1;
 
   // Calculate where the cutoff point is in the new path
@@ -938,7 +938,7 @@ void JumpBasic::calcRange(Varnode *vn,CircleRange &rng) const
   // Intersect any guard ranges which apply to -vn-
   int4 bitsPreserved;
   Varnode *baseVn = GuardRecord::quasiCopy(vn, bitsPreserved, true);
-  vector<GuardRecord>::const_iterator iter;
+  std::vector<GuardRecord>::const_iterator iter;
   for(iter=selectguards.begin();iter!=selectguards.end();++iter) {
     const GuardRecord &guard( *iter );
     int4 matchval = guard.valueMatch(vn,baseVn,bitsPreserved);
@@ -1097,14 +1097,14 @@ bool JumpBasic::recoverModel(Funcdata *fd,PcodeOp *indop,uint4 matchsize,uint4 m
   return true;
 }
 
-void JumpBasic::buildAddresses(Funcdata *fd,PcodeOp *indop,vector<Address> &addresstable,vector<LoadTable> *loadpoints) const
+void JumpBasic::buildAddresses(Funcdata *fd,PcodeOp *indop,std::vector<Address> &addresstable,std::vector<LoadTable> *loadpoints) const
 
 {
   uintb val,addr;
   addresstable.clear();		// Clear out any partial recoveries
 				// Build the emulation engine
   EmulateFunction emul(fd);
-  if (loadpoints != (vector<LoadTable> *)0)
+  if (loadpoints != (std::vector<LoadTable> *)0)
     emul.setLoadCollect(true);
 
   AddrSpace *spc = indop->getAddr().getSpace();
@@ -1116,7 +1116,7 @@ void JumpBasic::buildAddresses(Funcdata *fd,PcodeOp *indop,vector<Address> &addr
     addresstable.push_back(Address(spc,addr));
     notdone = jrange->next();
   }
-  if (loadpoints != (vector<LoadTable> *)0)
+  if (loadpoints != (std::vector<LoadTable> *)0)
     emul.collectLoadPoints(*loadpoints);
 }
 
@@ -1164,7 +1164,7 @@ void JumpBasic::findUnnormalized(uint4 maxaddsub,uint4 maxleftright,uint4 maxext
   }
 }
 
-void JumpBasic::buildLabels(Funcdata *fd,vector<Address> &addresstable,vector<uintb> &label,const JumpModel *orig) const
+void JumpBasic::buildLabels(Funcdata *fd,std::vector<Address> &addresstable,std::vector<uintb> &label,const JumpModel *orig) const
 
 { // Trace back each normal value to
   // the unnormalized value, this is the "case" label
@@ -1236,7 +1236,7 @@ bool JumpBasic::foldInGuards(Funcdata *fd,JumpTable *jump)
   return change;
 }
 
-bool JumpBasic::sanityCheck(Funcdata *fd,PcodeOp *indop,vector<Address> &addresstable)
+bool JumpBasic::sanityCheck(Funcdata *fd,PcodeOp *indop,std::vector<Address> &addresstable)
 
 {				// Test all the addresses in the addresstable checking
 				// that they are reasonable. We cut off at first
@@ -1434,7 +1434,7 @@ JumpBasicOverride::JumpBasicOverride(JumpTable *jt)
   istrivial = false;
 }
 
-void JumpBasicOverride::setAddresses(const vector<Address> &adtable)
+void JumpBasicOverride::setAddresses(const std::vector<Address> &adtable)
 
 {
   for(int4 i=0;i<adtable.size();++i)
@@ -1475,7 +1475,7 @@ int4 JumpBasicOverride::trialNorm(Funcdata *fd,Varnode *trialvn,uint4 tolerance)
     return opi;
 
   EmulateFunction emul(fd);
-  //  if (loadpoints != (vector<LoadTable> *)0)
+  //  if (loadpoints != (std::vector<LoadTable> *)0)
   //    emul.setLoadCollect(true);
 
   AddrSpace *spc = startop->getAddr().getSpace();
@@ -1483,7 +1483,7 @@ int4 JumpBasicOverride::trialNorm(Funcdata *fd,Varnode *trialvn,uint4 tolerance)
   uintb addr;
   uint4 total = 0;
   uint4 miss = 0;
-  set<Address> alreadyseen;
+  std::set<Address> alreadyseen;
   while(total < adset.size()) {
     try {
       addr = emul.emulatePath(val,pathMeld,startop,trialvn);
@@ -1510,7 +1510,7 @@ int4 JumpBasicOverride::trialNorm(Funcdata *fd,Varnode *trialvn,uint4 tolerance)
     val += 1;
   }
   
-  //  if ((loadpoint != (vector<LoadTable> *)0)&&(total == adset.size()))
+  //  if ((loadpoint != (std::vector<LoadTable> *)0)&&(total == adset.size()))
   //    emul.collectLoadPoints(*loadpoints);
   if (total == adset.size())
     return opi;
@@ -1523,7 +1523,7 @@ void JumpBasicOverride::setupTrivial(void)
 
 { // Since we have an absolute set of addresses, if all else fails we can use the indirect variable
   // as the normalized switch and the addresses as the values, similar to the trivial model
-  set<Address>::const_iterator iter;
+  std::set<Address>::const_iterator iter;
   if (addrtable.empty()) {
     for(iter=adset.begin();iter!=adset.end();++iter) {
       const Address &addr( *iter );
@@ -1612,13 +1612,13 @@ bool JumpBasicOverride::recoverModel(Funcdata *fd,PcodeOp *indop,uint4 matchsize
   return true;
 }
 
-void JumpBasicOverride::buildAddresses(Funcdata *fd,PcodeOp *indop,vector<Address> &addresstable,vector<LoadTable> *loadpoints) const
+void JumpBasicOverride::buildAddresses(Funcdata *fd,PcodeOp *indop,std::vector<Address> &addresstable,std::vector<LoadTable> *loadpoints) const
 
 {
   addresstable = addrtable;	// Addresses are already calculated, just copy them out
 }
 
-void JumpBasicOverride::buildLabels(Funcdata *fd,vector<Address> &addresstable,vector<uintb> &label,const JumpModel *orig) const
+void JumpBasicOverride::buildLabels(Funcdata *fd,std::vector<Address> &addresstable,std::vector<uintb> &label,const JumpModel *orig) const
 
 {
   uintb addr;
@@ -1664,10 +1664,10 @@ void JumpBasicOverride::clear(void)
   istrivial = false;
 }
 
-void JumpBasicOverride::saveXml(ostream &s) const
+void JumpBasicOverride::saveXml(std::ostream &s) const
 
 {
-  set<Address>::const_iterator iter;
+  std::set<Address>::const_iterator iter;
 
   s << "<basicoverride>\n";
   for(iter=adset.begin();iter!=adset.end();++iter) {
@@ -1703,13 +1703,13 @@ void JumpBasicOverride::restoreXml(const Element *el,Architecture *glb)
     else if (subel->getName() == "normaddr")
       normaddress = Address::restoreXml(subel,glb);
     else if (subel->getName() == "normhash") {
-      istringstream s1(subel->getContent());	
-      s1.unsetf(ios::dec | ios::hex | ios::oct);
+      std::istringstream s1(subel->getContent());	
+      s1.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
       s1 >> hash;
     }
     else if (subel->getName() == "startval") {
-      istringstream s2(subel->getContent());	
-      s2.unsetf(ios::dec | ios::hex | ios::oct);
+      std::istringstream s2(subel->getContent());	
+      s2.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
       s2 >> startingvalue;
     }
   }
@@ -1739,7 +1739,7 @@ bool JumpAssisted::recoverModel(Funcdata *fd,PcodeOp *indop,uint4 matchsize,uint
     sizeIndices = assistOp->getIn(2)->getOffset();
   else {
     ExecutablePcode *pcodeScript = (ExecutablePcode *)fd->getArch()->pcodeinjectlib->getPayload(userop->getCalcSize());
-    vector<uintb> inputs;
+    std::vector<uintb> inputs;
     int4 numInputs = assistOp->numInput() - 1;	// How many remaining varnodes after useropid
     if (pcodeScript->sizeInput() != numInputs)
       throw LowlevelError(userop->getName() + ": <size_pcode> has wrong number of parameters");
@@ -1755,7 +1755,7 @@ bool JumpAssisted::recoverModel(Funcdata *fd,PcodeOp *indop,uint4 matchsize,uint
   return true;
 }
 
-void JumpAssisted::buildAddresses(Funcdata *fd,PcodeOp *indop,vector<Address> &addresstable,vector<LoadTable> *loadpoints) const
+void JumpAssisted::buildAddresses(Funcdata *fd,PcodeOp *indop,std::vector<Address> &addresstable,std::vector<LoadTable> *loadpoints) const
 
 {
   if (userop->getIndex2Addr() == -1)
@@ -1764,7 +1764,7 @@ void JumpAssisted::buildAddresses(Funcdata *fd,PcodeOp *indop,vector<Address> &a
   addresstable.clear();
 
   AddrSpace *spc = indop->getAddr().getSpace();
-  vector<uintb> inputs;
+  std::vector<uintb> inputs;
   int4 numInputs = assistOp->numInput() - 1;	// How many remaining varnodes after useropid
   if (pcodeScript->sizeInput() != numInputs)
     throw LowlevelError(userop->getName() + ": <addr_pcode> has wrong number of parameters");
@@ -1784,7 +1784,7 @@ void JumpAssisted::buildAddresses(Funcdata *fd,PcodeOp *indop,vector<Address> &a
   addresstable.push_back(Address(spc,defaultAddress));		// Add default location to end of addresstable
 }
 
-void JumpAssisted::buildLabels(Funcdata *fd,vector<Address> &addresstable,vector<uintb> &label,const JumpModel *orig) const
+void JumpAssisted::buildLabels(Funcdata *fd,std::vector<Address> &addresstable,std::vector<uintb> &label,const JumpModel *orig) const
 
 {
   if ((( const JumpAssisted *)orig)->sizeIndices != sizeIndices)
@@ -1795,7 +1795,7 @@ void JumpAssisted::buildLabels(Funcdata *fd,vector<Address> &addresstable,vector
   }
   else {
     ExecutablePcode *pcodeScript = (ExecutablePcode *)fd->getArch()->pcodeinjectlib->getPayload(userop->getIndex2Case());
-    vector<uintb> inputs;
+    std::vector<uintb> inputs;
     int4 numInputs = assistOp->numInput() - 1;	// How many remaining varnodes after useropid
     if (numInputs != pcodeScript->sizeInput())
       throw LowlevelError(userop->getName() + ": <case_pcode> has wrong number of parameters");
@@ -2020,7 +2020,7 @@ bool JumpTable::isOverride(void) const
   return jmodel->isOverride();
 }
 
-void JumpTable::setOverride(const vector<Address> &addrtable,const Address &naddr,uintb h,uintb sv)
+void JumpTable::setOverride(const std::vector<Address> &addrtable,const Address &naddr,uintb h,uintb sv)
 
 { // Force an override on a jumptable
   if (jmodel != (JumpModel *)0)
@@ -2052,7 +2052,7 @@ int4 JumpTable::getIndexByBlock(const FlowBlock *bl,int4 i) const
 
 void JumpTable::setMostCommonIndex(uint4 tableind)
 
-{  // Set the most common address jump destination by supplying the (an) index for its address
+{  // set the most common address jump destination by supplying the (an) index for its address
   mostcommon = blocktable[tableind]; // Translate addresstable index to switch block out index
 }
 
@@ -2138,7 +2138,7 @@ void JumpTable::recoverAddresses(Funcdata *fd)
   if (collectloads)
     jmodel->buildAddresses(fd,indirect,addresstable,&loadpoints);
   else
-    jmodel->buildAddresses(fd,indirect,addresstable,(vector<LoadTable> *)0);
+    jmodel->buildAddresses(fd,indirect,addresstable,(std::vector<LoadTable> *)0);
   sanityCheck(fd);
 }
 
@@ -2150,7 +2150,7 @@ void JumpTable::recoverMultistage(Funcdata *fd)
   origmodel = jmodel;
   jmodel = (JumpModel *)0;
   
-  vector<Address> oldaddresstable = addresstable;
+  std::vector<Address> oldaddresstable = addresstable;
   addresstable.clear();
   loadpoints.clear();
   try {
@@ -2217,7 +2217,7 @@ bool JumpTable::recoverLabels(Funcdata *fd)
   else {
     jmodel = new JumpModelTrivial(this);
     jmodel->recoverModel(fd,indirect,addresstable.size(),maxtablesize);
-    jmodel->buildAddresses(fd,indirect,addresstable,(vector<LoadTable> *)0);
+    jmodel->buildAddresses(fd,indirect,addresstable,(std::vector<LoadTable> *)0);
     trivialSwitchOver();
     jmodel->buildLabels(fd,addresstable,label,origmodel);
   }
@@ -2249,7 +2249,7 @@ void JumpTable::clear(void)
   // -opaddress- -maxtablesize- -maxaddsub- -maxleftright- -maxext- -collectloads- are permanent
 }
 
-void JumpTable::saveXml(ostream &s) const
+void JumpTable::saveXml(std::ostream &s) const
 
 {				// Save addresses in a jump table in XML format
   if (!isRecovered())
@@ -2299,8 +2299,8 @@ void JumpTable::restoreXml(const Element *el)
       if (i<maxnum) {		// Found a label attribute
 	if (missedlabel)
 	  throw LowlevelError("Jumptable entries are missing labels");
-	istringstream s1(subel->getAttributeValue(i));	
-	s1.unsetf(ios::dec | ios::hex | ios::oct);
+	std::istringstream s1(subel->getAttributeValue(i));	
+	s1.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
 	uintb lab;
 	s1 >> lab;
 	label.push_back(lab);

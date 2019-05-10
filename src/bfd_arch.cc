@@ -148,7 +148,7 @@ void BfdArchitecture::restoreXml(DocumentStorage &store)
   restoreXmlHeader(el);
   {
     istringstream s( el->getAttributeValue("adjustvma"));
-    s.unsetf(ios::dec | ios::hex | ios::oct);
+    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
     s >> adjustvma;
   }
   const List &list(el->getChildren());

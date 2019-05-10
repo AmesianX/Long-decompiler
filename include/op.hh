@@ -32,11 +32,11 @@ namespace GhidraDec {
 /// within the \b fspec space.
 class IopSpace : public AddrSpace {
 public:
-  IopSpace(AddrSpaceManager *m,const Translate *t,const string &nm,int4 ind);
-  virtual void saveXmlAttributes(ostream &s,uintb offset) const { s << " space=\"iop\""; }
-  virtual void saveXmlAttributes(ostream &s,uintb offset,int4 size) const { s << " space=\"iop\""; }
-  virtual void printRaw(ostream &s,uintb offset) const;
-  virtual void saveXml(ostream &s) const;
+  IopSpace(AddrSpaceManager *m,const Translate *t,const std::string &nm,int4 ind);
+  virtual void saveXmlAttributes(std::ostream &s,uintb offset) const { s << " space=\"iop\""; }
+  virtual void saveXmlAttributes(std::ostream &s,uintb offset,int4 size) const { s << " space=\"iop\""; }
+  virtual void printRaw(std::ostream &s,uintb offset) const;
+  virtual void saveXml(std::ostream &s) const;
   virtual void restoreXml(const Element *el);
 };
 
@@ -117,7 +117,7 @@ private:
   list<PcodeOp *>::iterator insertiter;	///< Position in alive/dead list
   list<PcodeOp *>::iterator codeiter;	///< Position in opcode list
   Varnode *output;		///< The one possible output Varnode of this op
-  vector<Varnode *> inrefs;	///< The ordered list of input Varnodes for this op
+  std::vector<Varnode *> inrefs;	///< The ordered list of input Varnodes for this op
 
   // Only used by Funcdata
   void setOutput(Varnode *vn) { output = vn; } ///< Set the output Varnode of this op
@@ -213,10 +213,10 @@ public:
   uintb getNZMaskLocal(bool cliploop) const; ///< Calculate known zero bits for output to this op
   int4 compareOrder(const PcodeOp *bop) const; ///< Compare the control-flow order of this and \e bop
   void push(PrintLanguage *lng) const { opcode->push(lng,this); } ///< Push this op as a display token
-  void printRaw(ostream &s) const { opcode->printRaw(s,this); }	///< Print raw info about this op to stream
-  const string &getOpName(void) const { return opcode->getName(); } ///< Return the name of this op
-  void printDebug(ostream &s) const; ///< Print debug description of this op to stream
-  void saveXml(ostream &s) const; ///< Write an XML description of this op to stream
+  void printRaw(std::ostream &s) const { opcode->printRaw(s,this); }	///< Print raw info about this op to stream
+  const std::string &getOpName(void) const { return opcode->getName(); } ///< Return the name of this op
+  void printDebug(std::ostream &s) const; ///< Print debug description of this op to stream
+  void saveXml(std::ostream &s) const; ///< Write an XML description of this op to stream
   /// \brief Retrieve the PcodeOp encoded as the address \e addr
   static PcodeOp *getOpFromConst(const Address &addr) { return (PcodeOp *)(uintp)addr.getOffset(); }
 

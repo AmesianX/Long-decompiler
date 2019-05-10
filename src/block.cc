@@ -20,7 +20,7 @@
 namespace GhidraDec {
 /// The edge is saved assuming we already know what block we are in
 /// \param s is the output stream
-void BlockEdge::saveXml(ostream &s) const
+void BlockEdge::saveXml(std::ostream &s) const
 
 {
   s << "<edge";
@@ -38,13 +38,13 @@ void BlockEdge::restoreXml(const Element *el,BlockMap &resolver)
   label = 0;		// Tag does not currently contain info about label
   int4 endIndex;
   istringstream s(el->getAttributeValue("end"));
-  s.unsetf(ios::dec | ios::hex | ios::oct);
+  s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
   s >> endIndex;
   point = resolver.findLevelBlock(endIndex);
   if (point == (FlowBlock *)0)
     throw LowlevelError("Bad serialized edge in block graph");
   istringstream s2(el->getAttributeValue("rev"));
-  s2.unsetf(ios::dec | ios::hex | ios::oct);
+  s2.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
   s2 >> reverse_index;
 }
 
@@ -532,7 +532,7 @@ int4 FlowBlock::getOutIndex(const FlowBlock *bl) const
 
 /// Only print a header for \b this single block
 /// \param s is the output stream
-void FlowBlock::printHeader(ostream &s) const
+void FlowBlock::printHeader(std::ostream &s) const
 
 {
   s << dec << index << ' ' << getStart() << '-' << getStop();
@@ -541,7 +541,7 @@ void FlowBlock::printHeader(ostream &s) const
 /// Recursively print out the hierarchical structure of \b this FlowBlock.
 /// \param s is the output stream
 /// \param level is the current level of indentation
-void FlowBlock::printTree(ostream &s,int4 level) const
+void FlowBlock::printTree(std::ostream &s,int4 level) const
 
 {
   int4 i;
@@ -566,12 +566,12 @@ JumpTable *FlowBlock::getJumptable(void) const
   return jt;
 }
 
-/// Given a string describing a FlowBlock type, return the block_type.
+/// Given a std::string describing a FlowBlock type, return the block_type.
 /// This is currently only used by the restoreXml() process.
 /// TODO: Fill in the remaining names and types
-/// \param nm is the name string
+/// \param nm is the name std::string
 /// \return the corresponding block_type
-FlowBlock::block_type FlowBlock::nameToType(const string &nm)
+FlowBlock::block_type FlowBlock::nameToType(const std::string &nm)
 
 {
   FlowBlock::block_type bt = FlowBlock::t_plain;
@@ -584,8 +584,8 @@ FlowBlock::block_type FlowBlock::nameToType(const string &nm)
 
 /// For use in serializng FlowBlocks to XML.
 /// \param bt is the block_type
-/// \return the corresponding name string
-string FlowBlock::typeToName(FlowBlock::block_type bt)
+/// \return the corresponding name std::string
+std::string FlowBlock::typeToName(FlowBlock::block_type bt)
 
 {
   switch(bt) {
@@ -1138,7 +1138,7 @@ void BlockGraph::scopeBreak(int4 curexit,int4 curloopexit)
   }
 }
   
-void BlockGraph::printTree(ostream &s,int4 level) const
+void BlockGraph::printTree(std::ostream &s,int4 level) const
 
 {
   vector<FlowBlock *>::const_iterator iter;
@@ -1148,7 +1148,7 @@ void BlockGraph::printTree(ostream &s,int4 level) const
     (*iter)->printTree(s,level+1);
 }
 
-void BlockGraph::printRaw(ostream &s) const
+void BlockGraph::printRaw(std::ostream &s) const
 
 {
   vector<FlowBlock *>::const_iterator iter;
@@ -1187,7 +1187,7 @@ void BlockGraph::orderSwitchCases(void) const
     (*iter)->orderSwitchCases();
 }
 
-void BlockGraph::saveXmlBody(ostream &s) const
+void BlockGraph::saveXmlBody(std::ostream &s) const
 
 {
   FlowBlock::saveXmlBody(s);
@@ -1196,7 +1196,7 @@ void BlockGraph::saveXmlBody(ostream &s) const
     s << "<bhead";
     a_v_i(s,"index",bl->getIndex());
     FlowBlock::block_type bt = bl->getType();
-    string nm;
+    std::string nm;
     if (bt == FlowBlock::t_if) {
       int4 sz = ((BlockGraph *)bl)->getSize();
       if (sz == 1)
@@ -1228,9 +1228,9 @@ void BlockGraph::restoreXmlBody(List::const_iterator &iter,List::const_iterator 
     ++iter;
     int4 newindex;
     istringstream s(el->getAttributeValue("index"));
-    s.unsetf(ios::dec | ios::hex | ios::oct);
+    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
     s >> newindex;
-    const string &nm( el->getAttributeValue("type") );
+    const std::string &nm( el->getAttributeValue("type") );
     FlowBlock *bl = newresolver.createBlock(nm);
     bl->index = newindex;	// Need to set index here for sort
     tmplist.push_back(bl);
@@ -2252,7 +2252,7 @@ bool BlockBasic::isComplex(void) const
 }
 
 /// \param s is the output stream
-void FlowBlock::saveXmlHeader(ostream &s) const
+void FlowBlock::saveXmlHeader(std::ostream &s) const
 
 {
   a_v_i(s,"index",index);
@@ -2263,13 +2263,13 @@ void FlowBlock::restoreXmlHeader(const Element *el)
 
 {
   istringstream s(el->getAttributeValue("index"));
-  s.unsetf(ios::dec | ios::hex | ios::oct);
+  s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
   s >> index;
 }
 
 /// Write \<edge> tags to stream
 /// \param s is the output stream
-void FlowBlock::saveXmlEdges(ostream &s) const
+void FlowBlock::saveXmlEdges(std::ostream &s) const
 
 {
   for(int4 i=0;i<intothis.size();++i) {
@@ -2296,7 +2296,7 @@ void FlowBlock::restoreXmlEdges(List::const_iterator &iter,List::const_iterator 
 
 /// Serialize \b this and all its sub-components as an XML \<block> tag.
 /// \param s is the output stream
-void FlowBlock::saveXml(ostream &s) const
+void FlowBlock::saveXml(std::ostream &s) const
 
 {
   s << "<block";
@@ -2458,7 +2458,7 @@ void BlockBasic::setOrder(void)
   }
 }
 
-void BlockBasic::saveXmlBody(ostream &s) const
+void BlockBasic::saveXmlBody(std::ostream &s) const
 
 {
   cover.saveXml(s);
@@ -2471,14 +2471,14 @@ void BlockBasic::restoreXmlBody(List::const_iterator &iter,List::const_iterator 
   ++iter;
 }
 
-void BlockBasic::printHeader(ostream &s) const
+void BlockBasic::printHeader(std::ostream &s) const
 
 {
   s << "Basic Block ";
   FlowBlock::printHeader(s);
 }
 
-void BlockBasic::printRaw(ostream &s) const
+void BlockBasic::printRaw(std::ostream &s) const
   
 {
   list<PcodeOp *>::const_iterator iter;
@@ -2520,20 +2520,20 @@ bool BlockBasic::noInterveningStatement(PcodeOp *first,int4 path,PcodeOp *last)
   return false;
 }
 
-void BlockCopy::printHeader(ostream &s) const
+void BlockCopy::printHeader(std::ostream &s) const
 
 {
   s << "Basic(copy) block ";
   FlowBlock::printHeader(s);
 }
 
-void BlockCopy::printTree(ostream &s,int4 level) const
+void BlockCopy::printTree(std::ostream &s,int4 level) const
 
 {
   copy->printTree(s,level);
 }
 
-void BlockCopy::saveXmlHeader(ostream &s) const
+void BlockCopy::saveXmlHeader(std::ostream &s) const
 
 {
   FlowBlock::saveXmlHeader(s);
@@ -2577,7 +2577,7 @@ bool BlockGoto::gotoPrints(void) const
   return false;
 }
 
-void BlockGoto::printHeader(ostream &s) const
+void BlockGoto::printHeader(std::ostream &s) const
 
 {
   s << "Plain goto block ";
@@ -2590,7 +2590,7 @@ FlowBlock *BlockGoto::nextFlowAfter(const FlowBlock *bl) const
   return getGotoTarget()->getFrontLeaf();
 }
 
-void BlockGoto::saveXmlBody(ostream &s) const
+void BlockGoto::saveXmlBody(std::ostream &s) const
 
 {
   BlockGraph::saveXmlBody(s);
@@ -2609,7 +2609,7 @@ void BlockMultiGoto::scopeBreak(int4 curexit,int4 curloopexit)
   getBlock(0)->scopeBreak(-1,curloopexit); // Recurse
 }
 
-void BlockMultiGoto::printHeader(ostream &s) const
+void BlockMultiGoto::printHeader(std::ostream &s) const
 
 {
   s << "Multi goto block ";
@@ -2623,7 +2623,7 @@ FlowBlock *BlockMultiGoto::nextFlowAfter(const FlowBlock *bl) const
   return (FlowBlock *)0;
 } 
 
-void BlockMultiGoto::saveXmlBody(ostream &s) const
+void BlockMultiGoto::saveXmlBody(std::ostream &s) const
 
 {
   BlockGraph::saveXmlBody(s);
@@ -2668,7 +2668,7 @@ FlowBlock *BlockList::getSplitPoint(void)
   return getBlock(getSize()-1)->getSplitPoint();
 }
 
-void BlockList::printHeader(ostream &s) const
+void BlockList::printHeader(std::ostream &s) const
 
 {
   s << "List block ";
@@ -2726,7 +2726,7 @@ void BlockCondition::scopeBreak(int4 curexit,int4 curloopexit)
   getBlock(1)->scopeBreak(-1,curloopexit);
 }
 
-void BlockCondition::printHeader(ostream &s) const
+void BlockCondition::printHeader(std::ostream &s) const
 
 {
   s << "Condition block(";
@@ -2744,11 +2744,11 @@ FlowBlock *BlockCondition::nextFlowAfter(const FlowBlock *bl) const
   return (FlowBlock *)0;	// Do not know where flow goes
 }
 
-void BlockCondition::saveXmlHeader(ostream &s) const
+void BlockCondition::saveXmlHeader(std::ostream &s) const
 
 {
   BlockGraph::saveXmlHeader(s);
-  string nm(get_opname(opc));
+  std::string nm(get_opname(opc));
   a_v(s,"opcode",nm);
 }
 
@@ -2771,7 +2771,7 @@ void BlockIf::scopeBreak(int4 curexit,int4 curloopexit)
     gototype = f_break_goto;
 }
 
-void BlockIf::printHeader(ostream &s) const
+void BlockIf::printHeader(std::ostream &s) const
 
 {
   s << "If block ";
@@ -2822,7 +2822,7 @@ FlowBlock *BlockIf::nextFlowAfter(const FlowBlock *bl) const
   return getParent()->nextFlowAfter(this);
 }
 
-void BlockIf::saveXmlBody(ostream &s) const
+void BlockIf::saveXmlBody(std::ostream &s) const
 
 {
   BlockGraph::saveXmlBody(s);
@@ -2853,7 +2853,7 @@ void BlockWhileDo::scopeBreak(int4 curexit,int4 curloopexit)
   getBlock(1)->scopeBreak(getBlock(0)->getIndex(),curexit); // Exits into topblock
 }
 
-void BlockWhileDo::printHeader(ostream &s) const
+void BlockWhileDo::printHeader(std::ostream &s) const
 
 {
   s << "Whiledo block ";
@@ -2889,7 +2889,7 @@ void BlockDoWhile::scopeBreak(int4 curexit,int4 curloopexit)
   getBlock(0)->scopeBreak(-1,curexit); // Multiple exits
 }
 
-void BlockDoWhile::printHeader(ostream &s) const
+void BlockDoWhile::printHeader(std::ostream &s) const
 
 {
   s << "Dowhile block ";
@@ -2917,7 +2917,7 @@ void BlockInfLoop::scopeBreak(int4 curexit,int4 curloopexit)
   getBlock(0)->scopeBreak(getBlock(0)->getIndex(),curexit); // Exits into itself
 }
 
-void BlockInfLoop::printHeader(ostream &s) const
+void BlockInfLoop::printHeader(std::ostream &s) const
 
 {
   s << "Infinite loop block ";
@@ -3077,7 +3077,7 @@ void BlockSwitch::scopeBreak(int4 curexit,int4 curloopexit)
   }
 }
 
-void BlockSwitch::printHeader(ostream &s) const
+void BlockSwitch::printHeader(std::ostream &s) const
 
 {
   s << "Switch block ";
@@ -3160,7 +3160,7 @@ void BlockMap::sortList(void)
 /// Given the name of a block (deserialized from a \<bhead> tag), build the corresponding type of block.
 /// \param name is the name of the block type
 /// \return a new instance of the named FlowBlock type
-FlowBlock *BlockMap::createBlock(const string &name)
+FlowBlock *BlockMap::createBlock(const std::string &name)
 
 {
   FlowBlock::block_type bt = FlowBlock::nameToType(name);

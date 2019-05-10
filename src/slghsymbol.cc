@@ -29,7 +29,7 @@ SleighSymbol *SymbolScope::addSymbol(SleighSymbol *a)
   return a;
 }
 
-SleighSymbol *SymbolScope::findSymbol(const string &nm) const
+SleighSymbol *SymbolScope::findSymbol(const std::string &nm) const
 
 {
   SleighSymbol dummy(nm);
@@ -101,7 +101,7 @@ void SymbolTable::addSymbol(SleighSymbol *a)
     throw SleighError("Duplicate symbol name: "+a->getName());
 }
 
-SleighSymbol *SymbolTable::findSymbolInternal(SymbolScope *scope,const string &nm) const
+SleighSymbol *SymbolTable::findSymbolInternal(SymbolScope *scope,const std::string &nm) const
 
 {
   SleighSymbol *res;
@@ -137,7 +137,7 @@ void SymbolTable::replaceSymbol(SleighSymbol *a,SleighSymbol *b)
   }
 }
 
-void SymbolTable::saveXml(ostream &s) const
+void SymbolTable::saveXml(std::ostream &s) const
 
 {
   s << "<symbol_table";
@@ -169,14 +169,14 @@ void SymbolTable::restoreXml(const Element *el,SleighBase *trans)
   {
     uint4 size;
     istringstream s(el->getAttributeValue("scopesize"));
-    s.unsetf(ios::dec | ios::hex | ios::oct);
+    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
     s >> size;
     table.resize(size,(SymbolScope *)0);
   }
   {
     uint4 size;
     istringstream s(el->getAttributeValue("symbolsize"));
-    s.unsetf(ios::dec | ios::hex | ios::oct);
+    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
     s >> size;
     symbollist.resize(size,(SleighSymbol *)0);
   }
@@ -191,12 +191,12 @@ void SymbolTable::restoreXml(const Element *el,SleighBase *trans)
     uintm parent;
     {
       istringstream s(subel->getAttributeValue("id"));
-      s.unsetf(ios::dec | ios::hex | ios::oct);
+      s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
       s >> id;
     }
     {
       istringstream s(subel->getAttributeValue("parent"));
-      s.unsetf(ios::dec | ios::hex | ios::oct);
+      s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
       s >> parent;
     }
     SymbolScope *parscope = (parent==id) ? (SymbolScope *)0 : table[parent];
@@ -217,7 +217,7 @@ void SymbolTable::restoreXml(const Element *el,SleighBase *trans)
     SleighSymbol *sym;
     {
       istringstream s(subel->getAttributeValue("id"));
-      s.unsetf(ios::dec | ios::hex | ios::oct);
+      s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
       s >> id;
     }
     sym = findSymbol(id);
@@ -355,7 +355,7 @@ void SymbolTable::renumber(void)
   symbollist = newsymbol;
 }
 
-void SleighSymbol::saveXmlHeader(ostream &s) const
+void SleighSymbol::saveXmlHeader(std::ostream &s) const
 
 {				// Save the basic attributes of a symbol
   s << " name=\"" << name << "\"";
@@ -369,17 +369,17 @@ void SleighSymbol::restoreXmlHeader(const Element *el)
   name = el->getAttributeValue("name");
   {
     istringstream s(el->getAttributeValue("id"));
-    s.unsetf(ios::dec | ios::hex | ios::oct);
+    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
     s >> id;
   }
   {
     istringstream s(el->getAttributeValue("scope"));
-    s.unsetf(ios::dec | ios::hex | ios::oct);
+    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
     s >> scopeid;
   }
 }
 
-void UserOpSymbol::saveXml(ostream &s) const
+void UserOpSymbol::saveXml(std::ostream &s) const
 
 {
   s << "<userop";
@@ -388,7 +388,7 @@ void UserOpSymbol::saveXml(ostream &s) const
   s << "/>\n";
 }
 
-void UserOpSymbol::saveXmlHeader(ostream &s) const
+void UserOpSymbol::saveXmlHeader(std::ostream &s) const
 
 {
   s << "<userop_head";
@@ -400,7 +400,7 @@ void UserOpSymbol::restoreXml(const Element *el,SleighBase *trans)
 
 {
   istringstream s(el->getAttributeValue("index"));
-  s.unsetf(ios::dec | ios::hex | ios::oct);
+  s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
   s >> index;
 }
 
@@ -413,7 +413,7 @@ PatternlessSymbol::PatternlessSymbol(void)
   patexp->layClaim();
 }
 
-PatternlessSymbol::PatternlessSymbol(const string &nm)
+PatternlessSymbol::PatternlessSymbol(const std::string &nm)
   : SpecificSymbol(nm)
 {
   patexp = new ConstantValue((intb)0);
@@ -435,7 +435,7 @@ void EpsilonSymbol::getFixedHandle(FixedHandle &hand,ParserWalker &walker) const
   hand.size = 0;		// Cannot provide size
 }
 
-void EpsilonSymbol::print(ostream &s,ParserWalker &walker) const
+void EpsilonSymbol::print(std::ostream &s,ParserWalker &walker) const
 
 {
   s << '0';
@@ -450,7 +450,7 @@ VarnodeTpl *EpsilonSymbol::getVarnode(void) const
   return res;
 }
 
-void EpsilonSymbol::saveXml(ostream &s) const
+void EpsilonSymbol::saveXml(std::ostream &s) const
 
 {
   s << "<epsilon_sym";
@@ -458,7 +458,7 @@ void EpsilonSymbol::saveXml(ostream &s) const
   s << "/>\n";
 }
 
-void EpsilonSymbol::saveXmlHeader(ostream &s) const
+void EpsilonSymbol::saveXmlHeader(std::ostream &s) const
 
 {
   s << "<epsilon_sym_head";
@@ -472,7 +472,7 @@ void EpsilonSymbol::restoreXml(const Element *el,SleighBase *trans)
   const_space = trans->getConstantSpace();
 }
 
-ValueSymbol::ValueSymbol(const string &nm,PatternValue *pv)
+ValueSymbol::ValueSymbol(const std::string &nm,PatternValue *pv)
   : FamilySymbol(nm)
 {
   (patval=pv)->layClaim();
@@ -494,7 +494,7 @@ void ValueSymbol::getFixedHandle(FixedHandle &hand,ParserWalker &walker) const
   hand.size = 0;		// Cannot provide size
 }
 
-void ValueSymbol::print(ostream &s,ParserWalker &walker) const
+void ValueSymbol::print(std::ostream &s,ParserWalker &walker) const
 
 {
   intb val = patval->getValue(walker);
@@ -504,7 +504,7 @@ void ValueSymbol::print(ostream &s,ParserWalker &walker) const
     s << "-0x" << hex << -val;
 }
 
-void ValueSymbol::saveXml(ostream &s) const
+void ValueSymbol::saveXml(std::ostream &s) const
 
 {
   s << "<value_sym";
@@ -514,7 +514,7 @@ void ValueSymbol::saveXml(ostream &s) const
   s << "</value_sym>\n";
 }
 
-void ValueSymbol::saveXmlHeader(ostream &s) const
+void ValueSymbol::saveXmlHeader(std::ostream &s) const
 
 {
   s << "<value_sym_head";
@@ -571,7 +571,7 @@ void ValueMapSymbol::getFixedHandle(FixedHandle &hand,ParserWalker &walker) cons
   hand.size = 0;		// Cannot provide size
 }
 
-void ValueMapSymbol::print(ostream &s,ParserWalker &walker) const
+void ValueMapSymbol::print(std::ostream &s,ParserWalker &walker) const
 
 {
   uint4 ind = (uint4)patval->getValue(walker);
@@ -583,7 +583,7 @@ void ValueMapSymbol::print(ostream &s,ParserWalker &walker) const
     s << "-0x" << hex << -val;
 }
 
-void ValueMapSymbol::saveXml(ostream &s) const
+void ValueMapSymbol::saveXml(std::ostream &s) const
 
 {
   s << "<valuemap_sym";
@@ -595,7 +595,7 @@ void ValueMapSymbol::saveXml(ostream &s) const
   s << "</valuemap_sym>\n";
 }
 
-void ValueMapSymbol::saveXmlHeader(ostream &s) const
+void ValueMapSymbol::saveXmlHeader(std::ostream &s) const
 
 {
   s << "<valuemap_sym_head";
@@ -614,7 +614,7 @@ void ValueMapSymbol::restoreXml(const Element *el,SleighBase *trans)
   ++iter;
   while(iter != list.end()) {
     istringstream s((*iter)->getAttributeValue("val"));
-    s.unsetf(ios::dec | ios::hex | ios::oct);
+    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
     intb val;
     s >> val;
     valuetable.push_back(val);
@@ -653,7 +653,7 @@ Constructor *NameSymbol::resolve(ParserWalker &walker)
   return (Constructor *)0;
 }
 
-void NameSymbol::print(ostream &s,ParserWalker &walker) const
+void NameSymbol::print(std::ostream &s,ParserWalker &walker) const
 
 {
   uint4 ind = (uint4)patval->getValue(walker);
@@ -661,7 +661,7 @@ void NameSymbol::print(ostream &s,ParserWalker &walker) const
   s << nametable[ind];
 }
 
-void NameSymbol::saveXml(ostream &s) const
+void NameSymbol::saveXml(std::ostream &s) const
 
 {
   s << "<name_sym";
@@ -677,7 +677,7 @@ void NameSymbol::saveXml(ostream &s) const
   s << "</name_sym>\n";
 }
 
-void NameSymbol::saveXmlHeader(ostream &s) const
+void NameSymbol::saveXmlHeader(std::ostream &s) const
 
 {
   s << "<name_sym_head";
@@ -705,7 +705,7 @@ void NameSymbol::restoreXml(const Element *el,SleighBase *trans)
   checkTableFill();
 }
 
-VarnodeSymbol::VarnodeSymbol(const string &nm,AddrSpace *base,uintb offset,int4 size)
+VarnodeSymbol::VarnodeSymbol(const std::string &nm,AddrSpace *base,uintb offset,int4 size)
   : PatternlessSymbol(nm)
 {
   fix.space = base;
@@ -729,7 +729,7 @@ void VarnodeSymbol::getFixedHandle(FixedHandle &hand,ParserWalker &walker) const
   hand.size = fix.size;
 }
 
-void VarnodeSymbol::saveXml(ostream &s) const
+void VarnodeSymbol::saveXml(std::ostream &s) const
 
 {
   s << "<varnode_sym";
@@ -742,7 +742,7 @@ void VarnodeSymbol::saveXml(ostream &s) const
   s << "</varnode_sym>\n";
 }
 
-void VarnodeSymbol::saveXmlHeader(ostream &s) const
+void VarnodeSymbol::saveXmlHeader(std::ostream &s) const
 
 {
   s << "<varnode_sym_head";
@@ -756,18 +756,18 @@ void VarnodeSymbol::restoreXml(const Element *el,SleighBase *trans)
   fix.space = trans->getSpaceByName(el->getAttributeValue("space"));
   {
     istringstream s(el->getAttributeValue("offset"));
-    s.unsetf(ios::dec | ios::hex | ios::oct);
+    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
     s >> fix.offset;
   }
   {
     istringstream s(el->getAttributeValue("size"));
-    s.unsetf(ios::dec | ios::hex | ios::oct);
+    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
     s >> fix.size;
   }
 				// PatternlessSymbol does not need restoring
 }
 
-ContextSymbol::ContextSymbol(const string &nm,ContextField *pate,VarnodeSymbol *v,
+ContextSymbol::ContextSymbol(const std::string &nm,ContextField *pate,VarnodeSymbol *v,
 			     uint4 l,uint4 h,bool fl)
   : ValueSymbol(nm,pate)
 {
@@ -777,7 +777,7 @@ ContextSymbol::ContextSymbol(const string &nm,ContextField *pate,VarnodeSymbol *
   flow = fl;
 }
 
-void ContextSymbol::saveXml(ostream &s) const
+void ContextSymbol::saveXml(std::ostream &s) const
 
 {
   s << "<context_sym";
@@ -791,7 +791,7 @@ void ContextSymbol::saveXml(ostream &s) const
   s << "</context_sym>\n";
 }
 
-void ContextSymbol::saveXmlHeader(ostream &s) const
+void ContextSymbol::saveXmlHeader(std::ostream &s) const
 
 {
   s << "<context_sym_head";
@@ -806,18 +806,18 @@ void ContextSymbol::restoreXml(const Element *el,SleighBase *trans)
   {
     uintm id;
     istringstream s(el->getAttributeValue("varnode"));
-    s.unsetf(ios::dec | ios::hex | ios::oct);
+    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
     s >> id;
     vn = (VarnodeSymbol *)trans->findSymbol(id);
   }
   {  
     istringstream s(el->getAttributeValue("low"));
-    s.unsetf(ios::dec | ios::hex | ios::oct);
+    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
     s >> low;
   }
   {  
     istringstream s(el->getAttributeValue("high"));
-    s.unsetf(ios::dec | ios::hex | ios::oct);
+    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
     s >> high;
   }
   flow = true;
@@ -829,7 +829,7 @@ void ContextSymbol::restoreXml(const Element *el,SleighBase *trans)
   }
 }
 
-VarnodeListSymbol::VarnodeListSymbol(const string &nm,PatternValue *pv,const vector<SleighSymbol *> &vt)
+VarnodeListSymbol::VarnodeListSymbol(const std::string &nm,PatternValue *pv,const vector<SleighSymbol *> &vt)
   : ValueSymbol(nm,pv)
 {
   for(int4 i=0;i<vt.size();++i)
@@ -888,7 +888,7 @@ int4 VarnodeListSymbol::getSize(void) const
   throw SleighError("No register attached to: "+getName());
 }
 
-void VarnodeListSymbol::print(ostream &s,ParserWalker &walker) const
+void VarnodeListSymbol::print(std::ostream &s,ParserWalker &walker) const
 
 {
   uint4 ind = (uint4)patval->getValue(walker);
@@ -897,7 +897,7 @@ void VarnodeListSymbol::print(ostream &s,ParserWalker &walker) const
   s << varnode_table[ind]->getName();
 }
 
-void VarnodeListSymbol::saveXml(ostream &s) const
+void VarnodeListSymbol::saveXml(std::ostream &s) const
 
 {
   s << "<varlist_sym";
@@ -913,7 +913,7 @@ void VarnodeListSymbol::saveXml(ostream &s) const
   s << "</varlist_sym>\n";
 }
 
-void VarnodeListSymbol::saveXmlHeader(ostream &s) const
+void VarnodeListSymbol::saveXmlHeader(std::ostream &s) const
 
 {
   s << "<varlist_sym_head";
@@ -935,7 +935,7 @@ void VarnodeListSymbol::restoreXml(const Element *el,SleighBase *trans)
     if (subel->getName() == "var") {
       uintm id;
       istringstream s(subel->getAttributeValue("id"));
-      s.unsetf(ios::dec | ios::hex | ios::oct);
+      s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
       s >> id;
       varnode_table.push_back( (VarnodeSymbol *)trans->findSymbol(id) );
     }
@@ -946,7 +946,7 @@ void VarnodeListSymbol::restoreXml(const Element *el,SleighBase *trans)
   checkTableFill();
 }
 
-OperandSymbol::OperandSymbol(const string &nm,int4 index,Constructor *ct)
+OperandSymbol::OperandSymbol(const std::string &nm,int4 index,Constructor *ct)
   : SpecificSymbol(nm)
 {
   flags = 0;
@@ -1015,7 +1015,7 @@ int4 OperandSymbol::getSize(void) const
   return 0;
 }
 
-void OperandSymbol::print(ostream &s,ParserWalker &walker) const
+void OperandSymbol::print(std::ostream &s,ParserWalker &walker) const
 
 {
   walker.pushOperand(getIndex());
@@ -1035,7 +1035,7 @@ void OperandSymbol::print(ostream &s,ParserWalker &walker) const
   walker.popOperand();
 }
 
-void OperandSymbol::saveXml(ostream &s) const
+void OperandSymbol::saveXml(std::ostream &s) const
 
 {
   s << "<operand_sym";
@@ -1054,7 +1054,7 @@ void OperandSymbol::saveXml(ostream &s) const
   s << "</operand_sym>\n";
 }
 
-void OperandSymbol::saveXmlHeader(ostream &s) const
+void OperandSymbol::saveXmlHeader(std::ostream &s) const
 
 {
   s << "<operand_sym_head";
@@ -1070,29 +1070,29 @@ void OperandSymbol::restoreXml(const Element *el,SleighBase *trans)
   flags = 0;
   {
     istringstream s(el->getAttributeValue("index"));
-    s.unsetf(ios::dec | ios::hex | ios::oct);
+    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
     s >> hand;
   }
   {
     istringstream s(el->getAttributeValue("off"));
-    s.unsetf(ios::dec | ios::hex | ios::oct);
+    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
     s >> reloffset;
   }
   {
     istringstream s(el->getAttributeValue("base"));
-    s.unsetf(ios::dec | ios::hex | ios::oct);
+    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
     s >> offsetbase;
   }
   {
     istringstream s(el->getAttributeValue("minlen"));
-    s.unsetf(ios::dec | ios::hex | ios::oct);
+    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
     s >> minimumlength;
   }
   for(int4 i=0;i<el->getNumAttributes();++i) {
     if (el->getAttributeName(i) == "subsym") {
       uintm id;
       istringstream s(el->getAttributeValue(i));
-      s.unsetf(ios::dec | ios::hex | ios::oct);
+      s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
       s >> id;
       triple = (TripleSymbol *)trans->findSymbol(id);
     }
@@ -1113,7 +1113,7 @@ void OperandSymbol::restoreXml(const Element *el,SleighBase *trans)
   }
 }
 
-StartSymbol::StartSymbol(const string &nm,AddrSpace *cspc) : SpecificSymbol(nm)
+StartSymbol::StartSymbol(const std::string &nm,AddrSpace *cspc) : SpecificSymbol(nm)
 
 {
   const_space = cspc;
@@ -1146,14 +1146,14 @@ void StartSymbol::getFixedHandle(FixedHandle &hand,ParserWalker &walker) const
   hand.size = hand.space->getAddrSize();
 }
 
-void StartSymbol::print(ostream &s,ParserWalker &walker) const
+void StartSymbol::print(std::ostream &s,ParserWalker &walker) const
 
 {
   intb val = (intb) walker.getAddr().getOffset();
   s << "0x" << hex << val;
 }
 
-void StartSymbol::saveXml(ostream &s) const
+void StartSymbol::saveXml(std::ostream &s) const
 
 {
   s << "<start_sym";
@@ -1161,7 +1161,7 @@ void StartSymbol::saveXml(ostream &s) const
   s << "/>\n";
 }
 
-void StartSymbol::saveXmlHeader(ostream &s) const
+void StartSymbol::saveXmlHeader(std::ostream &s) const
 
 {
   s << "<start_sym_head";
@@ -1177,7 +1177,7 @@ void StartSymbol::restoreXml(const Element *el,SleighBase *trans)
   patexp->layClaim();
 }
 
-EndSymbol::EndSymbol(const string &nm,AddrSpace *cspc) : SpecificSymbol(nm)
+EndSymbol::EndSymbol(const std::string &nm,AddrSpace *cspc) : SpecificSymbol(nm)
 
 {
   const_space = cspc;
@@ -1210,14 +1210,14 @@ void EndSymbol::getFixedHandle(FixedHandle &hand,ParserWalker &walker) const
   hand.size = hand.space->getAddrSize();
 }
 
-void EndSymbol::print(ostream &s,ParserWalker &walker) const
+void EndSymbol::print(std::ostream &s,ParserWalker &walker) const
 
 {
   intb val = (intb) walker.getNaddr().getOffset();
   s << "0x" << hex << val;
 }
 
-void EndSymbol::saveXml(ostream &s) const
+void EndSymbol::saveXml(std::ostream &s) const
 
 {
   s << "<end_sym";
@@ -1225,7 +1225,7 @@ void EndSymbol::saveXml(ostream &s) const
   s << "/>\n";
 }
 
-void EndSymbol::saveXmlHeader(ostream &s) const
+void EndSymbol::saveXmlHeader(std::ostream &s) const
 
 {
   s << "<end_sym_head";
@@ -1241,7 +1241,7 @@ void EndSymbol::restoreXml(const Element *el,SleighBase *trans)
   patexp->layClaim();
 }
 
-FlowDestSymbol::FlowDestSymbol(const string &nm,AddrSpace *cspc) : SpecificSymbol(nm)
+FlowDestSymbol::FlowDestSymbol(const std::string &nm,AddrSpace *cspc) : SpecificSymbol(nm)
 
 {
   const_space = cspc;
@@ -1266,14 +1266,14 @@ void FlowDestSymbol::getFixedHandle(FixedHandle &hand,ParserWalker &walker) cons
   hand.size = refAddr.getAddrSize();
 }
 
-void FlowDestSymbol::print(ostream &s,ParserWalker &walker) const
+void FlowDestSymbol::print(std::ostream &s,ParserWalker &walker) const
 
 {
   intb val = (intb) walker.getDestAddr().getOffset();
   s << "0x" << hex << val;
 }
 
-void FlowDestSymbol::saveXml(ostream &s) const
+void FlowDestSymbol::saveXml(std::ostream &s) const
 
 {
   s << "<flowdest_sym";
@@ -1281,7 +1281,7 @@ void FlowDestSymbol::saveXml(ostream &s) const
   s << "/>\n";
 }
 
-void FlowDestSymbol::saveXmlHeader(ostream &s) const
+void FlowDestSymbol::saveXmlHeader(std::ostream &s) const
 
 {
   s << "<flowdest_sym_head";
@@ -1295,7 +1295,7 @@ void FlowDestSymbol::restoreXml(const Element *el,SleighBase *trans)
   const_space = trans->getConstantSpace();
 }
 
-FlowRefSymbol::FlowRefSymbol(const string &nm,AddrSpace *cspc) : SpecificSymbol(nm)
+FlowRefSymbol::FlowRefSymbol(const std::string &nm,AddrSpace *cspc) : SpecificSymbol(nm)
 
 {
   const_space = cspc;
@@ -1320,14 +1320,14 @@ void FlowRefSymbol::getFixedHandle(FixedHandle &hand,ParserWalker &walker) const
   hand.size = refAddr.getAddrSize();
 }
 
-void FlowRefSymbol::print(ostream &s,ParserWalker &walker) const
+void FlowRefSymbol::print(std::ostream &s,ParserWalker &walker) const
 
 {
   intb val = (intb) walker.getRefAddr().getOffset();
   s << "0x" << hex << val;
 }
 
-void FlowRefSymbol::saveXml(ostream &s) const
+void FlowRefSymbol::saveXml(std::ostream &s) const
 
 {
   s << "<flowref_sym";
@@ -1335,7 +1335,7 @@ void FlowRefSymbol::saveXml(ostream &s) const
   s << "/>\n";
 }
 
-void FlowRefSymbol::saveXmlHeader(ostream &s) const
+void FlowRefSymbol::saveXmlHeader(std::ostream &s) const
 
 {
   s << "<flowref_sym_head";
@@ -1400,16 +1400,16 @@ void Constructor::addInvisibleOperand(OperandSymbol *sym)
 void Constructor::addOperand(OperandSymbol *sym)
 
 {
-  string operstring = "\n ";	// Indicater character for operand
+  std::string operstring = "\n ";	// Indicater character for operand
   operstring[1] = ('A'+operands.size()); // Encode index of operand
   operands.push_back(sym);
-  printpiece.push_back(operstring); // Placeholder for operand's string
+  printpiece.push_back(operstring); // Placeholder for operand's std::string
 }
 
-void Constructor::addSyntax(const string &syn)
+void Constructor::addSyntax(const std::string &syn)
 
 {
-  string syntrim;
+  std::string syntrim;
 
   if (syn.size() == 0) return;
   bool hasNonSpace = false;
@@ -1459,10 +1459,10 @@ ConstructTpl *Constructor::getNamedTempl(int4 secnum) const
   return (ConstructTpl *)0;
 }
 
-void Constructor::print(ostream &s,ParserWalker &walker) const
+void Constructor::print(std::ostream &s,ParserWalker &walker) const
 
 {
-  vector<string>::const_iterator piter;
+  vector<std::string>::const_iterator piter;
 
   for(piter=printpiece.begin();piter!=printpiece.end();++piter) {
     if ((*piter)[0] == '\n') {
@@ -1474,7 +1474,7 @@ void Constructor::print(ostream &s,ParserWalker &walker) const
   }
 }
 
-void Constructor::printMnemonic(ostream &s,ParserWalker &walker) const
+void Constructor::printMnemonic(std::ostream &s,ParserWalker &walker) const
 
 {
   if (flowthruindex != -1) {
@@ -1497,7 +1497,7 @@ void Constructor::printMnemonic(ostream &s,ParserWalker &walker) const
   }
 }
 
-void Constructor::printBody(ostream &s,ParserWalker &walker) const
+void Constructor::printBody(std::ostream &s,ParserWalker &walker) const
 
 {
   if (flowthruindex != -1) {
@@ -1553,7 +1553,7 @@ bool Constructor::isRecursive(void) const
   return false;
 }
 
-void Constructor::saveXml(ostream &s) const
+void Constructor::saveXml(std::ostream &s) const
 
 {
   s << "<constructor";
@@ -1592,23 +1592,23 @@ void Constructor::restoreXml(const Element *el,SleighBase *trans)
   uintm id;
   {
     istringstream s(el->getAttributeValue("parent"));
-    s.unsetf(ios::dec | ios::hex | ios::oct);
+    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
     s >> id;
     parent = (SubtableSymbol *)trans->findSymbol(id);
   }
   {
     istringstream s(el->getAttributeValue("first"));
-    s.unsetf(ios::dec | ios::hex | ios::oct);
+    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
     s >> firstwhitespace;
   }
   {
     istringstream s(el->getAttributeValue("length"));
-    s.unsetf(ios::dec | ios::hex | ios::oct);
+    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
     s >> minimumlength;
   }
   {
     istringstream s(el->getAttributeValue("line"));
-    s.unsetf(ios::dec | ios::hex | ios::oct);
+    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
     s >> lineno;
   }
   const List &list(el->getChildren());
@@ -1619,7 +1619,7 @@ void Constructor::restoreXml(const Element *el,SleighBase *trans)
       uintm id;
       {
 	istringstream s((*iter)->getAttributeValue("id"));
-	s.unsetf(ios::dec | ios::hex | ios::oct);
+	s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
 	s >> id;
       }
       OperandSymbol *sym = (OperandSymbol *)trans->findSymbol(id);
@@ -1630,9 +1630,9 @@ void Constructor::restoreXml(const Element *el,SleighBase *trans)
     else if ((*iter)->getName() == "opprint") {
       int4 index;
       istringstream s((*iter)->getAttributeValue("id"));
-      s.unsetf(ios::dec | ios::hex | ios::oct);
+      s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
       s >> index;
-      string operstring = "\n ";
+      std::string operstring = "\n ";
       operstring[1] = ('A' + index);
       printpiece.push_back(operstring);
     }
@@ -1745,7 +1745,7 @@ void Constructor::orderOperands(void)
   operands = newops;
 }
 
-TokenPattern *Constructor::buildPattern(ostream &s)
+TokenPattern *Constructor::buildPattern(std::ostream &s)
 
 {
   if (pattern != (TokenPattern *)0) return pattern; // Already built
@@ -1834,7 +1834,7 @@ TokenPattern *Constructor::buildPattern(ostream &s)
   return pattern;
 }
 
-void Constructor::printInfo(ostream &s) const
+void Constructor::printInfo(std::ostream &s) const
 
 {				// Print identifying information about constructor
 				// for use in error messages
@@ -1842,7 +1842,7 @@ void Constructor::printInfo(ostream &s) const
   s << "\" constructor starting at line " << dec << lineno;
 }
 
-SubtableSymbol::SubtableSymbol(const string &nm) : TripleSymbol(nm)
+SubtableSymbol::SubtableSymbol(const std::string &nm) : TripleSymbol(nm)
 
 {
   beingbuilt = false;
@@ -1863,7 +1863,7 @@ SubtableSymbol::~SubtableSymbol(void)
     delete *iter;
 }
 
-void SubtableSymbol::saveXml(ostream &s) const
+void SubtableSymbol::saveXml(std::ostream &s) const
 
 {
   if (decisiontree == (DecisionNode *)0) return; // Not fully formed
@@ -1876,7 +1876,7 @@ void SubtableSymbol::saveXml(ostream &s) const
   s << "</subtable_sym>\n";
 }
 
-void SubtableSymbol::saveXmlHeader(ostream &s) const
+void SubtableSymbol::saveXmlHeader(std::ostream &s) const
 
 {
   s << "<subtable_sym_head";
@@ -1890,7 +1890,7 @@ void SubtableSymbol::restoreXml(const Element *el,SleighBase *trans)
   {
     int4 numct;
     istringstream s(el->getAttributeValue("numct"));
-    s.unsetf(ios::dec | ios::hex | ios::oct);
+    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
     s >> numct;
     construct.reserve(numct);
   }
@@ -1931,7 +1931,7 @@ void SubtableSymbol::buildDecisionTree(DecisionProperties &props)
   decisiontree->split(props);	// Create the decision strategy
 }
 
-TokenPattern *SubtableSymbol::buildPattern(ostream &s)
+TokenPattern *SubtableSymbol::buildPattern(std::ostream &s)
 
 {
   if (pattern != (TokenPattern *)0) return pattern; // Already built
@@ -2316,7 +2316,7 @@ Constructor *DecisionNode::resolve(ParserWalker &walker) const
   return children[val]->resolve(walker);
 }
 
-void DecisionNode::saveXml(ostream &s) const
+void DecisionNode::saveXml(std::ostream &s) const
 
 {
   s << "<decision";
@@ -2345,18 +2345,18 @@ void DecisionNode::restoreXml(const Element *el,DecisionNode *par,SubtableSymbol
   parent = par;
   {
     istringstream s(el->getAttributeValue("number"));
-    s.unsetf(ios::dec | ios::hex | ios::oct);
+    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
     s >> num;
   }
   contextdecision = xml_readbool(el->getAttributeValue("context"));
   {
     istringstream s(el->getAttributeValue("start"));
-    s.unsetf(ios::dec | ios::hex | ios::oct);
+    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
     s >> startbit;
   }
   {
     istringstream s(el->getAttributeValue("size"));
-    s.unsetf(ios::dec | ios::hex | ios::oct);
+    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
     s >> bitsize;
   }
   const List &childlist(el->getChildren());
@@ -2368,7 +2368,7 @@ void DecisionNode::restoreXml(const Element *el,DecisionNode *par,SubtableSymbol
       DisjointPattern *pat;
       uintm id;
       istringstream s((*iter)->getAttributeValue("id"));
-      s.unsetf(ios::dec | ios::hex | ios::oct);
+      s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
       s >> id;
       ct = sub->getConstructor(id);
       pat = DisjointPattern::restoreDisjoint((*iter)->getChildren().front());
@@ -2433,7 +2433,7 @@ void ContextOp::validate(void) const
   }
 }
 
-void ContextOp::saveXml(ostream &s) const
+void ContextOp::saveXml(std::ostream &s) const
 
 {
   s << "<context_op";
@@ -2449,17 +2449,17 @@ void ContextOp::restoreXml(const Element *el,SleighBase *trans)
 {
   {
     istringstream s(el->getAttributeValue("i"));
-    s.unsetf(ios::dec | ios::hex | ios::oct);
+    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
     s >> num;
   }
   {
     istringstream s(el->getAttributeValue("shift"));
-    s.unsetf(ios::dec | ios::hex | ios::oct);
+    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
     s >> shift;
   }
   {
     istringstream s(el->getAttributeValue("mask"));
-    s.unsetf(ios::dec | ios::hex | ios::oct);
+    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
     s >> mask;
   }
   const List &list(el->getChildren());
@@ -2496,7 +2496,7 @@ void ContextCommit::apply(ParserWalkerChange &walker) const
   walker.getParserContext()->addCommit(sym,num,mask,flow,walker.getPoint());
 }
 
-void ContextCommit::saveXml(ostream &s) const
+void ContextCommit::saveXml(std::ostream &s) const
 
 {
   s << "<commit";
@@ -2512,19 +2512,19 @@ void ContextCommit::restoreXml(const Element *el,SleighBase *trans)
 {
   uintm id;
   {
-    istringstream s(el->getAttributeValue("id"));
-    s.unsetf(ios::dec | ios::hex | ios::oct);
+	std::istringstream s(el->getAttributeValue("id"));
+    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
     s >> id;
     sym = (TripleSymbol *)trans->findSymbol(id);
   }
   {
-    istringstream s(el->getAttributeValue("num"));
-    s.unsetf(ios::dec | ios::hex | ios::oct);
+	std::istringstream s(el->getAttributeValue("num"));
+    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
     s >> num;
   }
   {
-    istringstream s(el->getAttributeValue("mask"));
-    s.unsetf(ios::dec | ios::hex | ios::oct);
+	std::istringstream s(el->getAttributeValue("mask"));
+    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
     s >> mask;
   }
   if (el->getNumAttributes()==4)

@@ -25,7 +25,7 @@
 
 %union {
   uintb *i;
-  string *str;
+  std::string *str;
   vector<ExprTree *> *param;
   StarQuality *starqual;
   VarnodeTpl *varnode;
@@ -47,7 +47,7 @@
 // Conflicts
 // 1 integervarnode ':' conflict   (does ':' apply to INTEGER or varnode)
 //     resolved by shifting which applies ':' to INTEGER (best solution)
-// 2 statement -> STRING . conflicts (STRING might be mislabelled varnode, or temporary declaration)
+// 2 statement -> std::string . conflicts (std::string might be mislabelled varnode, or temporary declaration)
 //     resolved by shifting which means assume this is a temporary declaration
 
 %left OP_BOOL_OR
@@ -109,7 +109,7 @@ statement: lhsvarnode '=' expr ';'	{ $3->setOutput($1); $$ = ExprTree::toVector(
   | STRING '=' expr ';'			{ $$ = pcode->newOutput(false,$3,$1); }
   | LOCAL_KEY STRING ':' INTEGER '=' expr ';'	{ $$ = pcode->newOutput(true,$6,$2,*$4); delete $4; }
   | STRING ':' INTEGER '=' expr ';'	{ $$ = pcode->newOutput(true,$5,$1,*$3); delete $3; }
-  | LOCAL_KEY specificsymbol '=' { $$ = (vector<OpTpl *> *)0; string errmsg = "Redefinition of symbol: "+$2->getName(); yyerror(errmsg.c_str()); YYERROR; }
+  | LOCAL_KEY specificsymbol '=' { $$ = (vector<OpTpl *> *)0; std::string errmsg = "Redefinition of symbol: "+$2->getName(); yyerror(errmsg.c_str()); YYERROR; }
   | sizedstar expr '=' expr ';'		{ $$ = pcode->createStore($1,$2,$4); }
   | USEROPSYM '(' paramlist ')' ';'	{ $$ = pcode->createUserOpNoOut($1,$3); }
   | lhsvarnode '[' INTEGER ',' INTEGER ']' '=' expr ';' { $$ = pcode->assignBitRange($1,(uint4)*$3,(uint4)*$5,$8); delete $3, delete $5; }
@@ -199,11 +199,11 @@ jumpdest: STARTSYM		{ VarnodeTpl *sym = $1->getVarnode(); $$ = new VarnodeTpl(Co
   | BADINTEGER                  { $$ = new VarnodeTpl(ConstTpl(ConstTpl::j_curspace),ConstTpl(ConstTpl::real,0),ConstTpl(ConstTpl::j_curspace_size)); yyerror("Parsed integer is too big (overflow)"); }
   | INTEGER '[' SPACESYM ']'	{ AddrSpace *spc = $3->getSpace(); $$ = new VarnodeTpl(ConstTpl(spc),ConstTpl(ConstTpl::real,*$1),ConstTpl(ConstTpl::real,spc->getAddrSize())); delete $1; }
   | label                       { $$ = new VarnodeTpl(ConstTpl(pcode->getConstantSpace()),ConstTpl(ConstTpl::j_relative,$1->getIndex()),ConstTpl(ConstTpl::real,sizeof(uintm))); $1->incrementRefCount(); }
-  | STRING			{ $$ = (VarnodeTpl *)0; string errmsg = "Unknown jump destination: "+*$1; delete $1; yyerror(errmsg.c_str()); YYERROR; }
+  | STRING			{ $$ = (VarnodeTpl *)0; std::string errmsg = "Unknown jump destination: "+*$1; delete $1; yyerror(errmsg.c_str()); YYERROR; }
   ;
 varnode: specificsymbol		{ $$ = $1->getVarnode(); }
   | integervarnode		{ $$ = $1; }
-  | STRING			{ $$ = (VarnodeTpl *)0; string errmsg = "Unknown varnode parameter: "+*$1; delete $1; yyerror(errmsg.c_str()); YYERROR; }
+  | STRING			{ $$ = (VarnodeTpl *)0; std::string errmsg = "Unknown varnode parameter: "+*$1; delete $1; yyerror(errmsg.c_str()); YYERROR; }
   ;
 integervarnode: INTEGER		{ $$ = new VarnodeTpl(ConstTpl(pcode->getConstantSpace()),ConstTpl(ConstTpl::real,*$1),ConstTpl(ConstTpl::real,0)); delete $1; }
   | BADINTEGER                  { $$ = new VarnodeTpl(ConstTpl(pcode->getConstantSpace()),ConstTpl(ConstTpl::real,0),ConstTpl(ConstTpl::real,0)); yyerror("Parsed integer is too big (overflow)"); }
@@ -212,7 +212,7 @@ integervarnode: INTEGER		{ $$ = new VarnodeTpl(ConstTpl(pcode->getConstantSpace(
   | '&' ':' INTEGER varnode     { $$ = pcode->addressOf($4,*$3); delete $3; }
   ;
 lhsvarnode: specificsymbol	{ $$ = $1->getVarnode(); }
-  | STRING			{ $$ = (VarnodeTpl *)0; string errmsg = "Unknown assignment varnode: "+*$1; delete $1; yyerror(errmsg.c_str()); YYERROR; }
+  | STRING			{ $$ = (VarnodeTpl *)0; std::string errmsg = "Unknown assignment varnode: "+*$1; delete $1; yyerror(errmsg.c_str()); YYERROR; }
   ;
 label: '<' LABELSYM '>'         { $$ = $2; }
   | '<' STRING '>'              { $$ = pcode->defineLabel( $2 ); }
@@ -278,7 +278,7 @@ const IdentRec PcodeLexer::idents[]= { // Sorted list of identifiers
   { "zext", OP_ZEXT }
 };
 
-int4 PcodeLexer::findIdentifier(const string &str) const
+int4 PcodeLexer::findIdentifier(const std::string &str) const
 
 {
   int4 low = 0;
@@ -587,13 +587,13 @@ int4 PcodeLexer::getNextToken(void)
     curidentifier = curtoken;
     int4 num = findIdentifier(curidentifier);
     if (num < 0)			// Not a keyword
-      return STRING;
+      return std::string;
     return idents[num].id;
   }
   else if ((tok == hexstring)||(tok == decstring)) {
     curtoken[tokpos] = '\0';
     istringstream s1(curtoken);
-    s1.unsetf(ios::dec | ios::hex | ios::oct);
+    s1.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
     s1 >> curnum;
     if (!s1)
       return BADINTEGER;
@@ -712,7 +712,7 @@ PcodeSnippet::~PcodeSnippet(void)
   }
 }
 
-void PcodeSnippet::reportError(const string &msg)
+void PcodeSnippet::reportError(const std::string &msg)
 
 {
   if (errorcount == 0)
@@ -724,7 +724,7 @@ int4 PcodeSnippet::lex(void)
 
 {
   int4 tok = lexer.getNextToken();
-  if (tok == STRING) {
+  if (tok == std::string) {
     SleighSymbol *sym;
     SleighSymbol tmpsym(lexer.getIdentifier());
     SymbolTree::const_iterator iter = tree.find(&tmpsym);
@@ -762,8 +762,8 @@ int4 PcodeSnippet::lex(void)
 	break;
       }
     }
-    yylval.str = new string(lexer.getIdentifier());
-    return STRING;
+    yylval.str = new std::string(lexer.getIdentifier());
+    return std::string;
   }
   if (tok == INTEGER) {
     yylval.i = new uintb(lexer.getNumber());
@@ -789,7 +789,7 @@ int4 PcodeSnippet::lex(void)
   return true;
 }
 
-void PcodeSnippet::addOperand(const string &name,int4 index)
+void PcodeSnippet::addOperand(const std::string &name,int4 index)
 
 { // Add an operand symbol for this snippet
   OperandSymbol *sym = new OperandSymbol(name,index,(Constructor *)0);

@@ -22,8 +22,8 @@ void TruncationTag::restoreXml(const Element *el)
 
 {
   spaceName = el->getAttributeValue("space");
-  istringstream s(el->getAttributeValue("size"));
-  s.unsetf(ios::dec | ios::hex | ios::oct);
+  std::istringstream s(el->getAttributeValue("size"));
+  s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
   s >> size;
 }
 
@@ -59,7 +59,7 @@ SpacebaseSpace::SpacebaseSpace(AddrSpaceManager *m,const Translate *t)
 }
 
 /// This routine sets the base register associated with this \b virtual space
-/// It will throw an exception if something tries to set two (different) base registers
+/// It will throw an exception if something tries to std::set two (different) base registers
 /// \param data is the location data for the base register
 /// \param truncSize is the size of the space covered by the register
 /// \param stackGrowth is \b true if the stack which this register manages grows in a negative direction
@@ -140,7 +140,7 @@ bool JoinRecord::operator<(const JoinRecord &op2) const
   }
 }
 
-/// Initialize manager containing no address spaces. All the cached space slots are set to null
+/// Initialize manager containing no address spaces. All the cached space slots are std::set to null
 AddrSpaceManager::AddrSpaceManager(void)
 
 {
@@ -217,7 +217,7 @@ void AddrSpaceManager::setDefaultSpace(int4 index)
 
 {
   if (defaultspace != (AddrSpace *)0)
-    throw LowlevelError("Default space set multiple times");
+    throw LowlevelError("Default space std::set multiple times");
   if (baselist.size()<=index)
     throw LowlevelError("Bad index for default space");
   defaultspace = baselist[index];
@@ -235,7 +235,7 @@ void AddrSpaceManager::setReverseJustified(AddrSpace *spc)
 }
 
 /// This adds a previously instantiated address space (AddrSpace)
-/// to the model for this processor.  It checks a set of
+/// to the model for this processor.  It checks a std::set of
 /// indexing and naming conventions for the space and throws
 /// an exception if the conventions are violated. Should
 /// only be called during initialization.
@@ -352,7 +352,7 @@ void AddrSpaceManager::insertResolver(AddrSpace *spc,AddressResolver *rsolv)
 AddrSpaceManager::~AddrSpaceManager(void)
 
 {
-  for(vector<AddrSpace *>::iterator iter=baselist.begin();iter!=baselist.end();++iter) {
+  for(std::vector<AddrSpace *>::iterator iter=baselist.begin();iter!=baselist.end();++iter) {
     AddrSpace *spc = *iter;
     if (spc->refcount > 1)
       spc->refcount -= 1;
@@ -488,7 +488,7 @@ AddrSpace *AddrSpaceManager::getNextSpaceInOrder(AddrSpace *spc) const
 /// \param pieces if the list memory locations to be joined
 /// \param logicalsize of a \e single \e piece join, or zero
 /// \return a pointer to the JoinRecord
-JoinRecord *AddrSpaceManager::findAddJoin(const vector<VarnodeData> &pieces,uint4 logicalsize)
+JoinRecord *AddrSpaceManager::findAddJoin(const std::vector<VarnodeData> &pieces,uint4 logicalsize)
 
 { // Find a pre-existing split record, or create a new one corresponding to the input -pieces-
   // If -logicalsize- is 0, calculate logical size as sum of pieces
@@ -515,9 +515,9 @@ JoinRecord *AddrSpaceManager::findAddJoin(const vector<VarnodeData> &pieces,uint
 
   testnode.pieces = pieces;
   testnode.unified.size = totalsize;
-  set<JoinRecord *,JoinRecordCompare>::const_iterator iter;
+  std::set<JoinRecord *,JoinRecordCompare>::const_iterator iter;
   iter = splitset.find(&testnode);
-  if (iter != splitset.end())		// If already in the set
+  if (iter != splitset.end())		// If already in the std::set
     return *iter;
 
   JoinRecord *newjoin = new JoinRecord();
@@ -557,10 +557,10 @@ JoinRecord *AddrSpaceManager::findJoin(uintb offset) const
   throw LowlevelError("Unlinked join address");
 }
 
-/// Set the number of passes for a specific AddrSpace before deadcode removal is allowed
+/// std::set the number of passes for a specific AddrSpace before deadcode removal is allowed
 /// for that space.
 /// \param spcnum is the index of the AddrSpace to change
-/// \param delaydelta is the number of rounds to the delay should be set to
+/// \param delaydelta is the number of rounds to the delay should be std::set to
 void AddrSpaceManager::setDeadcodeDelay(int4 spcnum,int4 delaydelta)
 
 {
@@ -590,7 +590,7 @@ Address AddrSpaceManager::constructFloatExtensionAddress(const Address &realaddr
 {
   if (logicalsize == realsize)
     return realaddr;
-  vector<VarnodeData> pieces;
+  std::vector<VarnodeData> pieces;
   pieces.push_back(VarnodeData());
   pieces.back().space = realaddr.getSpace();
   pieces.back().offset = realaddr.getOffset();
@@ -642,7 +642,7 @@ Address AddrSpaceManager::constructJoinAddress(const Translate *translate,
     }
   }
   // Otherwise construct a formal JoinRecord
-  vector<VarnodeData> pieces;
+  std::vector<VarnodeData> pieces;
   pieces.push_back(VarnodeData());
   pieces.push_back(VarnodeData());
   pieces[0].space = hiaddr.getSpace();
@@ -688,7 +688,7 @@ void Translate::setDefaultFloatFormats(void)
 const FloatFormat *Translate::getFloatFormat(int4 size) const
 
 {
-  vector<FloatFormat>::const_iterator iter;
+  std::vector<FloatFormat>::const_iterator iter;
 
   for(iter=floatformats.begin();iter!=floatformats.end();++iter) {
     if ((*iter).getSize() == size)
@@ -710,7 +710,7 @@ void PcodeEmit::restoreXmlOp(const Element *el,const AddrSpaceManager *manage)
   VarnodeData invar[30];
   VarnodeData *outptr;
 
-  istringstream i(el->getAttributeValue("code"));
+  std::istringstream i(el->getAttributeValue("code"));
   i >> opcode;
   const List &list(el->getChildren());
   List::const_iterator iter = list.begin();

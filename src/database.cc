@@ -159,7 +159,7 @@ Datatype *SymbolEntry::getSizedType(const Address &inaddr,int4 sz) const
 
 /// Give a contained one-line description of \b this storage, suitable for a debug console
 /// \param s is the output stream
-void SymbolEntry::printEntry(ostream &s) const
+void SymbolEntry::printEntry(std::ostream &s) const
 
 {
   s << symbol->getName() << " : ";
@@ -180,7 +180,7 @@ void SymbolEntry::printEntry(ostream &s) const
 /// It outputs the address tag (or the \<hash> tag for dynamic symbols) and
 /// a \<rangelist> tag associated with the \b uselimit.
 /// \param s is the output stream
-void SymbolEntry::saveXml(ostream &s) const
+void SymbolEntry::saveXml(std::ostream &s) const
 
 {
   if (isPiece()) return;	// Don't save a piece
@@ -270,7 +270,7 @@ SymbolEntry *Symbol::getMapEntry(const Address &addr) const
 }
 
 /// \param s is the output stream
-void Symbol::saveXmlHeader(ostream &s) const
+void Symbol::saveXmlHeader(std::ostream &s) const
 
 {
   a_v(s,"name",name);
@@ -347,7 +347,7 @@ void Symbol::restoreXmlHeader(const Element *el)
 	flags |= Varnode::hiddenretparm;
     }
     else if (el->getAttributeName(i)=="format") {
-      const string &formString( el->getAttributeValue(i));
+      const std::string &formString( el->getAttributeValue(i));
       if (formString == "hex")
 	dispflags |= Symbol::force_hex;
       else if (formString == "dec")
@@ -371,7 +371,7 @@ void Symbol::restoreXmlHeader(const Element *el)
 
 /// Save the data-type for the Symbol
 /// \param s is the output stream
-void Symbol::saveXmlBody(ostream &s) const
+void Symbol::saveXmlBody(std::ostream &s) const
 
 {
   type->saveXmlRef(s);
@@ -387,7 +387,7 @@ void Symbol::restoreXmlBody(List::const_iterator iter)
 }
 
 /// \param s is the output stream
-void Symbol::saveXml(ostream &s) const
+void Symbol::saveXml(std::ostream &s) const
 
 {
   s << "<symbol";
@@ -430,7 +430,7 @@ void FunctionSymbol::buildType(int4 size)
 /// \param sc is the Scope that will contain the new Symbol
 /// \param nm is the name of the new Symbol
 /// \param size is the number of bytes the Symbol should consume
-FunctionSymbol::FunctionSymbol(Scope *sc,const string &nm,int4 size)
+FunctionSymbol::FunctionSymbol(Scope *sc,const std::string &nm,int4 size)
   : Symbol(sc)
 {
   fd = (Funcdata *)0;
@@ -459,7 +459,7 @@ Funcdata *FunctionSymbol::getFunction(void)
   return fd;
 }
 
-void FunctionSymbol::saveXml(ostream &s) const
+void FunctionSymbol::saveXml(std::ostream &s) const
 
 {
   if (fd != (Funcdata *)0)
@@ -514,7 +514,7 @@ bool EquateSymbol::isValueClose(uintb op2Value,int4 size) const
   return false;
 }
 
-void EquateSymbol::saveXml(ostream &s) const
+void EquateSymbol::saveXml(std::ostream &s) const
 
 {
   s << "<equatesymbol";
@@ -550,7 +550,7 @@ void LabSymbol::buildType(void)
 
 /// \param sc is the Scope that will contain the new Symbol
 /// \param nm is the name of the new Symbol
-LabSymbol::LabSymbol(Scope *sc,const string &nm)
+LabSymbol::LabSymbol(Scope *sc,const std::string &nm)
   : Symbol(sc)
 {
   buildType();
@@ -564,7 +564,7 @@ LabSymbol::LabSymbol(Scope *sc)
   buildType();
 }
 
-void LabSymbol::saveXml(ostream &s) const
+void LabSymbol::saveXml(std::ostream &s) const
 
 {
   s << "<labelsym";
@@ -586,7 +586,7 @@ void ExternRefSymbol::buildNameType(void)
   type = typegrp->getTypeCode();
   type = typegrp->getTypePointer(refaddr.getAddrSize(),type,refaddr.getSpace()->getWordSize());
   if (name.size() == 0) {	// If a name was not already provided
-    ostringstream s;		// Give the reference a unique name
+    std::ostringstream s;		// Give the reference a unique name
     s << refaddr.getShortcut();
     refaddr.printRaw(s);
     name = s.str();
@@ -598,14 +598,14 @@ void ExternRefSymbol::buildNameType(void)
 /// \param sc is the Scope containing the Symbol
 /// \param ref is the placeholder address where the system will hold meta-data
 /// \param nm is the name of the Symbol
-ExternRefSymbol::ExternRefSymbol(Scope *sc,const Address &ref,const string &nm)
+ExternRefSymbol::ExternRefSymbol(Scope *sc,const Address &ref,const std::string &nm)
   : Symbol(sc,nm,(Datatype *)0)
 {
   refaddr = ref;
   buildNameType();
 }
 
-void ExternRefSymbol::saveXml(ostream &s) const
+void ExternRefSymbol::saveXml(std::ostream &s) const
 
 {
   s << "<externrefsymbol";
@@ -687,7 +687,7 @@ void Scope::attachScope(Scope *child)
     throw LowlevelError("Non-global scope has empty name");
   res = children.insert(value);
   if (res.second==false) {
-    ostringstream s;
+    std::ostringstream s;
     s << "Duplicate scope name: ";
     s << child->getFullName();
     delete child;
@@ -995,7 +995,7 @@ Scope::~Scope(void)
 /// the result list
 /// \param name is the name to search for
 /// \param res is the result list
-void Scope::queryByName(const string &name,vector<Symbol *> &res) const
+void Scope::queryByName(const std::string &name,std::vector<Symbol *> &res) const
 
 {
   findByName(name,res);
@@ -1009,10 +1009,10 @@ void Scope::queryByName(const string &name,vector<Symbol *> &res) const
 /// If there are no Symbols with that name in \b this Scope at all, recurse into the parent Scope.
 /// \param name if the name to search for
 /// \return the Funcdata object of the matching function, or NULL if it doesn't exist
-Funcdata *Scope::queryFunction(const string &name) const
+Funcdata *Scope::queryFunction(const std::string &name) const
 
 {
-  vector<Symbol *> symList;
+  std::vector<Symbol *> symList;
   queryByName(name,symList);
   for(int4 i=0;i<symList.size();++i) {
     Symbol *sym = symList[i];
@@ -1111,7 +1111,7 @@ LabSymbol *Scope::queryCodeLabel(const Address &addr) const
 /// Look for the (last) immediate child of \b this with a given name
 /// \param name is the child's name
 /// \return the child Scope or NULL if there is no child with that name
-Scope *Scope::resolveScope(const string &name) const
+Scope *Scope::resolveScope(const std::string &name) const
 
 {
   ScopeKey key(name,0xffffffff);
@@ -1148,7 +1148,7 @@ Scope *Scope::discoverScope(const Address &addr,int4 sz,const Address &usepoint)
 /// in post order.  For each Scope, the saveXml() method is invoked.
 /// \param s is the output stream
 /// \param onlyGlobal is \b true if only non-local Scopes should be saved
-void Scope::saveXmlRecursive(ostream &s,bool onlyGlobal) const
+void Scope::saveXmlRecursive(std::ostream &s,bool onlyGlobal) const
 
 {
   if (onlyGlobal && (!isGlobal())) return;		// Only save global scopes
@@ -1220,11 +1220,11 @@ bool Scope::isSubScope(const Scope *scp) const
   return false;
 }
 
-string Scope::getFullName(void) const
+std::string Scope::getFullName(void) const
 
 {
   if (parent == (Scope *)0) return "";
-  string fname = name;
+  std::string fname = name;
   Scope *scope = parent;
   while(scope->parent != (Scope *)0) {
     fname = scope->name + "::" + fname;
@@ -1236,7 +1236,7 @@ string Scope::getFullName(void) const
 /// Put the names of \b this and all its parent Scopes into an array in order.
 /// The name of the first entry will generally be the name of the global Scope
 /// \param vec is the array in which to store the names
-void Scope::getNameSegments(vector<string> &vec) const
+void Scope::getNameSegments(std::vector<std::string> &vec) const
 
 {
   int4 count = 0;
@@ -1258,7 +1258,7 @@ void Scope::getNameSegments(vector<string> &vec) const
 /// \param name is the name of the new Symbol
 /// \param ct is a data-type to assign to the new Symbol
 /// \return the new Symbol object
-Symbol *Scope::addSymbol(const string &name,Datatype *ct)
+Symbol *Scope::addSymbol(const std::string &name,Datatype *ct)
 
 {
   Symbol *sym;
@@ -1278,7 +1278,7 @@ Symbol *Scope::addSymbol(const string &name,Datatype *ct)
 /// \param addr is the starting address of the Symbol storage
 /// \param usepoint is the point accessing that storage (may be \e invalid)
 /// \return the SymbolEntry matching the new mapping
-SymbolEntry *Scope::addSymbol(const string &name,Datatype *ct,
+SymbolEntry *Scope::addSymbol(const std::string &name,Datatype *ct,
 			      const Address &addr,
 			      const Address &usepoint)
 {
@@ -1317,7 +1317,7 @@ Symbol *Scope::addMapSym(const Element *el)
   List::const_iterator subiter = sublist.begin();
   const Element *subel = *subiter;
   Symbol *sym;
-  const string &symname( subel->getName() );
+  const std::string &symname( subel->getName() );
   if (symname == "symbol")
     sym = new Symbol(this);
   else if (symname == "dynsymbol")
@@ -1362,14 +1362,14 @@ Symbol *Scope::addMapSym(const Element *el)
 /// \param addr is the entry address of the function
 /// \param nm is the name of the function, within \b this Scope
 /// \return the new FunctionSymbol object
-FunctionSymbol *Scope::addFunction(const Address &addr,const string &nm)
+FunctionSymbol *Scope::addFunction(const Address &addr,const std::string &nm)
 
 {
   FunctionSymbol *sym;
 
   SymbolEntry *overlap = queryContainer(addr,1,Address());
   if (overlap != (SymbolEntry *)0) {
-    string errmsg = "WARNING: Function "+name;
+    std::string errmsg = "WARNING: Function "+name;
     errmsg += " overlaps object: "+overlap->getSymbol()->getName();
     glb->printMessage(errmsg);
   }
@@ -1389,7 +1389,7 @@ FunctionSymbol *Scope::addFunction(const Address &addr,const string &nm)
 /// \param refaddr is the reference address
 /// \param nm is the name of the symbol/function
 /// \return the new ExternRefSymbol
-ExternRefSymbol *Scope::addExternalRef(const Address &addr,const Address &refaddr,const string &nm)
+ExternRefSymbol *Scope::addExternalRef(const Address &addr,const Address &refaddr,const std::string &nm)
 
 {
   ExternRefSymbol *sym;
@@ -1411,14 +1411,14 @@ ExternRefSymbol *Scope::addExternalRef(const Address &addr,const Address &refadd
 /// \param addr is the given address to map to
 /// \param nm is the name of the symbol/label
 /// \return the new LabSymbol
-LabSymbol *Scope::addCodeLabel(const Address &addr,const string &nm)
+LabSymbol *Scope::addCodeLabel(const Address &addr,const std::string &nm)
 
 {
   LabSymbol *sym;
 
   SymbolEntry *overlap = queryContainer(addr,1,addr);
   if (overlap != (SymbolEntry *)0) {
-    string errmsg = "WARNING: Codelabel "+nm;
+    std::string errmsg = "WARNING: Codelabel "+nm;
     errmsg += " overlaps object: "+overlap->getSymbol()->getName();
     glb->printMessage(errmsg);
   }
@@ -1437,7 +1437,7 @@ LabSymbol *Scope::addCodeLabel(const Address &addr,const string &nm)
 /// \param caddr is the code address where the Symbol is being used
 /// \param hash is the dynamic hash
 /// \return the new Symbol
-Symbol *Scope::addDynamicSymbol(const string &nm,Datatype *ct,const Address &caddr,uint8 hash)
+Symbol *Scope::addDynamicSymbol(const std::string &nm,Datatype *ct,const Address &caddr,uint8 hash)
 
 {
   Symbol *sym;
@@ -1480,8 +1480,8 @@ void ScopeInternal::addSymbolInternal(Symbol *sym)
     insertNameTree(sym);
     if (sym->category >= 0) {
       while(category.size() <= sym->category)
-	category.push_back(vector<Symbol *>());
-      vector<Symbol *> &list(category[sym->category]);
+	category.push_back(std::vector<Symbol *>());
+      std::vector<Symbol *> &list(category[sym->category]);
       if (sym->category > 0)
 	sym->catindex = list.size();
       while(list.size() <= sym->catindex)
@@ -1508,7 +1508,7 @@ SymbolEntry *ScopeInternal::addMapInternal(Symbol *sym,uint4 exfl,const Address 
   SymbolEntry::inittype initdata(sym,exfl,addr.getSpace(),off,uselim);
   Address lastaddress = addr + (sz-1);
   if (lastaddress.getOffset() < addr.getOffset()) {
-    string msg = "Symbol ";
+    std::string msg = "Symbol ";
     msg += sym->getName();
     msg += " extends beyond the end of the address space";
     throw LowlevelError(msg);
@@ -1534,7 +1534,7 @@ MapIterator ScopeInternal::begin(void) const
 
 {
   // The symbols are ordered via their mapping address
-  vector<EntryMap *>::const_iterator iter;
+  std::vector<EntryMap *>::const_iterator iter;
   iter = maptable.begin();
   while((iter!=maptable.end())&&((*iter)==(EntryMap *)0))
     ++iter;
@@ -1588,7 +1588,7 @@ list<SymbolEntry>::iterator ScopeInternal::endDynamic(void)
 
 /// \param nm is the name of the Scope
 /// \param g is the Architecture it belongs to
-ScopeInternal::ScopeInternal(const string &nm,Architecture *g)
+ScopeInternal::ScopeInternal(const std::string &nm,Architecture *g)
   : Scope(nm,g)
 {
   int4 numspaces = g->numSpaces();
@@ -1599,7 +1599,7 @@ ScopeInternal::ScopeInternal(const string &nm,Architecture *g)
 ScopeInternal::~ScopeInternal(void)
 
 {
-  vector<EntryMap *>::iterator iter1;
+  std::vector<EntryMap *>::iterator iter1;
 
   for(iter1=maptable.begin();iter1!=maptable.end();++iter1)
     if ((*iter1) != (EntryMap *)0)
@@ -1640,7 +1640,7 @@ void ScopeInternal::categorySanity(void)
       }
     }
     if (nullsymbol) {		// Clear entire category
-      vector<Symbol *> list;
+      std::vector<Symbol *> list;
       for(int4 j=0;j<num;++j)
 	list.push_back(category[i][j]);
       for(int4 j=0;j<list.size();++j) {
@@ -1740,10 +1740,10 @@ void ScopeInternal::clearUnlockedCategory(int4 cat)
 void ScopeInternal::removeSymbol(Symbol *symbol)
 
 {
-  vector<list<SymbolEntry>::iterator>::iterator iter;
+  std::vector<list<SymbolEntry>::iterator>::iterator iter;
 
   if (symbol->category >= 0) {
-    vector<Symbol *> &list(category[symbol->category]);
+    std::vector<Symbol *> &list(category[symbol->category]);
     list[symbol->catindex] = (Symbol *)0;
     while((!list.empty())&&(list.back() == (Symbol *)0))
       list.pop_back();
@@ -1763,11 +1763,11 @@ void ScopeInternal::removeSymbol(Symbol *symbol)
   delete symbol;
 }
 
-void ScopeInternal::renameSymbol(Symbol *sym,const string &newname)
+void ScopeInternal::renameSymbol(Symbol *sym,const std::string &newname)
 
 {
   nametree.erase(sym);		// Erase under old name 
-  string oldname = sym->name;
+  std::string oldname = sym->name;
   sym->name = newname;
   insertNameTree(sym);
 }
@@ -2032,7 +2032,7 @@ SymbolEntry *ScopeInternal::findAfter(const Address &addr) const
   return (SymbolEntry *)0;
 }
 
-void ScopeInternal::findByName(const string &name,vector<Symbol *> &res) const
+void ScopeInternal::findByName(const std::string &name,std::vector<Symbol *> &res) const
 
 {
   SymbolNameTree::const_iterator iter = findFirstByName(name);
@@ -2044,18 +2044,18 @@ void ScopeInternal::findByName(const string &name,vector<Symbol *> &res) const
   }
 }
 
-string ScopeInternal::buildVariableName(const Address &addr,
+std::string ScopeInternal::buildVariableName(const Address &addr,
 					const Address &pc,
 					Datatype *ct,int4 &index,uint4 flags) const
 {
-  ostringstream s;
+  std::ostringstream s;
   int4 sz = (ct == (Datatype *)0) ? 1 : ct->getSize();
 
   if ((flags & Varnode::unaffected)!=0) {
     if ((flags & Varnode::return_address)!=0)
       s << "unaff_retaddr";
     else {
-      string unaffname;
+      std::string unaffname;
       unaffname = glb->translate->getRegisterName(addr.getSpace(),addr.getOffset(),sz);
       if (unaffname.empty()) {
 	s << "unaff_";
@@ -2066,7 +2066,7 @@ string ScopeInternal::buildVariableName(const Address &addr,
     }
   }
   else if ((flags & Varnode::persist)!=0) {
-    string spacename;
+    std::string spacename;
     spacename = glb->translate->getRegisterName(addr.getSpace(),addr.getOffset(),sz);
     if (!spacename.empty())
       s << spacename;
@@ -2081,7 +2081,7 @@ string ScopeInternal::buildVariableName(const Address &addr,
     }
   }
   else if (((flags & Varnode::input)!=0)&&(index<0)) { // Irregular input
-    string regname;
+    std::string regname;
     regname = glb->translate->getRegisterName(addr.getSpace(),addr.getOffset(),sz);
     if (regname.empty()) {
       s << "in_" << addr.getSpace()->getName() << '_';
@@ -2098,14 +2098,14 @@ string ScopeInternal::buildVariableName(const Address &addr,
   else if ((flags & Varnode::addrtied)!=0) {
     if (ct != (Datatype *)0)
       ct->printNameBase(s);
-    string spacename = addr.getSpace()->getName();
+    std::string spacename = addr.getSpace()->getName();
     spacename[0] = toupper( spacename[0] ); // Capitalize space
     s << spacename;
     s << hex << setfill('0') << setw(2*addr.getAddrSize());
     s << AddrSpace::byteToAddress(addr.getOffset(),addr.getSpace()->getWordSize());
   }
   else if ((flags & Varnode::indirect_creation)!=0) {
-    string regname;
+    std::string regname;
     s << "extraout_";
     regname = glb->translate->getRegisterName(addr.getSpace(),addr.getOffset(),sz);
     if (!regname.empty())
@@ -2119,7 +2119,7 @@ string ScopeInternal::buildVariableName(const Address &addr,
     s << "Var" << dec << index++;
     if (findFirstByName(s.str()) != nametree.end()) {	// If the name already exists
       for(int4 i=0;i<10;++i) {	// Try bumping up the index a few times before calling makeNameUnique
-	ostringstream s2;
+	std::ostringstream s2;
 	if (ct != (Datatype *)0)
 	  ct->printNameBase(s2);
 	s2 << "Var" << dec << index++;
@@ -2132,7 +2132,7 @@ string ScopeInternal::buildVariableName(const Address &addr,
   return makeNameUnique(s.str());
 }
 
-string ScopeInternal::buildUndefinedName(void) const
+std::string ScopeInternal::buildUndefinedName(void) const
 
 { // We maintain a family of officially undefined names
   // so that symbols can be stored in the database without
@@ -2149,7 +2149,7 @@ string ScopeInternal::buildUndefinedName(void) const
   if (iter != nametree.begin())
     --iter;
   if (iter != nametree.end()) {
-    const string &symname((*iter)->getName());
+    const std::string &symname((*iter)->getName());
     if ((symname.size() == 15) && (0==symname.compare(0,7,"$$undef"))) {
       istringstream s( symname.substr(7,8) );
       uint4 uniq = ~((uint4)0);
@@ -2157,7 +2157,7 @@ string ScopeInternal::buildUndefinedName(void) const
       if (uniq == ~((uint4)0))
 	throw LowlevelError("Error creating undefined name");
       uniq += 1;
-      ostringstream s2;
+      std::ostringstream s2;
       s2 << "$$undef" << hex << setw(8) << setfill('0') << uniq;
       return s2.str();
     }
@@ -2165,7 +2165,7 @@ string ScopeInternal::buildUndefinedName(void) const
   return "$$undef00000000";
 }
 
-string ScopeInternal::makeNameUnique(const string &nm) const
+std::string ScopeInternal::makeNameUnique(const std::string &nm) const
 
 {
   SymbolNameTree::const_iterator iter = findFirstByName(nm);
@@ -2180,7 +2180,7 @@ string ScopeInternal::makeNameUnique(const string &nm) const
     --iter2;			// Last symbol whose name starts with nm
     if (iter == iter2) break;
     Symbol *bsym = *iter2;
-    string bname = bsym->getName();
+    std::string bname = bsym->getName();
     bool isXForm = false;
     int4 digCount = 0;
     if ((bname.size() >= (nm.size() + 3)) && (bname[nm.size()] == '_')) {
@@ -2208,14 +2208,14 @@ string ScopeInternal::makeNameUnique(const string &nm) const
       uniqid = 0xffffffff;
   } while(uniqid == 0xffffffff);
 
-  string resString;
+  std::string resString;
   if (uniqid == 0xffffffff) {
     // no other names matching our convention
     resString = nm + "_00";		// Start a new sequence
   }
   else {
     uniqid += 1;
-    ostringstream s;
+    std::ostringstream s;
     s << nm << '_' << dec << setfill('0');
     if (uniqid < 100)
       s << setw(2) << uniqid;
@@ -2231,7 +2231,7 @@ string ScopeInternal::makeNameUnique(const string &nm) const
 /// Given a list of name strings, write out each one in an XML \<val> tag.
 /// \param s is the output stream
 /// \param vec is the list of names
-void ScopeInternal::savePathXml(ostream &s,const vector<string> &vec)
+void ScopeInternal::savePathXml(std::ostream &s,const std::vector<std::string> &vec)
 
 {
   for(int4 i=0;i<vec.size();++i) {
@@ -2242,10 +2242,10 @@ void ScopeInternal::savePathXml(ostream &s,const vector<string> &vec)
 }
 
 /// Given an element, parse all of its children (as \<val> tags) and
-/// put each of their content into a string array.
-/// \param vec will hold the resulting string array
+/// put each of their content into a std::string array.
+/// \param vec will hold the resulting std::string array
 /// \param el is the XML element
-void ScopeInternal::restorePathXml(vector<string> &vec,const Element *el)
+void ScopeInternal::restorePathXml(std::vector<std::string> &vec,const Element *el)
 
 {
   const List &list(el->getChildren());
@@ -2255,13 +2255,13 @@ void ScopeInternal::restorePathXml(vector<string> &vec,const Element *el)
     vec.push_back( (*iter)->getContent() );
 }
 
-void ScopeInternal::saveXml(ostream &s) const
+void ScopeInternal::saveXml(std::ostream &s) const
 
 {
   s << "<scope";
   a_v(s,"name",name);
   s << ">\n";
-  vector<string> fname;
+  std::vector<std::string> fname;
   getNameSegments(fname);
   fname.pop_back();		// Pop 1 level to get parent path
   s << "<parent>\n";
@@ -2287,7 +2287,7 @@ void ScopeInternal::saveXml(ostream &s) const
 	s << " type=\"equate\"";
       s << ">\n";
       sym->saveXml(s);
-      vector<list<SymbolEntry>::iterator>::const_iterator miter;
+      std::vector<list<SymbolEntry>::iterator>::const_iterator miter;
       for(miter=sym->mapentry.begin();miter!=sym->mapentry.end();++miter) {
 	const SymbolEntry &entry((*(*miter)));
 	entry.saveXml(s);
@@ -2349,7 +2349,7 @@ void ScopeInternal::insertNameTree(Symbol *sym)
 ///
 /// \param name is the name to search for
 /// \return iterator pointing to the first Symbol or nametree.end() if there is no matching Symbol
-SymbolNameTree::const_iterator ScopeInternal::findFirstByName(const string &name) const
+SymbolNameTree::const_iterator ScopeInternal::findFirstByName(const std::string &name) const
 
 {
   Symbol sym((Scope *)0,name,(Datatype *)0);
@@ -2406,7 +2406,7 @@ void ScopeInternal::restoreXml(const Element *el)
   categorySanity();
 }
 
-void ScopeInternal::printEntries(ostream &s) const
+void ScopeInternal::printEntries(std::ostream &s) const
 
 {
   s << "Scope " << name << endl;
@@ -2443,7 +2443,7 @@ void ScopeInternal::setCategory(Symbol *sym,int4 cat,int4 ind)
 
 {
   if (sym->category >= 0) {
-    vector<Symbol *> &list(category[sym->category]);
+    std::vector<Symbol *> &list(category[sym->category]);
     list[sym->catindex] = (Symbol *)0;
     while((!list.empty())&&(list.back() == (Symbol *)0))
       list.pop_back();
@@ -2453,8 +2453,8 @@ void ScopeInternal::setCategory(Symbol *sym,int4 cat,int4 ind)
   sym->catindex = ind;
   if (cat < 0) return;
   while(category.size() <= sym->category)
-    category.push_back(vector<Symbol *>());
-  vector<Symbol *> &list(category[sym->category]);
+    category.push_back(std::vector<Symbol *>());
+  std::vector<Symbol *> &list(category[sym->category]);
   while(list.size() <= sym->catindex)
     list.push_back((Symbol *)0);
   list[sym->catindex] = sym;
@@ -2635,7 +2635,7 @@ void Database::removeRange(Scope *scope,AddrSpace *spc,uintb first,uintb last)
 /// global Scope is assumed, and the name is assumed to refer to a child.
 /// \param subnames is the \e path of names
 /// \return the desired Scope or NULL if a matching name isn't found
-Scope *Database::resolveScope(const vector<string> &subnames) const
+Scope *Database::resolveScope(const std::vector<std::string> &subnames) const
 
 {
   if (subnames.size()==0) return (Scope *)0;
@@ -2663,18 +2663,18 @@ Scope *Database::resolveScope(const vector<string> &subnames) const
 /// \param basename will hold the passed back base Symbol name
 /// \param start is the Scope to start drilling down from, or NULL for the global scope
 /// \return the Scope being referred to by the name
-Scope *Database::resolveScopeSymbolName(const string &fullname,const string &delim,string &basename,
+Scope *Database::resolveScopeSymbolName(const std::string &fullname,const std::string &delim,std::string &basename,
 					Scope *start) const
 {
   if (start == (Scope *)0)
     start = globalscope;
   
-  string::size_type mark = 0;
-  string::size_type endmark;
+  std::string::size_type mark = 0;
+  std::string::size_type endmark;
   for(;;) {
     endmark = fullname.find(delim,mark);
-    if (endmark == string::npos) break;
-    string scopename = fullname.substr(mark,endmark-mark);
+    if (endmark == std::string::npos) break;
+    std::string scopename = fullname.substr(mark,endmark-mark);
     start = start->resolveScope(scopename);
     if (start == (Scope *)0)	// Was the scope name bad
       return start;
@@ -2755,7 +2755,7 @@ void Database::setPropertyRange(uint4 flags,const Range &range)
 /// This writes a single \<db> tag to the stream, which contains sub-tags
 /// for each Scope (which contain Symbol sub-tags in turn).
 /// \param s is the output stream
-void Database::saveXml(ostream &s) const
+void Database::saveXml(std::ostream &s) const
 
 {
   partmap<Address,uint4>::const_iterator piter,penditer;
@@ -2787,7 +2787,7 @@ void Database::saveXml(ostream &s) const
 /// \param el is the given element (with \<parent> as a child)
 /// \param name will hold the \e name attribute
 /// \param parnames will hold the Scope path
-void Database::parseParentTag(const Element *el,string &name,vector<string> &parnames)
+void Database::parseParentTag(const Element *el,std::string &name,std::vector<std::string> &parnames)
 
 {
   const List &list1(el->getChildren());
@@ -2833,8 +2833,8 @@ void Database::restoreXml(const Element *el)
   for(;iter!=list.end();++iter) {
     const Element *subel = *iter;
     Scope *new_scope;
-    string name;
-    vector<string> parnames;
+    std::string name;
+    std::vector<std::string> parnames;
     parseParentTag(subel,name,parnames);
     parnames.push_back(name);
     new_scope = resolveScope(parnames);
@@ -2867,7 +2867,7 @@ void Database::restoreXmlScope(const Element *el,Scope *new_scope)
 
 {
   Scope *par_scope;
-  vector<string> parnames;
+  std::vector<std::string> parnames;
   parseParentTag(el,new_scope->name,parnames);		// Shove recovered basename straight into new_scope
   par_scope = resolveScope(parnames);
   if (par_scope == (Scope *)0)

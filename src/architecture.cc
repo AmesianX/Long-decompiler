@@ -837,7 +837,7 @@ void Architecture::parseDeadcodeDelay(const Element *el)
   if (spc == (AddrSpace *)0)
     throw LowlevelError("Unknown space name: "+el->getAttributeValue("space"));
   istringstream s(el->getAttributeValue("delay"));
-  s.unsetf(ios::dec | ios::hex | ios::oct);
+  s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
   int4 delay = -1;
   s >> delay;
   if (delay >= 0)
@@ -855,7 +855,7 @@ void Architecture::parseFuncPtrAlign(const Element *el)
 {
   int4 align;
   istringstream s(el->getAttributeValue("align"));
-  s.unsetf(ios::dec | ios::hex | ios::oct);
+  s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
   s >> align;
   
   if (align == 0) {

@@ -15,6 +15,10 @@
  */
 #include "loadimage.hh"
 
+#include <iostream>
+#include <fstream>
+#include <cstring>
+
 namespace GhidraDec {
 
 /// This is a convenience method wrapped around the core
@@ -36,11 +40,11 @@ uint1 *LoadImage::load(int4 size,const Address &addr)
   return buf;
 }
 
-RawLoadImage::RawLoadImage(const string &f) : LoadImage(f)
+RawLoadImage::RawLoadImage(const std::string &f) : LoadImage(f)
 
 {
   vma = 0;
-  thefile = (ifstream *)0;
+  thefile = (std::ifstream *)0;
   spaceid = (AddrSpace *)0;
   filesize = 0;
 }
@@ -48,7 +52,7 @@ RawLoadImage::RawLoadImage(const string &f) : LoadImage(f)
 RawLoadImage::~RawLoadImage(void)
 
 {
-  if (thefile != (ifstream *)0) {
+  if (thefile != (std::ifstream *)0) {
     thefile->close();
     delete thefile;
   }
@@ -58,17 +62,17 @@ RawLoadImage::~RawLoadImage(void)
 void RawLoadImage::open(void)
 
 {
-  if (thefile != (ifstream *)0) throw LowlevelError("loadimage is already open");
-  thefile = new ifstream(filename.c_str());
+  if (thefile != (std::ifstream *)0) throw LowlevelError("loadimage is already open");
+  thefile = new std::ifstream(filename.c_str());
   if (!(*thefile)) {
-    string errmsg = "Unable to open raw image file: "+filename;
+    std::string errmsg = "Unable to open raw image file: "+filename;
     throw LowlevelError(errmsg);
   }
-  thefile->seekg(0,ios::end);
+  thefile->seekg(0, std::ios::end);
   filesize = thefile->tellg();
 }
 
-string RawLoadImage::getArchType(void) const
+std::string RawLoadImage::getArchType(void) const
 
 {
   return "unknown";

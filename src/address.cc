@@ -16,8 +16,10 @@
 #include "address.hh"
 #include "translate.hh"
 
+#include <set>
+
 namespace GhidraDec {
-ostream &operator<<(ostream &s,const SeqNum &sq)
+std::ostream &operator<<(std::ostream &s,const SeqNum &sq)
 
 {
   sq.pc.printRaw(s);
@@ -32,7 +34,7 @@ ostream &operator<<(ostream &s,const SeqNum &sq)
 /// \param s is the stream being written to
 /// \param addr is the Address to write
 /// \return the output stream
-ostream &operator<<(ostream &s,const Address &addr)
+std::ostream &operator<<(std::ostream &s,const Address &addr)
 
 {
   addr.printRaw(s);
@@ -45,7 +47,7 @@ SeqNum::SeqNum(Address::mach_extreme ex) : pc(ex)
   uniq = (ex == Address::m_minimal) ? 0 : ~((uintm)0);
 }
 
-void SeqNum::saveXml(ostream &s) const
+void SeqNum::saveXml(std::ostream &s) const
 
 {
   s << "<seqnum";
@@ -62,7 +64,7 @@ SeqNum SeqNum::restoreXml(const Element *el,const AddrSpaceManager *manage)
   for(int4 i=0;i<el->getNumAttributes();++i)
     if (el->getAttributeName(i) == "uniq") {
       istringstream s2(el->getAttributeValue(i)); // Recover unique (if present)
-      s2.unsetf(ios::dec | ios::hex | ios::oct);
+      s2.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
       s2 >> uniq;
       break;
     }
@@ -229,7 +231,7 @@ Address Range::getLastAddrOpen(const AddrSpaceManager *manage) const
 
 /// Output a description of this Range like:  ram: 7f-9c
 /// \param s is the output stream
-void Range::printBounds(ostream &s) const
+void Range::printBounds(std::ostream &s) const
 
 {
   s << spc->getName() << ": ";
@@ -238,7 +240,7 @@ void Range::printBounds(ostream &s) const
 
 /// Write this object to a stream as a \<range> tag.
 /// \param s is the output stream
-void Range::saveXml(ostream &s) const
+void Range::saveXml(std::ostream &s) const
 
 {
   s << "<range";
@@ -265,12 +267,12 @@ void Range::restoreXml(const Element *el,const AddrSpaceManager *manage)
     }
     else if (el->getAttributeName(i) == "first") {
       istringstream s(el->getAttributeValue(i));
-      s.unsetf(ios::dec | ios::hex | ios::oct);
+      s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
       s >> first;
     }
     else if (el->getAttributeName(i) == "last") {
       istringstream s(el->getAttributeValue(i));
-      s.unsetf(ios::dec | ios::hex | ios::oct);
+      s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
       s >> last;
     }
     else if (el->getAttributeName(i) == "name") {
@@ -294,12 +296,12 @@ void Range::restoreXml(const Element *el,const AddrSpaceManager *manage)
 void RangeList::insertRange(AddrSpace *spc,uintb first,uintb last)
 
 {
-  set<Range>::iterator iter1,iter2;
+  std::set<Range>::iterator iter1,iter2;
 
   // we must have iter1.first > first
   iter1 = tree.upper_bound(Range(spc,first,first));
 
-  // Set iter1 to first range with range.last >=first
+  // std::set iter1 to first range with range.last >=first
   // It is either current iter1 or the one before
   if (iter1 != tree.begin()) {
     --iter1;
@@ -307,7 +309,7 @@ void RangeList::insertRange(AddrSpace *spc,uintb first,uintb last)
       ++iter1;
   }
 
-  // Set iter2 to first range with range.first > last
+  // std::set iter2 to first range with range.first > last
   iter2 = tree.upper_bound(Range(spc,last,last));
   
   while(iter1!=iter2) {
@@ -328,14 +330,14 @@ void RangeList::insertRange(AddrSpace *spc,uintb first,uintb last)
 void RangeList::removeRange(AddrSpace *spc,uintb first,uintb last)
 
 {				// remove a range
-  set<Range>::iterator iter1,iter2;
+  std::set<Range>::iterator iter1,iter2;
 
   if (tree.empty()) return;	// Nothing to do
 
   // we must have iter1.first > first
   iter1 = tree.upper_bound(Range(spc,first,first));
 
-  // Set iter1 to first range with range.last >=first
+  // std::set iter1 to first range with range.last >=first
   // It is either current iter1 or the one before
   if (iter1 != tree.begin()) {
     --iter1;
@@ -343,7 +345,7 @@ void RangeList::removeRange(AddrSpace *spc,uintb first,uintb last)
       ++iter1;
   }
 
-  // Set iter2 to first range with range.first > last
+  // std::set iter2 to first range with range.first > last
   iter2 = tree.upper_bound(Range(spc,last,last));
   
   while(iter1!=iter2) {
@@ -362,7 +364,7 @@ void RangeList::removeRange(AddrSpace *spc,uintb first,uintb last)
 void RangeList::merge(const RangeList &op2)
 
 { // Merge -op2- into this rangelist
-  set<Range>::const_iterator iter1,iter2;
+  std::set<Range>::const_iterator iter1,iter2;
   iter1 = op2.tree.begin();
   iter2 = op2.tree.end();
   while(iter1 != iter2) {
@@ -379,7 +381,7 @@ void RangeList::merge(const RangeList &op2)
 bool RangeList::inRange(const Address &addr,int4 size) const
 
 {
-  set<Range>::const_iterator iter;
+  std::set<Range>::const_iterator iter;
 
   if (addr.isInvalid()) return true; // We don't really care
   if (tree.empty()) return false;
@@ -387,7 +389,7 @@ bool RangeList::inRange(const Address &addr,int4 size) const
   // iter = first range with its first > addr
   iter = tree.upper_bound(Range(addr.getSpace(),addr.getOffset(),addr.getOffset()));
   if (iter == tree.begin()) return false;
-  // Set iter to last range with range.first <= addr
+  // std::set iter to last range with range.first <= addr
   --iter;
   //  if (iter == tree.end())   // iter can't be end if non-empty
   //    return false;
@@ -405,9 +407,9 @@ const Range *RangeList::getRange(AddrSpace *spaceid,uintb offset) const
   if (tree.empty()) return (const Range *)0;
 
   // iter = first range with its first > offset
-  set<Range>::const_iterator iter = tree.upper_bound(Range(spaceid,offset,offset));
+  std::set<Range>::const_iterator iter = tree.upper_bound(Range(spaceid,offset,offset));
   if (iter == tree.begin()) return (const Range *)0;
-  // Set iter to last range with range.first <= offset
+  // std::set iter to last range with range.first <= offset
   --iter;
   if ((*iter).spc != spaceid) return (const Range *)0;
   if ((*iter).last >= offset)
@@ -423,7 +425,7 @@ const Range *RangeList::getRange(AddrSpace *spaceid,uintb offset) const
 uintb RangeList::longestFit(const Address &addr,uintb maxsize) const
 
 {
-  set<Range>::const_iterator iter;
+  std::set<Range>::const_iterator iter;
 
   if (addr.isInvalid()) return 0;
   if (tree.empty()) return 0;
@@ -432,7 +434,7 @@ uintb RangeList::longestFit(const Address &addr,uintb maxsize) const
   uintb offset = addr.getOffset();
   iter = tree.upper_bound(Range(addr.getSpace(),offset,offset));
   if (iter == tree.begin()) return 0;
-  // Set iter to last range with range.first <= addr
+  // std::set iter to last range with range.first <= addr
   --iter;
   uintb sizeres = 0;
   if ((*iter).last < offset) return sizeres;
@@ -460,12 +462,12 @@ const Range *RangeList::getLastRange(void) const
 
 {
   if (tree.empty()) return (const Range *)0;
-  set<Range>::const_iterator iter = tree.end();
+  std::set<Range>::const_iterator iter = tree.end();
   --iter;
   return &(*iter);
 }
 
-/// Treating offsets with their high-bits set as coming \e before
+/// Treating offsets with their high-bits std::set as coming \e before
 /// offset where the high-bit is clear, return the last/latest contiguous
 /// Range within the given address space
 /// \param spaceid is the given address space
@@ -475,7 +477,7 @@ const Range *RangeList::getLastSignedRange(AddrSpace *spaceid) const
 {
   uintb midway = spaceid->getHighest() / 2;		// Maximal signed value
   Range range(spaceid,midway,midway);
-  set<Range>::const_iterator iter = tree.upper_bound(range);	// First element greater than -range- (should be MOST negative)
+  std::set<Range>::const_iterator iter = tree.upper_bound(range);	// First element greater than -range- (should be MOST negative)
 
   if (iter!=tree.begin()) {
     --iter;
@@ -496,13 +498,13 @@ const Range *RangeList::getLastSignedRange(AddrSpace *spaceid) const
 
 /// Print a one line description of each disjoint Range making up \b this RangeList
 /// \param s is the output stream
-void RangeList::printBounds(ostream &s) const
+void RangeList::printBounds(std::ostream &s) const
 
 {
   if (tree.empty())
     s << "all" << endl;
   else {
-    set<Range>::const_iterator iter;
+    std::set<Range>::const_iterator iter;
     for(iter=tree.begin();iter!=tree.end();++iter) {
       (*iter).printBounds(s);
       s << endl;
@@ -512,10 +514,10 @@ void RangeList::printBounds(ostream &s) const
 
 /// Serialize this object to an XML \<rangelist> tag
 /// \param s is the output stream
-void RangeList::saveXml(ostream &s) const
+void RangeList::saveXml(std::ostream &s) const
 
 {
-  set<Range>::const_iterator iter;
+  std::set<Range>::const_iterator iter;
 
   s << "<rangelist>\n";
   for(iter=tree.begin();iter!=tree.end();++iter) {
@@ -552,10 +554,10 @@ uintb uintbmasks[9] = { 0, 0xff, 0xffff, 0xffffff, 0xffffffff, 0xffffffffffLL,
 /// Treat the given \b val as a constant of \b size bytes
 /// \param val is the given value
 /// \param size is the size in bytes
-/// \return \b true if the constant (as sized) has its sign bit set
+/// \return \b true if the constant (as sized) has its sign bit std::set
 bool signbit_negative(uintb val,int4 size)
 
-{				// Return true if signbit is set (negative)
+{				// Return true if signbit is std::set (negative)
   uintb mask = 0x80;
   mask <<= 8*(size-1);
   return ((val&mask) != 0);
@@ -657,7 +659,7 @@ uintb byte_swap(uintb val,int4 size)
 
 /// The least significant bit is index 0.
 /// \param val is the given value
-/// \return the index of the least significant set bit, or -1 if none are set
+/// \return the index of the least significant std::set bit, or -1 if none are std::set
 int4 leastsigbit_set(uintb val)
 
 {
@@ -678,7 +680,7 @@ int4 leastsigbit_set(uintb val)
 
 /// The least significant bit is index 0.
 /// \param val is the given value
-/// \return the index of the most significant set bit, or -1 if none are set
+/// \return the index of the most significant std::set bit, or -1 if none are std::set
 int4 mostsigbit_set(uintb val)
 
 {

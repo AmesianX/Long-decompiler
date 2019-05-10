@@ -159,7 +159,7 @@ void PatternBlock::normalize(void)
     valvec.clear();
     return;
   }
-  vector<uintm>::iterator iter1,iter2;
+  std::vector<uintm>::iterator iter1,iter2;
   
   iter1 = maskvec.begin();	// Cut zeros from beginning of mask
   iter2 = valvec.begin();
@@ -254,7 +254,7 @@ PatternBlock::PatternBlock(const PatternBlock *a,const PatternBlock *b)
   delete res;
 }
 
-PatternBlock::PatternBlock(vector<PatternBlock *> &list)
+PatternBlock::PatternBlock(std::vector<PatternBlock *> &list)
 
 {				// AND several blocks together to construct new block
   PatternBlock *res,*next;
@@ -484,7 +484,7 @@ bool PatternBlock::isContextMatch(ParserWalker &walker) const
   return true;
 }
 
-void PatternBlock::saveXml(ostream &s) const
+void PatternBlock::saveXml(std::ostream &s) const
 
 {
   s << "<pat_block ";
@@ -503,12 +503,12 @@ void PatternBlock::restoreXml(const Element *el)
 {
   {
     istringstream s(el->getAttributeValue("offset"));
-    s.unsetf(ios::dec | ios::hex | ios::oct);
+    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
     s >> offset;
   }
   {
     istringstream s(el->getAttributeValue("nonzero"));
-    s.unsetf(ios::dec | ios::hex | ios::oct);
+    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
     s >> nonzerosize;
   }
   const List &list(el->getChildren());
@@ -519,12 +519,12 @@ void PatternBlock::restoreXml(const Element *el)
     Element *subel = *iter;
     {
       istringstream s(subel->getAttributeValue("mask"));
-      s.unsetf(ios::dec | ios::hex | ios::oct);
+      s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
       s >> mask;
     }
     {
       istringstream s(subel->getAttributeValue("val"));
-      s.unsetf(ios::dec | ios::hex | ios::oct);
+      s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
       s >> val;
     }
     maskvec.push_back(mask);
@@ -622,7 +622,7 @@ Pattern *InstructionPattern::doOr(const Pattern *b,int4 sa) const
   return new OrPattern(res1,res2);
 }
 
-void InstructionPattern::saveXml(ostream &s) const
+void InstructionPattern::saveXml(std::ostream &s) const
 
 {
   s << "<instruct_pat>\n";
@@ -672,7 +672,7 @@ Pattern *ContextPattern::commonSubPattern(const Pattern *b,int4 sa) const
   return new ContextPattern(resblock);
 }
 
-void ContextPattern::saveXml(ostream &s) const
+void ContextPattern::saveXml(std::ostream &s) const
 
 {
   s << "<context_pat>\n";
@@ -803,7 +803,7 @@ Pattern *CombinePattern::simplifyClone(void) const
 			    (InstructionPattern *)instr->simplifyClone());
 }
 
-void CombinePattern::saveXml(ostream &s) const
+void CombinePattern::saveXml(std::ostream &s) const
 
 {
   s << "<combine_pat>\n";
@@ -832,10 +832,10 @@ OrPattern::OrPattern(DisjointPattern *a,DisjointPattern *b)
   orlist.push_back(b);
 }
 
-OrPattern::OrPattern(const vector<DisjointPattern *> &list)
+OrPattern::OrPattern(const std::vector<DisjointPattern *> &list)
 
 {
-  vector<DisjointPattern *>::const_iterator iter;
+  std::vector<DisjointPattern *>::const_iterator iter;
 
   for(iter=list.begin();iter!=list.end();++iter)
     orlist.push_back(*iter);
@@ -844,7 +844,7 @@ OrPattern::OrPattern(const vector<DisjointPattern *> &list)
 OrPattern::~OrPattern(void)
 
 {
-  vector<DisjointPattern *>::iterator iter;
+  std::vector<DisjointPattern *>::iterator iter;
 
   for(iter=orlist.begin();iter!=orlist.end();++iter)
     delete *iter;
@@ -853,7 +853,7 @@ OrPattern::~OrPattern(void)
 void OrPattern::shiftInstruction(int4 sa)
 
 {
-  vector<DisjointPattern *>::iterator iter;
+  std::vector<DisjointPattern *>::iterator iter;
 
   for(iter=orlist.begin();iter!=orlist.end();++iter)
     (*iter)->shiftInstruction(sa);
@@ -872,7 +872,7 @@ bool OrPattern::alwaysTrue(void) const
 
 {				// This isn't quite right because different branches
 				// may cover the entire gamut
-  vector<DisjointPattern *>::const_iterator iter;
+  std::vector<DisjointPattern *>::const_iterator iter;
 
   for(iter=orlist.begin();iter!=orlist.end();++iter)
     if ((*iter)->alwaysTrue()) return true;
@@ -882,7 +882,7 @@ bool OrPattern::alwaysTrue(void) const
 bool OrPattern::alwaysFalse(void) const
 
 {
-  vector<DisjointPattern *>::const_iterator iter;
+  std::vector<DisjointPattern *>::const_iterator iter;
 
   for(iter=orlist.begin();iter!=orlist.end();++iter)
     if (!(*iter)->alwaysFalse()) return false;
@@ -892,7 +892,7 @@ bool OrPattern::alwaysFalse(void) const
 bool OrPattern::alwaysInstructionTrue(void) const
 
 {
-  vector<DisjointPattern *>::const_iterator iter;
+  std::vector<DisjointPattern *>::const_iterator iter;
 
   for(iter=orlist.begin();iter!=orlist.end();++iter)
     if (!(*iter)->alwaysInstructionTrue()) return false;
@@ -903,8 +903,8 @@ Pattern *OrPattern::doAnd(const Pattern *b,int4 sa) const
 
 {
   const OrPattern *b2 = dynamic_cast<const OrPattern *>(b);
-  vector<DisjointPattern *> newlist;
-  vector<DisjointPattern *>::const_iterator iter,iter2;
+  std::vector<DisjointPattern *> newlist;
+  std::vector<DisjointPattern *>::const_iterator iter,iter2;
   DisjointPattern *tmp;
   OrPattern *tmpor;
 
@@ -928,7 +928,7 @@ Pattern *OrPattern::doAnd(const Pattern *b,int4 sa) const
 Pattern *OrPattern::commonSubPattern(const Pattern *b,int4 sa) const
 
 {
-  vector<DisjointPattern *>::const_iterator iter;
+  std::vector<DisjointPattern *>::const_iterator iter;
   Pattern *res,*next;
 
   iter = orlist.begin();
@@ -950,8 +950,8 @@ Pattern *OrPattern::doOr(const Pattern *b,int4 sa) const
 
 {
   const OrPattern *b2 = dynamic_cast<const OrPattern *>(b);
-  vector<DisjointPattern *> newlist;
-  vector<DisjointPattern *>::const_iterator iter;
+  std::vector<DisjointPattern *> newlist;
+  std::vector<DisjointPattern *>::const_iterator iter;
 
   for(iter=orlist.begin();iter!=orlist.end();++iter)
     newlist.push_back((DisjointPattern *)(*iter)->simplifyClone());
@@ -976,13 +976,13 @@ Pattern *OrPattern::doOr(const Pattern *b,int4 sa) const
 Pattern *OrPattern::simplifyClone(void) const
 
 {				// Look for alwaysTrue eliminate alwaysFalse
-  vector<DisjointPattern *>::const_iterator iter;
+  std::vector<DisjointPattern *>::const_iterator iter;
 
   for(iter=orlist.begin();iter!=orlist.end();++iter) // Look for alwaysTrue
     if ((*iter)->alwaysTrue())
       return new InstructionPattern(true);
 
-  vector<DisjointPattern *> newlist;
+  std::vector<DisjointPattern *> newlist;
   for(iter=orlist.begin();iter!=orlist.end();++iter) // Look for alwaysFalse
     if (!(*iter)->alwaysFalse())
       newlist.push_back((DisjointPattern *)(*iter)->simplifyClone());
@@ -994,7 +994,7 @@ Pattern *OrPattern::simplifyClone(void) const
   return new OrPattern(newlist);
 }
 
-void OrPattern::saveXml(ostream &s) const
+void OrPattern::saveXml(std::ostream &s) const
 
 {
   s << "<or_pat>\n";

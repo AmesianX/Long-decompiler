@@ -22,6 +22,8 @@
 
 #include "block.hh"
 
+#include <map>
+
 namespace GhidraDec {
 
 /// Container holding the stack system for the renaming algorithm.  Every disjoint address

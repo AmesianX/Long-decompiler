@@ -18,7 +18,7 @@
 namespace GhidraDec {
 /// Save the constant pool object description as a \<cpoolrec> tag.
 /// \param s is the output stream
-void CPoolRecord::saveXml(ostream &s) const
+void CPoolRecord::saveXml(std::ostream &s) const
 
 {
   s << "<cpoolrec";
@@ -33,7 +33,7 @@ void CPoolRecord::saveXml(ostream &s) const
   else if (tag == check_cast)
     a_v(s,"tag","checkcast");
   else if (tag == string_literal)
-    a_v(s,"tag","string");
+    a_v(s,"tag","std::string");
   else if (tag == class_reference)
     a_v(s,"tag","classref");
   else
@@ -83,9 +83,9 @@ void CPoolRecord::restoreXml(const Element *el,TypeFactory &typegrp)
   flags = 0;
   int4 num = el->getNumAttributes();
   for(int4 i=0;i<num;++i) {
-    const string &attr(el->getAttributeName(i));
+    const std::string &attr(el->getAttributeName(i));
     if (attr == "tag") {
-      const string &tagstring(el->getAttributeValue(i));
+      const std::string &tagstring(el->getAttributeValue(i));
       if (tagstring == "method")
 	tag = pointer_method;
       else if (tagstring == "field")
@@ -96,7 +96,7 @@ void CPoolRecord::restoreXml(const Element *el,TypeFactory &typegrp)
 	tag = array_length;
       else if (tagstring == "checkcast")
 	tag = check_cast;
-      else if (tagstring == "string")
+      else if (tagstring == "std::string")
 	tag = string_literal;
       else if (tagstring == "classref")
 	tag = class_reference;
@@ -122,7 +122,7 @@ void CPoolRecord::restoreXml(const Element *el,TypeFactory &typegrp)
   if (tag == primitive) {	// First tag must be value
     subel = *iter;
     istringstream s1(subel->getContent());
-    s1.unsetf(ios::dec | ios::hex | ios::oct);
+    s1.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
     s1 >> value;
     ++iter;
   }
@@ -132,7 +132,7 @@ void CPoolRecord::restoreXml(const Element *el,TypeFactory &typegrp)
     token = subel->getContent();
   else {
     istringstream s2(subel->getAttributeValue("length"));
-    s2.unsetf(ios::dec | ios::hex | ios::oct);
+    s2.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
     s2 >> byteDataLen;
     istringstream s3(subel->getContent());
     byteData = new uint1[byteDataLen];
@@ -155,7 +155,7 @@ void CPoolRecord::restoreXml(const Element *el,TypeFactory &typegrp)
     type = typegrp.restoreXmlType(subel);
 }
 
-void ConstantPool::putRecord(const vector<uintb> &refs,uint4 tag,const string &tok,Datatype *ct)
+void ConstantPool::putRecord(const std::vector<uintb> &refs,uint4 tag,const std::string &tok,Datatype *ct)
 
 {
   CPoolRecord *newrec = createRecord(refs);
@@ -164,7 +164,7 @@ void ConstantPool::putRecord(const vector<uintb> &refs,uint4 tag,const string &t
   newrec->type = ct;
 }
 
-const CPoolRecord *ConstantPool::restoreXmlRecord(const vector<uintb> &refs,const Element *el,TypeFactory &typegrp)
+const CPoolRecord *ConstantPool::restoreXmlRecord(const std::vector<uintb> &refs,const Element *el,TypeFactory &typegrp)
 
 {
   CPoolRecord *newrec = createRecord(refs);
@@ -174,7 +174,7 @@ const CPoolRecord *ConstantPool::restoreXmlRecord(const vector<uintb> &refs,cons
 
 /// The reference is output as a \<ref> tag.
 /// \param s is the output stream
-void ConstantPoolInternal::CheapSorter::saveXml(ostream &s) const
+void ConstantPoolInternal::CheapSorter::saveXml(std::ostream &s) const
 
 {
   s << "<ref";
@@ -189,39 +189,39 @@ void ConstantPoolInternal::CheapSorter::restoreXml(const Element *el)
 
 {
   istringstream s1(el->getAttributeValue("a"));
-  s1.unsetf(ios::dec | ios::hex | ios::oct);
+  s1.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
   s1 >> a;
   istringstream s2(el->getAttributeValue("b"));
-  s2.unsetf(ios::dec | ios::hex | ios::oct);
+  s2.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
   s2 >> b;
 }
 
-CPoolRecord *ConstantPoolInternal::createRecord(const vector<uintb> &refs)
+CPoolRecord *ConstantPoolInternal::createRecord(const std::vector<uintb> &refs)
 
 {
   CheapSorter sorter(refs);
-  pair<map<CheapSorter,CPoolRecord>::iterator,bool> res;
+  pair<std::map<CheapSorter,CPoolRecord>::iterator,bool> res;
   res = cpoolMap.insert(pair<CheapSorter,CPoolRecord>(sorter,CPoolRecord()));
   if (res.second == false)
     throw LowlevelError("Creating duplicate entry in constant pool: "+(*res.first).second.getToken());
   return &(*res.first).second;
 }
 
-const CPoolRecord *ConstantPoolInternal::getRecord(const vector<uintb> &refs) const
+const CPoolRecord *ConstantPoolInternal::getRecord(const std::vector<uintb> &refs) const
 
 {
   CheapSorter sorter(refs);
-  map<CheapSorter,CPoolRecord>::const_iterator iter = cpoolMap.find(sorter);
+  std::map<CheapSorter,CPoolRecord>::const_iterator iter = cpoolMap.find(sorter);
   if (iter == cpoolMap.end())
     return (CPoolRecord *)0;
 
   return &(*iter).second;
 }
 
-void ConstantPoolInternal::saveXml(ostream &s) const
+void ConstantPoolInternal::saveXml(std::ostream &s) const
 
 {
-  map<CheapSorter,CPoolRecord>::const_iterator iter;
+  std::map<CheapSorter,CPoolRecord>::const_iterator iter;
   s << "<constantpool>\n";
   for(iter=cpoolMap.begin();iter!=cpoolMap.end();++iter) {
     (*iter).first.saveXml(s);
@@ -239,7 +239,7 @@ void ConstantPoolInternal::restoreXml(const Element *el,TypeFactory &typegrp)
     const Element *subel = *iter;
     CheapSorter sorter;
     sorter.restoreXml(subel);
-    vector<uintb> refs;
+    std::vector<uintb> refs;
     sorter.apply(refs);
     ++iter;
     subel = *iter;

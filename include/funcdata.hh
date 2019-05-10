@@ -25,6 +25,8 @@
 #include "merge.hh"
 #include "dynamic.hh"
 
+#include <string>
+
 namespace GhidraDec {
 class FlowInfo;
 
@@ -64,7 +66,7 @@ class Funcdata {
   uint4 high_level_index;	///< Creation index of first Varnode created after HighVariables are created
   uint4 cast_phase_index;	///< Creation index of first Varnode created after ActionSetCasts
   Architecture *glb;		///< Global configuration data
-  string name;			///< Name of function
+  std::string name;			///< Name of function
   int4 size;			///< Number of bytes of binary data in function body
   Address baseaddr;		///< Starting code address of binary data
   FuncProto funcp;		///< Prototype of this function
@@ -118,9 +120,9 @@ class Funcdata {
   static PcodeOp *findPrimaryBranch(PcodeOpTree::const_iterator iter,PcodeOpTree::const_iterator enditer,
 				    bool findbranch,bool findcall,bool findreturn);
 public:
-  Funcdata(const string &nm,Scope *conf,const Address &addr,int4 sz=0);	///< Constructor
+  Funcdata(const std::string &nm,Scope *conf,const Address &addr,int4 sz=0);	///< Constructor
   ~Funcdata(void);							///< Destructor
-  const string &getName(void) const { return name; }			///< Get the function's local symbol name
+  const std::string &getName(void) const { return name; }			///< Get the function's local symbol name
   const Address &getAddress(void) const { return baseaddr; }		///< Get the entry point address
   int4 getSize(void) const { return size; }				///< Get the function body size in bytes
   Architecture *getArch(void) const { return glb; }			///< Get the program/architecture owning the function
@@ -147,8 +149,8 @@ public:
   bool isDoublePrecisOn(void) const { return ((flags & double_precis_on)!=0); }	///< Is double precision analysis enabled
   bool hasNoStructBlocks(void) const { return (sblocks.getSize() == 0); }	///< Return \b true if no block structuring was performed
   void clear(void);						///< Clear out old disassembly
-  void warning(const string &txt,const Address &ad) const;	///< Add a warning comment in the function body
-  void warningHeader(const string &txt) const;			///< Add a warning comment as part of the function header
+  void warning(const std::string &txt,const Address &ad) const;	///< Add a warning comment in the function body
+  void warningHeader(const std::string &txt) const;			///< Add a warning comment as part of the function header
   void startProcessing(void);					///< Start processing for this function
   void stopProcessing(void);					///< Mark that processing has completed for this function
   bool startTypeRecovery(void);					///< Mark that data-type analysis has started
@@ -343,7 +345,7 @@ public:
   /// \brief End of (input or free) Varnodes at a given storage address
   VarnodeDefSet::const_iterator endDef(uint4 fl,const Address &addr) const { return vbank.endDef(fl,addr); }
 
-  HighVariable *findHigh(const string &name) const;	///< Find a high-level variable by name
+  HighVariable *findHigh(const std::string &name) const;	///< Find a high-level variable by name
   void mapGlobals(void);			///< Make sure there is a Symbol entry for all global Varnodes
   bool checkCallDoubleUse(const PcodeOp *opmatch,const PcodeOp *op,const Varnode *vn,const ParamTrial &trial) const;
   bool onlyOpUse(const Varnode *invn,const PcodeOp *opmatch,const ParamTrial &trial) const;
@@ -488,7 +490,7 @@ public:
 #ifdef OPACTION_DEBUG
   void (*jtcallback)(Funcdata &orig,Funcdata &fd);	///< Hook point debugging the jump-table simplification process
   vector<PcodeOp *> modify_list;		///< List of modified ops
-  vector<string> modify_before;			///< List of "before" strings for modified ops
+  vector<std::string> modify_before;			///< List of "before" strings for modified ops
   int4 opactdbg_count;				///< Number of debug statements printed
   int4 opactdbg_breakcount;			///< Which debug to break on
   bool opactdbg_on;				///< Are we currently doing op action debugs
@@ -504,7 +506,7 @@ public:
   void debugDeactivate(void) { opactdbg_active = false; }		///< Turn off recording
   void debugModCheck(PcodeOp *op);		///< Cache \e before state of the given PcodeOp
   void debugModClear(void);			///< Abandon printing debug for current action
-  void debugModPrint(const string &actionname);	///< Print before and after strings for PcodeOps modified by given action
+  void debugModPrint(const std::string &actionname);	///< Print before and after strings for PcodeOps modified by given action
   bool debugBreak(void) const { return opactdbg_on&&opactdbg_breakon; }	///< Has a breakpoint been hit
   int4 debugSize(void) const { return opactdbg_pclow.size(); }	///< Number of code ranges being debug traced
   void debugEnable(void) { opactdbg_on = true; opactdbg_count = 0; }	///< Turn on debugging

@@ -41,7 +41,7 @@ vector<FileStreamState> filebuffers;
 vector<int4> ifstack;
 int4 negative_if = -1;
 
-void preproc_error(const string &err)
+void preproc_error(const std::string &err)
 
 {
   slgh->reportError(err,true);
@@ -58,11 +58,11 @@ void check_to_endofline(istream &s)
       preproc_error("Extra characters in preprocessor directive"); 
 }
 
-string read_identifier(istream &s)
+std::string read_identifier(istream &s)
 
 {  // Read a proper identifier from the stream
   s >> ws;   // Skip any whitespace
-  string res;
+  std::string res;
   while(!s.eof()) {
     char tok = s.peek();
     if (isalnum(tok) || (tok == '_')) {
@@ -75,15 +75,15 @@ string read_identifier(istream &s)
   return res;
 }
 
-void preprocess_string(istream &s,string &res)
+void preprocess_string(istream &s,std::string &res)
 
-{  // Grab string surrounded by double quotes from stream or call preprocess_error
+{  // Grab std::string surrounded by double quotes from stream or call preprocess_error
   int4 val;
   
   s >> ws;   // Skip any whitespace
   val = s.get();
   if (val != '\"')
-    preproc_error("Expecting double quoted string");
+    preproc_error("Expecting double quoted std::string");
   val = s.get();
   while((val != '\"')&&(val>=0)) {
     res += (char)val;
@@ -100,7 +100,7 @@ int4 read_defined_operator(istream &s)
 {  // We have seen a -defined- keyword in an if or elif
    // Read macro name used as input, return 1 if it is defined
   char tok = ' ';
-  string macroname;
+  std::string macroname;
   
   s >> ws >> tok;
   if (tok != '(')
@@ -128,9 +128,9 @@ int4 read_boolean_clause(istream &s)
     return res;
   }
 				// Otherwise we must have a normal comparison operator
-  string lhs,rhs,comp;
+  std::string lhs,rhs,comp;
 
-  if (s.peek()=='\"')		// Read left-hand side string
+  if (s.peek()=='\"')		// Read left-hand side std::string
     preprocess_string(s,lhs);
   else {
     lhs = read_identifier(s);
@@ -147,7 +147,7 @@ int4 read_boolean_clause(istream &s)
   comp += tok;
     
   s >> ws;
-  if (s.peek()=='\"')            // Read right-hand side string
+  if (s.peek()=='\"')            // Read right-hand side std::string
     preprocess_string(s,rhs);
   else {
     rhs = read_identifier(s);
@@ -170,7 +170,7 @@ int4 preprocess_if(istream &s)
   int4 res = read_boolean_clause(s);
   s >> ws;
   while((!s.eof())&&(s.peek()!=')')) {
-    string boolop;
+    std::string boolop;
     char tok;
     s >> tok;
     boolop += tok;
@@ -190,30 +190,30 @@ int4 preprocess_if(istream &s)
   return res;
 }
 
-void expand_preprocmacros(string &str)
+void expand_preprocmacros(std::string &str)
 
 {
-  string::size_type pos;
-  string::size_type lastpos = 0;
+  std::string::size_type pos;
+  std::string::size_type lastpos = 0;
   pos = str.find("$(",lastpos);
-  if (pos == string::npos)
+  if (pos == std::string::npos)
     return;
-  string res;
+  std::string res;
   for(;;) {
-    if (pos == string::npos) {
+    if (pos == std::string::npos) {
       res += str.substr(lastpos);
       str = res;
       return;
     }
     else {
       res += str.substr(lastpos,(pos-lastpos));
-      string::size_type endpos = str.find(')',pos+2);
-      if (endpos == string::npos) {
-	preproc_error("Unterminated macro in string");
+      std::string::size_type endpos = str.find(')',pos+2);
+      if (endpos == std::string::npos) {
+	preproc_error("Unterminated macro in std::string");
 	break;
       }
-      string macro = str.substr(pos+2, endpos - (pos+2));
-      string value;
+      std::string macro = str.substr(pos+2, endpos - (pos+2));
+      std::string value;
       if (!slgh->getPreprocValue(macro,value)) {
 	preproc_error("Unknown preprocessing macro "+macro);
 	break;
@@ -228,12 +228,12 @@ void expand_preprocmacros(string &str)
 int4 preprocess(int4 cur_state,int4 blank_state)
 
 {
-  string str(yytext);
-  string::size_type pos = str.find('#');
-  if (pos != string::npos)
+  std::string str(yytext);
+  std::string::size_type pos = str.find('#');
+  if (pos != std::string::npos)
     str.erase(pos);
   istringstream s(str);
-  string type;
+  std::string type;
 
   if (cur_state != blank_state)
     last_preproc = cur_state;
@@ -246,7 +246,7 @@ int4 preprocess(int4 cur_state,int4 blank_state)
       filebuffers.back().lastbuffer = YY_CURRENT_BUFFER;
       filebuffers.back().file = (FILE *)0;
       s >> ws;
-      string fname;
+      std::string fname;
       preprocess_string(s,fname);
       expand_preprocmacros(fname);
       slgh->parseFromNewFile(fname);
@@ -261,8 +261,8 @@ int4 preprocess(int4 cur_state,int4 blank_state)
   }
   else if (type == "define") {
     if (negative_if == -1) {
-      string varname;
-      string value;
+      std::string varname;
+      std::string value;
       varname = read_identifier(s);   // Get name of variable being defined
       s >> ws;
       if (s.peek() == '\"')
@@ -277,7 +277,7 @@ int4 preprocess(int4 cur_state,int4 blank_state)
   }
   else if (type == "undef") {
     if (negative_if == -1) {
-      string varname;
+      std::string varname;
       varname = read_identifier(s);		// Name of variable to undefine
       if (varname.size()==0)
         preproc_error("Error in preprocessor undef");
@@ -286,21 +286,21 @@ int4 preprocess(int4 cur_state,int4 blank_state)
     }
   }
   else if (type=="ifdef") {
-    string varname;
+    std::string varname;
     varname = read_identifier(s);
     if (varname.size()==0)
       preproc_error("Error in preprocessor ifdef");
-    string value;
+    std::string value;
     int4 truth = (slgh->getPreprocValue(varname,value)) ? 1 : 0;
     ifstack.push_back(truth);
     check_to_endofline(s);
   }
   else if (type=="ifndef") {
-    string varname;
+    std::string varname;
     varname = read_identifier(s);
     if (varname.size()==0)
       preproc_error("Error in preprocessor ifndef");
-    string value;
+    std::string value;
     int4 truth = (slgh->getPreprocValue(varname,value)) ? 0 : 1;	// flipped from ifdef
     ifstack.push_back(truth);
     check_to_endofline(s);
@@ -372,10 +372,10 @@ void preproc_macroexpand(void)
   filebuffers.push_back(FileStreamState());
   filebuffers.back().lastbuffer = YY_CURRENT_BUFFER;
   filebuffers.back().file = (FILE *)0;
-  string macro(yytext);
+  std::string macro(yytext);
   macro.erase(0,2);
   macro.erase(macro.size()-1,1);
-  string value;
+  std::string value;
   if (!slgh->getPreprocValue(macro,value))
     preproc_error("Unknown preprocessing macro "+macro);
   yy_switch_to_buffer( yy_scan_string( value.c_str() ) );
@@ -383,11 +383,11 @@ void preproc_macroexpand(void)
 }
 
 int4 find_symbol(void) {
-  string * newstring = new string(yytext);
+  std::string * newstring = new std::string(yytext);
   SleighSymbol *sym = slgh->findSymbol(*newstring);
   if (sym == (SleighSymbol *)0) {
     yylval.str = newstring;
-    return STRING;
+    return std::string;
   }
   delete newstring;
   switch(sym->getType()) {
@@ -467,7 +467,7 @@ int4 scan_number(char *numtext,YYSTYPE *lval,bool signednum)
     }
   } else {
     istringstream s(numtext);
-    s.unsetf(ios::dec | ios::hex | ios::oct);
+    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
     s >> val;
     if (!s)
       return BADINTEGER;
@@ -509,7 +509,7 @@ with   { BEGIN(pattern); withsection = 1; slgh->calcContextLayout(); return WITH
 <macroblock>\$\([a-zA-Z0-9_.][a-zA-Z0-9_.]*\)  { preproc_macroexpand(); }
 <macroblock>[(),]  { yylval.ch = yytext[0]; return yytext[0]; }
 <macroblock>\{     { BEGIN(sem); return yytext[0]; }
-<macroblock>[a-zA-Z_.][a-zA-Z0-9_.]*   {  yylval.str = new string(yytext); return STRING;  }
+<macroblock>[a-zA-Z_.][a-zA-Z0-9_.]*   {  yylval.str = new std::string(yytext); return std::string;  }
 <macroblock>[\r\ \t\v]+
 <macroblock>\n     { slgh->nextLine(); }
 <macroblock>.      { return yytext[0]; }
@@ -546,7 +546,7 @@ with   { BEGIN(pattern); withsection = 1; slgh->calcContextLayout(); return WITH
 <defblock>[0-9]|[1-9][0-9]+	{ return scan_number(yytext,&yylval,false); }
 <defblock>0x[0-9a-fA-F]+	{ return scan_number(yytext,&yylval,false); }
 <defblock>0b[01]+		{ return scan_number(yytext,&yylval,false); }
-<defblock>\"([^\"]|\"\")*\"	{ yylval.str = new string(yytext+1,strlen(yytext)-2); return STRING; }
+<defblock>\"([^\"]|\"\")*\"	{ yylval.str = new std::string(yytext+1,strlen(yytext)-2); return std::string; }
 <defblock>[\r\ \t\v]+
 <defblock>\n        { slgh->nextLine(); }
 <defblock>.         { return yytext[0]; }
@@ -557,8 +557,8 @@ with   { BEGIN(pattern); withsection = 1; slgh->calcContextLayout(); return WITH
 <print>[~!@#$%&*()\-=+\[\]{}|;:<>?,/0-9] { yylval.ch = yytext[0]; return CHAR; }
 <print>\^           { yylval.ch = '^'; return '^'; }
 <print>is           { BEGIN(pattern); actionon=0; return IS_KEY; }
-<print>[a-zA-Z_.][a-zA-Z0-9_.]*   {  yylval.str = new string(yytext); return SYMBOLSTRING;  }
-<print>\"([^\"]|\"\")*\"       { yylval.str = new string(yytext+1,strlen(yytext)-2); return STRING; }
+<print>[a-zA-Z_.][a-zA-Z0-9_.]*   {  yylval.str = new std::string(yytext); return SYMBOLSTRING;  }
+<print>\"([^\"]|\"\")*\"       { yylval.str = new std::string(yytext+1,strlen(yytext)-2); return std::string; }
 <print>[\r\ \t\v]+  { yylval.ch = ' '; return ' '; }
 <print>\n           { slgh->nextLine(); return ' '; }
 <print>.            { return yytext[0]; }

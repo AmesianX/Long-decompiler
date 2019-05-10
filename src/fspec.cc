@@ -295,37 +295,37 @@ void ParamEntry::restoreXml(const Element *el,const AddrSpaceManager *manage,boo
   int4 num = el->getNumAttributes();
   
   for(int4 i=0;i<num;++i) {
-    const string &attrname( el->getAttributeName(i) );
+    const std::string &attrname( el->getAttributeName(i) );
     if (attrname=="minsize") {
       istringstream i1(el->getAttributeValue(i));
-      i1.unsetf(ios::dec | ios::hex | ios::oct);
+      i1.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
       i1 >> minsize;
     }
     else if (attrname == "size") { // old style
       istringstream i2(el->getAttributeValue(i));
-      i2.unsetf(ios::dec | ios::hex | ios::oct);
+      i2.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
       i2 >> alignment;
     }
     else if (attrname == "align") { // new style
       istringstream i4(el->getAttributeValue(i));
-      i4.unsetf(ios::dec | ios::hex | ios::oct);
+      i4.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
       i4 >> alignment;
     }
     else if (attrname == "maxsize") {
       istringstream i3(el->getAttributeValue(i));
-      i3.unsetf(ios::dec | ios::hex | ios::oct);
+      i3.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
       i3 >> size;
     }
     else if (attrname == "metatype")
       type = string2metatype(el->getAttributeValue(i));
     else if (attrname == "group") { // Override the group
       istringstream i5(el->getAttributeValue(i));
-      i5.unsetf(ios::dec | ios::hex | ios::oct);
+      i5.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
       i5 >> group;
     }
     else if (attrname == "groupsize") {
       istringstream i6(el->getAttributeValue(i));
-      i6.unsetf(ios::dec | ios::hex | ios::oct);
+      i6.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
       i6 >> groupsize;
     }
     else if (attrname == "extension") {
@@ -891,10 +891,10 @@ void ParamListStandard::restoreXml(const Element *el,const AddrSpaceManager *man
   thisbeforeret = false;
   bool autokilledbycall = false;
   for(int4 i=0;i<el->getNumAttributes();++i) {
-    const string &attrname( el->getAttributeName(i) );
+    const std::string &attrname( el->getAttributeName(i) );
     if (attrname == "pointermax") {
       istringstream i1(el->getAttributeValue(i));
-      i1.unsetf(ios::dec | ios::hex | ios::oct);
+      i1.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
       i1 >> pointermax;
     }
     else if (attrname == "thisbeforeretpointer") {
@@ -1413,7 +1413,7 @@ int4 ParamActive::getNumUsed(void) const
 /// \param t is the associated processor translator
 /// \param nm is the name of the space (always \b fspec)
 /// \param ind is the index associated with the space
-FspecSpace::FspecSpace(AddrSpaceManager *m,const Translate *t,const string &nm,int4 ind)
+FspecSpace::FspecSpace(AddrSpaceManager *m,const Translate *t,const std::string &nm,int4 ind)
   : AddrSpace(m,t,IPTR_FSPEC,nm,sizeof(void *),1,ind,0,1)
 {
   clearFlags(heritaged|does_deadcode|big_endian);
@@ -1421,7 +1421,7 @@ FspecSpace::FspecSpace(AddrSpaceManager *m,const Translate *t,const string &nm,i
     setFlags(big_endian);
 }
 
-void FspecSpace::saveXmlAttributes(ostream &s,uintb offset) const
+void FspecSpace::saveXmlAttributes(std::ostream &s,uintb offset) const
 
 {
   FuncCallSpecs *fc = (FuncCallSpecs *)(uintp)offset;
@@ -1437,7 +1437,7 @@ void FspecSpace::saveXmlAttributes(ostream &s,uintb offset) const
   }
 }
 
-void FspecSpace::saveXmlAttributes(ostream &s,uintb offset,int4 size) const
+void FspecSpace::saveXmlAttributes(std::ostream &s,uintb offset,int4 size) const
 
 {
   FuncCallSpecs *fc = (FuncCallSpecs *)(uintp)offset;
@@ -1454,7 +1454,7 @@ void FspecSpace::saveXmlAttributes(ostream &s,uintb offset,int4 size) const
   }
 }
 
-void FspecSpace::printRaw(ostream &s,uintb offset) const
+void FspecSpace::printRaw(std::ostream &s,uintb offset) const
 
 {
   FuncCallSpecs *fc = (FuncCallSpecs *)(uintp)offset;
@@ -1467,7 +1467,7 @@ void FspecSpace::printRaw(ostream &s,uintb offset) const
   }
 }
 
-void FspecSpace::saveXml(ostream &s) const
+void FspecSpace::saveXml(std::ostream &s) const
 
 {
   throw LowlevelError("Should never save fspec space to XML");
@@ -1513,7 +1513,7 @@ EffectRecord::EffectRecord(const VarnodeData &data,uint4 t)
 
 /// Writes just an \<addr> tag.  The effect type is indicated by the parent tag.
 /// \param s is the output stream
-void EffectRecord::saveXml(ostream &s) const
+void EffectRecord::saveXml(std::ostream &s) const
 
 {
   Address addr(address.space,address.offset);
@@ -1594,7 +1594,7 @@ void ProtoModel::defaultParamRange(void)
 
 /// Generate derived ParamList objects based on a given strategy
 /// \param strategy is the resource \e strategy: currently "standard" or "register"
-void ProtoModel::buildParamList(const string &strategy)
+void ProtoModel::buildParamList(const std::string &strategy)
 
 {
   if ((strategy == "")||(strategy == "standard")) {
@@ -1629,7 +1629,7 @@ ProtoModel::ProtoModel(Architecture *g)
 /// Everything is copied from the given prototype model except the name
 /// \param nm is the new name for \b this copy
 /// \param op2 is the prototype model to copy
-ProtoModel::ProtoModel(const string &nm,const ProtoModel &op2)
+ProtoModel::ProtoModel(const std::string &nm,const ProtoModel &op2)
 
 {
   glb = op2.glb;
@@ -1762,7 +1762,7 @@ void ProtoModel::restoreXml(const Element *el)
   AddrSpace *stackspc = glb->getStackSpace();
   if (stackspc != (AddrSpace *)0)
     stackgrowsnegative = stackspc->stackGrowsNegative();	// Get growth boolean from stack space itself
-  string strategystring;
+  std::string strategystring;
   localrange.clear();
   paramrange.clear();
   extrapop = -300;
@@ -1780,7 +1780,7 @@ void ProtoModel::restoreXml(const Element *el)
 	extrapop = extrapop_unknown;
       else {
 	istringstream s(el->getAttributeValue(i));
-	s.unsetf(ios::dec | ios::hex | ios::oct);
+	s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
 	s >> extrapop;
       }
     }
@@ -2165,7 +2165,7 @@ ProtoParameter *ParameterBasic::clone(void) const
   return res;
 }
 
-const string &ParameterSymbol::getName(void) const 
+const std::string &ParameterSymbol::getName(void) const 
 
 { 
   return sym->getName(); 
@@ -2318,7 +2318,7 @@ ParameterSymbol *ProtoStoreSymbol::getSymbolBacked(int4 i)
   return res;
 }
 
-ProtoParameter *ProtoStoreSymbol::setInput(int4 i, const string &nm,const ParameterPieces &pieces)
+ProtoParameter *ProtoStoreSymbol::setInput(int4 i, const std::string &nm,const ParameterPieces &pieces)
 
 {
   ParameterSymbol *res = getSymbolBacked(i);
@@ -2336,7 +2336,7 @@ ProtoParameter *ProtoStoreSymbol::setInput(int4 i, const string &nm,const Parame
   if (res->sym == (Symbol *)0) {
     if (scope->discoverScope(pieces.addr,pieces.type->getSize(),usepoint) != scope)
       usepoint = restricted_usepoint; 
-    string name;
+    std::string name;
     if (nm.size()==0) {
       int4 index = i+1;
       name = scope->buildVariableName(pieces.addr,usepoint,pieces.type,index,Varnode::input);
@@ -2445,7 +2445,7 @@ ProtoStore *ProtoStoreSymbol::clone(void) const
   return res;
 }
 
-void ProtoStoreSymbol::saveXml(ostream &s) const
+void ProtoStoreSymbol::saveXml(std::ostream &s) const
 
 { // Do not store anything explicitly for a symboltable backed store
   // as the symboltable will be stored separately
@@ -2481,7 +2481,7 @@ ProtoStoreInternal::~ProtoStoreInternal(void)
   }
 }
 
-ProtoParameter *ProtoStoreInternal::setInput(int4 i,const string &nm,const ParameterPieces &pieces)
+ProtoParameter *ProtoStoreInternal::setInput(int4 i,const std::string &nm,const ParameterPieces &pieces)
 
 {
   while(inparam.size() <= i)
@@ -2573,7 +2573,7 @@ ProtoStore *ProtoStoreInternal::clone(void) const
   return res;
 }
 
-void ProtoStoreInternal::saveXml(ostream &s) const
+void ProtoStoreInternal::saveXml(std::ostream &s) const
 
 {
   s << "<internallist>\n";
@@ -2620,7 +2620,7 @@ void ProtoStoreInternal::restoreXml(const Element *el,ProtoModel *model)
   const List &list(el->getChildren());
   List::const_iterator iter;
   vector<ParameterPieces> pieces;
-  vector<string> namelist;
+  vector<std::string> namelist;
   vector<bool> typelocklist;
   vector<bool> namelocklist;
   bool addressesdetermined = true;
@@ -2638,12 +2638,12 @@ void ProtoStoreInternal::restoreXml(const Element *el,ProtoModel *model)
 
   for(iter=list.begin();iter!=list.end();++iter) { // This is only the input params
     const Element *subel = *iter;
-    string name;
+    std::string name;
     bool typelock = false;
     bool namelock = false;
     uint4 flags = 0;
     for(int4 i=0;i<subel->getNumAttributes();++i) {
-      const string &attr( subel->getAttributeName(i) );
+      const std::string &attr( subel->getAttributeName(i) );
       if (attr == "name")
 	name = subel->getAttributeValue(i);
       else if (attr == "typelock")
@@ -2715,7 +2715,7 @@ void FuncProto::paramShift(int4 paramshift)
   if ((model == (ProtoModel *)0)||(store == (ProtoStore *)0))
     throw LowlevelError("Cannot parameter shift without a model");
 
-  vector<string> nmlist;
+  vector<std::string> nmlist;
   vector<Datatype *> typelist;
   bool isdotdotdot = false;
   TypeFactory *typefactory = model->getArch()->types;
@@ -2851,7 +2851,7 @@ void FuncProto::setPieces(const PrototypePieces &pieces)
   if (pieces.model != (ProtoModel *)0)
     setModel(pieces.model);
   vector<Datatype *> typelist;
-  vector<string> nmlist;
+  vector<std::string> nmlist;
   typelist.push_back(pieces.outtype);
   nmlist.push_back("");
   for(int4 i=0;i<pieces.intypes.size();++i) {
@@ -3157,7 +3157,7 @@ void FuncProto::updateOutputNoTypes(const vector<Varnode *> &triallist,TypeFacto
 /// \param namelist is the list of parameter names
 /// \param typelist is the list of data-types
 /// \param dtdtdt is \b true if the new prototype accepts variable argument lists
-void FuncProto::updateAllTypes(const vector<string> &namelist,const vector<Datatype *> &typelist,
+void FuncProto::updateAllTypes(const vector<std::string> &namelist,const vector<Datatype *> &typelist,
 			       bool dtdtdt)
 
 {
@@ -3385,7 +3385,7 @@ bool FuncProto::isCompatible(const FuncProto &op2) const
 ///
 /// \param funcname is an identifier of the function using \b this prototype
 /// \param s is the output stream
-void FuncProto::printRaw(const string &funcname,ostream &s) const
+void FuncProto::printRaw(const std::string &funcname,std::ostream &s) const
 
 {
   if (model != (ProtoModel *)0)
@@ -3414,7 +3414,7 @@ void FuncProto::printRaw(const string &funcname,ostream &s) const
 /// may \e not include input parameters, as these are typically
 /// controlled by the function's symbol table scope.
 /// \param s is the output stream
-void FuncProto::saveXml(ostream &s) const
+void FuncProto::saveXml(std::ostream &s) const
 
 {
   s << " <prototype";
@@ -3529,9 +3529,9 @@ void FuncProto::restoreXml(const Element *el,Architecture *glb)
   flags = 0;
   injectid = -1;
   for(int4 i=0;i<num;++i) {
-    const string &attrname( el->getAttributeName(i) );
+    const std::string &attrname( el->getAttributeName(i) );
     if (attrname == "model") {
-      const string &modelname( el->getAttributeValue(i) );
+      const std::string &modelname( el->getAttributeValue(i) );
       if ((modelname == "default")||(modelname.size()==0))
 	mod = glb->defaultfp;	// Get default model
       else if (modelname == "unknown") {
@@ -3543,12 +3543,12 @@ void FuncProto::restoreXml(const Element *el,Architecture *glb)
     }
     else if (attrname == "extrapop") {
       seenextrapop = true;
-      const string &expopval( el->getAttributeValue(i) );
+      const std::string &expopval( el->getAttributeValue(i) );
       if (expopval == "unknown")
 	readextrapop = ProtoModel::extrapop_unknown;
       else {
 	istringstream i1(expopval);
-	i1.unsetf(ios::dec | ios::hex | ios::oct);
+	i1.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
 	i1 >> readextrapop;
       }
     }
@@ -3611,7 +3611,7 @@ void FuncProto::restoreXml(const Element *el,Architecture *glb)
     if (subel->getName() == "returnsym") {
       int4 num = subel->getNumAttributes();
       for(int4 i=0;i<num;++i) {
-	const string &attrname( subel->getAttributeName(i) );
+	const std::string &attrname( subel->getAttributeName(i) );
 	if (attrname == "typelock")
 	  outputlock = xml_readbool(subel->getAttributeValue(i));
       }

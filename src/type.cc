@@ -277,7 +277,7 @@ void Datatype::restoreXmlBasic(const Element *el)
 {
   name = el->getAttributeValue("name");
   istringstream i(el->getAttributeValue("size"));
-  i.unsetf(ios::dec | ios::hex | ios::oct);
+  i.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
   size = -1;
   i >> size;
   if (size < 0)
@@ -291,7 +291,7 @@ void Datatype::restoreXmlBasic(const Element *el)
     }
     else if (el->getAttributeName(i) == "id") {
       istringstream i1(el->getAttributeValue(i));
-      i1.unsetf(ios::dec | ios::hex | ios::oct);
+      i1.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
       i1 >> id;
     }
   }
@@ -437,7 +437,7 @@ void TypePointer::restoreXml(const Element *el,TypeFactory &typegrp)
   for(int4 i=0;i<el->getNumAttributes();++i)
     if (el->getAttributeName(i) == "wordsize") {
       istringstream s(el->getAttributeValue(i));
-      s.unsetf(ios::dec | ios::hex | ios::oct);
+      s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
       s >> wordsize;
     }
   ptrto = typegrp.restoreXmlType( *el->getChildren().begin() );
@@ -523,7 +523,7 @@ void TypeArray::restoreXml(const Element *el,TypeFactory &typegrp)
   restoreXmlBasic(el);
   arraysize = -1;
   istringstream j(el->getAttributeValue("arraysize"));
-  j.unsetf(ios::dec | ios::hex | ios::oct);
+  j.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
   j >> arraysize;
   arrayof  = typegrp.restoreXmlType(*el->getChildren().begin());
   if ((arraysize<=0)||(arraysize*arrayof->getSize()!=size))
@@ -702,7 +702,7 @@ void TypeEnum::restoreXml(const Element *el,TypeFactory &typegrp)
     uintb val;
     Element *subel = *iter;
     istringstream is(subel->getAttributeValue("value"));
-    is.unsetf(ios::dec|ios::hex|ios::oct);
+    is.unsetf(std::ios::dec|std::ios::hex|std::ios::oct);
     intb valsign;		// Value might be negative
     is >> valsign;
     val = (uintb)valsign & calc_mask(size);
@@ -892,7 +892,7 @@ void TypeStruct::restoreXml(const Element *el,TypeFactory &typegrp)
     field.push_back( TypeField() );
     field.back().name = (*iter)->getAttributeValue("name");
     istringstream j((*iter)->getAttributeValue("offset"));
-    j.unsetf(ios::dec | ios::hex | ios::oct);
+    j.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
     j >> field.back().offset;
     field.back().type = typegrp.restoreXmlType( *(*iter)->getChildren().begin() );
     int4 trialmax = field.back().offset + field.back().type->getSize();
@@ -1903,7 +1903,7 @@ Datatype *TypeFactory::restoreXmlType(const Element *el)
     for(int4 i=0;i<num;++i) {
       if (el->getAttributeName(i) == "id") {
 	istringstream s(el->getAttributeValue(i));
-	s.unsetf(ios::dec | ios::hex | ios::oct);
+	s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
 	s >> newid;
       }
     }
@@ -1936,7 +1936,7 @@ Datatype *TypeFactory::restoreXmlTypeWithCodeFlags(const Element *el,bool hasThi
   for(int4 i=0;i<el->getNumAttributes();++i)
     if (el->getAttributeName(i) == "wordsize") {
       istringstream s(el->getAttributeValue(i));
-      s.unsetf(ios::dec | ios::hex | ios::oct);
+      s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
       s >> tp.wordsize;
     }
   const List &list(el->getChildren());
@@ -2052,12 +2052,12 @@ Datatype *TypeFactory::restoreXmlTypeNoRef(const Element *el,bool forcecore)
       for(int4 i=0;i<num;++i) {
 	if (el->getAttributeName(i) == "id") {
 	  istringstream s(el->getAttributeValue(i));
-	  s.unsetf(ios::dec | ios::hex | ios::oct);
+	  s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
 	  s >> newid;
 	}
 	else if (el->getAttributeName(i) == "size") {
 	  istringstream s(el->getAttributeValue(i));
-	  s.unsetf(ios::dec | ios::hex | ios::oct);
+	  s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
 	  s >> structsize;
 	}
       }
@@ -2155,13 +2155,13 @@ void TypeFactory::restoreXml(const Element *el)
   string metastring;
 
   istringstream i3(el->getAttributeValue("intsize"));
-  i3.unsetf(ios::dec | ios::hex | ios::oct);
+  i3.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
   i3 >> sizeOfInt;
   istringstream i(el->getAttributeValue("structalign"));
-  i.unsetf(ios::dec | ios::hex | ios::oct);
+  i.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
   i >> align;
   istringstream i2(el->getAttributeValue("enumsize"));
-  i2.unsetf(ios::dec | ios::hex | ios::oct);
+  i2.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
   i2 >> enumsize;
   if (xml_readbool(el->getAttributeValue("enumsigned")))
     enumtype = TYPE_INT;
@@ -2202,7 +2202,7 @@ void TypeFactory::parseDataOrganization(const Element *el)
     const Element *subel = *iter;
     if (subel->getName() == "integer_size") {
       istringstream i(subel->getAttributeValue("value"));
-      i.unsetf(ios::dec | ios::hex | ios::oct);
+      i.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
       i >> sizeOfInt;
     }
     else if (subel->getName() == "size_alignment_map") {
@@ -2213,7 +2213,7 @@ void TypeFactory::parseDataOrganization(const Element *el)
 	const Element *childel = *iter2;
 	int4 val;
 	istringstream i2(childel->getAttributeValue("alignment"));
-	i2.unsetf(ios::dec | ios::hex | ios::oct);
+	i2.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
 	i2 >> val;
 	if (val > align)		// Take maximum size alignment
 	  align = val;
@@ -2230,7 +2230,7 @@ void TypeFactory::parseEnumConfig(const Element *el)
 
 {
   istringstream s(el->getAttributeValue("size"));
-  s.unsetf(ios::dec | ios::hex | ios::oct);
+  s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
   s >> enumsize;
   if (xml_readbool(el->getAttributeValue("signed")))
     enumtype = TYPE_INT;

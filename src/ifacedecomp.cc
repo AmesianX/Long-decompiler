@@ -53,11 +53,11 @@ void IfaceDecompCapability::registerCommands(IfaceStatus *status)
   status->registerCom(new IfcAddrrangeLoad(),"load","addr");
   status->registerCom(new IfcReadSymbols(),"read","symbols");
   status->registerCom(new IfcCleararch(),"clear","architecture");
-  status->registerCom(new IfcMapaddress(),"map","address");
-  status->registerCom(new IfcMaphash(),"map","hash");
-  status->registerCom(new IfcMapfunction(),"map","function");
-  status->registerCom(new IfcMapexternalref(),"map","externalref");
-  status->registerCom(new IfcMaplabel(),"map","label");
+  status->registerCom(new IfcMapaddress(),"std::map","address");
+  status->registerCom(new IfcMaphash(),"std::map","hash");
+  status->registerCom(new IfcMapfunction(),"std::map","function");
+  status->registerCom(new IfcMapexternalref(),"std::map","externalref");
+  status->registerCom(new IfcMaplabel(),"std::map","label");
   status->registerCom(new IfcPrintdisasm(),"disassemble");
   status->registerCom(new IfcDecompile(),"decompile");
   status->registerCom(new IfcDump(),"dump");
@@ -102,7 +102,7 @@ void IfaceDecompCapability::registerCommands(IfaceStatus *status)
   status->registerCom(new IfcPrintTree(),"print","tree","varnode");
   status->registerCom(new IfcPrintBlocktree(),"print","tree","block");
   status->registerCom(new IfcPrintLocalrange(),"print","localrange");
-  status->registerCom(new IfcPrintMap(),"print","map");
+  status->registerCom(new IfcPrintMap(),"print","std::map");
   status->registerCom(new IfcPrintVarnode(),"print","varnode");
   status->registerCom(new IfcPrintCover(),"print","cover","high");
   status->registerCom(new IfcVarnodeCover(),"print","cover","varnode");
@@ -224,7 +224,7 @@ IfaceDecompData::~IfaceDecompData(void)
 // fd will get deleted with Database
 }
 
-void IfaceDecompData::abortFunction(ostream &s)
+void IfaceDecompData::abortFunction(std::ostream &s)
 
 {				// Clear references to current function
   if (fd == (Funcdata *)0) return;
@@ -338,7 +338,7 @@ void IfcAdjustVma::execute(istream &s)
   adjust = 0uL;
   if (dcp->conf == (Architecture *)0)
     throw IfaceExecutionError("No load image present");
-  s.unsetf(ios::dec | ios::hex | ios::oct); // Let user specify base
+  s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct); // Let user specify base
   s >> ws >> adjust;
   if (adjust == 0uL)
     throw IfaceParseError("No adjustment parameter");
@@ -349,7 +349,7 @@ void IfcAdjustVma::execute(istream &s)
 static void jump_callback(Funcdata &orig,Funcdata &fd);
 #endif
 
-static void IfcFollowFlow(ostream &s,IfaceDecompData *dcp,const Address &offset,int4 size)
+static void IfcFollowFlow(std::ostream &s,IfaceDecompData *dcp,const Address &offset,int4 size)
 
 {
 #ifdef OPACTION_DEBUG
@@ -740,7 +740,7 @@ void IfcListprototypes::execute(istream &s)
   if (dcp->conf == (Architecture *)0)
     throw IfaceExecutionError("No load image present");
   
-  map<string,ProtoModel *>::const_iterator iter;
+  std::map<string,ProtoModel *>::const_iterator iter;
   for(iter=dcp->conf->protoModels.begin();iter!=dcp->conf->protoModels.end();++iter) {
     ProtoModel *model = (*iter).second;
     *status->optr << model->getName();
@@ -766,7 +766,7 @@ void IfcSetcontextrange::execute(istream &s)
   if (name.size()==0)
     throw IfaceParseError("Missing context variable name");
 
-  s.unsetf(ios::dec | ios::hex | ios::oct); // Let user specify base
+  s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct); // Let user specify base
   uintm value = 0xbadbeef;
   s >> value;
   if (value == 0xbadbeef)
@@ -803,7 +803,7 @@ void IfcSettrackedrange::execute(istream &s)
   if (name.size() ==0)
     throw IfaceParseError("Missing tracked register name");
 
-  s.unsetf(ios::dec | ios::hex | ios::oct); // Let user specify base
+  s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct); // Let user specify base
   uintb value = 0xbadbeef;
   s >> value;
   if (value == 0xbadbeef)
@@ -980,7 +980,7 @@ void IfcRename::execute(istream &s)
     throw IfaceParseError("Missing new name");
     
   Symbol *sym;
-  vector<Symbol *> symList;
+  std::vector<Symbol *> symList;
   if (dcp->fd != (Funcdata *)0)
     dcp->fd->getScopeLocal()->queryByName(oldname,symList);
   else
@@ -1008,7 +1008,7 @@ void IfcRemove::execute(istream &s)
   if (name.size()==0)
     throw IfaceParseError("Missing symbol name");
 
-  vector<Symbol *> symList;
+  std::vector<Symbol *> symList;
   if (dcp->fd != (Funcdata *)0)
     dcp->fd->getScopeLocal()->queryByName(name,symList);
   else
@@ -1033,7 +1033,7 @@ void IfcRetype::execute(istream &s)
   ct = parse_type(s,newname,dcp->conf);
 
   Symbol *sym;
-  vector<Symbol *> symList;
+  std::vector<Symbol *> symList;
   if (dcp->fd != (Funcdata *)0)
     dcp->fd->getScopeLocal()->queryByName(name,symList);
   else
@@ -1394,7 +1394,7 @@ void IfcJumpOverride::execute(istream &s)
   s >> ws;
   Address jmpaddr( parse_machaddr(s,discard,*dcp->conf->types));
   JumpTable *jt = dcp->fd->installJumpTable(jmpaddr);
-  vector<Address> adtable;
+  std::vector<Address> adtable;
   Address naddr;
   uintb h=0;
   uintb sv = 0;
@@ -1407,7 +1407,7 @@ void IfcJumpOverride::execute(istream &s)
 //     s >> token;
 //   }
   if (token == "startval") {
-    s.unsetf(ios::dec | ios::hex | ios::oct); // Let user specify base
+    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct); // Let user specify base
     s >> sv;
     s >> token;
   }
@@ -1517,9 +1517,9 @@ void IfcGlobalRegisters::execute(istream &s)
 {
   if (dcp->conf == (Architecture *)0)
     throw IfaceExecutionError("No load image present");
-  map<VarnodeData,string> reglist;
+  std::map<VarnodeData,string> reglist;
   dcp->conf->translate->getAllRegisters(reglist);
-  map<VarnodeData,string>::const_iterator iter;
+  std::map<VarnodeData,string>::const_iterator iter;
   AddrSpace *spc = (AddrSpace *)0;
   uintb lastoff=0;
   Scope *globalscope = dcp->conf->symboltab->getGlobalScope();
@@ -1550,7 +1550,7 @@ void IfcGlobalRegisters::execute(istream &s)
 static bool nontrivial_use(Varnode *vn)
 
 {
-  vector<Varnode *> vnlist;
+  std::vector<Varnode *> vnlist;
   bool res = false;
   vnlist.push_back(vn);
   uint4 proc = 0;
@@ -1584,7 +1584,7 @@ static bool nontrivial_use(Varnode *vn)
 static int4 check_restore(Varnode *vn)
 
 { // Return 0 if vn is written to from an input at the same location
-  vector<Varnode *> vnlist;
+  std::vector<Varnode *> vnlist;
   int4 res = 0;
   vnlist.push_back(vn);
   uint4 proc = 0;
@@ -1660,7 +1660,7 @@ static bool find_restore(Varnode *vn,Funcdata *fd)
   return (count>0);
 }
 
-static void print_function_inputs(Funcdata *fd,ostream &s)
+static void print_function_inputs(Funcdata *fd,std::ostream &s)
 
 {
   VarnodeDefSet::const_iterator iter,enditer;
@@ -1773,7 +1773,7 @@ void IfcPrintMap::execute(istream &s)
   if (name.size() != 0) {
     scope = scope->resolveScope(name);
     if (scope == (Scope *)0)
-      throw IfaceExecutionError("No map named: "+name);
+      throw IfaceExecutionError("No std::map named: "+name);
   }
 
   *status->fileoptr << scope->getFullName() << endl;
@@ -1995,7 +1995,7 @@ void IfcCommentInstr::execute(istream &s)
 				  dcp->fd->getAddress(),addr,comment);
 }
 
-static void duplicate_hash(Funcdata *fd,ostream &s)
+static void duplicate_hash(Funcdata *fd,std::ostream &s)
 
 { // Make sure no two varnodes of -fd- have the same hash
   DynamicHash dhash;
@@ -2201,7 +2201,7 @@ void IfcCallGraphLoad::execute(istream &s)
   *status->optr << "Successfully read in callgraph" << endl;
 
   Scope *gscope = dcp->conf->symboltab->getGlobalScope();
-  map<Address,CallGraphNode>::iterator iter,enditer;
+  std::map<Address,CallGraphNode>::iterator iter,enditer;
   iter = dcp->cgraph->begin();
   enditer = dcp->cgraph->end();
 
@@ -2232,7 +2232,7 @@ void IfcCallGraphList::iterationCallback(Funcdata *fd)
   *status->optr << fd->getName() << endl;
 }
 
-static void readPcodeSnippet(istream &s,string &name,string &outname,vector<string> &inname,string &pcodestring)
+static void readPcodeSnippet(istream &s,string &name,string &outname,std::vector<string> &inname,string &pcodestring)
 
 {
   char bracket;
@@ -2260,7 +2260,7 @@ void IfcCallFixup::execute(istream &s)
 
 {
   string name,outname,pcodestring;
-  vector<string> inname;
+  std::vector<string> inname;
 
   readPcodeSnippet(s,name,outname,inname,pcodestring);
   int4 id = -1;
@@ -2278,7 +2278,7 @@ void IfcCallOtherFixup::execute(istream &s)
 
 {
   string useropname,outname,pcodestring;
-  vector<string> inname;
+  std::vector<string> inname;
 
   readPcodeSnippet(s,useropname,outname,inname,pcodestring);
   dcp->conf->userops.manualCallOtherFixup(useropname,outname,inname,pcodestring,dcp->conf);
@@ -2359,7 +2359,7 @@ void IfcStructureBlocks::execute(istream &s)
     ingraph.restoreXml(doc->getRoot(),dcp->conf);
     
     BlockGraph resultgraph;
-    vector<FlowBlock *> rootlist;
+    std::vector<FlowBlock *> rootlist;
     
     resultgraph.buildCopy(ingraph);
     resultgraph.structureLoops(rootlist);
@@ -2410,7 +2410,7 @@ void IfcParseRule::execute(istream &s)
     return;
   }
   int4 opparam;
-  vector<OpCode> opcodelist;
+  std::vector<OpCode> opcodelist;
   opparam = ruler.postProcessRule(opcodelist);
   UnifyCPrinter cprinter;
   cprinter.initializeRuleAction(ruler.getRule(),opparam,opcodelist);
@@ -2499,7 +2499,7 @@ void IfcTraceBreak::execute(istream &s)
     throw IfaceExecutionError("No function selected");
 
   s >> ws;
-  s.unsetf(ios::dec | ios::hex | ios::oct); // Let user specify base
+  s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct); // Let user specify base
   count = -1;
   s >> count;
   if (count == -1)
@@ -2530,7 +2530,7 @@ void IfcTraceAddress::execute(istream &s)
   }
   uqhigh = uqlow = ~((uintm)0);
   if (!s.eof()) {
-    s.unsetf(ios::dec | ios::hex | ios::oct); // Let user specify base
+    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct); // Let user specify base
     s >> uqlow >> uqhigh >> ws;
   }
   dcp->fd->debugSetRange(pclow,pchigh,uqlow,uqhigh);
@@ -2586,7 +2586,7 @@ void IfcTraceList::execute(istream &s)
     dcp->fd->debugPrintRange(i);
 }
     
-static vector<Funcdata *> jumpstack;
+static std::vector<Funcdata *> jumpstack;
 static IfaceDecompData *dcp_callback;
 static IfaceStatus *status_callback;
 

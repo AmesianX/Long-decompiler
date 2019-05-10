@@ -25,7 +25,7 @@ XmlArchitectureCapability::XmlArchitectureCapability(void)
   name = "xml";
 }
 
-Architecture *XmlArchitectureCapability::buildArchitecture(const string &filename,const string &target,ostream *estream)
+Architecture *XmlArchitectureCapability::buildArchitecture(const string &filename,const string &target,std::ostream *estream)
 
 {
   return new XmlArchitecture(filename,target,estream);
@@ -82,7 +82,7 @@ void XmlArchitecture::postSpecFile(void)
 /// \param fname is the path to the executable file (containing XML)
 /// \param targ is the (optional) language id
 /// \param estream is the stream to use for the error console
-XmlArchitecture::XmlArchitecture(const string &fname,const string &targ,ostream *estream)
+XmlArchitecture::XmlArchitecture(const string &fname,const string &targ,std::ostream *estream)
   : SleighArchitecture(fname,targ,estream)
 
 {
@@ -91,7 +91,7 @@ XmlArchitecture::XmlArchitecture(const string &fname,const string &targ,ostream 
 
 /// Prepend extra stuff to specify binary file and spec
 /// \param s is the stream to write to
-void XmlArchitecture::saveXml(ostream &s) const
+void XmlArchitecture::saveXml(std::ostream &s) const
 
 {
   s << "<xml_savefile";
@@ -114,7 +114,7 @@ void XmlArchitecture::restoreXml(DocumentStorage &store)
   restoreXmlHeader(el);
   {
     istringstream s( el->getAttributeValue("adjustvma"));
-    s.unsetf(ios::dec | ios::hex | ios::oct);
+    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
     s >> adjustvma;
   }    
   const List &list(el->getChildren());

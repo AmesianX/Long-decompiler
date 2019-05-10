@@ -43,7 +43,7 @@ void AddrSpace::assignShortcut(void)
 /// \param ind is the integer identifier for the new space
 /// \param fl can be 0 or AddrSpace::hasphysical
 /// \param dl is the number of rounds to delay heritage for the new space
-AddrSpace::AddrSpace(AddrSpaceManager *m,const Translate *t,spacetype tp,const string &nm,
+AddrSpace::AddrSpace(AddrSpaceManager *m,const Translate *t,spacetype tp,const std::string &nm,
 		     uint4 size,uint4 ws, int4 ind,uint4 fl,int4 dl)
 {
   refcount = 0;			// No references to this space yet
@@ -88,7 +88,7 @@ AddrSpace::AddrSpace(AddrSpaceManager *m,const Translate *t,spacetype tp)
 /// \e size, \e wordsize, and \e physical attributes which
 /// are common with all address spaces derived from AddrSpace
 /// \param s the stream where the attributes are written
-void AddrSpace::saveBasicAttributes(ostream &s) const
+void AddrSpace::saveBasicAttributes(std::ostream &s) const
 
 {
   a_v(s,"name",name);
@@ -161,7 +161,7 @@ uintm AddrSpace::data2Uintm(const uint1 *ptr,int4 size) const
 /// in other details pertaining to this particular space.
 /// \param s is the stream to write to
 /// \param offset is the offset of the address
-void AddrSpace::saveXmlAttributes(ostream &s,uintb offset) const
+void AddrSpace::saveXmlAttributes(std::ostream &s,uintb offset) const
 
 {
   a_v(s,"space",getName());	// Just append the proper attributes
@@ -176,7 +176,7 @@ void AddrSpace::saveXmlAttributes(ostream &s,uintb offset) const
 /// \param s is the stream to write to
 /// \param offset is the offset of the address
 /// \param size is the size of the memory location
-void AddrSpace::saveXmlAttributes(ostream &s,uintb offset,int4 size) const
+void AddrSpace::saveXmlAttributes(std::ostream &s,uintb offset,int4 size) const
 
 {
   a_v(s,"space",getName());	// Just append the proper attributes
@@ -201,12 +201,12 @@ uintb AddrSpace::restoreXmlAttributes(const Element *el,uint4 &size) const
     if (el->getAttributeName(i)=="offset") {
       foundoffset = true;
       istringstream s1(el->getAttributeValue(i));
-      s1.unsetf(ios::dec | ios::hex | ios::oct);
+      s1.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
       s1 >> offset;
     }
     else if (el->getAttributeName(i)=="size") {
       istringstream s2(el->getAttributeValue(i));
-      s2.unsetf(ios::dec | ios::hex | ios::oct);
+      s2.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
       s2 >> size;
     }
   }
@@ -219,7 +219,7 @@ uintb AddrSpace::restoreXmlAttributes(const Element *el,uint4 &size) const
 /// Print the \e offset as hexidecimal digits.
 /// \param s is the stream to write to
 /// \param offset is the offset to be printed
-void AddrSpace::printOffset(ostream &s,uintb offset) const
+void AddrSpace::printOffset(std::ostream &s,uintb offset) const
 
 {
   s << "0x" << hex << offset;
@@ -231,7 +231,7 @@ void AddrSpace::printOffset(ostream &s,uintb offset) const
 /// returns the expected/typical size of values from this space.
 /// \param s is the stream being written
 /// \param offset is the offset to be printed
-void AddrSpace::printRaw(ostream &s,uintb offset) const
+void AddrSpace::printRaw(std::ostream &s,uintb offset) const
 
 {
   int4 sz = getAddrSize();
@@ -251,7 +251,7 @@ void AddrSpace::printRaw(ostream &s,uintb offset) const
 
 static int4 get_offset_size(const char *ptr,uintb &offset)
 
-{				// Get optional size and offset fields from string
+{				// Get optional size and offset fields from std::string
   int4 size;
   uint4 val;
   char *ptr2;
@@ -277,22 +277,22 @@ static int4 get_offset_size(const char *ptr,uintb &offset)
 /// appending a ':' and integer, .i.e.  0x1000:2.  Offsets within
 /// a register can be indicated by appending a '+' and integer,
 /// i.e. eax+2
-/// \param s is the string to be parsed
+/// \param s is the std::string to be parsed
 /// \param size is a reference to the size being returned
 /// \return the parsed offset
-uintb AddrSpace::read(const string &s,int4 &size) const
+uintb AddrSpace::read(const std::string &s,int4 &size) const
 
 {
   const char *enddata;
   char *tmpdata;
   int4 expsize;
-  string::size_type append;
-  string frontpart;
+  std::string::size_type append;
+  std::string frontpart;
   uintb offset;
   
   append = s.find_first_of(":+");
   try {
-    if (append == string::npos) {
+    if (append == std::string::npos) {
       const VarnodeData &point(trans->getRegister(s));
       offset = point.offset;
       size = point.size;
@@ -314,7 +314,7 @@ uintb AddrSpace::read(const string &s,int4 &size) const
     }
     size = getAddrSize();
   }
-  if (append != string::npos) {
+  if (append != std::string::npos) {
     enddata = s.c_str()+append;
     expsize = get_offset_size( enddata, offset );
     if (expsize!=-1) {
@@ -328,7 +328,7 @@ uintb AddrSpace::read(const string &s,int4 &size) const
 /// Write a tag fully describing the details of this space
 /// suitable for later recovery via restoreXml.
 /// \param s is the stream being written
-void AddrSpace::saveXml(ostream &s) const
+void AddrSpace::saveXml(std::ostream &s) const
 
 {
   s << "<space";		// This implies type=processor
@@ -346,8 +346,8 @@ void AddrSpace::restoreXml(const Element *el)
   int4 numAttribs = el->getNumAttributes();
   deadcodedelay = -1;
   for (int4 i=0; i < numAttribs; i++) {
-    string attrName = el->getAttributeName(i);
-    string attrValue = el->getAttributeValue(i);
+    std::string attrName = el->getAttributeName(i);
+    std::string attrValue = el->getAttributeValue(i);
     
     if (attrName == "name") {
       name = attrValue;
@@ -355,19 +355,19 @@ void AddrSpace::restoreXml(const Element *el)
     if (attrName == "index")
       {
 	istringstream s1(attrValue);
-	s1.unsetf(ios::dec | ios::hex | ios::oct);
+	s1.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
 	s1 >> index;
       }
     if (attrName == "size")
       {
 	istringstream s1(attrValue);
-	s1.unsetf(ios::dec | ios::hex | ios::oct);
+	s1.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
 	s1 >> addressSize;
       }
     if (attrName == "wordsize")
       {
 	istringstream s1(attrValue);
-	s1.unsetf(ios::dec | ios::hex | ios::oct);
+	s1.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
 	s1 >> wordsize;
       }
     if (attrName == "bigendian") {
@@ -376,12 +376,12 @@ void AddrSpace::restoreXml(const Element *el)
     }
     if (attrName == "delay") {
       istringstream s1(attrValue);
-      s1.unsetf(ios::dec | ios::hex | ios::oct);
+      s1.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
       s1 >> delay;
     }
     if (attrName == "deadcodedelay") {
       istringstream s1(attrValue);
-      s1.unsetf(ios::dec | ios::hex | ios::oct);
+      s1.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
       s1 >> deadcodedelay;
     }      
     if (attrName == "physical") {
@@ -404,7 +404,7 @@ void AddrSpace::restoreXml(const Element *el)
 /// \param nm is the name
 /// \param ind is the integer identifier
 ConstantSpace::ConstantSpace(AddrSpaceManager *m,const Translate *t,
-			     const string &nm,int4 ind)
+			     const std::string &nm,int4 ind)
   : AddrSpace(m,t,IPTR_CONSTANT,nm,sizeof(uintb),1,ind,0,0)
 {
   clearFlags(heritaged|does_deadcode|big_endian);
@@ -414,7 +414,7 @@ ConstantSpace::ConstantSpace(AddrSpaceManager *m,const Translate *t,
 
 /// Constants are always printed as hexidecimal values in
 /// the debugger and console dumps
-void ConstantSpace::printRaw(ostream &s,uintb offset) const
+void ConstantSpace::printRaw(std::ostream &s,uintb offset) const
 
 {
   s << "0x" << hex << offset;
@@ -422,7 +422,7 @@ void ConstantSpace::printRaw(ostream &s,uintb offset) const
 
 /// The ConstantSpace should never be explicitly saved as it is
 /// always built automatically
-void ConstantSpace::saveXml(ostream &s) const
+void ConstantSpace::saveXml(std::ostream &s) const
 
 {
   throw LowlevelError("Should never save the constant space as XML");
@@ -444,7 +444,7 @@ void ConstantSpace::restoreXml(const Element *el)
 /// \param nm is the name of the space
 /// \param ind is the integer identifier
 /// \param fl are attribute flags (currently unused)
-UniqueSpace::UniqueSpace(AddrSpaceManager *m,const Translate *t,const string &nm,
+UniqueSpace::UniqueSpace(AddrSpaceManager *m,const Translate *t,const std::string &nm,
 			 int4 ind,uint4 fl)
   : AddrSpace(m,t,IPTR_INTERNAL,nm,sizeof(uintm),1,ind,fl,0)
 {
@@ -457,7 +457,7 @@ UniqueSpace::UniqueSpace(AddrSpaceManager *m,const Translate *t)
   setFlags(hasphysical);
 }
 
-void UniqueSpace::saveXml(ostream &s) const
+void UniqueSpace::saveXml(std::ostream &s) const
 
 {
   s << "<space_unique";
@@ -471,7 +471,7 @@ void UniqueSpace::saveXml(ostream &s) const
 /// \param t is the associated processor translator
 /// \param nm is the name of the space
 /// \param ind is the integer identifier
-JoinSpace::JoinSpace(AddrSpaceManager *m,const Translate *t,const string &nm,int4 ind)
+JoinSpace::JoinSpace(AddrSpaceManager *m,const Translate *t,const std::string &nm,int4 ind)
   : AddrSpace(m,t,IPTR_JOIN,nm,sizeof(uintm),1,ind,0,0)
 {
   // This is a virtual space
@@ -484,7 +484,7 @@ JoinSpace::JoinSpace(AddrSpaceManager *m,const Translate *t,const string &nm,int
 /// be recursive tags into an attribute
 /// \param s is the stream being written to
 /// \param offset is the offset within the address space to encode
-void JoinSpace::saveXmlAttributes(ostream &s,uintb offset) const
+void JoinSpace::saveXmlAttributes(std::ostream &s,uintb offset) const
 
 {
   JoinRecord *rec = getManager()->findJoin(offset); // Record must already exist
@@ -509,7 +509,7 @@ void JoinSpace::saveXmlAttributes(ostream &s,uintb offset) const
 /// \param s is the stream being written to
 /// \param offset is the offset within the address space to encode
 /// \param size is the size of the memory location being encoded
-void JoinSpace::saveXmlAttributes(ostream &s,uintb offset,int4 size) const
+void JoinSpace::saveXmlAttributes(std::ostream &s,uintb offset,int4 size) const
 
 {
   JoinRecord *rec = getManager()->findJoin(offset); // Record must already exist
@@ -545,11 +545,11 @@ uintb JoinSpace::restoreXmlAttributes(const Element *el,uint4 &size) const
   uint4 sizesum = 0;
   uint4 logicalsize = 0;
   for(int4 i=0;i<numAttribs;++i) {
-    string attrName = el->getAttributeName(i);
+    std::string attrName = el->getAttributeName(i);
     if (0!=attrName.compare(0,5,"piece")) {
       if (attrName == "logicalsize") {
 	istringstream s3(el->getAttributeValue(i));
-	s3.unsetf(ios::dec | ios::hex | ios::oct);
+	s3.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
 	s3 >> logicalsize;
       }
       continue;
@@ -559,24 +559,24 @@ uintb JoinSpace::restoreXmlAttributes(const Element *el,uint4 &size) const
       pieces.push_back(VarnodeData());
     VarnodeData &vdat( pieces[pos] );
 
-    string attrVal = el->getAttributeValue(i);
-    string::size_type offpos = attrVal.find(':');
-    if (offpos == string::npos) {
+    std::string attrVal = el->getAttributeValue(i);
+    std::string::size_type offpos = attrVal.find(':');
+    if (offpos == std::string::npos) {
       const Translate *trans = getTrans();
       const VarnodeData &point(trans->getRegister(attrVal));
       vdat = point;
     }
     else {
-      string::size_type szpos = attrVal.find(':',offpos+1);
-      if (szpos==string::npos)
+      std::string::size_type szpos = attrVal.find(':',offpos+1);
+      if (szpos==std::string::npos)
 	throw LowlevelError("join address piece attribute is malformed");
-      string spcname = attrVal.substr(0,offpos);
+      std::string spcname = attrVal.substr(0,offpos);
       vdat.space = getManager()->getSpaceByName(spcname);
       istringstream s1(attrVal.substr(offpos+1,szpos));
-      s1.unsetf(ios::dec | ios::hex | ios::oct);
+      s1.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
       s1 >> vdat.offset;
       istringstream s2(attrVal.substr(szpos+1));
-      s2.unsetf(ios::dec | ios::hex | ios::oct);
+      s2.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
       s2 >> vdat.size;
     }
     sizesum += vdat.size;
@@ -586,7 +586,7 @@ uintb JoinSpace::restoreXmlAttributes(const Element *el,uint4 &size) const
   return rec->getUnified().offset;
 }
 
-void JoinSpace::printRaw(ostream &s,uintb offset) const
+void JoinSpace::printRaw(std::ostream &s,uintb offset) const
 
 {
   JoinRecord *rec = getManager()->findJoin(offset);
@@ -607,7 +607,7 @@ void JoinSpace::printRaw(ostream &s,uintb offset) const
   s << '}';
 }
 
-uintb JoinSpace::read(const string &s,int4 &size) const
+uintb JoinSpace::read(const std::string &s,int4 &size) const
 
 {
   vector<VarnodeData> pieces;
@@ -615,7 +615,7 @@ uintb JoinSpace::read(const string &s,int4 &size) const
   int4 i=0;
   while(i < s.size()) {
     pieces.push_back(VarnodeData()); // Prepare to read next VarnodeData
-    string token;
+    std::string token;
     while((i<s.size())&&(s[i]!=',')) {
       token += s[i];
       i += 1;
@@ -628,7 +628,7 @@ uintb JoinSpace::read(const string &s,int4 &size) const
       char shortcut = token[0];
       AddrSpace *spc = getManager()->getSpaceByShortcut(shortcut);
       if (spc == (AddrSpace *)0)
-	throw LowlevelError("Could not parse join string");
+	throw LowlevelError("Could not parse join std::string");
 
       int4 subsize;
       pieces.back().space = spc;
@@ -642,7 +642,7 @@ uintb JoinSpace::read(const string &s,int4 &size) const
   return rec->getUnified().offset;
 }
 
-void JoinSpace::saveXml(ostream &s) const
+void JoinSpace::saveXml(std::ostream &s) const
 
 {
   throw LowlevelError("Should never save join space to XML");
@@ -670,7 +670,7 @@ AddrSpace *OverlaySpace::getBaseSpace(void) const
   return baseSpace;
 }
 
-void OverlaySpace::saveXml(ostream &s) const
+void OverlaySpace::saveXml(std::ostream &s) const
 
 {
   s << "<space_overlay";
@@ -685,10 +685,10 @@ void OverlaySpace::restoreXml(const Element *el)
 {
   name = el->getAttributeValue("name");
   istringstream s1(el->getAttributeValue("index"));
-  s1.unsetf(ios::dec | ios::hex | ios::oct);
+  s1.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
   s1 >> index;
   
-  string basename = el->getAttributeValue("base");
+  std::string basename = el->getAttributeValue("base");
   baseSpace = getManager()->getSpaceByName(basename);
   if (baseSpace == (AddrSpace *)0)
     throw LowlevelError("Base space does not exist for overlay space: "+name);
