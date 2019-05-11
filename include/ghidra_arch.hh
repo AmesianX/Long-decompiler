@@ -61,7 +61,7 @@ struct JavaError : public LowlevelError {
 ///   - Local symbol and jump-table information
 ///   - Parameter identification information
 class ArchitectureGhidra : public Architecture {
-  istream &sin;			///< Input stream for interfacing with Ghidra
+  std::istream &sin;			///< Input stream for interfacing with Ghidra
   std::ostream &sout;		///< Output stream for interfacing with Ghidra
   mutable std::string warnings;	///< Warnings accumulated by the decompiler
   std::string pspecxml;              ///< XML pspec passed from Ghidra
@@ -84,7 +84,7 @@ class ArchitectureGhidra : public Architecture {
   virtual void postSpecFile(void);
   virtual void resolveArchitecture(void);
 public:
-  ArchitectureGhidra(const std::string &pspec,const std::string &cspec,const std::string &tspec,const std::string &corespec,istream &i,std::ostream &o);
+  ArchitectureGhidra(const std::string &pspec,const std::string &cspec,const std::string &tspec,const std::string &corespec,std::istream &i,std::ostream &o);
   const std::string &getWarnings(void) const { return warnings; }	///< Get warnings produced by the last decompilation
   void clearWarnings(void) { warnings.clear(); }		///< Clear warnings
   Document *getRegister(const std::string &regname);			///< Retrieve a register description given a name
@@ -130,15 +130,15 @@ public:
   virtual void printMessage(const std::string &message) const;
 
   static void segvHandler(int4 sig);				///< Handler for a segment violation (SIGSEGV) signal
-  static int4 readToAnyBurst(istream &s);			///< Read the next message protocol marker
-  static void readStringStream(istream &s, std::string &res);		///< Receive a std::string from the client
+  static int4 readToAnyBurst(std::istream &s);			///< Read the next message protocol marker
+  static void readStringStream(std::istream &s, std::string &res);		///< Receive a std::string from the client
   static void writeStringStream(std::ostream &s,const std::string &msg);	///< Send a std::string to the client
-  static void readToResponse(istream &s);			///< Read the query response protocol marker
-  static void readResponseEnd(istream &s);			///< Read the ending query response protocol marker
-  static Document *readXMLAll(istream &s);			///< Read a whole response as an XML document
-  static Document *readXMLStream(istream &s);			///< Receive an XML document from the client
-  static uint1 *readPackedStream(istream &s);			///< Read packed p-code op information
-  static uint1 *readPackedAll(istream &s);			///< Read a whole response as packed p-code op information
+  static void readToResponse(std::istream &s);			///< Read the query response protocol marker
+  static void readResponseEnd(std::istream &s);			///< Read the ending query response protocol marker
+  static Document *readXMLAll(std::istream &s);			///< Read a whole response as an XML document
+  static Document *readXMLStream(std::istream &s);			///< Receive an XML document from the client
+  static uint1 *readPackedStream(std::istream &s);			///< Read packed p-code op information
+  static uint1 *readPackedAll(std::istream &s);			///< Read a whole response as packed p-code op information
   static void passJavaException(std::ostream &s,const std::string &tp,const std::string &msg);
 };
 

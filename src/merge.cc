@@ -20,7 +20,7 @@ namespace GhidraDec {
 /// This instance assumes the identity of the given Varnode and the defining index is
 /// cached to facilitate quick sorting.
 /// \param v is the given Varnode
-void BlockVarnode::std::set(Varnode *v)
+void BlockVarnode::set(Varnode *v)
 
 {
   vn = v;
@@ -39,14 +39,14 @@ void BlockVarnode::std::set(Varnode *v)
 /// \param blocknum is the index of the BlockBasic to search for
 /// \param std::list is the sorted std::list of BlockVarnodes
 /// \return the index of the BlockVarnode within the std::list or -1 if no Varnode in the block is found
-int4 BlockVarnode::findFront(int4 blocknum,const std::vector<BlockVarnode> &std::list)
+int4 BlockVarnode::findFront(int4 blocknum,const std::vector<BlockVarnode> &list)
 
 {
   int4 min = 0;
-  int4 max = std::list.size()-1;
+  int4 max = list.size()-1;
   while(min < max) {
     int4 cur = (min + max)/2;
-    int4 curblock = std::list[cur].getIndex();
+    int4 curblock = list[cur].getIndex();
     if (curblock >= blocknum)
       max = cur;
     else
@@ -54,7 +54,7 @@ int4 BlockVarnode::findFront(int4 blocknum,const std::vector<BlockVarnode> &std:
   }
   if (min > max)
     return -1;
-  if (std::list[min].getIndex() != blocknum)
+  if (list[min].getIndex() != blocknum)
     return -1;
   return min;
 }
@@ -326,13 +326,13 @@ void Merge::mergeByDatatype(VarnodeLocSet::const_iterator startiter,VarnodeLocSe
   }
 }
 
-/// \brief Snip off std::set of \e read p-code ops for a given Varnode
+/// \brief Snip off set of \e read p-code ops for a given Varnode
 ///
 /// The data-flow for the given Varnode is truncated by creating a COPY p-code from the Varnode
-/// into a new temporary Varnode, then replacing the Varnode reads for a specific std::set of
+/// into a new temporary Varnode, then replacing the Varnode reads for a specific set of
 /// p-code ops with the temporary.
 /// \param vn is the given Varnode
-/// \param markedop is the specific std::set of PcodeOps reading the Varnode
+/// \param markedop is the specific set of PcodeOps reading the Varnode
 void Merge::snipReads(Varnode *vn,std::list<PcodeOp *> &markedop)
 
 {
@@ -478,7 +478,7 @@ void Merge::unifyAddress(VarnodeLocSet::const_iterator startiter,VarnodeLocSet::
   }
   blocksort.resize(isectlist.size());
   for(int4 i=0;i<isectlist.size();++i)
-    blocksort[i].std::set(isectlist[i]);
+    blocksort[i].set(isectlist[i]);
   stable_sort(blocksort.begin(),blocksort.end());
 				// BEWARE, its possible that eliminate_intersect
 				// will insert new varnodes in the original range

@@ -591,7 +591,7 @@ void Varnode::printRaw(std::ostream &s) const
   int4 expect = printRawNoMarkup(s);
 
   if (expect != size)
-    s << ':' << setw(1) << size;
+    s << ':' << std::setw(1) << size;
   if ((flags&Varnode::input)!=0)
     s << "(i)";
   if (isWritten())
@@ -865,7 +865,7 @@ void VarnodeBank::destroy(Varnode *vn)
 Varnode *VarnodeBank::xref(Varnode *vn)
 
 {
-  pair<VarnodeLocSet::iterator,bool> check;
+  std::pair<VarnodeLocSet::iterator,bool> check;
   Varnode *othervn;
 
   check = loc_tree.insert( vn );

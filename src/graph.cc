@@ -27,14 +27,14 @@ static void print_varnode_vertex(Varnode *vn,std::ostream &s)
   AddrSpace *spc = vn->getSpace();
   if (spc->getType() == IPTR_FSPEC) return;
   if (spc->getType() == IPTR_IOP) return;
-  s << stddec << 'v' << vn->getCreateIndex() << ' ' << spc->getName();
+  s << std::dec << 'v' << vn->getCreateIndex() << ' ' << spc->getName();
   s << " var ";
 
   vn->printRawNoMarkup(s);
 
   op = vn->getDef();
   if (op != (PcodeOp *)0)
-    s << ' ' << stddec << op->getAddr().getOffset();
+    s << ' ' << std::dec << op->getAddr().getOffset();
   else if (vn->isInput())
     s << " i";
   else
@@ -46,7 +46,7 @@ static void print_varnode_vertex(Varnode *vn,std::ostream &s)
 static void print_op_vertex(PcodeOp *op,std::ostream &s)
 
 {
-  s << stddec << 'o' << op->getTime() << ' ';
+  s << std::dec << 'o' << op->getTime() << ' ';
   if (op->isBranch())
     s << "branch";
   else if (op->isCall())
@@ -60,7 +60,7 @@ static void print_op_vertex(PcodeOp *op,std::ostream &s)
     s << op->getOpName();
   else
     s << "unkop";
-  s << ' ' << stddec << op->getAddr().getOffset();
+  s << ' ' << std::dec << op->getAddr().getOffset();
   s << std::endl;
 }
 
@@ -145,7 +145,7 @@ static void print_edges(PcodeOp *op,std::ostream &s)
 
   vn = op->getOut();
   if (vn != (Varnode *)0)
-    s << stddec << 'o' << op->getTime() << " v" << vn->getCreateIndex() << " output\n";
+    s << std::dec << 'o' << op->getTime() << " v" << vn->getCreateIndex() << " output\n";
   start = 0;
   stop = op->numInput();
   switch(op->code()) {
@@ -165,7 +165,7 @@ static void print_edges(PcodeOp *op,std::ostream &s)
     vn = op->getIn(i);
     spacetype tp = vn->getSpace()->getType();
     if ((tp != IPTR_FSPEC)&&(tp != IPTR_IOP))
-      s << stddec << 'v' << vn->getCreateIndex() << " o" << op->getTime() << " input\n";
+      s << std::dec << 'v' << vn->getCreateIndex() << " o" << op->getTime() << " input\n";
   }
 }
 
@@ -297,10 +297,10 @@ void dump_dataflow_graph(Funcdata &data,std::ostream &s)
 static void print_block_vertex(FlowBlock *bl,std::ostream &s)
 
 {
-  s << ' ' << stddec << bl->sizeOut();
-  s << ' ' << stddec << bl->sizeIn();
-  s << ' ' << stddec << bl->getIndex();
-  s << ' ' << stddec << bl->getStart().getOffset();
+  s << ' ' << std::dec << bl->sizeOut();
+  s << ' ' << std::dec << bl->sizeIn();
+  s << ' ' << std::dec << bl->getIndex();
+  s << ' ' << std::dec << bl->getStart().getOffset();
   s << ' ' << bl->getStop().getOffset();
   s << std::endl;
 }
@@ -309,7 +309,7 @@ static void print_block_edge(FlowBlock *bl,std::ostream &s)
 
 {
   for(int4 i=0;i<bl->sizeIn();++i)
-    s << stddec << bl->getIn(i)->getIndex() << ' ' << bl->getIndex() << std::endl;
+    s << std::dec << bl->getIn(i)->getIndex() << ' ' << bl->getIndex() << std::endl;
 }
 
 static void dump_block_vertex(const BlockGraph &graph,std::ostream &s,bool falsenode)
@@ -354,9 +354,9 @@ static void print_dom_edge(FlowBlock *bl,std::ostream &s,bool falsenode)
   FlowBlock *dom = bl->getImmedDom();
 
   if (dom != (FlowBlock *)0)
-    s << stddec << dom->getIndex() << ' ' << bl->getIndex() << std::endl;
+    s << std::dec << dom->getIndex() << ' ' << bl->getIndex() << std::endl;
   else if (falsenode)
-    s << "-1 " << stddec << bl->getIndex() << std::endl;
+    s << "-1 " << std::dec << bl->getIndex() << std::endl;
 }
 
 static void dump_dom_edges(const BlockGraph &graph,std::ostream &s,bool falsenode)

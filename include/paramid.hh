@@ -52,7 +52,7 @@ private:
   int4 numcalls;
   void walkforward( WalkState &state, PcodeOp *ignoreop, Varnode *vn );
   void walkbackward( WalkState &state, PcodeOp *ignoreop,Varnode *vn );
-  void updaterank( ParamRank rank_in,bool best ) { rank = (best==true) ? min( rank, rank_in ) : max( rank, rank_in ); }
+  void updaterank( ParamRank rank_in,bool best ) { rank = (best==true) ? std::min( rank, rank_in ) : std::max( rank, rank_in ); }
 public:
   ParamMeasure( const Address &addr, int4 sz, Datatype *dt, ParamIDIO io_in) {
     vndata.space=addr.getSpace(); vndata.offset=addr.getOffset(); vndata.size = sz; vntype=dt; io = io_in; rank=WORSTRANK; }

@@ -266,7 +266,7 @@ void Override::printRaw(std::ostream &s,Architecture *glb) const
 /// Message are designed to be displayed in the function header comment
 /// \param messagelist will hold the generated std::list of messages
 /// \param glb is the Architecture
-void Override::generateOverrideMessages(vectorstd::string &messagelist,Architecture *glb) const
+void Override::generateOverrideMessages(std::vector<std::string> &messagelist,Architecture *glb) const
 
 {
   // Generate deadcode delay messages
@@ -349,10 +349,10 @@ void Override::saveXml(std::ostream &s,Architecture *glb) const
 void Override::restoreXml(const Element *el,Architecture *glb)
 
 {
-  const List &std::list(el->getChildren());
+  const List &list(el->getChildren());
   List::const_iterator iter;
 
-  for(iter=std::list.begin();iter!=std::list.end();++iter) {
+  for(iter=list.begin();iter!=list.end();++iter) {
     const Element *subel = *iter;
 
     if (subel->getName() == "indirectoverride") {

@@ -135,7 +135,7 @@ bool Action::checkActionBreak(void)
 int4 Action::print(std::ostream &s,int4 num,int4 depth) const
 
 {
-  s << std::setw(4) << stddec << num;
+  s << std::setw(4) << std::dec << num;
   s << (char *) (((flags&rule_repeatapply)!=0) ? " repeat " : "        ");
   s << (char) (((flags&rule_onceperfunc)!=0) ? '!' : ' ');
   s << (char) (((breakpoint&(break_start|tmpbreak_start))!=0) ? 'S' : ' ');
@@ -363,17 +363,17 @@ ActionGroup::~ActionGroup(void)
 {
   std::vector<Action *>::iterator iter;
   
-  for(iter=std::list.begin();iter!=std::list.end();++iter)
+  for(iter=list.begin();iter!=list.end();++iter)
     delete *iter;
 }
 
 /// To be used only during the construction of \b this ActionGroup. This routine
-/// adds an Action to the end of this group's std::list.
+/// adds an Action to the end of this group's list.
 /// \param ac is the Action to add
 void ActionGroup::addAction(Action *ac)
 
 {
-  std::list.push_back(ac);
+  list.push_back(ac);
 }
 
 Action *ActionGroup::clone(const ActionGroupList &grouplist) const
@@ -382,7 +382,7 @@ Action *ActionGroup::clone(const ActionGroupList &grouplist) const
   ActionGroup *res = (ActionGroup *)0;
   std::vector<Action *>::const_iterator iter;
   Action *ac;
-  for(iter=std::list.begin();iter!=std::list.end();++iter) {
+  for(iter=list.begin();iter!=list.end();++iter) {
     ac = (*iter)->clone(grouplist);
     if (ac != (Action *)0) {
       if (res == (ActionGroup *)0)
@@ -399,7 +399,7 @@ void ActionGroup::reset(Funcdata &data)
   std::vector<Action *>::iterator iter;
 
   Action::reset(data);
-  for(iter=std::list.begin();iter!=std::list.end();++iter)
+  for(iter=list.begin();iter!=list.end();++iter)
     (*iter)->reset(data);	// Reset each subrule
 }
 
@@ -409,7 +409,7 @@ void ActionGroup::resetStats(void)
   std::vector<Action *>::iterator iter;
 
   Action::resetStats();
-  for(iter=std::list.begin();iter!=std::list.end();++iter)
+  for(iter=list.begin();iter!=list.end();++iter)
     (*iter)->resetStats();
 }
 
@@ -420,7 +420,7 @@ int4 ActionGroup::print(std::ostream &s,int4 num,int4 depth) const
 
   num = Action::print(s,num,depth);
   s << std::endl;
-  for(titer=std::list.begin();titer!=std::list.end();++titer) {
+  for(titer=list.begin();titer!=list.end();++titer) {
     num = (*titer)->print(s,num,depth+1);
     if (state == titer)
       s << "  <-- ";
@@ -455,7 +455,7 @@ Action *ActionGroup::getSubAction(const std::string &specify)
   std::vector<Action *>::iterator iter;
   Action *lastaction = (Action *)0;
   int4 matchcount = 0;
-  for(iter=std::list.begin();iter!=std::list.end();++iter) {
+  for(iter=list.begin();iter!=list.end();++iter) {
     Action *testaction = (*iter)->getSubAction(remain);
     if (testaction != (Action *)0) {
       lastaction = testaction;
@@ -480,7 +480,7 @@ Rule *ActionGroup::getSubRule(const std::string &specify)
   std::vector<Action *>::iterator iter;
   Rule *lastrule = (Rule *)0;
   int4 matchcount = 0;
-  for(iter=std::list.begin();iter!=std::list.end();++iter) {
+  for(iter=list.begin();iter!=list.end();++iter) {
     Rule *testrule = (*iter)->getSubRule(remain);
     if (testrule != (Rule *)0) {
       lastrule = testrule;
@@ -497,8 +497,8 @@ int4 ActionGroup::apply(Funcdata &data)
   int4 res;
 
   if (status != status_mid)
-    state = std::list.begin();	// Initialize the derived action
-  for(;state!=std::list.end();++state) {
+    state = list.begin();	// Initialize the derived action
+  for(;state!=list.end();++state) {
     res = (*state)->perform(data);
     if (res>0) {		// A change was made
       count  += res;
@@ -520,7 +520,7 @@ Action *ActionRestartGroup::clone(const ActionGroupList &grouplist) const
   ActionGroup *res = (ActionGroup *)0;
   std::vector<Action *>::const_iterator iter;
   Action *ac;
-  for(iter=std::list.begin();iter!=std::list.end();++iter) {
+  for(iter=list.begin();iter!=list.end();++iter) {
     ac = (*iter)->clone(grouplist);
     if (ac != (Action *)0) {
       if (res == (ActionGroup *)0)
@@ -563,7 +563,7 @@ int4 ActionRestartGroup::apply(Funcdata &data)
 
     // Reset everything but ourselves
     std::vector<Action *>::iterator iter;
-    for(iter=std::list.begin();iter!=std::list.end();++iter)
+    for(iter=list.begin();iter!=list.end();++iter)
       (*iter)->reset(data);	// Reset each subrule
     status = status_start;
   }
@@ -576,7 +576,7 @@ bool ActionGroup::turnOnDebug(const std::string &nm)
   if (Action::turnOnDebug(nm))
     return true;
   std::vector<Action *>::iterator iter;
-  for(iter = std::list.begin();iter!=std::list.end();++iter)
+  for(iter = list.begin();iter!=list.end();++iter)
     if ((*iter)->turnOnDebug(nm))
       return true;
   return false;
@@ -588,7 +588,7 @@ bool ActionGroup::turnOffDebug(const std::string &nm)
   if (Action::turnOffDebug(nm))
     return true;
   std::vector<Action *>::iterator iter;
-  for(iter = std::list.begin();iter!=std::list.end();++iter)
+  for(iter = list.begin();iter!=list.end();++iter)
     if ((*iter)->turnOffDebug(nm))
       return true;
   return false;
@@ -600,12 +600,12 @@ void ActionGroup::printStatistics(std::ostream &s) const
 {
   Action::printStatistics(s);
   std::vector<Action *>::const_iterator iter;
-  for(iter = std::list.begin();iter!=std::list.end();++iter)
+  for(iter = list.begin();iter!=list.end();++iter)
     (*iter)->printStatistics(s);
 }
 
 /// \param g is the groupname to which \b this Rule belongs
-/// \param fl is the std::set of properties
+/// \param fl is the set of properties
 /// \param nm is the name of the Rule
 Rule::Rule(const std::string &g,uint4 fl,const std::string &nm)
 
@@ -735,7 +735,7 @@ void ActionPool::addRule(Rule *rl)
 
   rl->getOpList(oplist);
   for(iter=oplist.begin();iter!=oplist.end();++iter)
-    perop[*iter].push_back(rl);	// Add rule to std::list for each op it registers for
+    perop[*iter].push_back(rl);	// Add rule to list for each op it registers for
 }
 
 int4 ActionPool::print(std::ostream &s,int4 num,int4 depth) const
@@ -750,7 +750,7 @@ int4 ActionPool::print(std::ostream &s,int4 num,int4 depth) const
   depth += 1;
   for(iter=allrules.begin();iter!=allrules.end();++iter) {
     rl = *iter;
-    s << setw(4) << std::dec << num;
+    s << std::setw(4) << std::dec << num;
     s << (char) ( rl->isDisabled() ? 'D' : ' ');
     s << (char) ( ((rl->getBreakPoint()&(break_action|tmpbreak_action))!=0) ? 'A' : ' ');
     for(i=0;i<depth*5+2;++i)
@@ -1025,11 +1025,11 @@ Action *ActionDatabase::toggleAction(const std::string &grp, const std::string &
 void ActionDatabase::setGroup(const std::string &grp,const char **argv)
 
 {  ActionGroupList &curgrp( groupmap[ grp ] );
-  curgrp.std::list.clear();		// Clear out any old members
+  curgrp.list.clear();		// Clear out any old members
   for(int4 i=0;;++i) {
     if (argv[i] == (char *)0) break;
     if (argv[i][0] == '\0') break;
-    curgrp.std::list.insert( argv[i] );
+    curgrp.list.insert( argv[i] );
   }
 }
 
@@ -1053,7 +1053,7 @@ void ActionDatabase::cloneGroup(const std::string &oldname,const std::string &ne
 bool ActionDatabase::addToGroup(const std::string &grp, const std::string &basegroup)
 {
   ActionGroupList &curgrp( groupmap[ grp ] );
-  return curgrp.std::list.insert( basegroup ).second;
+  return curgrp.list.insert( basegroup ).second;
 }
 
 /// The group is removed from the grouplist of a \e root Action.
@@ -1064,7 +1064,7 @@ bool ActionDatabase::addToGroup(const std::string &grp, const std::string &baseg
 bool ActionDatabase::removeFromGroup(const std::string &grp, const std::string &basegrp)
 {
   ActionGroupList &curgrp( groupmap[ grp ] );
-  return (curgrp.std::list.erase(basegrp) > 0);
+  return (curgrp.list.erase(basegrp) > 0);
 }
 
 /// \param nm is the name of the \e root Action

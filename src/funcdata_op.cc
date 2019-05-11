@@ -1228,10 +1228,10 @@ PcodeOp *cseElimination(Funcdata &data,PcodeOp *op1,PcodeOp *op2)
 /// \brief Comparator for (hash,PcodeOp) pairs
 ///
 /// Compare by hash.
-/// \param a is the first pair
-/// \param b is the second pair
+/// \param a is the first std::pair
+/// \param b is the second std::pair
 /// \return \b true if the first comes before the second
-static bool compareCseHash(const pair<uintm,PcodeOp *> &a,const pair<uintm,PcodeOp *> &b)
+static bool compareCseHash(const std::pair<uintm,PcodeOp *> &a,const std::pair<uintm,PcodeOp *> &b)
 
 {
   return (a.first < b.first);
@@ -1246,18 +1246,18 @@ static bool compareCseHash(const pair<uintm,PcodeOp *> &a,const pair<uintm,Pcode
 /// \param data is the function being modified
 /// \param std::list is the std::list of (hash, PcodeOp) pairs
 /// \param outlist will hold Varnodes produced by duplicate calculations
-void cseEliminateList(Funcdata &data,std::vector< pair<uintm,PcodeOp *> > &std::list,std::vector<Varnode *> &outlist)
+void cseEliminateList(Funcdata &data,std::vector< std::pair<uintm,PcodeOp *> > &list,std::vector<Varnode *> &outlist)
 
 {
   PcodeOp *op1,*op2,*resop;
-  std::vector< pair<uintm,PcodeOp *> >::iterator liter1,liter2;
+  std::vector< std::pair<uintm,PcodeOp *> >::iterator liter1,liter2;
 
-  if (std::list.empty()) return;
-  stable_sort(std::list.begin(),std::list.end(),compareCseHash);
-  liter1 = std::list.begin();
-  liter2 = std::list.begin();
+  if (list.empty()) return;
+  stable_sort(list.begin(),list.end(),compareCseHash);
+  liter1 = list.begin();
+  liter2 = list.begin();
   liter2++;
-  while(liter2 != std::list.end()) {
+  while(liter2 != list.end()) {
     if ((*liter1).first == (*liter2).first) {
       op1 = (*liter1).second;
       op2 = (*liter2).second;

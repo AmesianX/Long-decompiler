@@ -33,13 +33,13 @@ namespace GhidraDec {
 /// together form a \b root Action.
 class ActionGroupList {
   friend class ActionDatabase;
-  std::set<std::string> std::list;		///< List of group names
+  std::set<std::string> list;		///< List of group names
 public:
   /// \brief Check if \b this ActionGroupList contains a given group
   ///
   /// \param nm is the given group to check for
   /// \return true if \b this contains the group
-  bool contains(const std::string &nm) const { return (std::list.find(nm)!=std::list.end()); }
+  bool contains(const std::string &nm) const { return (list.find(nm)!=list.end()); }
 };
 
 class Rule;
@@ -146,7 +146,7 @@ public:
 /// that also affect how the Actions are applied.
 class ActionGroup : public Action {
 protected:
-  std::vector<Action *> std::list;				///< List of actions to perform in the group
+  std::vector<Action *> list;				///< List of actions to perform in the group
   std::vector<Action *>::iterator state;			///< Current action being applied
 public:
   ActionGroup(uint4 f,const std::string &nm) : Action(f,nm,"") {}	///< Construct given properties and a name

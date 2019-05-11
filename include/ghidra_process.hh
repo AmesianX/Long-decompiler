@@ -42,7 +42,7 @@ protected:
   std::string name;						///< Identifier for capability and associated commands
 public:
   const std::string &getName(void) const { return name; }	///< Get the capability name
-  static int4 readCommand(istream &sin,std::ostream &out);	///< Dispatch a Ghidra command
+  static int4 readCommand(std::istream &sin,std::ostream &out);	///< Dispatch a Ghidra command
   static void shutDown(void);				///< Release all GhidraCommand resources
 };
 
@@ -71,14 +71,14 @@ public:
 /// and sendResult() will send back any accumulated warning/error messages.
 class GhidraCommand {
 protected:
-  istream &sin;				///< The input stream from the Ghidra client
+  std::istream &sin;				///< The input stream from the Ghidra client
   std::ostream &sout;			///< The output stream to the Ghidra client
   ArchitectureGhidra *ghidra;		///< The Architecture on which to perform the command
   int4 status;				///< Meta-command to system (0=wait for next command, 1=terminate process)
   virtual void loadParameters(void);	///< Read parameters directing command execution
   virtual void sendResult(void);	///< Send results of the command (if any) back to the Ghidra client
 public:
-  GhidraCommand(void) : sin(cin),sout(cout) {
+  GhidraCommand(void) : sin(std::cin),sout(std::cout) {
     ghidra = (ArchitectureGhidra *)0; 
   }					///< Construct given i/o streams
   virtual ~GhidraCommand(void) {}	///< Destructor

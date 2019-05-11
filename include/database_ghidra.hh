@@ -45,7 +45,7 @@ class ScopeGhidra : public Scope {
   Symbol *removeQuery(const Address &addr) const;		///< Process a query that missed the cache
   void processHole(const Element *el) const;			///< Process a response describing a hole
   Scope *createNewScope(const std::string &nm,Scope *par) const;	///< Create a global \e namespace Scope
-  Scope *reresolveScope(const vectorstd::string &path) const;	///< Find the Scope that will contain a result Symbol
+  Scope *reresolveScope(const std::vector<std::string> &path) const;	///< Find the Scope that will contain a result Symbol
   virtual void addRange(AddrSpace *spc,uintb first,uintb last);
   virtual void removeRange(AddrSpace *spc,uintb first,uintb last) {
     throw LowlevelError("remove_range should not be performed on ghidra scope");

@@ -87,7 +87,7 @@ std::string GhidraTranslate::getRegisterName(AddrSpace *base,uintb off,int4 size
   return res;
 }
 
-void GhidraTranslate::getUserOpNames(vectorstd::string &res) const
+void GhidraTranslate::getUserOpNames(std::vector<std::string> &res) const
 
 {
   int4 i=0;
@@ -158,12 +158,12 @@ void GhidraTranslate::restoreXml(const Element *el)
     s >> ubase;
     setUniqueBase(ubase);
   }
-  const List &std::list(el->getChildren());
+  const List &list(el->getChildren());
   List::const_iterator iter;
-  iter = std::list.begin();
+  iter = list.begin();
   restoreXmlSpaces(*iter,this);
   ++iter;
-  while(iter != std::list.end()) {
+  while(iter != list.end()) {
     const Element *subel = *iter;
     if (subel->getName() == "truncate_space") {
       TruncationTag tag;

@@ -243,7 +243,7 @@ int4 RuleSelectCse::applyOp(PcodeOp *op,Funcdata &data)
   OpCode opc = op->code();
   PcodeOp *otherop;
   uintm hash;
-  std::vector< pair<uintm,PcodeOp *> > std::list;
+  std::vector< std::pair<uintm,PcodeOp *> > list;
   std::vector<Varnode *> vlist;
   
   for(iter=vn->beginDescend();iter!=vn->endDescend();++iter) {
@@ -251,10 +251,10 @@ int4 RuleSelectCse::applyOp(PcodeOp *op,Funcdata &data)
     if (otherop->code() != opc) continue;
     hash = otherop->getCseHash();
     if (hash == 0) continue;
-    std::list.push_back(pair<uintm,PcodeOp *>(hash,otherop));
+    list.push_back(std::pair<uintm,PcodeOp *>(hash,otherop));
   }
-  if (std::list.size()<=1) return 0;
-  cseEliminateList(data,std::list,vlist);
+  if (list.size()<=1) return 0;
+  cseEliminateList(data,list,vlist);
   if (vlist.empty()) return 0;
   return 1;
 }
@@ -639,12 +639,12 @@ void RuleTermOrder::getOpList(std::vector<uint4> &oplist) const
 {
 				// FIXME:  All the commutative ops
 				// Use the TypeOp::commutative function
-  uint4 std::list[]={ CPUI_INT_EQUAL, CPUI_INT_NOTEQUAL, CPUI_INT_ADD, CPUI_INT_CARRY,
+  uint4 list[]={ CPUI_INT_EQUAL, CPUI_INT_NOTEQUAL, CPUI_INT_ADD, CPUI_INT_CARRY,
 		 CPUI_INT_SCARRY, CPUI_INT_XOR, CPUI_INT_AND, CPUI_INT_OR,
 		 CPUI_INT_MULT, CPUI_BOOL_XOR, CPUI_BOOL_AND, CPUI_BOOL_OR,
 		 CPUI_FLOAT_EQUAL, CPUI_FLOAT_NOTEQUAL, CPUI_FLOAT_ADD,
 		 CPUI_FLOAT_MULT };
-  oplist.insert(oplist.end(),std::list,std::list+16);
+  oplist.insert(oplist.end(),list,list+16);
 }
 
 int4 RuleTermOrder::applyOp(PcodeOp *op,Funcdata &data)
@@ -2229,11 +2229,11 @@ int4 RuleLessNotEqual::applyOp(PcodeOp *op,Funcdata &data)
 void RuleTrivialArith::getOpList(std::vector<uint4> &oplist) const
 
 {
-  uint4 std::list[]={ CPUI_INT_NOTEQUAL, CPUI_INT_SLESS, CPUI_INT_LESS, CPUI_BOOL_XOR, CPUI_BOOL_AND, CPUI_BOOL_OR,
+  uint4 list[]={ CPUI_INT_NOTEQUAL, CPUI_INT_SLESS, CPUI_INT_LESS, CPUI_BOOL_XOR, CPUI_BOOL_AND, CPUI_BOOL_OR,
 		 CPUI_INT_EQUAL, CPUI_INT_SLESSEQUAL, CPUI_INT_LESSEQUAL,
 		 CPUI_INT_XOR, CPUI_INT_AND, CPUI_INT_OR,
                  CPUI_FLOAT_EQUAL, CPUI_FLOAT_NOTEQUAL, CPUI_FLOAT_LESS, CPUI_FLOAT_LESSEQUAL };
-  oplist.insert(oplist.end(),std::list,std::list+16);
+  oplist.insert(oplist.end(),list,list+16);
 }
   
 int4 RuleTrivialArith::applyOp(PcodeOp *op,Funcdata &data)
@@ -2301,8 +2301,8 @@ int4 RuleTrivialArith::applyOp(PcodeOp *op,Funcdata &data)
 void RuleTrivialBool::getOpList(std::vector<uint4> &oplist) const
 
 {
-  uint4 std::list[] = { CPUI_BOOL_AND, CPUI_BOOL_OR, CPUI_BOOL_XOR };
-  oplist.insert(oplist.end(),std::list,std::list+3);
+  uint4 list[] = { CPUI_BOOL_AND, CPUI_BOOL_OR, CPUI_BOOL_XOR };
+  oplist.insert(oplist.end(),list,list+3);
 }
 
 int4 RuleTrivialBool::applyOp(PcodeOp *op,Funcdata &data)
@@ -2356,9 +2356,9 @@ int4 RuleTrivialBool::applyOp(PcodeOp *op,Funcdata &data)
 void RuleZextEliminate::getOpList(std::vector<uint4> &oplist) const
 
 {
-  uint4 std::list[] = {CPUI_INT_EQUAL, CPUI_INT_NOTEQUAL,
+  uint4 list[] = {CPUI_INT_EQUAL, CPUI_INT_NOTEQUAL,
 		  CPUI_INT_LESS,CPUI_INT_LESSEQUAL };
-  oplist.insert(oplist.end(),std::list,std::list+4);
+  oplist.insert(oplist.end(),list,list+4);
 }
 
 int4 RuleZextEliminate::applyOp(PcodeOp *op,Funcdata &data)
@@ -2482,8 +2482,8 @@ int4 RuleZextSless::applyOp(PcodeOp *op,Funcdata &data)
 void RuleBitUndistribute::getOpList(std::vector<uint4> &oplist) const
 
 {
-  uint4 std::list[]= { CPUI_INT_AND, CPUI_INT_OR, CPUI_INT_XOR };
-  oplist.insert(oplist.end(),std::list,std::list+3);
+  uint4 list[]= { CPUI_INT_AND, CPUI_INT_OR, CPUI_INT_XOR };
+  oplist.insert(oplist.end(),list,list+3);
 }
 
 int4 RuleBitUndistribute::applyOp(PcodeOp *op,Funcdata &data)
@@ -2557,8 +2557,8 @@ int4 RuleBitUndistribute::applyOp(PcodeOp *op,Funcdata &data)
 void RuleBooleanNegate::getOpList(std::vector<uint4> &oplist) const
 
 {
-  uint4 std::list[]= { CPUI_INT_NOTEQUAL, CPUI_INT_EQUAL };
-  oplist.insert(oplist.end(),std::list,std::list+2);
+  uint4 list[]= { CPUI_INT_NOTEQUAL, CPUI_INT_EQUAL };
+  oplist.insert(oplist.end(),list,list+2);
 }
 
 int4 RuleBooleanNegate::applyOp(PcodeOp *op,Funcdata &data)
@@ -2730,8 +2730,8 @@ int4 RuleBoolZext::applyOp(PcodeOp *op,Funcdata &data)
 void RuleLogic2Bool::getOpList(std::vector<uint4> &oplist) const
 
 {			      
-  uint4 std::list[]= { CPUI_INT_AND, CPUI_INT_OR, CPUI_INT_XOR };
-  oplist.insert(oplist.end(),std::list,std::list+3);
+  uint4 list[]= { CPUI_INT_AND, CPUI_INT_OR, CPUI_INT_XOR };
+  oplist.insert(oplist.end(),list,list+3);
 }
 
 int4 RuleLogic2Bool::applyOp(PcodeOp *op,Funcdata &data)
@@ -2881,7 +2881,7 @@ int4 RuleMultiCollapse::applyOp(PcodeOp *op,Funcdata &data)
       newop = copyr->getDef();
       skiplist.push_back(copyr); // We give the branch one last chance and
       copyr->setMark();
-      for(int4 i=0;i<newop->numInput();++i) // add its inputs to std::list of things to match
+      for(int4 i=0;i<newop->numInput();++i) // add its inputs to list of things to match
 	matchlist.push_back(newop->getIn(i));
     }
     else {			// A non-matching branch
@@ -3033,8 +3033,8 @@ int4 RuleSborrow::applyOp(PcodeOp *op,Funcdata &data)
 void RuleTrivialShift::getOpList(std::vector<uint4> &oplist) const
 
 {
-  uint4 std::list[] = { CPUI_INT_LEFT, CPUI_INT_RIGHT, CPUI_INT_SRIGHT };
-  oplist.insert(oplist.end(),std::list,std::list+3);
+  uint4 list[] = { CPUI_INT_LEFT, CPUI_INT_RIGHT, CPUI_INT_SRIGHT };
+  oplist.insert(oplist.end(),list,list+3);
 }
 
 int4 RuleTrivialShift::applyOp(PcodeOp *op,Funcdata &data)
@@ -3068,9 +3068,9 @@ int4 RuleTrivialShift::applyOp(PcodeOp *op,Funcdata &data)
 void RuleIdentityEl::getOpList(std::vector<uint4> &oplist) const
 
 {
-  uint4 std::list[]= { CPUI_INT_ADD, CPUI_INT_XOR, CPUI_INT_OR,
+  uint4 list[]= { CPUI_INT_ADD, CPUI_INT_XOR, CPUI_INT_OR,
 		  CPUI_BOOL_XOR, CPUI_BOOL_OR, CPUI_INT_MULT };
-  oplist.insert(oplist.end(),std::list,std::list+6);
+  oplist.insert(oplist.end(),list,list+6);
 }
 
 int4 RuleIdentityEl::applyOp(PcodeOp *op,Funcdata &data)
@@ -3488,8 +3488,8 @@ int4 RuleXorCollapse::applyOp(PcodeOp *op,Funcdata &data)
 void RuleAddMultCollapse::getOpList(std::vector<uint4> &oplist) const
 
 {
-  uint4 std::list[]= { CPUI_INT_ADD, CPUI_INT_MULT };
-  oplist.insert(oplist.end(),std::list,std::list+2);
+  uint4 list[]= { CPUI_INT_ADD, CPUI_INT_MULT };
+  oplist.insert(oplist.end(),list,list+2);
 }
 
 int4 RuleAddMultCollapse::applyOp(PcodeOp *op,Funcdata &data)
@@ -5182,8 +5182,8 @@ int4 RuleSLess2Zero::applyOp(PcodeOp *op,Funcdata &data)
 void RuleEqual2Zero::getOpList(std::vector<uint4> &oplist) const
 
 {
-  uint4 std::list[] = { CPUI_INT_EQUAL, CPUI_INT_NOTEQUAL };
-  oplist.insert(oplist.end(),std::list,std::list+2);
+  uint4 list[] = { CPUI_INT_EQUAL, CPUI_INT_NOTEQUAL };
+  oplist.insert(oplist.end(),list,list+2);
 }
 
 int4 RuleEqual2Zero::applyOp(PcodeOp *op,Funcdata &data)
@@ -5252,8 +5252,8 @@ int4 RuleEqual2Zero::applyOp(PcodeOp *op,Funcdata &data)
 void RuleEqual2Constant::getOpList(std::vector<uint4> &oplist) const
 
 {
-  uint4 std::list[] = { CPUI_INT_EQUAL, CPUI_INT_NOTEQUAL };
-  oplist.insert(oplist.end(),std::list,std::list+2);
+  uint4 list[] = { CPUI_INT_EQUAL, CPUI_INT_NOTEQUAL };
+  oplist.insert(oplist.end(),list,list+2);
 }
 
 int4 RuleEqual2Constant::applyOp(PcodeOp *op,Funcdata &data)
@@ -5642,8 +5642,8 @@ int4 RulePtrArith::applyOp(PcodeOp *op,Funcdata &data)
 void RuleStructOffset0::getOpList(std::vector<uint4> &oplist) const
 
 {
-  uint4 std::list[]={ CPUI_LOAD, CPUI_STORE };
-  oplist.insert(oplist.end(),std::list,std::list+2);
+  uint4 list[]={ CPUI_LOAD, CPUI_STORE };
+  oplist.insert(oplist.end(),list,list+2);
 }
   
 int4 RuleStructOffset0::applyOp(PcodeOp *op,Funcdata &data)

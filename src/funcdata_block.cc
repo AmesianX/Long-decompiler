@@ -332,7 +332,7 @@ void Funcdata::removeDoNothingBlock(BlockBasic *bb)
 bool Funcdata::removeUnreachableBlocks(bool issuewarning,bool checkexistence)
 
 {
-  std::vector<FlowBlock *> std::list;
+  std::vector<FlowBlock *> list;
   uint4 i;
 
   if (checkexistence) { // Quick check for the existence of unreachable blocks
@@ -350,13 +350,13 @@ bool Funcdata::removeUnreachableBlocks(bool issuewarning,bool checkexistence)
 
   for(i=0;i<bblocks.getSize();++i) // Find entry point
     if (bblocks.getBlock(i)->isEntryPoint()) break;
-  bblocks.collectReachable(std::list,bblocks.getBlock(i),true); // Collect (un)reachable blocks
+  bblocks.collectReachable(list,bblocks.getBlock(i),true); // Collect (un)reachable blocks
 
-  for(int4 i=0;i<std::list.size();++i) {
-    std::list[i]->setDead();
+  for(int4 i=0;i<list.size();++i) {
+    list[i]->setDead();
     if (issuewarning) {
       std::ostringstream s;
-      BlockBasic *bb = (BlockBasic *)std::list[i];
+      BlockBasic *bb = (BlockBasic *)list[i];
       s << "Removing unreachable block (";
       s << bb->getStart().getSpace()->getName();
       s << ',';
@@ -365,13 +365,13 @@ bool Funcdata::removeUnreachableBlocks(bool issuewarning,bool checkexistence)
       warningHeader(s.str());
     }
   }
-  for(int4 i=0;i<std::list.size();++i) {
-    BlockBasic *bb = (BlockBasic *)std::list[i];
+  for(int4 i=0;i<list.size();++i) {
+    BlockBasic *bb = (BlockBasic *)list[i];
     while(bb->sizeOut() > 0)
       branchRemoveInternal(bb,0);
   }
-  for(int4 i=0;i<std::list.size();++i) {
-    BlockBasic *bb = (BlockBasic *)std::list[i];
+  for(int4 i=0;i<list.size();++i) {
+    BlockBasic *bb = (BlockBasic *)list[i];
     blockRemoveInternal(bb,true);
   }
   structureReset();

@@ -402,9 +402,9 @@ void Symbol::restoreXml(const Element *el)
 
 {
   restoreXmlHeader(el);
-  const List &std::list(el->getChildren());
+  const List &list(el->getChildren());
 
-  restoreXmlBody(std::list.begin());
+  restoreXmlBody(list.begin());
 }
 
 void FunctionSymbol::buildType(int4 size)
@@ -528,9 +528,9 @@ void EquateSymbol::restoreXml(const Element *el)
 
 {
   restoreXmlHeader(el);
-  const List &std::list(el->getChildren());
+  const List &list(el->getChildren());
 
-  const Element *subel = *std::list.begin();
+  const Element *subel = *list.begin();
   std::istringstream s(subel->getContent());
   s.unsetf(std::ios::dec|std::ios::dec|std::ios::oct);
   s >> value;
@@ -623,10 +623,10 @@ void ExternRefSymbol::restoreXml(const Element *el)
     if (el->getAttributeName(i) == "name") // Unless we see it explicitly
       name = el->getAttributeValue(i);
   }
-  const List &std::list(el->getChildren());
+  const List &list(el->getChildren());
   List::const_iterator iter;
 
-  iter = std::list.begin();
+  iter = list.begin();
   refaddr = Address::restoreXml(*iter,scope->getArch());
   buildNameType();
 }
@@ -635,11 +635,11 @@ void ExternRefSymbol::restoreXml(const Element *el)
 /// \return a reference to the (advanced) iterator
 MapIterator &MapIterator::operator++(void) {
   ++curiter;
-  while((curmap!=std::map->end())&&(curiter==(*curmap)->end_list())) {
+  while((curmap!=map->end())&&(curiter==(*curmap)->end_list())) {
     do {
       ++curmap;
-    } while((curmap!=std::map->end())&&((*curmap)==(EntryMap *)0));
-    if (curmap!=std::map->end())
+    } while((curmap!=map->end())&&((*curmap)==(EntryMap *)0));
+    if (curmap!=map->end())
       curiter = (*curmap)->begin_list();
   }
   return *this;
@@ -651,11 +651,11 @@ MapIterator &MapIterator::operator++(void) {
 MapIterator MapIterator::operator++(int4 i) {
   MapIterator tmp(*this);
   ++curiter;
-  while((curmap!=std::map->end())&&(curiter==(*curmap)->end_list())) {
+  while((curmap!=map->end())&&(curiter==(*curmap)->end_list())) {
     do {
       ++curmap;
-    } while((curmap!=std::map->end())&&((*curmap)==(EntryMap *)0));
-    if (curmap!=std::map->end())
+    } while((curmap!=map->end())&&((*curmap)==(EntryMap *)0));
+    if (curmap!=map->end())
       curiter = (*curmap)->begin_list();
   }
   return tmp;
@@ -681,8 +681,8 @@ void Scope::attachScope(Scope *child)
 
 {
   child->parent = this;
-  pair<const ScopeKey,Scope *> value(ScopeKey(child->name,child->dedupId),child);
-  pair<ScopeMap::iterator,bool> res;
+  std::pair<const ScopeKey,Scope *> value(ScopeKey(child->name,child->dedupId),child);
+  std::pair<ScopeMap::iterator,bool> res;
   if (child->name.size()==0)
     throw LowlevelError("Non-global scope has empty name");
   res = children.insert(value);
@@ -992,9 +992,9 @@ Scope::~Scope(void)
 /// Starting from \b this Scope, look for a Symbol with the given name.
 /// If there are no Symbols in \b this Scope, recurse into the parent Scope.
 /// If there are 1 (or more) Symbols matching in \b this Scope, add them to
-/// the result std::list
+/// the result list
 /// \param name is the name to search for
-/// \param res is the result std::list
+/// \param res is the result list
 void Scope::queryByName(const std::string &name,std::vector<Symbol *> &res) const
 
 {
@@ -1481,12 +1481,12 @@ void ScopeInternal::addSymbolInternal(Symbol *sym)
     if (sym->category >= 0) {
       while(category.size() <= sym->category)
 	category.push_back(std::vector<Symbol *>());
-      std::vector<Symbol *> &std::list(category[sym->category]);
+      std::vector<Symbol *> &list(category[sym->category]);
       if (sym->category > 0)
-	sym->catindex = std::list.size();
-      while(std::list.size() <= sym->catindex)
-	std::list.push_back((Symbol *)0);
-      std::list[sym->catindex] = sym;
+	sym->catindex = list.size();
+      while(list.size() <= sym->catindex)
+	list.push_back((Symbol *)0);
+      list[sym->catindex] = sym;
     }
   } catch(LowlevelError &err) {
     delete sym;			// Symbol must be deleted to avoid orphaning its memory
@@ -1640,11 +1640,11 @@ void ScopeInternal::categorySanity(void)
       }
     }
     if (nullsymbol) {		// Clear entire category
-      std::vector<Symbol *> std::list;
+      std::vector<Symbol *> list;
       for(int4 j=0;j<num;++j)
-	std::list.push_back(category[i][j]);
-      for(int4 j=0;j<std::list.size();++j) {
-	Symbol *sym = std::list[j];
+	list.push_back(category[i][j]);
+      for(int4 j=0;j<list.size();++j) {
+	Symbol *sym = list[j];
 	if (sym == (Symbol *)0) continue;
 	setCategory(sym,-1,0);	// Set symbol to have no category
       }
@@ -1743,10 +1743,10 @@ void ScopeInternal::removeSymbol(Symbol *symbol)
   std::vector<std::list<SymbolEntry>::iterator>::iterator iter;
 
   if (symbol->category >= 0) {
-    std::vector<Symbol *> &std::list(category[symbol->category]);
-    std::list[symbol->catindex] = (Symbol *)0;
-    while((!std::list.empty())&&(std::list.back() == (Symbol *)0))
-      std::list.pop_back();
+    std::vector<Symbol *> &list(category[symbol->category]);
+    list[symbol->catindex] = (Symbol *)0;
+    while((!list.empty())&&(list.back() == (Symbol *)0))
+      list.pop_back();
   }
 
   // Remove each mapping of the symbol
@@ -1830,7 +1830,7 @@ SymbolEntry *ScopeInternal::findAddr(const Address &addr,const Address &usepoint
 {
   EntryMap *rangemap = maptable[ addr.getSpace()->getIndex() ];
   if (rangemap != (EntryMap *)0) {
-    pair<EntryMap::const_iterator,EntryMap::const_iterator> res;
+    std::pair<EntryMap::const_iterator,EntryMap::const_iterator> res;
     if (usepoint.isInvalid())
       res = rangemap->find(addr.getOffset(),
 			   EntryMap::subsorttype(false),
@@ -1857,7 +1857,7 @@ SymbolEntry *ScopeInternal::findContainer(const Address &addr,int4 size,
   SymbolEntry *bestentry = (SymbolEntry *)0;
   EntryMap *rangemap = maptable[ addr.getSpace()->getIndex() ];
   if (rangemap != (EntryMap *)0) {
-    pair<EntryMap::const_iterator,EntryMap::const_iterator> res;
+    std::pair<EntryMap::const_iterator,EntryMap::const_iterator> res;
     if (usepoint.isInvalid())
       res = rangemap->find(addr.getOffset(),
 			   EntryMap::subsorttype(false),
@@ -1891,7 +1891,7 @@ SymbolEntry *ScopeInternal::findClosestFit(const Address &addr,int4 size,
   SymbolEntry *bestentry = (SymbolEntry *)0;
   EntryMap *rangemap = maptable[ addr.getSpace()->getIndex() ];
   if (rangemap != (EntryMap *)0) {
-    pair<EntryMap::const_iterator,EntryMap::const_iterator> res;
+    std::pair<EntryMap::const_iterator,EntryMap::const_iterator> res;
     if (usepoint.isInvalid())
       res = rangemap->find(addr.getOffset(),
 			   EntryMap::subsorttype(false),
@@ -1928,7 +1928,7 @@ Funcdata *ScopeInternal::findFunction(const Address &addr) const
   FunctionSymbol *sym;
   EntryMap *rangemap = maptable[ addr.getSpace()->getIndex() ];
   if (rangemap != (EntryMap *)0) {
-    pair<EntryMap::const_iterator,EntryMap::const_iterator> res;
+    std::pair<EntryMap::const_iterator,EntryMap::const_iterator> res;
     res = rangemap->find(addr.getOffset());
     while(res.first != res.second) {
       SymbolEntry *entry = &(*res.first);
@@ -1949,7 +1949,7 @@ ExternRefSymbol *ScopeInternal::findExternalRef(const Address &addr) const
   ExternRefSymbol *sym = (ExternRefSymbol *)0;
   EntryMap *rangemap = maptable[ addr.getSpace()->getIndex() ];
   if (rangemap != (EntryMap *)0) {
-    pair<EntryMap::const_iterator,EntryMap::const_iterator> res;
+    std::pair<EntryMap::const_iterator,EntryMap::const_iterator> res;
     res = rangemap->find(addr.getOffset());
     while(res.first != res.second) {
       SymbolEntry *entry = &(*res.first);
@@ -1975,7 +1975,7 @@ LabSymbol *ScopeInternal::findCodeLabel(const Address &addr) const
   LabSymbol *sym = (LabSymbol *)0;
   EntryMap *rangemap = maptable[ addr.getSpace()->getIndex() ];
   if (rangemap != (EntryMap *)0) {
-    pair<EntryMap::const_iterator,EntryMap::const_iterator> res;
+    std::pair<EntryMap::const_iterator,EntryMap::const_iterator> res;
     res = rangemap->find(addr.getOffset(),
 			 EntryMap::subsorttype(false),
 			 EntryMap::subsorttype(addr));
@@ -2059,7 +2059,7 @@ std::string ScopeInternal::buildVariableName(const Address &addr,
       unaffname = glb->translate->getRegisterName(addr.getSpace(),addr.getOffset(),sz);
       if (unaffname.empty()) {
 	s << "unaff_";
-	s << setw(8) << setfill('0') << std::dec << addr.getOffset();
+	s << std::setw(8) << std::setfill('0') << std::dec << addr.getOffset();
       }
       else
 	s << "unaff_" << unaffname;
@@ -2076,7 +2076,7 @@ std::string ScopeInternal::buildVariableName(const Address &addr,
       spacename = addr.getSpace()->getName();
       spacename[0] = toupper( spacename[0] ); // Capitalize space
       s << spacename;
-      s << std::dec << setfill('0') << setw(2*addr.getAddrSize());
+      s << std::dec << std::setfill('0') << std::setw(2*addr.getAddrSize());
       s << AddrSpace::byteToAddress( addr.getOffset(), addr.getSpace()->getWordSize() );
     }
   }
@@ -2085,7 +2085,7 @@ std::string ScopeInternal::buildVariableName(const Address &addr,
     regname = glb->translate->getRegisterName(addr.getSpace(),addr.getOffset(),sz);
     if (regname.empty()) {
       s << "in_" << addr.getSpace()->getName() << '_';
-      s << setw(8) << setfill('0') << std::dec << addr.getOffset();
+      s << std::setw(8) << std::setfill('0') << std::dec << addr.getOffset();
     }
     else
       s << "in_" << regname;
@@ -2101,7 +2101,7 @@ std::string ScopeInternal::buildVariableName(const Address &addr,
     std::string spacename = addr.getSpace()->getName();
     spacename[0] = toupper( spacename[0] ); // Capitalize space
     s << spacename;
-    s << std::dec << setfill('0') << setw(2*addr.getAddrSize());
+    s << std::dec << std::setfill('0') << std::setw(2*addr.getAddrSize());
     s << AddrSpace::byteToAddress(addr.getOffset(),addr.getSpace()->getWordSize());
   }
   else if ((flags & Varnode::indirect_creation)!=0) {
@@ -2158,7 +2158,7 @@ std::string ScopeInternal::buildUndefinedName(void) const
 	throw LowlevelError("Error creating undefined name");
       uniq += 1;
       std::ostringstream s2;
-      s2 << "$$undef" << std::dec << setw(8) << setfill('0') << uniq;
+      s2 << "$$undef" << std::dec << std::setw(8) << std::setfill('0') << uniq;
       return s2.str();
     }
   }
@@ -2216,11 +2216,11 @@ std::string ScopeInternal::makeNameUnique(const std::string &nm) const
   else {
     uniqid += 1;
     std::ostringstream s;
-    s << nm << '_' << std::dec << setfill('0');
+    s << nm << '_' << std::dec << std::setfill('0');
     if (uniqid < 100)
-      s << setw(2) << uniqid;
+      s << std::setw(2) << uniqid;
     else
-      s << 'x' << setw(5) << uniqid;
+      s << 'x' << std::setw(5) << uniqid;
     resString = s.str();
   }
   if (findFirstByName(resString) != nametree.end())
@@ -2248,10 +2248,10 @@ void ScopeInternal::savePathXml(std::ostream &s,const std::vector<std::string> &
 void ScopeInternal::restorePathXml(std::vector<std::string> &vec,const Element *el)
 
 {
-  const List &std::list(el->getChildren());
+  const List &list(el->getChildren());
   List::const_iterator iter;
 
-  for(iter=std::list.begin();iter!=std::list.end();++iter)
+  for(iter=list.begin();iter!=list.end();++iter)
     vec.push_back( (*iter)->getContent() );
 }
 
@@ -2332,7 +2332,7 @@ void ScopeInternal::insertNameTree(Symbol *sym)
 
 {
   sym->nameDedup = 0;
-  pair<SymbolNameTree::iterator,bool> nameres;
+  std::pair<SymbolNameTree::iterator,bool> nameres;
   nameres = nametree.insert(sym);
   if (!nameres.second) {
     sym->nameDedup = 0xffffffff;
@@ -2366,11 +2366,11 @@ void ScopeInternal::restoreXml(const Element *el)
 //  name = el->getAttributeValue("name");	// Name must already be std::set in the constructor
   bool rangeequalssymbols = false;
 
-  const List &std::list(el->getChildren());
+  const List &list(el->getChildren());
   List::const_iterator iter;
   const Element *subel;
 
-  iter = std::list.begin();
+  iter = list.begin();
   ++iter;			// Skip <parent>, processed elsewhere
   subel = *iter;
   if (subel->getName() == "rangelist") {
@@ -2383,7 +2383,7 @@ void ScopeInternal::restoreXml(const Element *el)
     rangeequalssymbols = true;
     ++iter;
   }
-  if (iter != std::list.end()) {
+  if (iter != list.end()) {
     const List &symlist((*iter)->getChildren());
     List::const_iterator iter2;
     iter2 = symlist.begin();
@@ -2443,10 +2443,10 @@ void ScopeInternal::setCategory(Symbol *sym,int4 cat,int4 ind)
 
 {
   if (sym->category >= 0) {
-    std::vector<Symbol *> &std::list(category[sym->category]);
-    std::list[sym->catindex] = (Symbol *)0;
-    while((!std::list.empty())&&(std::list.back() == (Symbol *)0))
-      std::list.pop_back();
+    std::vector<Symbol *> &list(category[sym->category]);
+    list[sym->catindex] = (Symbol *)0;
+    while((!list.empty())&&(list.back() == (Symbol *)0))
+      list.pop_back();
   }
 
   sym->category = cat;
@@ -2454,10 +2454,10 @@ void ScopeInternal::setCategory(Symbol *sym,int4 cat,int4 ind)
   if (cat < 0) return;
   while(category.size() <= sym->category)
     category.push_back(std::vector<Symbol *>());
-  std::vector<Symbol *> &std::list(category[sym->category]);
-  while(std::list.size() <= sym->catindex)
-    std::list.push_back((Symbol *)0);
-  std::list[sym->catindex] = sym;
+  std::vector<Symbol *> &list(category[sym->category]);
+  while(list.size() <= sym->catindex)
+    list.push_back((Symbol *)0);
+  list[sym->catindex] = sym;
 }
 
 /// Check to make sure the Scope is a \e namespace then remove all
@@ -2473,7 +2473,7 @@ void Database::clearResolve(Scope *scope)
 
   for(iter=scope->rangetree.begin();iter!=scope->rangetree.end();++iter) {
     const Range &rng(*iter);
-    pair<ScopeResolve::const_iterator,ScopeResolve::const_iterator> res;
+    std::pair<ScopeResolve::const_iterator,ScopeResolve::const_iterator> res;
     res = resolvemap.find(rng.getFirstAddr());
     while(res.first != res.second) {
       if ((*res.first).scope == scope) {
@@ -2700,7 +2700,7 @@ const Scope *Database::mapScope(const Scope *qpoint,const Address &addr,
 				const Address &usepoint) const
 {  if (resolvemap.empty())	// If there are no namespace scopes
     return qpoint;		// Start querying from scope placing query
-  pair<ScopeResolve::const_iterator,ScopeResolve::const_iterator> res;
+  std::pair<ScopeResolve::const_iterator,ScopeResolve::const_iterator> res;
   res = resolvemap.find(addr);
   if (res.first != res.second)
     return (*res.first).getScope();
@@ -2718,7 +2718,7 @@ Scope *Database::mapScope(Scope *qpoint,const Address &addr,
 {
   if (resolvemap.empty())	// If there are no namespace scopes
     return qpoint;		// Start querying from scope placing query
-  pair<ScopeResolve::const_iterator,ScopeResolve::const_iterator> res;
+  std::pair<ScopeResolve::const_iterator,ScopeResolve::const_iterator> res;
   res = resolvemap.find(addr);
   if (res.first != res.second)
     return (*res.first).getScope();
@@ -2813,11 +2813,11 @@ void Database::parseParentTag(const Element *el,std::string &name,std::vector<st
 void Database::restoreXml(const Element *el)
 
 {
-  const List &std::list(el->getChildren());
+  const List &list(el->getChildren());
   List::const_iterator iter;
 
-  iter = std::list.begin();		// Restore readonly, volatile properties
-  while(iter != std::list.end()) {
+  iter = list.begin();		// Restore readonly, volatile properties
+  while(iter != list.end()) {
     const Element *subel = *iter;
     if (subel->getName() != "property_changepoint")
       break;
@@ -2830,7 +2830,7 @@ void Database::restoreXml(const Element *el)
     flagbase.split(addr) = val;
   }
 
-  for(;iter!=std::list.end();++iter) {
+  for(;iter!=list.end();++iter) {
     const Element *subel = *iter;
     Scope *new_scope;
     std::string name;

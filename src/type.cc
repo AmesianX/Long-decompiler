@@ -42,12 +42,12 @@ void print_data(std::ostream &s,uint1 *buffer,int4 size,const Address &baseaddr)
   start = addr & ~((uintb)0xf);
 
   while(start < endaddr) {
-    s << setfill('0') << setw(8) << std::dec << start << ": ";
+    s << std::setfill('0') << std::setw(8) << std::dec << start << ": ";
     for(i=0;i<16;++i) {
       if ((start+i < addr)||(start+i>=endaddr))
 	s << "   ";
       else
-	s << setfill('0') << setw(2) << std::dec << (uint4) buffer[start+i-addr] << ' ';
+	s << std::setfill('0') << std::setw(2) << std::dec << (uint4) buffer[start+i-addr] << ' ';
       
     }
     s << "  ";
@@ -603,12 +603,12 @@ void TypeEnum::setNameMap(const std::map<uintb,std::string> &nmap)
 }
 
 /// Given a specific value of the enumeration, calculate the named representation of that value.
-/// The representation is returned as a std::list of names that must logically ORed and possibly complemented.
+/// The representation is returned as a list of names that must logically ORed and possibly complemented.
 /// If no representation is possible, no names will be returned.
 /// \param val is the value to find the representation for
-/// \param valnames will hold the returned std::list of names
+/// \param valnames will hold the returned list of names
 /// \return true if the representation needs to be complemented
-bool TypeEnum::getMatches(uintb val,vectorstd::string &valnames) const
+bool TypeEnum::getMatches(uintb val,std::vector<std::string> &valnames) const
 
 {
   std::map<uintb,std::string>::const_iterator iter;
@@ -694,11 +694,11 @@ void TypeEnum::restoreXml(const Element *el,TypeFactory &typegrp)
 
 {
   restoreXmlBasic(el);
-  const List &std::list(el->getChildren());
+  const List &list(el->getChildren());
   List::const_iterator iter;
   std::map<uintb,std::string> nmap;
 
-  for(iter=std::list.begin();iter!=std::list.end();++iter) {
+  for(iter=list.begin();iter!=list.end();++iter) {
     uintb val;
     Element *subel = *iter;
     std::istringstream is(subel->getAttributeValue("value"));
@@ -718,9 +718,9 @@ TypeStruct::TypeStruct(const TypeStruct &op)
   size = op.size;		// setFields might have changed the size
 }
 
-/// Copy a std::list of fields into this structure, establishing its size.
+/// Copy a list of fields into this structure, establishing its size.
 /// Should only be called once when constructing the type
-/// \param fd is the std::list of fields to copy in
+/// \param fd is the list of fields to copy in
 void TypeStruct::setFields(const std::vector<TypeField> &fd)
 
 {
@@ -739,7 +739,7 @@ void TypeStruct::setFields(const std::vector<TypeField> &fd)
 /// Find the proper subfield given an offset. Return the index of that field
 /// or -1 if the offset is not inside a field.
 /// \param off is the offset into the structure
-/// \return the index into the field std::list or -1
+/// \return the index into the field list or -1
 int4 TypeStruct::getFieldIter(int4 off) const
 
 {				// Find subfield of given offset
@@ -885,10 +885,10 @@ void TypeStruct::restoreXml(const Element *el,TypeFactory &typegrp)
 
 {
   restoreXmlBasic(el);
-  const List &std::list(el->getChildren());
+  const List &list(el->getChildren());
   List::const_iterator iter;
   int4 maxoffset = 0;
-  for(iter=std::list.begin();iter!=std::list.end();++iter) {
+  for(iter=list.begin();iter!=list.end();++iter) {
     field.push_back( TypeField() );
     field.back().name = (*iter)->getAttributeValue("name");
     std::istringstream j((*iter)->getAttributeValue("offset"));
@@ -911,10 +911,10 @@ void TypeStruct::restoreXml(const Element *el,TypeFactory &typegrp)
 /// Turn on the data-type's function prototype
 /// \param model is the prototype model
 /// \param outtype is the return type of the prototype
-/// \param intypes is the std::list of input parameters
+/// \param intypes is the list of input parameters
 /// \param dotdotdot is true if the prototype takes variable arguments
 /// \param voidtype is the reference "void" data-type
-void TypeCode::std::set(ProtoModel *model,
+void TypeCode::set(ProtoModel *model,
 		    Datatype *outtype,const std::vector<Datatype *> &intypes,
 		    bool dotdotdot,Datatype *voidtype)
 {
@@ -923,7 +923,7 @@ void TypeCode::std::set(ProtoModel *model,
   proto = new FuncProto();
   proto->setInternal(model,voidtype);
   std::vector<Datatype *> typelist;
-  vectorstd::string blanknames(intypes.size()+1);
+  std::vector<std::string> blanknames(intypes.size()+1);
   if (outtype == (Datatype *)0)
     typelist.push_back(voidtype);
   else
@@ -1098,10 +1098,10 @@ void TypeCode::restoreXml(const Element *el,TypeFactory &typegrp)
     delete proto;
     proto = (FuncProto *)0;
   }
-  const List &std::list(el->getChildren());
+  const List &list(el->getChildren());
   List::const_iterator iter;
-  iter = std::list.begin();
-  if (iter == std::list.end()) return; // No underlying prototype
+  iter = list.begin();
+  if (iter == list.end()) return; // No underlying prototype
   Architecture *glb = typegrp.getArch();
   proto = new FuncProto();
   proto->setInternal( glb->defaultfp, typegrp.getTypeVoid() );
@@ -1188,8 +1188,8 @@ void TypeSpacebase::restoreXml(const Element *el,TypeFactory &typegrp)
 {
   restoreXmlBasic(el);
   spaceid = glb->getSpaceByName(el->getAttributeValue("space"));
-  const List &std::list(el->getChildren());
-  localframe = Address::restoreXml(std::list.front(),typegrp.getArch());
+  const List &list(el->getChildren());
+  localframe = Address::restoreXml(list.front(),typegrp.getArch());
 }
 
 
@@ -1266,7 +1266,7 @@ void TypeFactory::setCoreType(const std::string &name,int4 size,
   ct->flags |= Datatype::coretype;
 }
 
-/// Run through the std::list of "core" data-types and cache the most commonly
+/// Run through the list of "core" data-types and cache the most commonly
 /// accessed ones for quick access (avoiding the tree lookup).
 /// The "core" data-types must have been previously initialized.
 void TypeFactory::cacheCoreTypes(void)
@@ -1438,7 +1438,7 @@ Datatype *TypeFactory::findAdd(Datatype &ct)
   }
 
   newtype = ct.clone();		// Add the new type to trees
-  pair<DatatypeSet::iterator,bool> insres = tree.insert(newtype);
+  std::pair<DatatypeSet::iterator,bool> insres = tree.insert(newtype);
   if (!insres.second) {
     std::ostringstream s;
     s << "Shared type id: " << std::dec << newtype->getId() << std::endl;
@@ -1474,7 +1474,7 @@ Datatype *TypeFactory::setName(Datatype *ct,const std::string &n)
 
 /// Make sure all the offsets are fully established then std::set fields of the structure
 /// If -fixedsize- is greater than 0, force the final structure to have that size
-/// \param fd is the std::list of fields to std::set
+/// \param fd is the list of fields to std::set
 /// \param ot is the TypeStruct object to modify
 /// \param fixedsize is 0 or the forced size of the structure
 /// \return true if modification was successful
@@ -1533,15 +1533,15 @@ bool TypeFactory::setFields(std::vector<TypeField> &fd,TypeStruct *ot,int4 fixed
   return true;
 }
 
-/// Set the std::list of enumeration values and identifiers for a TypeEnum
+/// Set the list of enumeration values and identifiers for a TypeEnum
 /// Fill in any values for any names that weren't explicitly assigned
 /// and check for duplicates.
-/// \param namelist is the std::list of names in the enumeration
-/// \param vallist is the corresponding std::list of values assigned to names in namelist
+/// \param namelist is the list of names in the enumeration
+/// \param vallist is the corresponding list of values assigned to names in namelist
 /// \param assignlist is true if the corresponding name in namelist has an assigned value
 /// \param te is the enumeration object to modify
 /// \return true if the modification is successful (no duplicate names)
-bool TypeFactory::setEnumValues(const vectorstd::string &namelist,
+bool TypeFactory::setEnumValues(const std::vector<std::string> &namelist,
 				const std::vector<uintb> &vallist,
 				const std::vector<bool> &assignlist,
 				TypeEnum *te)
@@ -1582,15 +1582,15 @@ bool TypeFactory::setEnumValues(const vectorstd::string &namelist,
 }
 
 /// Recursively write out all the components of a data-type in dependency order
-/// Component data-types will come before the data-type containing them in the std::list.
-/// \param deporder holds the ordered std::list of data-types to construct
+/// Component data-types will come before the data-type containing them in the list.
+/// \param deporder holds the ordered list of data-types to construct
 /// \param mark is a "marking" container to prevent cycles
 /// \param ct is the data-type to have written out
 void TypeFactory::orderRecurse(std::vector<Datatype *> &deporder,DatatypeSet &mark,
 			       Datatype *ct) const
 
 {				// Make sure dependants of ct are in order, then add ct
-  pair<DatatypeSet::iterator,bool> res = mark.insert(ct);
+  std::pair<DatatypeSet::iterator,bool> res = mark.insert(ct);
   if (!res.second) return;	// Already inserted before
   int4 size = ct->numDepend();
   for(int4 i=0;i<size;++i)
@@ -1601,7 +1601,7 @@ void TypeFactory::orderRecurse(std::vector<Datatype *> &deporder,DatatypeSet &ma
 /// Place data-types in an order such that if the
 /// definition of data-type "a" depends on the definition of
 /// data-type "b", then "b" occurs earlier in the order
-/// \param deporder will hold the generated dependency std::list of data-types
+/// \param deporder will hold the generated dependency list of data-types
 void TypeFactory::dependentOrder(std::vector<Datatype *> &deporder) const
 
 {
@@ -1852,7 +1852,7 @@ TypeCode *TypeFactory::getTypeCode(ProtoModel *model,Datatype *outtype,
 				   bool dotdotdot)
 {
   TypeCode tc("");		// getFuncdata type with no name
-  tc.std::set(model,outtype,intypes,dotdotdot,getTypeVoid());
+  tc.set(model,outtype,intypes,dotdotdot,getTypeVoid());
   return (TypeCode *) findAdd(tc);
 }
 
@@ -1939,9 +1939,9 @@ Datatype *TypeFactory::restoreXmlTypeWithCodeFlags(const Element *el,bool hasThi
       s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
       s >> tp.wordsize;
     }
-  const List &std::list(el->getChildren());
+  const List &list(el->getChildren());
   List::const_iterator iter;
-  iter = std::list.begin();
+  iter = list.begin();
   const Element *subel = *iter;
   if (subel->getAttributeValue("metatype") != "code")
     throw LowlevelError("Special type restoreXml does not see code");
@@ -2150,7 +2150,7 @@ Datatype *TypeFactory::restoreXmlTypeNoRef(const Element *el,bool forcecore)
 void TypeFactory::restoreXml(const Element *el)
 
 {
-  const List &std::list(el->getChildren());
+  const List &list(el->getChildren());
   List::const_iterator iter;
   std::string metastring;
 
@@ -2167,7 +2167,7 @@ void TypeFactory::restoreXml(const Element *el)
     enumtype = TYPE_INT;
   else
     enumtype = TYPE_UINT;
-  for(iter=std::list.begin();iter!=std::list.end();++iter)
+  for(iter=list.begin();iter!=list.end();++iter)
     restoreXmlTypeNoRef(*iter,false);
 }
 
@@ -2180,10 +2180,10 @@ void TypeFactory::restoreXmlCoreTypes(const Element *el)
 {
   clear();			// Make sure this routine flushes
 
-  const List &std::list(el->getChildren());
+  const List &list(el->getChildren());
   List::const_iterator iter;
 
-  for(iter=std::list.begin();iter!=std::list.end();++iter)
+  for(iter=list.begin();iter!=list.end();++iter)
     restoreXmlTypeNoRef(*iter,true);
   cacheCoreTypes();
 }
@@ -2195,10 +2195,10 @@ void TypeFactory::restoreXmlCoreTypes(const Element *el)
 void TypeFactory::parseDataOrganization(const Element *el)
 
 {
-  const List &std::list(el->getChildren());
+  const List &list(el->getChildren());
   List::const_iterator iter;
 
-  for(iter=std::list.begin();iter!=std::list.end();++iter) {
+  for(iter=list.begin();iter!=list.end();++iter) {
     const Element *subel = *iter;
     if (subel->getName() == "integer_size") {
       std::istringstream i(subel->getAttributeValue("value"));

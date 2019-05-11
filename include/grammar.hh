@@ -52,8 +52,8 @@ private:
   int4 lineno;			// Line number containing this token
   int4 colno;			// Column where this token starts
   int4 filenum;			// Which file were we in
-  void std::set(uint4 tp);
-  void std::set(uint4 tp,char *ptr,int4 len);
+  void set(uint4 tp);
+  void set(uint4 tp,char *ptr,int4 len);
   void setPosition(int4 file,int4 line,int4 col) { filenum=file; lineno=line; colno=col; }
 public:
   GrammarToken(void);
@@ -67,14 +67,14 @@ public:
 
 class GrammarLexer {
   std::map<int4,std::string> filenamemap;	// All files ever seen
-  std::map<int4,istream *> streammap;
+  std::map<int4,std::istream *> streammap;
   std::vector<int4> filestack;	// Stack of current files
   int4 buffersize;		// maximum characters in buffer
   char *buffer;			// Current line being processed
   int4 bufstart;		// Next character to process
   int4 bufend;			// Next open position in buffer
   int4 curlineno;
-  istream *in;			// Current stream
+  std::istream *in;			// Current stream
   bool endoffile;
   uint4 state;			// State of parser
   std::string error;
@@ -103,8 +103,8 @@ public:
   GrammarLexer(int4 maxbuffer);
   ~GrammarLexer(void);
   void clear(void);
-  istream *getCurStream(void) { return in; }
-  void pushFile(const std::string &filename,istream *i);
+  std::istream *getCurStream(void) { return in; }
+  void pushFile(const std::string &filename,std::istream *i);
   void popFile(void);
   void getNextToken(GrammarToken &token);
   void writeLocation(std::ostream &s,int4 line,int4 filenum);
@@ -154,7 +154,7 @@ class FunctionModifier : public TypeModifier {
 public:
   FunctionModifier(const std::vector<TypeDeclarator *> *p,bool dtdtdt);
   void getInTypes(std::vector<Datatype *> &intypes,Architecture *glb) const;
-  void getInNames(vectorstd::string &innames) const;
+  void getInNames(std::vector<std::string> &innames) const;
   bool isDotdotdot(void) const { return dotdotdot; }
   virtual uint4 getType(void) const { return function_mod; }
   virtual bool isValid(void) const;
@@ -244,18 +244,18 @@ public:
   std::vector<TypeDeclarator *> *mergeSpecDecVec(TypeSpecifiers *spec);
   std::vector<TypeDeclarator *> *mergeSpecDecVec(TypeSpecifiers *spec,std::vector<TypeDeclarator *> *declist);
   TypeDeclarator *mergeSpecDec(TypeSpecifiers *spec);
-  TypeDeclarator *mergeSpecDec(TypeSpecifiers *spec,TypeDeclarator *std::dec);
+  TypeDeclarator *mergeSpecDec(TypeSpecifiers *spec,TypeDeclarator *dec);
   TypeSpecifiers *addSpecifier(TypeSpecifiers *spec,std::string *str);
   TypeSpecifiers *addTypeSpecifier(TypeSpecifiers *spec,Datatype *tp);
   TypeSpecifiers *addFuncSpecifier(TypeSpecifiers *spec,std::string *str);
-  TypeDeclarator *mergePointer(std::vector<uint4> *ptr,TypeDeclarator *std::dec);
+  TypeDeclarator *mergePointer(std::vector<uint4> *ptr,TypeDeclarator *dec);
   TypeDeclarator *newDeclarator(std::string *str);
   TypeDeclarator *newDeclarator(void);
   TypeSpecifiers *newSpecifier(void);
   std::vector<TypeDeclarator *> *newVecDeclarator(void);
   std::vector<uint4> *newPointer(void);
-  TypeDeclarator *newArray(TypeDeclarator *std::dec,uint4 flags,uintb *num);
-  TypeDeclarator *newFunc(TypeDeclarator *std::dec,std::vector<TypeDeclarator *> *declist);
+  TypeDeclarator *newArray(TypeDeclarator *dec,uint4 flags,uintb *num);
+  TypeDeclarator *newFunc(TypeDeclarator *dec,std::vector<TypeDeclarator *> *declist);
   Datatype *newStruct(const std::string &ident,std::vector<TypeDeclarator *> *declist);
   Datatype *oldStruct(const std::string &ident);
   Datatype *newUnion(const std::string &ident,std::vector<TypeDeclarator *> *declist);
@@ -271,23 +271,23 @@ public:
   int4 lex(void);
 
   bool parseFile(const std::string &filename,uint4 doctype);
-  bool parseStream(istream &s,uint4 doctype);
+  bool parseStream(std::istream &s,uint4 doctype);
 
   const std::string &getError(void) const { return lasterror; }
   void setResultDeclarations(std::vector<TypeDeclarator *> *val) { lastdecls = val; }
   std::vector<TypeDeclarator *> *getResultDeclarations(void) { return lastdecls; }
 };
 
-extern Datatype *parse_type(istream &s,std::string &name,Architecture *glb);
-extern void parse_protopieces(PrototypePieces &pieces,istream &s,Architecture *glb);
-extern void parse_C(Architecture *glb,istream &s);
+extern Datatype *parse_type(std::istream &s,std::string &name,Architecture *glb);
+extern void parse_protopieces(PrototypePieces &pieces,std::istream &s,Architecture *glb);
+extern void parse_C(Architecture *glb,std::istream &s);
 
 // Routines to parse interface commands
 
-extern void parse_toseparator(istream &s,std::string &name);
-extern Address parse_machaddr(istream &s,int4 &defaultsize,const TypeFactory &typegrp,bool ignorecolon=false);
-extern Address parse_varnode(istream &s,int4 &size,Address &pc,uintm &uq,const TypeFactory &typegrp);
-extern Address parse_op(istream &s,uintm &uq,const TypeFactory &typegrp);
+extern void parse_toseparator(std::istream &s,std::string &name);
+extern Address parse_machaddr(std::istream &s,int4 &defaultsize,const TypeFactory &typegrp,bool ignorecolon=false);
+extern Address parse_varnode(std::istream &s,int4 &size,Address &pc,uintm &uq,const TypeFactory &typegrp);
+extern Address parse_op(std::istream &s,uintm &uq,const TypeFactory &typegrp);
 
 }
 #endif

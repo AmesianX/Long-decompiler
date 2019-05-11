@@ -62,7 +62,7 @@ void ArchitectureGhidra::segvHandler(int4 sig)
 /// Ghidra cannot interrupt either of its responses.
 /// \param s is the input stream from the client
 /// \return the command code
-int4 ArchitectureGhidra::readToAnyBurst(istream &s)
+int4 ArchitectureGhidra::readToAnyBurst(std::istream &s)
 
 {
   int4 c;
@@ -92,7 +92,7 @@ int4 ArchitectureGhidra::readToAnyBurst(istream &s)
 /// or an exception is thrown.
 /// \param s is the input stream from the client
 /// \param res will hold the std::string
-void ArchitectureGhidra::readStringStream(istream &s,std::string &res)
+void ArchitectureGhidra::readStringStream(std::istream &s,std::string &res)
 
 {
   int4 c;
@@ -120,7 +120,7 @@ void ArchitectureGhidra::readStringStream(istream &s,std::string &res)
 /// otherwise it throws and exception.  The std::string is read in and then parsed as XML.
 /// \param s is the input stream from the client.
 /// \return the XML document
-Document *ArchitectureGhidra::readXMLStream(istream &s)
+Document *ArchitectureGhidra::readXMLStream(std::istream &s)
 
 {
   int4 type = readToAnyBurst(s);
@@ -142,7 +142,7 @@ Document *ArchitectureGhidra::readXMLStream(istream &s)
 /// rest of the std::string.
 /// \param s is the input stream from the client
 /// \return the array of packed p-code data
-uint1 *ArchitectureGhidra::readPackedStream(istream &s)
+uint1 *ArchitectureGhidra::readPackedStream(std::istream &s)
 
 {
   int4 type = readToAnyBurst(s);
@@ -182,7 +182,7 @@ void ArchitectureGhidra::writeStringStream(std::ostream &s,const std::string &ms
 /// Consume the query response header. If it indicates an exception,
 /// read details of the exception and throw JavaError.
 /// \param s is the input stream from the client
-void ArchitectureGhidra::readToResponse(istream &s)
+void ArchitectureGhidra::readToResponse(std::istream &s)
 
 {
   int4 type = readToAnyBurst(s);
@@ -200,7 +200,7 @@ void ArchitectureGhidra::readToResponse(istream &s)
 /// Read the next protocol marker. If it does not indicate the end of
 /// a query response, throw an exception
 /// \param s is the input stream from the client
-void ArchitectureGhidra::readResponseEnd(istream &s)
+void ArchitectureGhidra::readResponseEnd(std::istream &s)
 
 {
   int4 type = readToAnyBurst(s);
@@ -212,7 +212,7 @@ void ArchitectureGhidra::readResponseEnd(istream &s)
 /// exception record, otherwise read in a std::string as an XML document.
 /// \param s is the input stream from the client
 /// \return the XML document
-Document *ArchitectureGhidra::readXMLAll(istream &s)
+Document *ArchitectureGhidra::readXMLAll(std::istream &s)
 
 {
   readToResponse(s);
@@ -226,7 +226,7 @@ Document *ArchitectureGhidra::readXMLAll(istream &s)
 /// exception record, otherwise read in packed p-code op data.
 /// \param s is the input stream from the client
 /// \return the array of packed p-coded data
-uint1 *ArchitectureGhidra::readPackedAll(istream &s)
+uint1 *ArchitectureGhidra::readPackedAll(std::istream &s)
 
 {
   readToResponse(s);
@@ -714,7 +714,7 @@ void ArchitectureGhidra::printMessage(const std::string &message) const
 /// \param i is the input stream from the Ghidra client
 /// \param o is the output stream to the Ghidra client
 ArchitectureGhidra::ArchitectureGhidra(const std::string &pspec,const std::string &cspec,const std::string &tspec,
-				       const std::string &corespec,istream &i,std::ostream &o)
+				       const std::string &corespec,std::istream &i,std::ostream &o)
   : Architecture(), sin(i), sout(o)
 
 {

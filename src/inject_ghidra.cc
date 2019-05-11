@@ -63,9 +63,9 @@ void InjectPayloadGhidra::inject(InjectContext &con,PcodeEmit &emit) const
     throw LowlevelError("Could not retrieve pcode snippet: "+name);
   }
   const Element *el = doc->getRoot();
-  const List &std::list(el->getChildren());
+  const List &list(el->getChildren());
   List::const_iterator iter;
-  for(iter=std::list.begin();iter!=std::list.end();++iter)
+  for(iter=list.begin();iter!=list.end();++iter)
     emit.restoreXmlOp(*iter,ghidra->translate);
   delete doc;
 }
@@ -95,11 +95,11 @@ InjectCallotherGhidra::InjectCallotherGhidra(const std::string &src,const std::s
 void InjectCallotherGhidra::restoreXml(const Element *el)
 
 {
-  const List &std::list(el->getChildren());
+  const List &list(el->getChildren());
   List::const_iterator iter;
   name = el->getAttributeValue("targetop");
-  iter = std::list.begin();
-  if ((iter == std::list.end()) || ((*iter)->getName() != "pcode"))
+  iter = list.begin();
+  if ((iter == list.end()) || ((*iter)->getName() != "pcode"))
     throw LowlevelError("<callotherfixup> does not contain a <pcode> tag");
   InjectPayload::restoreXml(*iter);
 }
@@ -127,9 +127,9 @@ void ExecutablePcodeGhidra::inject(InjectContext &con,PcodeEmit &emit) const
     throw LowlevelError("Could not retrieve pcode snippet: "+name);
   }
   const Element *el = doc->getRoot();
-  const List &std::list(el->getChildren());
+  const List &list(el->getChildren());
   List::const_iterator iter;
-  for(iter=std::list.begin();iter!=std::list.end();++iter)
+  for(iter=list.begin();iter!=list.end();++iter)
     emit.restoreXmlOp(*iter,ghidra->translate);
   delete doc;
 }
@@ -215,7 +215,7 @@ int4 PcodeInjectLibraryGhidra::manualCallFixup(const std::string &name,const std
 }
 
 int4 PcodeInjectLibraryGhidra::manualCallOtherFixup(const std::string &name,const std::string &outname,
-						    const vectorstd::string &inname,const std::string &snippet)
+						    const std::vector<std::string> &inname,const std::string &snippet)
 {
   return 0;	 // We don't have to do anything
 }

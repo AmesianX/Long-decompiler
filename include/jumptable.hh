@@ -61,9 +61,9 @@ class PathMeld {
   int4 meldOps(const std::vector<PcodeOp *> &path,int4 cutOff,const std::vector<int4> &parentMap);
   void truncatePaths(int4 cutPoint);
 public:
-  void std::set(const PathMeld &op2);
-  void std::set(const std::vector<PcodeOp *> &path,const std::vector<int4> &slot);
-  void std::set(PcodeOp *op,Varnode *vn);
+  void set(const PathMeld &op2);
+  void set(const std::vector<PcodeOp *> &path,const std::vector<int4> &slot);
+  void set(PcodeOp *op,Varnode *vn);
   void append(const PathMeld &op2);
   void clear(void);
   void meld(std::vector<PcodeOp *> &path,std::vector<int4> &slot);

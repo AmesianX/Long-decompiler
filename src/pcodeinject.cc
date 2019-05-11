@@ -76,9 +76,9 @@ void InjectPayload::restoreXml(const Element *el)
     else if (elname == "dynamic")
       dynamic = xml_readbool(el->getAttributeValue(i));
   }
-  const List &std::list(el->getChildren());
+  const List &list(el->getChildren());
   List::const_iterator iter;
-  for(iter=std::list.begin();iter!=std::list.end();++iter) {
+  for(iter=list.begin();iter!=list.end();++iter) {
     const Element *subel = *iter;
     if (subel->getName() == "input") {
       std::string paramName;
@@ -186,8 +186,8 @@ PcodeInjectLibrary::~PcodeInjectLibrary(void)
 void PcodeInjectLibrary::registerCallFixup(const std::string &fixupName,int4 injectid/* , vectorstd::string targets */)
 
 {
-  pair<std::map<std::string,int4>::iterator,bool> check;
-  check = callFixupMap.insert( pair<std::string,int4>(fixupName,injectid) );
+  std::pair<std::map<std::string,int4>::iterator,bool> check;
+  check = callFixupMap.insert( std::pair<std::string,int4>(fixupName,injectid) );
   if (!check.second)		// This symbol is already mapped
     throw LowlevelError("Duplicate <callfixup>: "+fixupName);
   while(callFixupNames.size() <= injectid)
@@ -202,8 +202,8 @@ void PcodeInjectLibrary::registerCallFixup(const std::string &fixupName,int4 inj
 void PcodeInjectLibrary::registerCallOtherFixup(const std::string &fixupName,int4 injectid)
 
 {
-  pair<std::map<std::string,int4>::iterator,bool> check;
-  check = callOtherFixupMap.insert( pair<std::string,int4>(fixupName,injectid) );
+  std::pair<std::map<std::string,int4>::iterator,bool> check;
+  check = callOtherFixupMap.insert( std::pair<std::string,int4>(fixupName,injectid) );
   if (!check.second)		// This symbol is already mapped
     throw LowlevelError("Duplicate <callotherfixup>: "+fixupName);
   while(callOtherTarget.size() <= injectid)
@@ -218,8 +218,8 @@ void PcodeInjectLibrary::registerCallOtherFixup(const std::string &fixupName,int
 void PcodeInjectLibrary::registerCallMechanism(const std::string &fixupName,int4 injectid)
 
 {
-  pair<std::map<std::string,int4>::iterator,bool> check;
-  check = callMechFixupMap.insert( pair<std::string,int4>(fixupName,injectid) );
+  std::pair<std::map<std::string,int4>::iterator,bool> check;
+  check = callMechFixupMap.insert( std::pair<std::string,int4>(fixupName,injectid) );
   if (!check.second)		// This symbol is already mapped
     throw LowlevelError("Duplicate <callmechanism>: "+fixupName);
   while(callMechTarget.size() <= injectid)
@@ -234,8 +234,8 @@ void PcodeInjectLibrary::registerCallMechanism(const std::string &fixupName,int4
 void PcodeInjectLibrary::registerExeScript(const std::string &scriptName,int4 injectid)
 
 {
-  pair<std::map<std::string,int4>::iterator,bool> check;
-  check = scriptMap.insert( pair<std::string,int4>(scriptName,injectid) );
+  std::pair<std::map<std::string,int4>::iterator,bool> check;
+  check = scriptMap.insert( std::pair<std::string,int4>(scriptName,injectid) );
   if (!check.second)		// This symbol is already mapped
     throw LowlevelError("Duplicate <script>: "+scriptName);
   while(scriptNames.size() <= injectid)

@@ -267,7 +267,7 @@ public:
 /// with its own input and output blocks.
 /// All the code structuring elements (BlockList, BlockIf, BlockWhileDo, etc.) derive from this.
 class BlockGraph : public FlowBlock {
-  std::vector<FlowBlock *> std::list;     	///< List of FlowBlock components within \b this super-block
+  std::vector<FlowBlock *> list;     	///< List of FlowBlock components within \b this super-block
   void addBlock(FlowBlock *bl);		///< Add a component FlowBlock
   void forceOutputNum(int4 i);		///< Force number of outputs
   void selfIdentify(void);		///< Inherit our edges from the edges of our components
@@ -283,11 +283,11 @@ protected:
 public:
   void clear(void);					///< Clear all component FlowBlock objects
   virtual ~BlockGraph(void) { clear(); }		///< Destructor
-  const std::vector<FlowBlock *> &getList(void) const { return std::list; }	///< Get the std::list of component FlowBlock objects
-  int4 getSize(void) const { return std::list.size(); }	///< Get the number of components
-  FlowBlock *getBlock(int4 i) const { return std::list[i]; }	///< Get the i-th component
+  const std::vector<FlowBlock *> &getList(void) const { return list; }	///< Get the std::list of component FlowBlock objects
+  int4 getSize(void) const { return list.size(); }	///< Get the number of components
+  FlowBlock *getBlock(int4 i) const { return list[i]; }	///< Get the i-th component
   virtual block_type getType(void) const { return t_graph; }
-  virtual FlowBlock *subBlock(int4 i) const { return std::list[i]; }
+  virtual FlowBlock *subBlock(int4 i) const { return list[i]; }
   virtual void markUnstructured(void);
   virtual void markLabelBumpUp(bool bump);
   virtual void scopeBreak(int4 curexit,int4 curloopexit);
@@ -329,7 +329,7 @@ public:
   BlockSwitch *newBlockSwitch(const std::vector<FlowBlock *> &cs);			///< Build a new BlockSwitch
 
   void orderBlocks(void) {	///< Sort blocks using the final ordering
-    if (std::list.size()!=1) sort(std::list.begin(),std::list.end(),compareFinalOrder); }
+    if (list.size()!=1) sort(list.begin(),list.end(),compareFinalOrder); }
   void buildCopy(const BlockGraph &graph);					///< Build a copy of a BlockGraph
   void clearVisitCount(void);							///< Clear the visit count in all node FlowBlocks
   void calcForwardDominator(const std::vector<FlowBlock *> &rootlist);		///< Calculate forward dominators
@@ -686,7 +686,7 @@ class BlockMap {
   const AddrSpaceManager *manage;	///< Address space manager used to restore FlowBlock address ranges
   std::vector<FlowBlock *> sortlist;		///< The std::list of deserialized FlowBlock objects
   FlowBlock *resolveBlock(FlowBlock::block_type bt);	///< Construct a FlowBlock of the given type
-  static FlowBlock *findBlock(const std::vector<FlowBlock *> &std::list,int4 ind);	///< Locate a FlowBlock with a given index
+  static FlowBlock *findBlock(const std::vector<FlowBlock *> &list,int4 ind);	///< Locate a FlowBlock with a given index
 public:
   BlockMap(const AddrSpaceManager *m) { manage = m; }	///< Construct given an address space manager
   BlockMap(const BlockMap &op2);			///< Copy constructor

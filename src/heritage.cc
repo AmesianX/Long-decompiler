@@ -57,7 +57,7 @@ LocationMap::iterator LocationMap::add(Address addr,int4 size,int4 pass,int4 &in
       intersect = 1;
     themap.erase(iter++);
   }
-  iter = themap.insert(pair<Address,SizePass>( addr, SizePass() )).first;
+  iter = themap.insert(std::pair<Address,SizePass>( addr, SizePass() )).first;
   (*iter).second.size = size;
   (*iter).second.pass = pass;
   return iter;
@@ -1306,7 +1306,7 @@ void Heritage::buildADT(void)
   std::vector<int4> b(size,0);
   std::vector<int4> t(size,0);
   std::vector<int4> z(size);
-  std::vector<FlowBlock *> upstart,upend;	// Up edges (node pair)
+  std::vector<FlowBlock *> upstart,upend;	// Up edges (node std::pair)
   FlowBlock *x,*u,*v;
   int4 i,j,k,l;
 

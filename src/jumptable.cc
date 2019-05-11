@@ -38,8 +38,8 @@ void LoadTable::restoreXml(const Element *el,Architecture *glb)
   std::istringstream s2(el->getAttributeValue("num"));	
   s2.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
   s2 >> num;
-  const List &std::list( el->getChildren() );
-  List::const_iterator iter = std::list.begin();
+  const List &list( el->getChildren() );
+  List::const_iterator iter = list.begin();
   addr = Address::restoreXml( *iter, glb);
 }
 
@@ -472,7 +472,7 @@ void JumpBasic::findDeterminingVarnodes(PcodeOp *op,int4 slot)
     if (isprune(curvn)) {	// Here is a node of the tree
       if (ispoint(curvn)) {	// Is it a possible switch variable
 	if (!firstpoint) {	// If it is the first possible
-	  pathMeld.std::set(path,slotpath);	// Take the current path as the result
+	  pathMeld.set(path,slotpath);	// Take the current path as the result
 	  firstpoint = true;
 	}
 	else			// If we have already seen at least one possible
@@ -495,7 +495,7 @@ void JumpBasic::findDeterminingVarnodes(PcodeOp *op,int4 slot)
   if (pathMeld.empty()) {	// Never found a likely point, which means that
 				// it looks like the address is uniquely determined
 				// but the constants/readonlys haven't been collapsed
-    pathMeld.std::set(op,op->getIn(slot));
+    pathMeld.set(op,op->getIn(slot));
   }
 }
 
@@ -770,14 +770,14 @@ void PathMeld::truncatePaths(int4 cutPoint)
   commonVn.resize(cutPoint);			// Since intersection is ordered, just resize to cutPoint
 }
 
-void PathMeld::std::set(const PathMeld &op2)
+void PathMeld::set(const PathMeld &op2)
 
 {
   commonVn = op2.commonVn;
   opMeld = op2.opMeld;
 }
 
-void PathMeld::std::set(const std::vector<PcodeOp *> &path,const std::vector<int4> &slot)
+void PathMeld::set(const std::vector<PcodeOp *> &path,const std::vector<int4> &slot)
 
 {
   for(int4 i=0;i<path.size();++i) {
@@ -788,9 +788,9 @@ void PathMeld::std::set(const std::vector<PcodeOp *> &path,const std::vector<int
   }
 }
 
-void PathMeld::std::set(PcodeOp *op,Varnode *vn)
+void PathMeld::set(PcodeOp *op,Varnode *vn)
 
-{ // std::set a single varnode and op as the path
+{ // set a single varnode and op as the path
   commonVn.push_back(vn);
   opMeld.push_back(RootedOp(op,0));
 }
@@ -1320,7 +1320,7 @@ void JumpBasic2::initializeStart(const PathMeld &pathMeld)
     return;
   }
   extravn = pathMeld.getVarnode(pathMeld.numCommonVarnode()-1);
-  origPathMeld.std::set(pathMeld);
+  origPathMeld.set(pathMeld);
 }
 
 bool JumpBasic2::recoverModel(Funcdata *fd,PcodeOp *indop,uint4 matchsize,uint4 maxtablesize)
@@ -1692,9 +1692,9 @@ void JumpBasicOverride::saveXml(std::ostream &s) const
 void JumpBasicOverride::restoreXml(const Element *el,Architecture *glb)
 
 {
-  const List &std::list( el->getChildren() );
-  List::const_iterator iter = std::list.begin();
-  while(iter != std::list.end()) {
+  const List &list( el->getChildren() );
+  List::const_iterator iter = list.begin();
+  while(iter != list.end()) {
     const Element *subel = *iter;
     ++iter;
     if (subel->getName() == "dest") {
@@ -2282,12 +2282,12 @@ void JumpTable::saveXml(std::ostream &s) const
 void JumpTable::restoreXml(const Element *el)
 
 {
-  const List &std::list( el->getChildren() );
-  List::const_iterator iter = std::list.begin();
+  const List &list( el->getChildren() );
+  List::const_iterator iter = list.begin();
   opaddress = Address::restoreXml( *iter, glb);
   bool missedlabel = false;
   ++iter;
-  while(iter != std::list.end()) {
+  while(iter != list.end()) {
     const Element *subel = *iter;
     if (subel->getName() == "dest") {
       addresstable.push_back( Address::restoreXml( subel, glb) );

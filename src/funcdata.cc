@@ -510,9 +510,9 @@ void Funcdata::printLocalRange(std::ostream &s) const
 void Funcdata::restoreXmlJumpTable(const Element *el)
 
 {
-  const List &std::list( el->getChildren() );
+  const List &list( el->getChildren() );
   List::const_iterator iter;
-  for(iter=std::list.begin();iter!=std::list.end();++iter) {
+  for(iter=list.begin();iter!=list.end();++iter) {
     JumpTable *jt = new JumpTable(glb);
     jt->restoreXml(*iter);
     jumpvec.push_back(jt);
@@ -716,11 +716,11 @@ void Funcdata::restoreXml(const Element *el)
     throw LowlevelError("Missing function name");
   if (size == -1)
     throw LowlevelError("Missing function size");
-  const List &std::list( el->getChildren() );
-  List::const_iterator iter = std::list.begin();
+  const List &list( el->getChildren() );
+  List::const_iterator iter = list.begin();
   baseaddr = Address::restoreXml( *iter, glb );
   ++iter;
-  for(;iter!=std::list.end();++iter) {
+  for(;iter!=list.end();++iter) {
     if ((*iter)->getName() == "localdb") {
       if (localmap != (ScopeLocal *)0)
 	throw LowlevelError("Pre-existing local scope when restoring: "+name);

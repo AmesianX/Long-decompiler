@@ -87,7 +87,7 @@ class PcodeInjectLibraryGhidra : public PcodeInjectLibrary {
 public:
   PcodeInjectLibraryGhidra(ArchitectureGhidra *ghi);		///< Constructor
   virtual int4 manualCallFixup(const std::string &name,const std::string &snippet);
-  virtual int4 manualCallOtherFixup(const std::string &name,const std::string &outname,const vectorstd::string &inname,
+  virtual int4 manualCallOtherFixup(const std::string &name,const std::string &outname,const std::vector<std::string> &inname,
 				    const std::string &snippet);
   virtual InjectContext &getCachedContext(void) { return contextCache; }
   virtual const std::vector<OpBehavior *> &getBehaviors(void);

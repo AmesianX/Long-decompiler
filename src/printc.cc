@@ -1010,7 +1010,7 @@ void PrintC::push_integer(uintb val,int4 sz,bool sign,
   else if (displayFormat == Symbol::force_dec)
     t << std::dec << val;
   else if (displayFormat == Symbol::force_oct)
-    t << oct << '0' << val;
+    t << std::oct << '0' << val;
   else if (displayFormat == Symbol::force_char) {
     int4 internalSize = 4;
     if (val < 256)
@@ -1127,13 +1127,13 @@ void PrintC::printUnicode(std::ostream &s,int4 onechar) const
     }
     // Generic unicode escape
     if (onechar < 256) {
-      s << "\\x" << setfill('0') << setw(2) << std::dec << onechar;
+      s << "\\x" << std::setfill('0') << std::setw(2) << std::dec << onechar;
     }
     else if (onechar < 65536) {
-      s << "\\x" << setfill('0') << setw(4) << std::dec << onechar;
+      s << "\\x" << std::setfill('0') << std::setw(4) << std::dec << onechar;
     }
     else
-      s << "\\x" << setfill('0') << setw(8) << std::dec << onechar;
+      s << "\\x" << std::setfill('0') << std::setw(8) << std::dec << onechar;
     return;
   }
   writeUtf8(s, onechar);		// emit normally
@@ -2296,10 +2296,10 @@ void PrintC::emitBlockBasic(const BlockBasic *bb)
 void PrintC::emitBlockGraph(const BlockGraph *bl)
 
 {
-  const std::vector<FlowBlock *> &std::list(bl->getList());
+  const std::vector<FlowBlock *> &list(bl->getList());
   std::vector<FlowBlock *>::const_iterator iter;
 
-  for(iter=std::list.begin();iter!=std::list.end();++iter) {
+  for(iter=list.begin();iter!=list.end();++iter) {
     int4 id = emit->beginBlock(*iter);
     (*iter)->emit(this);
     emit->endBlock(id);

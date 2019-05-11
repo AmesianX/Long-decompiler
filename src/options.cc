@@ -96,7 +96,7 @@ OptionDatabase::~OptionDatabase(void)
 /// \param p2 is the second optional parameter
 /// \param p3 is the third optional parameter
 /// \return the confirmation/failure method after trying to apply the option
-std::string OptionDatabase::std::set(const std::string &nm,const std::string &p1,const std::string &p2,const std::string &p3)
+std::string OptionDatabase::set(const std::string &nm,const std::string &p1,const std::string &p2,const std::string &p3)
 
 {
   std::map<std::string,ArchOption *>::const_iterator iter;
@@ -113,29 +113,29 @@ void OptionDatabase::parseOne(const Element *el)
 
 {
   const std::string &optname( el->getName() );
-  const List &std::list(el->getChildren());
+  const List &list(el->getChildren());
   List::const_iterator iter;
   
   std::string p1,p2,p3;
 
-  iter = std::list.begin();
-  if (iter != std::list.end()) {
+  iter = list.begin();
+  if (iter != list.end()) {
     p1 = (*iter)->getContent();
     ++iter;
-    if (iter != std::list.end()) {
+    if (iter != list.end()) {
       p2 = (*iter)->getContent();
       ++iter;
-      if (iter != std::list.end()) {
+      if (iter != list.end()) {
 	p3 = (*iter)->getContent();
 	++iter;
-	if (iter != std::list.end())
+	if (iter != list.end())
 	  throw LowlevelError("Too many parameters to option: "+optname);
       }
     }
   }
   else
     p1 = el->getContent();	// If no children, content is param 1
-  std::set(optname,p1,p2,p3);
+  set(optname,p1,p2,p3);
 }
 
 /// Parse the \<optionslist> tag, treating each sub-tag as an \e option \e command.
@@ -143,10 +143,10 @@ void OptionDatabase::parseOne(const Element *el)
 void OptionDatabase::restoreXml(const Element *el)
 
 {
-  const List &std::list(el->getChildren());
+  const List &list(el->getChildren());
   List::const_iterator iter;
 
-  for(iter=std::list.begin();iter!=std::list.end();++iter)
+  for(iter=list.begin();iter!=list.end();++iter)
     parseOne(*iter);
 }
 
@@ -170,7 +170,7 @@ std::string OptionExtraPop::apply(Architecture *glb,const std::string &p1,const 
     expop = ProtoModel::extrapop_unknown;
   else {
     std::istringstream s1(p1);
-    s1.unsetf(std::ios::stddec | std::ios::dec | std::ios::oct); // Let user specify base
+    s1.unsetf(std::ios::dec | std::ios::dec | std::ios::oct); // Let user specify base
     s1 >> expop;
   }
   if (expop == -300)
@@ -181,7 +181,7 @@ std::string OptionExtraPop::apply(Architecture *glb,const std::string &p1,const 
     if (fd == (Funcdata *)0)
       throw RecovError("Unknown function name: "+p2);
     fd->getFuncProto().setExtraPop(expop);
-    res = "ExtraPop std::set for function "+p2;
+    res = "ExtraPop set for function "+p2;
   }
   else {
     glb->defaultfp->setExtraPop(expop);
@@ -189,7 +189,7 @@ std::string OptionExtraPop::apply(Architecture *glb,const std::string &p1,const 
       glb->evalfp_current->setExtraPop(expop);
     if (glb->evalfp_called != (ProtoModel *)0)
       glb->evalfp_called->setExtraPop(expop);
-    res = "Global extrapop std::set";
+    res = "Global extrapop set";
   }
   return res;
 }
@@ -203,7 +203,7 @@ std::string OptionReadOnly::apply(Architecture *glb,const std::string &p1,const 
 
 {
   if (p1.size()==0)
-    throw ParseError("Read-only option must be std::set \"on\" or \"off\"");
+    throw ParseError("Read-only option must be set \"on\" or \"off\"");
   glb->readonlypropagate = onOrOff(p1);
   if (glb->readonlypropagate)
     return "Read-only memory locations now propagate as constants";
@@ -237,7 +237,7 @@ std::string OptionInferConstPtr::apply(Architecture *glb,const std::string &p1,c
     glb->infer_pointers = true;
   }
   else {
-    res = "Constant pointers must now be std::set explicitly";
+    res = "Constant pointers must now be set explicitly";
     glb->infer_pointers = false;
   }
   return res;
@@ -247,7 +247,7 @@ std::string OptionInferConstPtr::apply(Architecture *glb,const std::string &p1,c
 /// \brief Mark/unmark a specific function as \e inline
 ///
 /// The first parameter gives the symbol name of a function. The second parameter is
-/// true" to std::set the \e inline property, "false" to clear.
+/// true" to set the \e inline property, "false" to clear.
 std::string OptionInline::apply(Architecture *glb,const std::string &p1,const std::string &p2,const std::string &p3) const
 
 {
@@ -304,12 +304,12 @@ std::string OptionStructAlign::apply(Architecture *glb,const std::string &p1,con
 {
   int4 val  = -1;
   std::istringstream s(p1);
-  s >> stddec >> val;
+  s >> std::dec >> val;
   if (val == -1)
     throw ParseError("Missing alignment value");
 
   glb->types->setStructAlign(val);
-  return "Structure alignment std::set";
+  return "Structure alignment set";
 }
 
 /// \class OptionWarning
@@ -404,7 +404,7 @@ std::string OptionMaxLineWidth::apply(Architecture *glb,const std::string &p1,co
 
 {
   std::istringstream s(p1);
-  s.unsetf(std::ios::stddec | std::ios::dec | std::ios::oct);
+  s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
   int4 val = -1;
   s >> val;
   if (val==-1)
@@ -421,7 +421,7 @@ std::string OptionIndentIncrement::apply(Architecture *glb,const std::string &p1
 
 {
   std::istringstream s(p1);
-  s.unsetf(std::ios::stddec | std::ios::dec | std::ios::oct);
+  s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
   int4 val = -1;
   s >> val;
   if (val==-1)
@@ -439,7 +439,7 @@ std::string OptionCommentIndent::apply(Architecture *glb,const std::string &p1,c
 
 {
   std::istringstream s(p1);
-  s.unsetf(std::ios::stddec | std::ios::dec | std::ios::oct);
+  s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
   int4 val = -1;
   s >> val;
   if (val==-1)
@@ -504,7 +504,7 @@ std::string OptionCommentInstruction::apply(Architecture *glb,const std::string 
 /// \class OptionIntegerFormat
 /// \brief Set the formatting strategy used by the decompiler to emit integers
 ///
-/// The first parameter is the strategy name: "std::dec", "stddec", or "best"
+/// The first parameter is the strategy name: "std::dec", "std::dec", or "best"
 std::string OptionIntegerFormat::apply(Architecture *glb,const std::string &p1,const std::string &p2,const std::string &p3) const
 
 {

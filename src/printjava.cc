@@ -185,10 +185,10 @@ void PrintJava::printUnicode(std::ostream &s,int4 onechar) const
     }
     // Generic unicode escape
     if (onechar < 65536) {
-      s << "\\ux" << setfill('0') << setw(4) << std::dec << onechar;
+      s << "\\ux" << std::setfill('0') << std::setw(4) << std::dec << onechar;
     }
     else
-      s << "\\ux" << setfill('0') << setw(8) << std::dec << onechar;
+      s << "\\ux" << std::setfill('0') << std::setw(8) << std::dec << onechar;
     return;
   }
   writeUtf8(s, onechar);		// Emit normally

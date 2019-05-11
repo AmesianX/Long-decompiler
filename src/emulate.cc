@@ -25,7 +25,7 @@ void BreakTableCallBack::registerPcodeCallback(const std::string &name,BreakCall
 
 {
   func->setEmulate(emulate);
-  vectorstd::string userops;
+  std::vector<std::string> userops;
   trans->getUserOpNames(userops);
   for(int4 i=0;i<userops.size();++i) {
     if (userops[i] == name) {

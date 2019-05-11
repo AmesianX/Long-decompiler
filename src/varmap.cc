@@ -985,7 +985,7 @@ bool ScopeLocal::makeNameRecommendation(std::string &res,const Address &addr,con
   return false;
 }
 
-void ScopeLocal::makeNameRecommendationsForSymbols(vectorstd::string &resname,std::vector<Symbol *> &ressym) const
+void ScopeLocal::makeNameRecommendationsForSymbols(std::vector<std::string> &resname,std::vector<Symbol *> &ressym) const
 
 { 				// Find nameable symbols with a varnode rep matching a name recommendation
   std::map<AddressSorter,std::string>::const_iterator iter;

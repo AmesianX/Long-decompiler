@@ -61,7 +61,7 @@ Scope *ScopeGhidra::createNewScope(const std::string &nm,Scope *par) const
 /// it if it isn't. This may mean creating a new \e namespace Scope.
 /// \param path is absolute path to the desired Scope
 /// \return the Scope matching the path.
-Scope *ScopeGhidra::reresolveScope(const vectorstd::string &path) const
+Scope *ScopeGhidra::reresolveScope(const std::vector<std::string> &path) const
 
 {
   if (path.size()==1) return cache;
@@ -129,7 +129,7 @@ Symbol *ScopeGhidra::dump2Cache(Document *doc) const
   List::const_iterator iter = el->getChildren().begin();
   // The first subnode must be scope information
   el = *iter;
-  vectorstd::string path;
+  std::vector<std::string> path;
   const List &list2(el->getChildren());
   List::const_iterator iter2;
   for(iter2=list2.begin();iter2!=list2.end();++iter2)

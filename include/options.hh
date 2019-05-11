@@ -68,7 +68,7 @@ class OptionDatabase {
 public:
   OptionDatabase(Architecture *g);		///< Construct given the owning Architecture
   ~OptionDatabase(void);			///< Destructor
-  std::string std::set(const std::string &nm,const std::string &p1="",const std::string &p2="",const std::string &p3="");	///< Issue an option command
+  std::string set(const std::string &nm,const std::string &p1="",const std::string &p2="",const std::string &p3="");	///< Issue an option command
   void parseOne(const Element *el);		///< Unwrap and execute a single option XML tag
   void restoreXml(const Element *el);		///< Execute a series of \e option \e commands passed by XML
 };  

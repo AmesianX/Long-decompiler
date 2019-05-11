@@ -462,7 +462,7 @@ void SetOptions::sendResult(void)
 /// \param sin is the input stream from the client
 /// \param out is the output stream to the client
 /// \return the result code of the command
-int4 GhidraCapability::readCommand(istream &sin,std::ostream &out)
+int4 GhidraCapability::readCommand(std::istream &sin,std::ostream &out)
 
 {
   std::string function;
@@ -515,7 +515,7 @@ int main(int argc,char **argv)
   GhidraDec::CapabilityPoint::initializeAll();
   GhidraDec::int4 status = 0;
   while(status == 0) {
-    status = GhidraDec::GhidraCapability::readCommand(cin,cout);
+    status = GhidraDec::GhidraCapability::readCommand(std::cin,std::cout);
   }
   GhidraDec::GhidraCapability::shutDown();
 }

@@ -47,11 +47,11 @@ class BlockVarnode {
   int4 index;		///< Index of BlockBasic defining Varnode
   Varnode *vn;		///< The Varnode itself
 public:
-  void std::set(Varnode *v);		///< Set \b this as representing the given Varnode
+  void set(Varnode *v);		///< Set \b this as representing the given Varnode
   bool operator<(const BlockVarnode &op2) const { return (index < op2.index); } ///< Comparator
   Varnode *getVarnode(void) const { return vn; } ///< Get the Varnode represented by \b this
   int4 getIndex(void) const { return index; }	 ///< Get the Varnode's defining block index
-  static int4 findFront(int4 blocknum,const std::vector<BlockVarnode> &std::list);
+  static int4 findFront(int4 blocknum,const std::vector<BlockVarnode> &list);
 };
 
 class Funcdata;

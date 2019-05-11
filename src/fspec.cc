@@ -1805,9 +1805,9 @@ void ProtoModel::restoreXml(const Element *el)
     throw LowlevelError("Missing prototype attributes");
 
   buildParamList(strategystring); // Allocate input and output ParamLists
-  const List &std::list(el->getChildren());
+  const List &list(el->getChildren());
   List::const_iterator iter;
-  for(iter=std::list.begin();iter!=std::list.end();++iter) {
+  for(iter=list.begin();iter!=list.end();++iter) {
     const Element *subnode = *iter;
     if (subnode->getName() == "input") {
       input->restoreXml(subnode,glb,effectlist,stackgrowsnegative);
@@ -2105,9 +2105,9 @@ void ProtoModelMerged::restoreXml(const Element *el)
 
 {
   name = el->getAttributeValue("name");
-  const List &std::list(el->getChildren());
+  const List &list(el->getChildren());
   List::const_iterator iter;
-  for(iter=std::list.begin();iter!=std::list.end();++iter) { // A tag for each merged prototype
+  for(iter=list.begin();iter!=list.end();++iter) { // A tag for each merged prototype
     const Element *subel = *iter;
     ProtoModel *mymodel = glb->getModel( subel->getAttributeValue("name"));
     if (mymodel == (ProtoModel *)0)
@@ -2617,7 +2617,7 @@ void ProtoStoreInternal::restoreXml(const Element *el,ProtoModel *model)
   if (el->getName() != "internallist")
     throw LowlevelError("Mismatched ProtoStore tag: ProtoStoreInternal did not get <internallist>");
   Architecture *glb = model->getArch();
-  const List &std::list(el->getChildren());
+  const List &list(el->getChildren());
   List::const_iterator iter;
   std::vector<ParameterPieces> pieces;
   std::vector<std::string> namelist;
@@ -2636,7 +2636,7 @@ void ProtoStoreInternal::restoreXml(const Element *el,ProtoModel *model)
   if (outparam->getAddress().isInvalid())
     addressesdetermined = false;
 
-  for(iter=std::list.begin();iter!=std::list.end();++iter) { // This is only the input params
+  for(iter=list.begin();iter!=list.end();++iter) { // This is only the input params
     const Element *subel = *iter;
     std::string name;
     bool typelock = false;
@@ -3596,11 +3596,11 @@ void FuncProto::restoreXml(const Element *el,Architecture *glb)
   if (seenunknownmod)
     flags |= unknown_model;
 
-  const List &std::list(el->getChildren());
-  List::const_iterator iter = std::list.begin();
+  const List &list(el->getChildren());
+  List::const_iterator iter = list.begin();
 
   const Element *subel = (const Element *)0;
-  if (iter != std::list.end()) {
+  if (iter != list.end()) {
     subel = *iter;
     ++iter;
   }
@@ -3643,7 +3643,7 @@ void FuncProto::restoreXml(const Element *el,Architecture *glb)
   if (((flags&voidinputlock)!=0)||(isOutputLocked()))
     flags |= modellock;
 
-  for(;iter!=std::list.end();++iter) {
+  for(;iter!=list.end();++iter) {
     if ((*iter)->getName() == "unaffected") {
       const List &list2((*iter)->getChildren());
       List::const_iterator iter2 = list2.begin();

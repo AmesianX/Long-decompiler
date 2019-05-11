@@ -353,10 +353,10 @@ void Architecture::globalify(void)
 void Architecture::restoreFlowOverride(const Element *el)
 
 {
-  const List &std::list(el->getChildren());
+  const List &list(el->getChildren());
   List::const_iterator iter;
 
-  for(iter=std::list.begin();iter!=std::list.end();++iter) {
+  for(iter=list.begin();iter!=list.end();++iter) {
     const Element *subel = *iter;
     const List &sublist(subel->getChildren());
     List::const_iterator subiter = sublist.begin();
@@ -400,10 +400,10 @@ void Architecture::restoreXml(DocumentStorage &store)
   else
     loadersymbols_parsed = false;
 
-  const List &std::list(el->getChildren());
+  const List &list(el->getChildren());
   List::const_iterator iter;
 
-  for(iter=std::list.begin();iter!=std::list.end();++iter) {
+  for(iter=list.begin();iter!=list.end();++iter) {
     const Element *subel = *iter;
     if (subel->getName() == "typegrp")
       types->restoreXml(subel);
@@ -694,10 +694,10 @@ void Architecture::parseProtoEval(const Element *el)
 void Architecture::parseDefaultProto(const Element *el)
 
 {
-  const List &std::list(el->getChildren());
+  const List &list(el->getChildren());
   List::const_iterator iter;
 
-  for(iter=std::list.begin();iter!=std::list.end();++iter) {
+  for(iter=list.begin();iter!=list.end();++iter) {
     if (defaultfp != (ProtoModel *)0)
       throw LowlevelError("More than one default prototype model");
     defaultfp = parseProto(*iter);
@@ -711,10 +711,10 @@ void Architecture::parseGlobal(const Element *el)
 
 {
   Scope *scope = buildGlobalScope();
-  const List &std::list(el->getChildren());
+  const List &list(el->getChildren());
   List::const_iterator iter;
   
-  for(iter=std::list.begin();iter!=std::list.end();++iter) {
+  for(iter=list.begin();iter!=list.end();++iter) {
     Range range;
     range.restoreXml(*iter,this);
     symboltab->addRange(scope,range.getSpace(),range.getFirst(),range.getLast());
@@ -737,10 +737,10 @@ void Architecture::parseGlobal(const Element *el)
 void Architecture::parseReadOnly(const Element *el)
 
 {
-  const List &std::list(el->getChildren());
+  const List &list(el->getChildren());
   List::const_iterator iter;
   
-  for(iter=std::list.begin();iter!=std::list.end();++iter) {
+  for(iter=list.begin();iter!=list.end();++iter) {
     Range range;
     range.restoreXml(*iter,this);
     symboltab->setPropertyRange(Varnode::readonly,range);
@@ -754,10 +754,10 @@ void Architecture::parseVolatile(const Element *el)
 
 {
   userops.parseVolatile(el,this);
-  const List &std::list(el->getChildren());
+  const List &list(el->getChildren());
   List::const_iterator iter;
   
-  for(iter=std::list.begin();iter!=std::list.end();++iter) {
+  for(iter=list.begin();iter!=list.end();++iter) {
     Range range;
     range.restoreXml(*iter,this); // Tag itself is range
     symboltab->setPropertyRange(Varnode::volatil,range);
@@ -770,11 +770,11 @@ void Architecture::parseVolatile(const Element *el)
 void Architecture::parseReturnAddress(const Element *el)
 
 {
-  const List &std::list(el->getChildren());
+  const List &list(el->getChildren());
   List::const_iterator iter;
 
-  iter = std::list.begin();
-  if (iter == std::list.end()) return;
+  iter = list.begin();
+  if (iter == list.end()) return;
   if (defaultReturnAddr.space != (AddrSpace *)0)
     throw LowlevelError("Multiple <returnaddress> tags in .cspec");
   defaultReturnAddr.restoreXml(*iter,this);
@@ -786,10 +786,10 @@ void Architecture::parseReturnAddress(const Element *el)
 void Architecture::parseIncidentalCopy(const Element *el)
 
 {
-  const List &std::list(el->getChildren());
+  const List &list(el->getChildren());
   List::const_iterator iter;
 
-  for(iter=std::list.begin();iter!=std::list.end();++iter) {
+  for(iter=list.begin();iter!=list.end();++iter) {
     VarnodeData vdata;
     vdata.restoreXml(*iter,this);
     Range range( vdata.space, vdata.offset, vdata.offset+vdata.size-1);
@@ -890,10 +890,10 @@ void Architecture::parseSpacebase(const Element *el)
 void Architecture::parseNoHighPtr(const Element *el)
 
 {
-  const List &std::list(el->getChildren());
+  const List &list(el->getChildren());
   List::const_iterator iter;
   
-  for(iter=std::list.begin();iter!=std::list.end();++iter) { // Iterate over every range tag in the std::list
+  for(iter=list.begin();iter!=list.end();++iter) { // Iterate over every range tag in the std::list
     Range range;
     range.restoreXml(*iter,this);
     addNoHighPtr(range);
@@ -909,10 +909,10 @@ void Architecture::parsePreferSplit(const Element *el)
   std::string style = el->getAttributeValue("style");
   if (style != "inhalf")
     throw LowlevelError("Unknown prefersplit style: "+style);
-  const List &std::list(el->getChildren());
+  const List &list(el->getChildren());
   List::const_iterator iter;
 
-  for(iter=std::list.begin();iter!=std::list.end();++iter) {
+  for(iter=list.begin();iter!=list.end();++iter) {
     splitrecords.push_back(PreferSplitRecord());
     PreferSplitRecord &record( splitrecords.back() );
     record.storage.restoreXml( *iter, this );
@@ -944,10 +944,10 @@ void Architecture::parseProcessorConfig(DocumentStorage &store)
   const Element *el = store.getTag("processor_spec");
   if (el == (const Element *)0)
     throw LowlevelError("No processor configuration tag found");
-  const List &std::list(el->getChildren());
+  const List &list(el->getChildren());
   List::const_iterator iter;
   
-  for(iter=std::list.begin();iter!=std::list.end();++iter) {
+  for(iter=list.begin();iter!=list.end();++iter) {
     if ((*iter)->getName() == "programcounter") {
     }
     else if ((*iter)->getName() == "volatile")
@@ -986,10 +986,10 @@ void Architecture::parseCompilerConfig(DocumentStorage &store)
   const Element *el = store.getTag("compiler_spec");
   if (el == (const Element *)0)
     throw LowlevelError("No compiler configuration tag found");
-  const List &std::list(el->getChildren());
+  const List &list(el->getChildren());
   List::const_iterator iter;
 
-  for(iter=std::list.begin();iter!=std::list.end();++iter) {
+  for(iter=list.begin();iter!=list.end();++iter) {
     const std::string &elname( (*iter)->getName() );
     if (elname == "default_proto")
       parseDefaultProto(*iter);
@@ -1068,10 +1068,10 @@ void Architecture::parseExtraRules(DocumentStorage &store)
 {
   const Element *expertag = store.getTag("experimental_rules");
   if (expertag != (const Element *)0) {
-    const List &std::list(expertag->getChildren());
+    const List &list(expertag->getChildren());
     List::const_iterator iter;
     
-    for(iter=std::list.begin();iter!=std::list.end();++iter)
+    for(iter=list.begin();iter!=list.end();++iter)
       parseDynamicRule( *iter );
   }
 }

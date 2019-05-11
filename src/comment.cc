@@ -58,15 +58,15 @@ void Comment::restoreXml(const Element *el,const AddrSpaceManager *manage)
 {
   type = 0;
   type = Comment::encodeCommentType(el->getAttributeValue("type"));
-  const List &std::list(el->getChildren());
+  const List &list(el->getChildren());
   List::const_iterator iter;
 
-  iter = std::list.begin();
+  iter = list.begin();
   funcaddr = Address::restoreXml(*iter,manage);
   ++iter;
   addr = Address::restoreXml(*iter,manage);
   ++iter;
-  if (iter != std::list.end())
+  if (iter != list.end())
     text = (*iter)->getContent();
 }
 
@@ -251,10 +251,10 @@ void CommentDatabaseInternal::saveXml(std::ostream &s) const
 void CommentDatabaseInternal::restoreXml(const Element *el,const AddrSpaceManager *manage)
 
 {
-  const List &std::list(el->getChildren());
+  const List &list(el->getChildren());
   List::const_iterator iter;
   
-  for(iter=std::list.begin();iter!=std::list.end();++iter) {
+  for(iter=list.begin();iter!=list.end();++iter) {
     Comment com;
     com.restoreXml(*iter,manage);
     addComment(com.getType(),com.getFuncAddr(),com.getAddr(),com.getText());

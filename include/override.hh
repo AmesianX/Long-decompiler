@@ -75,7 +75,7 @@ public:
   bool hasFlowOverride(void) const { return (!flowoverride.empty()); }	///< Are there any flow overrides
   uint4 getFlowOverride(const Address &addr) const;
   void printRaw(std::ostream &s,Architecture *glb) const;
-  void generateOverrideMessages(std::string &messagelist,Architecture *glb) const;
+  void generateOverrideMessages(std::vector<std::string> &messagelist,Architecture *glb) const;
   void saveXml(std::ostream &s,Architecture *glb) const;
   void restoreXml(const Element *el,Architecture *glb);
   static std::string typeToString(uint4 tp);			///< Convert a flow override type to a std::string

@@ -48,7 +48,7 @@ public:
   virtual std::string getRegisterName(AddrSpace *base,uintb off,int4 size) const;
   virtual void getAllRegisters(std::map<VarnodeData,std::string> &reglist) const {
     throw LowlevelError("Cannot currently get all registers through this interface"); }
-  virtual void getUserOpNames(vectorstd::string &res) const;
+  virtual void getUserOpNames(std::vector<std::string> &res) const;
   virtual int4 oneInstruction(PcodeEmit &emit,const Address &baseaddr) const;
   virtual int4 instructionLength(const Address &baseaddr) const {
     throw LowlevelError("Cannot currently get instruction length through this interface"); }

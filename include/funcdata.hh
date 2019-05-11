@@ -604,7 +604,7 @@ extern void opFlipInPlaceExecute(Funcdata &data,std::vector<PcodeOp *> &fliplist
 extern PcodeOp *earliestUseInBlock(Varnode *vn,BlockBasic *bl);
 extern PcodeOp *cseFindInBlock(PcodeOp *op,Varnode *vn,BlockBasic *bl,PcodeOp *earliest);
 extern PcodeOp *cseElimination(Funcdata &data,PcodeOp *op1,PcodeOp *op2);
-extern void cseEliminateList(Funcdata &data,std::vector< std::pair<uintm,PcodeOp *> > &std::list,
+extern void cseEliminateList(Funcdata &data,std::vector< std::pair<uintm,PcodeOp *> > &list,
 			     std::vector<Varnode *> &outlist);
 
 }

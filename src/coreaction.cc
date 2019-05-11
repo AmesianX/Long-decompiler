@@ -2107,7 +2107,7 @@ void ActionNameVars::lookForRecommendedNames(Funcdata &data)
 
 {
   ScopeLocal *localmap = data.getScopeLocal();
-  vectorstd::string names;
+  std::vector<std::string> names;
   std::vector<Symbol *> symbols;
 
   localmap->makeNameRecommendationsForSymbols(names,symbols);
@@ -3724,7 +3724,7 @@ int4 ActionDynamicSymbols::apply(Funcdata &data)
 int4 ActionPrototypeWarnings::apply(Funcdata &data)
 
 {
-  vectorstd::string overridemessages;
+  std::vector<std::string> overridemessages;
   data.getOverride().generateOverrideMessages(overridemessages,data.getArch());
   for(int4 i=0;i<overridemessages.size();++i)
     data.warningHeader(overridemessages[i]);

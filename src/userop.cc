@@ -237,9 +237,9 @@ void SegmentOp::restoreXml(const Element *el)
     throw LowlevelError("Missing userop attribute in segmentop tag");
   basepresent = (baseinsize != 0);
 
-  const List &std::list(el->getChildren());
+  const List &list(el->getChildren());
   List::const_iterator iter;
-  for(iter=std::list.begin();iter!=std::list.end();++iter) {
+  for(iter=list.begin();iter!=list.end();++iter) {
     const Element *subel = *iter;
     if (subel->getName()=="baseop") {
       basefollow.push_back(OpFollow());
@@ -284,9 +284,9 @@ void JumpAssistOp::restoreXml(const Element *el)
   index2addr = -1;
   defaultaddr = -1;
   calcsize = -1;
-  const List &std::list(el->getChildren());
+  const List &list(el->getChildren());
   List::const_iterator iter;
-  for(iter=std::list.begin();iter!=std::list.end();++iter) {
+  for(iter=list.begin();iter!=list.end();++iter) {
     const Element *subel = *iter;
     if (subel->getName() == "case_pcode") {
       if (index2case != -1)
@@ -353,7 +353,7 @@ UserOpManage::~UserOpManage(void)
 void UserOpManage::initialize(Architecture *glb)
 
 {
-  vectorstd::string basicops;
+  std::vector<std::string> basicops;
   glb->translate->getUserOpNames(basicops);
   for(uint4 i=0;i<basicops.size();++i) {
     if (basicops[i].size()==0) continue;
@@ -539,7 +539,7 @@ void UserOpManage::parseJumpAssist(const Element *el,Architecture *glb)
 /// \param snippet is the raw p-code source snippet
 /// \param glb is the owning Architecture
 void UserOpManage::manualCallOtherFixup(const std::string &useropname,const std::string &outname,
-					const vectorstd::string &inname,const std::string &snippet,Architecture *glb)
+					const std::vector<std::string> &inname,const std::string &snippet,Architecture *glb)
 
 {
   UserPcodeOp *userop = getOp(useropname);
