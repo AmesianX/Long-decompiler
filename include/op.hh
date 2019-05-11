@@ -63,7 +63,7 @@ class PcodeOp {
   friend class VarnodeBank;    // Only uses setInput
 public:
   /// Boolean attributes (flags) that can be placed on a PcodeOp. Even though this enum is public, these are
-  /// all set and read internally, although many are read publically via \e get or \e is methods.
+  /// all std::set and read internally, although many are read publically via \e get or \e is methods.
   enum {
     startbasic = 1,	    ///< This instruction starts a basic block
     branch = 2,		    ///< This instruction is a branch
@@ -113,11 +113,11 @@ private:
   mutable uint4 addlflags;	///< Additional boolean attributes for this op
   SeqNum start;	                ///< What instruction address is this attached to
   BlockBasic *parent;	        ///< Basic block in which this op is contained
-  list<PcodeOp *>::iterator basiciter;	///< Iterator within basic block
-  list<PcodeOp *>::iterator insertiter;	///< Position in alive/dead list
-  list<PcodeOp *>::iterator codeiter;	///< Position in opcode list
+  std::list<PcodeOp *>::iterator basiciter;	///< Iterator within basic block
+  std::list<PcodeOp *>::iterator insertiter;	///< Position in alive/dead std::list
+  std::list<PcodeOp *>::iterator codeiter;	///< Position in opcode std::list
   Varnode *output;		///< The one possible output Varnode of this op
-  std::vector<Varnode *> inrefs;	///< The ordered list of input Varnodes for this op
+  std::vector<Varnode *> inrefs;	///< The ordered std::list of input Varnodes for this op
 
   // Only used by Funcdata
   void setOutput(Varnode *vn) { output = vn; } ///< Set the output Varnode of this op
@@ -133,7 +133,7 @@ private:
   void insertInput(int4 slot);	///< Make room for a new input Varnode at a specific position
   void setOrder(uintm ord) { start.setOrder(ord); } ///< Order this op within the ops for a single instruction
   void setParent(BlockBasic *p) { parent = p; }	///< Set the parent basic block of this op
-  void setBasicIter(list<PcodeOp *>::iterator iter) { basiciter = iter; } ///< Store the iterator into this op's basic block
+  void setBasicIter(std::list<PcodeOp *>::iterator iter) { basiciter = iter; } ///< Store the iterator into this op's basic block
 
 public:
   PcodeOp(int4 s,const SeqNum &sq); ///< Construct an unattached PcodeOp
@@ -148,8 +148,8 @@ public:
   const Address &getAddr(void) const { return start.getAddr(); } ///< Get the instruction address associated with this op
   uintm getTime(void) const { return start.getTime(); }	///< Get the time index indicating when this op was created
   const SeqNum &getSeqNum(void) const { return start; }	///< Get the sequence number associated with this op
-  list<PcodeOp *>::iterator getInsertIter(void) const { return insertiter; } ///< Get position within alive/dead list
-  list<PcodeOp *>::iterator getBasicIter(void) const { return basiciter; } ///< Get position within basic block
+  std::list<PcodeOp *>::iterator getInsertIter(void) const { return insertiter; } ///< Get position within alive/dead std::list
+  std::list<PcodeOp *>::iterator getBasicIter(void) const { return basiciter; } ///< Get position within basic block
   /// \brief Get the slot number of the indicated input varnode
   int4 getSlot(const Varnode *vn) const { int4 i,n; n=inrefs.size(); for(i=0;i<n;++i) if (inrefs[i]==vn) break; return i; }
   /// \brief Get the evaluation type of this op
@@ -226,8 +226,8 @@ public:
   bool inheritsSign(void) const { return opcode->inheritsSign(); } ///< Does this token inherit its sign from operands
 };
 
-/// A map from sequence number (SeqNum) to PcodeOp
-typedef map<SeqNum,PcodeOp *> PcodeOpTree;
+/// A std::map from sequence number (SeqNum) to PcodeOp
+typedef std::map<SeqNum,PcodeOp *> PcodeOpTree;
 
 /// \brief Container class for PcodeOps associated with a single function
 ///
@@ -238,15 +238,15 @@ typedef map<SeqNum,PcodeOp *> PcodeOpTree;
 /// Several lists group PcodeOps with important op-codes (like STORE and RETURN).
 class PcodeOpBank {
   PcodeOpTree optree;			///< The main sequence number sort
-  list<PcodeOp *> deadlist;		///< List of \e dead PcodeOps
-  list<PcodeOp *> alivelist;		///< List of \e alive PcodeOps
-  list<PcodeOp *> storelist;		///< List of STORE PcodeOps
-  list<PcodeOp *> returnlist;		///< List of RETURN PcodeOps
-  list<PcodeOp *> useroplist;		///< List of user-defined PcodeOps
-  list<PcodeOp *> deadandgone;		///< List of retired PcodeOps
+  std::list<PcodeOp *> deadlist;		///< List of \e dead PcodeOps
+  std::list<PcodeOp *> alivelist;		///< List of \e alive PcodeOps
+  std::list<PcodeOp *> storelist;		///< List of STORE PcodeOps
+  std::list<PcodeOp *> returnlist;		///< List of RETURN PcodeOps
+  std::list<PcodeOp *> useroplist;		///< List of user-defined PcodeOps
+  std::list<PcodeOp *> deadandgone;		///< List of retired PcodeOps
   uintm uniqid;				///< Counter for producing unique id's for each op
-  void addToCodeList(PcodeOp *op);	///< Add given PcodeOp to specific op-code list
-  void removeFromCodeList(PcodeOp *op);	///< Remove given PcodeOp from specific op-code list
+  void addToCodeList(PcodeOp *op);	///< Add given PcodeOp to specific op-code std::list
+  void removeFromCodeList(PcodeOp *op);	///< Remove given PcodeOp from specific op-code std::list
   void clearCodeLists(void);		///< Clear all op-code specific lists
 public:
   void clear(void);					///< Clear all PcodeOps from \b this container
@@ -257,11 +257,11 @@ public:
   PcodeOp *create(int4 inputs,const Address &pc);	///< Create a PcodeOp with at a given Address
   PcodeOp *create(int4 inputs,const SeqNum &sq);	///< Create a PcodeOp with a given sequence number
   void destroy(PcodeOp *op);				///< Destroy/retire the given PcodeOp
-  void destroyDead(void);				///< Destroy/retire all PcodeOps in the \e dead list
+  void destroyDead(void);				///< Destroy/retire all PcodeOps in the \e dead std::list
   void changeOpcode(PcodeOp *op,TypeOp *newopc);	///< Change the op-code for the given PcodeOp
   void markAlive(PcodeOp *op);				///< Mark the given PcodeOp as \e alive
   void markDead(PcodeOp *op);				///< Mark the given PcodeOp as \e dead
-  void insertAfterDead(PcodeOp *op,PcodeOp *prev);	///< Insert the given PcodeOp after a point in the \e dead list
+  void insertAfterDead(PcodeOp *op,PcodeOp *prev);	///< Insert the given PcodeOp after a point in the \e dead std::list
   void moveSequenceDead(PcodeOp *firstop,PcodeOp *lastop,PcodeOp *prev);
   bool empty(void) const { return optree.empty(); }	///< Return \b true if there are no PcodeOps in \b this container
   PcodeOp *target(const Address &addr) const;		///< Find the first executing PcodeOp for a target address
@@ -281,22 +281,22 @@ public:
   PcodeOpTree::const_iterator end(const Address &addr) const;
 
   /// \brief Start of all PcodeOps marked as \e alive
-  list<PcodeOp *>::const_iterator beginAlive(void) const { return alivelist.begin(); }
+  std::list<PcodeOp *>::const_iterator beginAlive(void) const { return alivelist.begin(); }
 
   /// \brief End of all PcodeOps marked as \e alive
-  list<PcodeOp *>::const_iterator endAlive(void) const { return alivelist.end(); }
+  std::list<PcodeOp *>::const_iterator endAlive(void) const { return alivelist.end(); }
 
   /// \brief Start of all PcodeOps marked as \e dead
-  list<PcodeOp *>::const_iterator beginDead(void) const { return deadlist.begin(); }
+  std::list<PcodeOp *>::const_iterator beginDead(void) const { return deadlist.begin(); }
 
   /// \brief End of all PcodeOps marked as \e dead
-  list<PcodeOp *>::const_iterator endDead(void) const { return deadlist.end(); }
+  std::list<PcodeOp *>::const_iterator endDead(void) const { return deadlist.end(); }
 
   /// \brief Start of all PcodeOps sharing the given op-code
-  list<PcodeOp *>::const_iterator begin(OpCode opc) const;
+  std::list<PcodeOp *>::const_iterator begin(OpCode opc) const;
 
   /// \brief End of all PcodeOps sharing the given op-code
-  list<PcodeOp *>::const_iterator end(OpCode opc) const;
+  std::list<PcodeOp *>::const_iterator end(OpCode opc) const;
 };
 
 extern int4 functionalEqualityLevel(Varnode *vn1,Varnode *vn2,Varnode **res1,Varnode **res2);

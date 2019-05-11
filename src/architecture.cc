@@ -34,7 +34,7 @@ std::vector<ArchitectureCapability *> ArchitectureCapability::thelist;
 const uint4 ArchitectureCapability::majorversion = 3;
 const uint4 ArchitectureCapability::minorversion = 4;
 
-/// This builds a list of just the ArchitectureCapability extensions
+/// This builds a std::list of just the ArchitectureCapability extensions
 void ArchitectureCapability::initialize(void)
 
 {
@@ -170,7 +170,7 @@ Architecture::~Architecture(void)
     delete context;
 }
 
-/// The Architecture maintains the set of prototype models that can
+/// The Architecture maintains the std::set of prototype models that can
 /// be applied for this particular executable. Retrieve one by name.
 /// The model must exist or an exception is thrown.
 /// \param nm is the name
@@ -227,7 +227,7 @@ AddrSpace *Architecture::getSpaceBySpacebase(const Address &loc,int4 size) const
 
 /// The default model is used whenever an explicit model is not known
 /// or can't be determined.
-/// \param nm is the name of the model to set
+/// \param nm is the name of the model to std::set
 void Architecture::setDefaultModel(const std::string &nm)
 
 {
@@ -262,8 +262,8 @@ void Architecture::readLoaderSymbols(void)
 }
 
 /// For all registered p-code opcodes, return the corresponding OpBehavior object.
-/// The object pointers are provided in a list indexed by OpCode.
-/// \param behave is the list to be populated
+/// The object pointers are provided in a std::list indexed by OpCode.
+/// \param behave is the std::list to be populated
 void Architecture::collectBehaviors(std::vector<OpBehavior *> &behave) const
 
 {
@@ -353,10 +353,10 @@ void Architecture::globalify(void)
 void Architecture::restoreFlowOverride(const Element *el)
 
 {
-  const List &list(el->getChildren());
+  const List &std::list(el->getChildren());
   List::const_iterator iter;
 
-  for(iter=list.begin();iter!=list.end();++iter) {
+  for(iter=std::list.begin();iter!=std::list.end();++iter) {
     const Element *subel = *iter;
     const List &sublist(subel->getChildren());
     List::const_iterator subiter = sublist.begin();
@@ -400,10 +400,10 @@ void Architecture::restoreXml(DocumentStorage &store)
   else
     loadersymbols_parsed = false;
 
-  const List &list(el->getChildren());
+  const List &std::list(el->getChildren());
   List::const_iterator iter;
 
-  for(iter=list.begin();iter!=list.end();++iter) {
+  for(iter=std::list.begin();iter!=std::list.end();++iter) {
     const Element *subel = *iter;
     if (subel->getName() == "typegrp")
       types->restoreXml(subel);
@@ -433,7 +433,7 @@ void Architecture::restoreXml(DocumentStorage &store)
 void Architecture::nameFunction(const Address &addr,std::string &name) const
 
 {
-  ostringstream defname;
+  std::ostringstream defname;
   defname << "func_";
   addr.printRaw(defname);
   name = defname.str();
@@ -694,10 +694,10 @@ void Architecture::parseProtoEval(const Element *el)
 void Architecture::parseDefaultProto(const Element *el)
 
 {
-  const List &list(el->getChildren());
+  const List &std::list(el->getChildren());
   List::const_iterator iter;
 
-  for(iter=list.begin();iter!=list.end();++iter) {
+  for(iter=std::list.begin();iter!=std::list.end();++iter) {
     if (defaultfp != (ProtoModel *)0)
       throw LowlevelError("More than one default prototype model");
     defaultfp = parseProto(*iter);
@@ -711,10 +711,10 @@ void Architecture::parseGlobal(const Element *el)
 
 {
   Scope *scope = buildGlobalScope();
-  const List &list(el->getChildren());
+  const List &std::list(el->getChildren());
   List::const_iterator iter;
   
-  for(iter=list.begin();iter!=list.end();++iter) {
+  for(iter=std::list.begin();iter!=std::list.end();++iter) {
     Range range;
     range.restoreXml(*iter,this);
     symboltab->addRange(scope,range.getSpace(),range.getFirst(),range.getLast());
@@ -737,10 +737,10 @@ void Architecture::parseGlobal(const Element *el)
 void Architecture::parseReadOnly(const Element *el)
 
 {
-  const List &list(el->getChildren());
+  const List &std::list(el->getChildren());
   List::const_iterator iter;
   
-  for(iter=list.begin();iter!=list.end();++iter) {
+  for(iter=std::list.begin();iter!=std::list.end();++iter) {
     Range range;
     range.restoreXml(*iter,this);
     symboltab->setPropertyRange(Varnode::readonly,range);
@@ -754,10 +754,10 @@ void Architecture::parseVolatile(const Element *el)
 
 {
   userops.parseVolatile(el,this);
-  const List &list(el->getChildren());
+  const List &std::list(el->getChildren());
   List::const_iterator iter;
   
-  for(iter=list.begin();iter!=list.end();++iter) {
+  for(iter=std::list.begin();iter!=std::list.end();++iter) {
     Range range;
     range.restoreXml(*iter,this); // Tag itself is range
     symboltab->setPropertyRange(Varnode::volatil,range);
@@ -770,26 +770,26 @@ void Architecture::parseVolatile(const Element *el)
 void Architecture::parseReturnAddress(const Element *el)
 
 {
-  const List &list(el->getChildren());
+  const List &std::list(el->getChildren());
   List::const_iterator iter;
 
-  iter = list.begin();
-  if (iter == list.end()) return;
+  iter = std::list.begin();
+  if (iter == std::list.end()) return;
   if (defaultReturnAddr.space != (AddrSpace *)0)
     throw LowlevelError("Multiple <returnaddress> tags in .cspec");
   defaultReturnAddr.restoreXml(*iter,this);
 }
 
-/// Apply information from an \<incidentalcopy> tag, which marks a set of addresses
+/// Apply information from an \<incidentalcopy> tag, which marks a std::set of addresses
 /// as being copied to incidentally. This allows the decompiler to ignore certain side-effects.
 /// \param el is the XML element
 void Architecture::parseIncidentalCopy(const Element *el)
 
 {
-  const List &list(el->getChildren());
+  const List &std::list(el->getChildren());
   List::const_iterator iter;
 
-  for(iter=list.begin();iter!=list.end();++iter) {
+  for(iter=std::list.begin();iter!=std::list.end();++iter) {
     VarnodeData vdata;
     vdata.restoreXml(*iter,this);
     Range range( vdata.space, vdata.offset, vdata.offset+vdata.size-1);
@@ -836,8 +836,8 @@ void Architecture::parseDeadcodeDelay(const Element *el)
   AddrSpace *spc = getSpaceByName(el->getAttributeValue("space"));
   if (spc == (AddrSpace *)0)
     throw LowlevelError("Unknown space name: "+el->getAttributeValue("space"));
-  istringstream s(el->getAttributeValue("delay"));
-  s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+  std::istringstream s(el->getAttributeValue("delay"));
+  s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
   int4 delay = -1;
   s >> delay;
   if (delay >= 0)
@@ -854,8 +854,8 @@ void Architecture::parseFuncPtrAlign(const Element *el)
 
 {
   int4 align;
-  istringstream s(el->getAttributeValue("align"));
-  s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+  std::istringstream s(el->getAttributeValue("align"));
+  s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
   s >> align;
   
   if (align == 0) {
@@ -890,10 +890,10 @@ void Architecture::parseSpacebase(const Element *el)
 void Architecture::parseNoHighPtr(const Element *el)
 
 {
-  const List &list(el->getChildren());
+  const List &std::list(el->getChildren());
   List::const_iterator iter;
   
-  for(iter=list.begin();iter!=list.end();++iter) { // Iterate over every range tag in the list
+  for(iter=std::list.begin();iter!=std::list.end();++iter) { // Iterate over every range tag in the std::list
     Range range;
     range.restoreXml(*iter,this);
     addNoHighPtr(range);
@@ -909,10 +909,10 @@ void Architecture::parsePreferSplit(const Element *el)
   std::string style = el->getAttributeValue("style");
   if (style != "inhalf")
     throw LowlevelError("Unknown prefersplit style: "+style);
-  const List &list(el->getChildren());
+  const List &std::list(el->getChildren());
   List::const_iterator iter;
 
-  for(iter=list.begin();iter!=list.end();++iter) {
+  for(iter=std::list.begin();iter!=std::list.end();++iter) {
     splitrecords.push_back(PreferSplitRecord());
     PreferSplitRecord &record( splitrecords.back() );
     record.storage.restoreXml( *iter, this );
@@ -944,10 +944,10 @@ void Architecture::parseProcessorConfig(DocumentStorage &store)
   const Element *el = store.getTag("processor_spec");
   if (el == (const Element *)0)
     throw LowlevelError("No processor configuration tag found");
-  const List &list(el->getChildren());
+  const List &std::list(el->getChildren());
   List::const_iterator iter;
   
-  for(iter=list.begin();iter!=list.end();++iter) {
+  for(iter=std::list.begin();iter!=std::list.end();++iter) {
     if ((*iter)->getName() == "programcounter") {
     }
     else if ((*iter)->getName() == "volatile")
@@ -986,10 +986,10 @@ void Architecture::parseCompilerConfig(DocumentStorage &store)
   const Element *el = store.getTag("compiler_spec");
   if (el == (const Element *)0)
     throw LowlevelError("No compiler configuration tag found");
-  const List &list(el->getChildren());
+  const List &std::list(el->getChildren());
   List::const_iterator iter;
 
-  for(iter=list.begin();iter!=list.end();++iter) {
+  for(iter=std::list.begin();iter!=std::list.end();++iter) {
     const std::string &elname( (*iter)->getName() );
     if (elname == "default_proto")
       parseDefaultProto(*iter);
@@ -1058,7 +1058,7 @@ void Architecture::parseCompilerConfig(DocumentStorage &store)
   userops.setDefaults(this);
   initializeSegments();
   PreferSplitManager::initialize(splitrecords);
-  types->setupSizes();		// If no data_organization was registered, set up default values
+  types->setupSizes();		// If no data_organization was registered, std::set up default values
 }
 
 /// Look for the \<experimental_rules> tag and create any dynamic Rule objects it specifies.
@@ -1068,10 +1068,10 @@ void Architecture::parseExtraRules(DocumentStorage &store)
 {
   const Element *expertag = store.getTag("experimental_rules");
   if (expertag != (const Element *)0) {
-    const List &list(expertag->getChildren());
+    const List &std::list(expertag->getChildren());
     List::const_iterator iter;
     
-    for(iter=list.begin();iter!=list.end();++iter)
+    for(iter=std::list.begin();iter!=std::list.end();++iter)
       parseDynamicRule( *iter );
   }
 }
@@ -1084,7 +1084,7 @@ void Architecture::fillinReadOnlyFromLoader(void)
 {
   RangeList rangelist;
   loader->getReadonly(rangelist); // Get read only ranges
-  set<Range>::const_iterator iter,eiter;
+  std::set<Range>::const_iterator iter,eiter;
   iter = rangelist.begin();
   eiter = rangelist.end();
   while(iter != eiter) {
@@ -1217,25 +1217,25 @@ void Statistics::process(const Funcdata &data)
 void Statistics::printResults(std::ostream &s)
 
 {
-  s << "Number of functions: " << dec << numfunc << endl;
-  //  s << "Number of variables: " << dec << numvar << endl;
+  s << "Number of functions: " << std::dec << numfunc << std::endl;
+  //  s << "Number of variables: " << std::dec << numvar << std::endl;
 
   //  double average = ((double)coversum)/numvar;
   //  double variance = ((double)coversumsq)/numvar;
   //  double stddev = sqrt(variance);
 
-  //  s << "Average number of non-empty covers: " << average << endl;
-  //  s << "Standard deviation: " << stddev << endl;
+  //  s << "Average number of non-empty covers: " << average << std::endl;
+  //  s << "Standard deviation: " << stddev << std::endl;
 
   double average = ((double)castcount)/numfunc;
   double variance = ((double)castcountsq)/numfunc;
   variance -= average*average;
   double stddev = sqrt(variance);
 
-  s << "Total functions = " << dec << numfunc << endl;
-  s << "Total casts = " << dec << castcount << endl;
-  s << "Average casts per function = " << average << endl;
-  s << "        Standard deviation = " << stddev << endl;
+  s << "Total functions = " << std::dec << numfunc << std::endl;
+  s << "Total casts = " << std::dec << castcount << std::endl;
+  s << "Average casts per function = " << average << std::endl;
+  s << "        Standard deviation = " << stddev << std::endl;
 }
 
 #endif

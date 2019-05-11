@@ -72,8 +72,8 @@ class Funcdata {
   FuncProto funcp;		///< Prototype of this function
   ScopeLocal *localmap;		///< Local variables (symbols in the function scope)
 
-  vector<FuncCallSpecs *> qlst;	///< List of calls this function makes
-  vector<JumpTable *> jumpvec;	///< List of jump-tables for this function
+  std::vector<FuncCallSpecs *> qlst;	///< List of calls this function makes
+  std::vector<JumpTable *> jumpvec;	///< List of jump-tables for this function
 
   VarnodeBank vbank;		///< Container of Varnode objects for \b this function
   PcodeOpBank obank;		///< Container of PcodeOp objects for \b this function
@@ -115,7 +115,7 @@ class Funcdata {
   void nodeSplitRawDuplicate(BlockBasic *b,BlockBasic *bprime);
   void nodeSplitInputPatch(BlockBasic *b,BlockBasic *bprime,int4 inedge);
   static bool descendantsOutside(Varnode *vn);
-  static void saveVarnodeXml(ostream &s,VarnodeLocSet::const_iterator iter,VarnodeLocSet::const_iterator enditer);
+  static void saveVarnodeXml(std::ostream &s,VarnodeLocSet::const_iterator iter,VarnodeLocSet::const_iterator enditer);
   static bool checkIndirectUse(Varnode *vn);
   static PcodeOp *findPrimaryBranch(PcodeOpTree::const_iterator iter,PcodeOpTree::const_iterator enditer,
 				    bool findbranch,bool findcall,bool findreturn);
@@ -164,18 +164,18 @@ public:
   void truncatedFlow(const Funcdata *fd,const FlowInfo *flow);
   bool inlineFlow(Funcdata *inlinefd,FlowInfo &flow,PcodeOp *callop);
   void overrideFlow(const Address &addr,uint4 type);
-  void doLiveInject(InjectPayload *payload,const Address &addr,BlockBasic *bl,list<PcodeOp *>::iterator pos);
+  void doLiveInject(InjectPayload *payload,const Address &addr,BlockBasic *bl,std::list<PcodeOp *>::iterator pos);
   
-  void printRaw(ostream &s) const;			///< Print raw p-code op descriptions to a stream
-  void printVarnodeTree(ostream &s) const;		///< Print a description of all Varnodes to a stream
-  void printBlockTree(ostream &s) const;		///< Print a description of control-flow structuring to a stream
-  void printLocalRange(ostream &s) const;		///< Print description of memory ranges associated with local scopes
-  void saveXml(ostream &s,bool savetree) const;		///< Emit an XML description of \b this function to stream
+  void printRaw(std::ostream &s) const;			///< Print raw p-code op descriptions to a stream
+  void printVarnodeTree(std::ostream &s) const;		///< Print a description of all Varnodes to a stream
+  void printBlockTree(std::ostream &s) const;		///< Print a description of control-flow structuring to a stream
+  void printLocalRange(std::ostream &s) const;		///< Print description of memory ranges associated with local scopes
+  void saveXml(std::ostream &s,bool savetree) const;		///< Emit an XML description of \b this function to stream
   void restoreXml(const Element *el);			///< Restore the state of \b this function from an XML description
-  void saveXmlJumpTable(ostream &s) const;		///< Emit an XML description of jump-tables to stream
+  void saveXmlJumpTable(std::ostream &s) const;		///< Emit an XML description of jump-tables to stream
   void restoreXmlJumpTable(const Element *el);		///< Restore jump-tables from an XML description
-  void saveXmlTree(ostream &s) const;			///< Save an XML description of the p-code tree to stream
-  void saveXmlHigh(ostream &s) const;			///< Save an XML description of all HighVariables to stream
+  void saveXmlTree(std::ostream &s) const;			///< Save an XML description of the p-code tree to stream
+  void saveXmlHigh(std::ostream &s) const;			///< Save an XML description of all HighVariables to stream
 
   Override &getOverride(void) { return localoverride; }	///< Get the Override object for \b this function
 
@@ -195,7 +195,7 @@ public:
   bool hasUnimplemented(void) const { return ((flags&unimplemented_present)!=0); }
 
   bool hasBadData(void) const { return ((flags&baddata_present)!=0); }	///< Does \b this function flow into bad data
-  void spacebase(void);				///< Mark registers that map to a virtual address space
+  void spacebase(void);				///< Mark registers that std::map to a virtual address space
   Varnode *newSpacebasePtr(AddrSpace *id);	///< Construct a new \e spacebase register for a given address space
   Varnode *findSpacebaseInput(AddrSpace *id) const;
   void spacebaseConstant(PcodeOp *op,int4 slot,SymbolEntry *entry,const Address &rampoint,uintb origval,int4 origsize);
@@ -393,7 +393,7 @@ public:
   void opInsertBegin(PcodeOp *op,BlockBasic *bl);		///< Insert given PcodeOp at the beginning of a basic block
   void opInsertEnd(PcodeOp *op,BlockBasic *bl);			///< Insert given PcodeOp at the end of a basic block
 
-  /// \brief Moved given PcodeOp to specified point in the \e dead list
+  /// \brief Moved given PcodeOp to specified point in the \e dead std::list
   void opDeadInsertAfter(PcodeOp *op,PcodeOp *prev) { obank.insertAfterDead(op,prev); }
 
   void opHeritage(void) { heritage.heritage(); }		///< Perform an entire heritage pass linking Varnode reads to writes
@@ -404,15 +404,15 @@ public:
   void opSetInput(PcodeOp *op,Varnode *vn,int4 slot);		///< Set a specific input operand for the given PcodeOp
   void opSwapInput(PcodeOp *op,int4 slot1,int4 slot2);		///< Swap two input operands in the given PcodeOp
   void opUnsetInput(PcodeOp *op,int4 slot);			///< Clear an input operand slot for the given PcodeOp
-  void opInsert(PcodeOp *op,BlockBasic *bl,list<PcodeOp *>::iterator iter);
+  void opInsert(PcodeOp *op,BlockBasic *bl,std::list<PcodeOp *>::iterator iter);
   void opUninsert(PcodeOp *op);					///< Remove the given PcodeOp from its basic block
   void opUnlink(PcodeOp *op);					///< Unset inputs/output and remove given PcodeOP from its basic block
   void opDestroy(PcodeOp *op);					///< Remove given PcodeOp and destroy its Varnode operands
   void opDestroyRaw(PcodeOp *op);				///< Remove the given \e raw PcodeOp
   void opDeadAndGone(PcodeOp *op) { obank.destroy(op); }	///< Free resources for the given \e dead PcodeOp
-  void opSetAllInput(PcodeOp *op,const vector<Varnode *> &vvec);	///< Set all input Varnodes for the given PcodeOp simultaneously
+  void opSetAllInput(PcodeOp *op,const std::vector<Varnode *> &vvec);	///< Set all input Varnodes for the given PcodeOp simultaneously
   void opRemoveInput(PcodeOp *op,int4 slot);			///< Remove a specific input slot for the given PcodeOp
-  void opInsertInput(PcodeOp *op,Varnode *vn,int4 slot);	///< Insert a new Varnode into the operand list for the given PcodeOp
+  void opInsertInput(PcodeOp *op,Varnode *vn,int4 slot);	///< Insert a new Varnode into the operand std::list for the given PcodeOp
   void opSetFlag(PcodeOp *op,uint4 fl) { op->setFlag(fl); }	///< Set a boolean property on the given PcodeOp
   void opClearFlag(PcodeOp *op,uint4 fl) { op->clearFlag(fl); }	///< Clear a boolean property on the given PcodeOp
   void opFlipFlag(PcodeOp *op,uint4 fl) { op->flipFlag(fl); }	///< Flip a boolean property on the given PcodeOp
@@ -422,22 +422,22 @@ public:
   PcodeOp *opStackStore(AddrSpace *spc,uintb off,PcodeOp *op,bool insertafter);
 
   /// \brief Start of PcodeOp objects with the given op-code
-  list<PcodeOp *>::const_iterator beginOp(OpCode opc) const { return obank.begin(opc); }
+  std::list<PcodeOp *>::const_iterator beginOp(OpCode opc) const { return obank.begin(opc); }
 
   /// \brief End of PcodeOp objects with the given op-code
-  list<PcodeOp *>::const_iterator endOp(OpCode opc) const { return obank.end(opc); }
+  std::list<PcodeOp *>::const_iterator endOp(OpCode opc) const { return obank.end(opc); }
 
-  /// \brief Start of PcodeOp objects in the \e alive list
-  list<PcodeOp *>::const_iterator beginOpAlive(void) const { return obank.beginAlive(); }
+  /// \brief Start of PcodeOp objects in the \e alive std::list
+  std::list<PcodeOp *>::const_iterator beginOpAlive(void) const { return obank.beginAlive(); }
 
-  /// \brief End of PcodeOp objects in the \e alive list
-  list<PcodeOp *>::const_iterator endOpAlive(void) const { return obank.endAlive(); }
+  /// \brief End of PcodeOp objects in the \e alive std::list
+  std::list<PcodeOp *>::const_iterator endOpAlive(void) const { return obank.endAlive(); }
 
-  /// \brief Start of PcodeOp objects in the \e dead list
-  list<PcodeOp *>::const_iterator beginOpDead(void) const { return obank.beginDead(); }
+  /// \brief Start of PcodeOp objects in the \e dead std::list
+  std::list<PcodeOp *>::const_iterator beginOpDead(void) const { return obank.beginDead(); }
 
-  /// \brief End of PcodeOp objects in the \e dead list
-  list<PcodeOp *>::const_iterator endOpDead(void) const { return obank.endDead(); }
+  /// \brief End of PcodeOp objects in the \e dead std::list
+  std::list<PcodeOp *>::const_iterator endOpDead(void) const { return obank.endDead(); }
 
   /// \brief Start of all (alive) PcodeOp objects sorted by sequence number
   PcodeOpTree::const_iterator beginOpAll(void) const { return obank.beginAll(); }
@@ -489,17 +489,17 @@ public:
 
 #ifdef OPACTION_DEBUG
   void (*jtcallback)(Funcdata &orig,Funcdata &fd);	///< Hook point debugging the jump-table simplification process
-  vector<PcodeOp *> modify_list;		///< List of modified ops
-  vector<std::string> modify_before;			///< List of "before" strings for modified ops
+  std::vector<PcodeOp *> modify_list;		///< List of modified ops
+  std::vector<std::string> modify_before;			///< List of "before" strings for modified ops
   int4 opactdbg_count;				///< Number of debug statements printed
   int4 opactdbg_breakcount;			///< Which debug to break on
   bool opactdbg_on;				///< Are we currently doing op action debugs
   bool opactdbg_active;				///< \b true if current op mods should be recorded
   bool opactdbg_breakon;			///< Has a breakpoint been hit
-  vector<Address> opactdbg_pclow;		///< Lower bounds on the PC register
-  vector<Address> opactdbg_pchigh;		///< Upper bounds on the PC register
-  vector<uintm> opactdbg_uqlow;			///< Lower bounds on the unique register
-  vector<uintm> opactdbg_uqhigh;		///< Upper bounds on the unique register
+  std::vector<Address> opactdbg_pclow;		///< Lower bounds on the PC register
+  std::vector<Address> opactdbg_pchigh;		///< Upper bounds on the PC register
+  std::vector<uintm> opactdbg_uqlow;			///< Lower bounds on the unique register
+  std::vector<uintm> opactdbg_uqhigh;		///< Upper bounds on the unique register
   void enableJTCallback(void (*jtcb)(Funcdata &orig,Funcdata &fd)) { jtcallback = jtcb; }	///< Enable a debug callback
   void disableJTCallback(void) { jtcallback = (void (*)(Funcdata &orig,Funcdata &fd))0; }	///< Disable debug callback
   void debugActivate(void) { if (opactdbg_on) opactdbg_active=true; }	///< Turn on recording
@@ -525,7 +525,7 @@ public:
 /// \brief A p-code emitter for building PcodeOp objects
 ///
 /// The emitter is attached to a specific Funcdata object.  Any p-code generated (by FlowInfo typically)
-/// will be instantiated as PcodeOp and Varnode objects and placed in the Funcdata \e dead list.
+/// will be instantiated as PcodeOp and Varnode objects and placed in the Funcdata \e dead std::list.
 class PcodeEmitFd : public PcodeEmit {
   Funcdata *fd;			///< The Funcdata container to emit to
   virtual void dump(const Address &addr,OpCode opc,VarnodeData *outvar,VarnodeData *vars,int4 isize);
@@ -578,8 +578,8 @@ class AncestorRealistic {
     pop_failkill	///< Backtracking, from path with a bad ancestor, specifically killedbycall
   };
   ParamTrial *trial;			///< Current trial being analyzed for suitability
-  vector<State> stateStack;		///< Holds the depth-first traversal stack
-  vector<const Varnode *> markedVn;	///< Holds visited Varnodes to properly trim cycles
+  std::vector<State> stateStack;		///< Holds the depth-first traversal stack
+  std::vector<const Varnode *> markedVn;	///< Holds visited Varnodes to properly trim cycles
   int4 multiDepth;			///< Number of MULTIEQUAL ops along current traversal path
   bool allowFailingPath;		///< True if we allow and test for failing paths due to conditional execution
 
@@ -598,14 +598,14 @@ public:
   bool execute(PcodeOp *op,int4 slot,ParamTrial *t,bool allowFail);
 };
 
-extern int4 opFlipInPlaceTest(PcodeOp *op,vector<PcodeOp *> &fliplist);
-extern void opFlipInPlaceExecute(Funcdata &data,vector<PcodeOp *> &fliplist);
+extern int4 opFlipInPlaceTest(PcodeOp *op,std::vector<PcodeOp *> &fliplist);
+extern void opFlipInPlaceExecute(Funcdata &data,std::vector<PcodeOp *> &fliplist);
 
 extern PcodeOp *earliestUseInBlock(Varnode *vn,BlockBasic *bl);
 extern PcodeOp *cseFindInBlock(PcodeOp *op,Varnode *vn,BlockBasic *bl,PcodeOp *earliest);
 extern PcodeOp *cseElimination(Funcdata &data,PcodeOp *op1,PcodeOp *op2);
-extern void cseEliminateList(Funcdata &data,vector< pair<uintm,PcodeOp *> > &list,
-			     vector<Varnode *> &outlist);
+extern void cseEliminateList(Funcdata &data,std::vector< std::pair<uintm,PcodeOp *> > &std::list,
+			     std::vector<Varnode *> &outlist);
 
 }
 #endif

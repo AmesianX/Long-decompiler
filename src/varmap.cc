@@ -22,7 +22,7 @@ AddressSorter::AddressSorter(const Address &ad,const Address &use,int4 sz) : add
 {
   size = sz;
   if (useaddr.isInvalid())	// If invalid
-    useaddr = Address((AddrSpace *)0,0); // Make sure to set offset to zero, so invalids compare equal
+    useaddr = Address((AddrSpace *)0,0); // Make sure to std::set offset to zero, so invalids compare equal
 }
 
 bool AddressSorter::operator<(const AddressSorter &op2) const
@@ -95,7 +95,7 @@ void ScopeLocal::resetLocalWindow(void)
   stackgrowsnegative = fd->getFuncProto().isStackGrowsNegative();
   RangeList newrange;
 
-  set<Range>::const_iterator iter;
+  std::set<Range>::const_iterator iter;
   for(iter=localrange.begin();iter!=localrange.end();++iter) {
     AddrSpace *spc = (*iter).getSpace();
     uintb first = (*iter).getFirst();
@@ -111,7 +111,7 @@ void ScopeLocal::resetLocalWindow(void)
   glb->symboltab->setRange(this,newrange);
 }
 
-void ScopeLocal::saveXml(ostream &s) const
+void ScopeLocal::saveXml(std::ostream &s) const
 
 {
   s << "<localdb";
@@ -176,12 +176,12 @@ void ScopeLocal::markNotMapped(AddrSpace *spc,uintb first,int4 sz,bool parameter
   glb->symboltab->removeRange(this,spaceid,first,last);
 }
 
-string ScopeLocal::buildVariableName(const Address &addr,
+std::string ScopeLocal::buildVariableName(const Address &addr,
 				     const Address &pc,
 				     Datatype *ct,
 				     int4 &index,uint4 flags) const
 {
-  map<AddressSorter,string>::const_iterator iter;
+  std::map<AddressSorter,std::string>::const_iterator iter;
   iter = name_recommend.find( AddressSorter(addr,pc,0));
   if (iter != name_recommend.end()) {
     // We are not checking if the recommended size matches
@@ -194,17 +194,17 @@ string ScopeLocal::buildVariableName(const Address &addr,
       sign_extend(start,addr.getAddrSize()*8-1);
       if (stackgrowsnegative)
 	start = -start;
-      ostringstream s;
+      std::ostringstream s;
       if (ct != (Datatype *)0)
 	ct->printNameBase(s);
-      string spacename = addr.getSpace()->getName();
+      std::string spacename = addr.getSpace()->getName();
       spacename[0] = toupper(spacename[0]);
       s << spacename;
       if (start <= 0) {
 	s << 'X';		// Indicate local stack space allocated by caller
 	start = -start;
       }
-      s << dec << start;
+      s << std::dec << start;
       return makeNameUnique(s.str());
     }
   }
@@ -249,7 +249,7 @@ void ScopeLocal::createEntry(const MapRange &a)
     ct = glb->types->getTypeArray(num,ct);
 
   int4 index=0;
-  string nm = buildVariableName(addr,usepoint,ct,index,Varnode::addrtied);
+  std::string nm = buildVariableName(addr,usepoint,ct,index,Varnode::addrtied);
 
   addSymbol(nm,ct,addr,usepoint);
 }
@@ -301,7 +301,7 @@ void AliasChecker::gatherInternal(void) const
   if (spacebase == (Varnode *)0) return; // No possible alias
 
   gatherAdditiveBase(spacebase,addbase);
-  for(vector<AddBase>::iterator iter=addbase.begin();iter!=addbase.end();++iter) {
+  for(std::vector<AddBase>::iterator iter=addbase.begin();iter!=addbase.end();++iter) {
     uintb offset = gatherOffset((*iter).base);
     offset = AddrSpace::addressToByte(offset,spaceid->getWordSize()); // Convert to byte offset
     alias.push_back(offset);
@@ -360,12 +360,12 @@ void AliasChecker::sortAlias(void) const
 // of the traversed trees.
 // \param startvn is the Varnode to trace
 // \param addbase will contain all the collected roots
-void AliasChecker::gatherAdditiveBase(Varnode *startvn,vector<AddBase> &addbase)
+void AliasChecker::gatherAdditiveBase(Varnode *startvn,std::vector<AddBase> &addbase)
 
 {
-  vector<AddBase> vnqueue;		// varnodes involved in addition with original vn
+  std::vector<AddBase> vnqueue;		// varnodes involved in addition with original vn
   Varnode *vn,*subvn,*indexvn,*othervn;
-  list<PcodeOp *>::const_iterator iter;
+  std::list<PcodeOp *>::const_iterator iter;
   PcodeOp *op;
   bool nonadduse;
   int4 i=0;
@@ -465,7 +465,7 @@ MapState::MapState(AddrSpace *spc,const RangeList &rn,
 {
   spaceid = spc;
   default_type = dt;
-  set<Range>::const_iterator iter;
+  std::set<Range>::const_iterator iter;
   for(iter=pm.begin();iter!=pm.end();++iter) {
     AddrSpace *spc = (*iter).getSpace();
     uintb first = (*iter).getFirst();
@@ -480,7 +480,7 @@ MapState::MapState(AddrSpace *spc,const RangeList &rn,
 MapState::~MapState(void)
 
 {
-  vector<MapRange *>::iterator iter;
+  std::vector<MapRange *>::iterator iter;
   for(iter=maplist.begin();iter!=maplist.end();++iter)
     delete *iter;
 }
@@ -500,11 +500,11 @@ void MapState::addRange(uintb st,Datatype *ct,uint4 fl,bool ay,int4 lo,int4 hi)
   maplist.push_back(range);
 #ifdef OPACTION_DEBUG
   if (debugon) {
-    ostringstream s;
-    s << "Add Range: " << hex << st << ":" << dec << sz;
+    std::ostringstream s;
+    s << "Add Range: " << std::dec << st << ":" << std::dec << sz;
     s << " ";
     ct->printRaw(s);
-    s << endl;
+    s << std::endl;
     glb->printDebug(s.str());
   }
 #endif
@@ -513,7 +513,7 @@ void MapState::addRange(uintb st,Datatype *ct,uint4 fl,bool ay,int4 lo,int4 hi)
 void MapState::addRange(const EntryMap *rangemap)
 
 {				// Add rangemap entries to MapState
-  list<SymbolEntry>::const_iterator iter;
+  std::list<SymbolEntry>::const_iterator iter;
   Symbol *sym;
   if (rangemap == (EntryMap *)0) return;
   for(iter=rangemap->begin_list();iter!=rangemap->end_list();++iter) {
@@ -569,7 +569,7 @@ void MapState::gatherVarnodes(const Funcdata &fd)
 void MapState::gatherHighs(const Funcdata &fd)
 
 {				// Same as gather_varnodes, but get types from highs
-  vector<HighVariable *> varvec;
+  std::vector<HighVariable *> varvec;
   VarnodeLocSet::const_iterator iter,iterend;
   Varnode *vn;
   HighVariable *high;
@@ -598,8 +598,8 @@ void MapState::gatherOpen(const Funcdata &fd)
 				// to the use of ptrs to local variables
   checker.gather(&fd,spaceid,false);
 
-  const vector<AliasChecker::AddBase> &addbase( checker.getAddBase() );
-  const vector<uintb> &alias( checker.getAlias() );
+  const std::vector<AliasChecker::AddBase> &addbase( checker.getAddBase() );
+  const std::vector<uintb> &alias( checker.getAlias() );
   uintb offset;
   Datatype *ct;
 
@@ -631,7 +631,7 @@ void ScopeLocal::restructureVarnode(bool aliasyes)
 { // Define stack mapping based on varnodes. Don't mark unaliased symbols unless -aliasyes- is true
   clearUnlockedCategory(-1);	// Clear out any unlocked entries
   MapState state(spaceid,getRangeTree(),fd->getFuncProto().getParamRange(),
-		  glb->types->getBase(1,TYPE_UNKNOWN)); // Organize list of ranges to insert
+		  glb->types->getBase(1,TYPE_UNKNOWN)); // Organize std::list of ranges to insert
     
 #ifdef OPACTION_DEBUG
   if (debugon)
@@ -658,7 +658,7 @@ void ScopeLocal::restructureHigh(void)
 {				// Define stack mapping based on highs
   clearUnlockedCategory(-1);	// Clear out any unlocked entries
   MapState state(spaceid,getRangeTree(),fd->getFuncProto().getParamRange(),
-		  glb->types->getBase(1,TYPE_UNKNOWN)); // Organize list of ranges to insert
+		  glb->types->getBase(1,TYPE_UNKNOWN)); // Organize std::list of ranges to insert
     
 #ifdef OPACTION_DEBUG
   if (debugon)
@@ -836,7 +836,7 @@ void ScopeLocal::rangeUnion(MapRange *a,MapRange *b,bool warning)
     if ((a->flags & Varnode::typelock)!=0) { // If a is locked
       return;			// Discard b entirely in favor of a
     }
-    // Concede confusion about types, set unknown type rather than a or b's type
+    // Concede confusion about types, std::set unknown type rather than a or b's type
     a->size = spaceid->wrapOffset(end-a->start);
     a->type = glb->types->getBase(a->size,TYPE_UNKNOWN);
     a->flags = 0;
@@ -877,12 +877,12 @@ void ScopeLocal::restructure(MapState &state,bool warning)
 				// build an entry for it
 }
 
-void ScopeLocal::markUnaliased(const vector<uintb> &alias)
+void ScopeLocal::markUnaliased(const std::vector<uintb> &alias)
 
 { // Mark all local symbols for which there are no aliases
   EntryMap *rangemap = maptable[spaceid->getIndex()];
   if (rangemap == (EntryMap *)0) return;
-  list<SymbolEntry>::iterator iter,enditer;
+  std::list<SymbolEntry>::iterator iter,enditer;
 
   bool aliason = false;
   uintb curalias=0;
@@ -961,7 +961,7 @@ void ScopeLocal::fakeInputSymbols(void)
       int4 size = (endpoint - addr.getOffset()) + 1;
       Datatype *ct = fd->getArch()->types->getBase(size,TYPE_UNKNOWN);
       int4 index = -1;		// NOT a parameter
-      string nm = buildVariableName(addr,usepoint,ct,index,Varnode::input);
+      std::string nm = buildVariableName(addr,usepoint,ct,index,Varnode::input);
       try {
 	addSymbol(nm,ct,addr,usepoint)->getSymbol();
       }
@@ -973,10 +973,10 @@ void ScopeLocal::fakeInputSymbols(void)
   }
 }
 
-bool ScopeLocal::makeNameRecommendation(string &res,const Address &addr,const Address &usepoint) const
+bool ScopeLocal::makeNameRecommendation(std::string &res,const Address &addr,const Address &usepoint) const
 
 {
-  map<AddressSorter,string>::const_iterator iter;
+  std::map<AddressSorter,std::string>::const_iterator iter;
   iter = name_recommend.find( AddressSorter(addr,usepoint,0) );
   if (iter != name_recommend.end()) {
     res = (*iter).second;
@@ -985,10 +985,10 @@ bool ScopeLocal::makeNameRecommendation(string &res,const Address &addr,const Ad
   return false;
 }
 
-void ScopeLocal::makeNameRecommendationsForSymbols(vector<string> &resname,vector<Symbol *> &ressym) const
+void ScopeLocal::makeNameRecommendationsForSymbols(vectorstd::string &resname,std::vector<Symbol *> &ressym) const
 
 { 				// Find nameable symbols with a varnode rep matching a name recommendation
-  map<AddressSorter,string>::const_iterator iter;
+  std::map<AddressSorter,std::string>::const_iterator iter;
   for(iter=name_recommend.begin();iter!=name_recommend.end();++iter) {
     VarnodeLocSet::const_iterator biter,eiter;
     bool isaddrtied;
@@ -1023,7 +1023,7 @@ void ScopeLocal::makeNameRecommendationsForSymbols(vector<string> &resname,vecto
   }
 }
 
-void ScopeLocal::addRecommendName(const Address &addr,const Address &usepoint,const string &nm,int4 sz)
+void ScopeLocal::addRecommendName(const Address &addr,const Address &usepoint,const std::string &nm,int4 sz)
 
 { // Add a recommended name for a local symbol
   name_recommend[ AddressSorter(addr,usepoint,sz) ] = nm;

@@ -23,13 +23,13 @@
 
 namespace GhidraDec {
 
-/// \brief A map from a linear space to value objects
+/// \brief A std::map from a linear space to value objects
 ///
 /// The partmap is a template class taking:
 ///   -  _linetype which represents an element in the linear space
 ///   -  _valuetype which are the objects that linear space maps to
 ///
-/// Let R be the linear space with an ordering, and let { a_i } be a finite set
+/// Let R be the linear space with an ordering, and let { a_i } be a finite std::set
 /// of points in R.
 /// The a_i partition R into a finite number of disjoint sets
 /// { x : x < a_0 },  { x : x>=a_0 && x < a_1 }, ...
@@ -41,7 +41,7 @@ namespace GhidraDec {
 /// looking up the value associated with the partition element
 /// containing x.
 ///
-/// The map is defined by starting with a \e default value object that applies
+/// The std::map is defined by starting with a \e default value object that applies
 /// to the whole linear space.  Then \e split points are introduced, one at a time,
 /// in the linear space. At each split point, the associated value object is split
 /// into two objects.  At any point the value object describing some part of the linear space
@@ -49,8 +49,8 @@ namespace GhidraDec {
 template<typename _linetype,typename _valuetype>
 class partmap {
 public:
-  typedef std::map<_linetype,_valuetype> maptype;		///< Defining the map from split points to value objects
-  typedef typename maptype::iterator iterator;			///< A partmap iterator is an iterator into the map
+  typedef std::map<_linetype,_valuetype> maptype;		///< Defining the std::map from split points to value objects
+  typedef typename maptype::iterator iterator;			///< A partmap iterator is an iterator into the std::map
   typedef typename maptype::const_iterator const_iterator;	///< A constant iterator
 private:
   maptype database;						///< Map from linear split points to the value objects
@@ -197,15 +197,16 @@ template<typename _linetype,typename _valuetype>
     return defaultvalue;
   }
 
+} // namespace GhidraDec
+
 #if 0
 
 #include <iostream>
-using namespace std;
 
 int main(int argc,char **argv)
 
 {
-  partmap<int,unsigned int> data;
+  GhidraDec::partmap<int,unsigned int> data;
 
   data.defaultValue() = 0;
   data.split(5) = 5;
@@ -213,23 +214,22 @@ int main(int argc,char **argv)
   data.split(3) = 4;
   data.split(3) = 3;
 
-  cout << data.getValue(6) << endl;
-  cout << data.getValue(8) << endl;
-  cout << data.getValue(4) << endl;
-  cout << data.getValue(1) << endl;
+  std::cout << data.getValue(6) << std::endl;
+  std::cout << data.getValue(8) << std::endl;
+  std::cout << data.getValue(4) << std::endl;
+  std::cout << data.getValue(1) << std::endl;
   
-  partmap<int,unsigned int>::const_iterator iter;
+  GhidraDec::partmap<int,unsigned int>::const_iterator iter;
 
   iter = data.begin(3);
   while(iter!=data.end()) {
-    cout << (*iter).second << endl;
+	std::cout << (*iter).second << std::endl;
     ++iter;
   }
 }
 
 #endif
 
-} // namespace GhidraDec
 
 
 #endif

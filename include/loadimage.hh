@@ -29,7 +29,7 @@ namespace GhidraDec {
 /// data cannot be met, usually because the requested address
 /// range is not in the image.
 struct DataUnavailError : public LowlevelError {
-  DataUnavailError(const string &s) : LowlevelError(s) {} ///< Instantiate with an explanatory string
+  DataUnavailError(const std::string &s) : LowlevelError(s) {} ///< Instantiate with an explanatory std::string
 };
 
 /// \brief A record indicating a function symbol
@@ -37,7 +37,7 @@ struct DataUnavailError : public LowlevelError {
 /// This is a lightweight object holding the Address and name of a function
 struct LoadImageFunc {
   Address address;	///< Start of function
-  string name;		///< Name of function
+  std::string name;		///< Name of function
 };
 
 /// \brief A record describing a section bytes in the executable
@@ -72,11 +72,11 @@ struct LoadImageSection {
 /// has only rudimentary support for accessing such properties.
 class LoadImage {
 protected:
-  string filename;		///< Name of the loadimage
+  std::string filename;		///< Name of the loadimage
 public:
-  LoadImage(const string &f);	///< LoadImage constructor
+  LoadImage(const std::string &f);	///< LoadImage constructor
   virtual ~LoadImage(void);	///< LoadImage destructor
-  const string &getFileName(void) const; ///< Get the name of the LoadImage
+  const std::string &getFileName(void) const; ///< Get the name of the LoadImage
   virtual void loadFill(uint1 *ptr,int4 size,const Address &addr)=0; ///< Get data from the LoadImage
   virtual void openSymbols(void) const; ///< Prepare to read symbols
   virtual void closeSymbols(void) const; ///< Stop reading symbols
@@ -84,8 +84,8 @@ public:
   virtual void openSectionInfo(void) const; ///< Prepare to read section info
   virtual void closeSectionInfo(void) const; ///< Stop reading section info
   virtual bool getNextSection(LoadImageSection &sec) const; ///< Get info on the next section
-  virtual void getReadonly(RangeList &list) const; ///< Return list of \e readonly address ranges
-  virtual string getArchType(void) const=0; ///< Get a string indicating the architecture type
+  virtual void getReadonly(RangeList &list) const; ///< Return std::list of \e readonly address ranges
+  virtual std::string getArchType(void) const=0; ///< Get a std::string indicating the architecture type
   virtual void adjustVma(long adjust)=0; ///< Adjust load addresses with a global offset
   uint1 *load(int4 size,const Address &addr);	///< Load a chunk of image
 };
@@ -97,23 +97,23 @@ public:
 /// of the first byte in the file.  No symbols or sections are supported
 class RawLoadImage : public LoadImage {
   uintb vma;			///< Address of first byte in the file
-  ifstream *thefile;		///< Main file stream for image
+  std::ifstream *thefile;		///< Main file stream for image
   uintb filesize;		///< Total number of bytes in the loadimage/file
   AddrSpace *spaceid;		///< Address space that the file bytes are mapped to
 public:
-  RawLoadImage(const string &f); ///< RawLoadImage constructor
+  RawLoadImage(const std::string &f); ///< RawLoadImage constructor
   void attachToSpace(AddrSpace *id) { spaceid = id; }	///< Attach the raw image to a particular space
   void open(void);					///< Open the raw file for reading
   virtual ~RawLoadImage(void);				///< RawLoadImage destructor
   virtual void loadFill(uint1 *ptr,int4 size,const Address &addr);
-  virtual string getArchType(void) const;
+  virtual std::string getArchType(void) const;
   virtual void adjustVma(long adjust);
 };
 
 /// For the base class there is no relevant initialization except
 /// the name of the image.
 /// \param f is the name of the image
-inline LoadImage::LoadImage(const string &f) {
+inline LoadImage::LoadImage(const std::string &f) {
   filename = f;
 }
 
@@ -122,9 +122,9 @@ inline LoadImage::~LoadImage(void) {
 }
 
 /// The loadimage is usually associated with a file. This routine
-/// retrieves the name as a string.
+/// retrieves the name as a std::string.
 /// \return the name of the image
-inline const string &LoadImage::getFileName(void) const {
+inline const std::string &LoadImage::getFileName(void) const {
   return filename;
 }
 
@@ -182,7 +182,7 @@ inline bool LoadImage::getNextSection(LoadImageSection &record) const {
 /// \b readonly.  This method is intended to be called only
 /// once, so all information should be written to the passed
 /// RangeList object.
-/// \param list is where readonly info will get put
+/// \param std::list is where readonly info will get put
 inline void LoadImage::getReadonly(RangeList &list) const {
 }
 
@@ -202,16 +202,16 @@ inline void LoadImage::getReadonly(RangeList &list) const {
 /// then would adjust the load address of the first byte.
 /// \param adjust is the offset amount to be added to default values
 
-/// \fn string LoadImage::getArchType(void) const
+/// \fn std::string LoadImage::getArchType(void) const
 /// The load image class is intended to be a generic front-end
 /// to the large variety of load formats in use.  This method
-/// should return a string that identifies the particular
+/// should return a std::string that identifies the particular
 /// architecture this particular image is intended to run on.
 /// It is currently the responsibility of any derived LoadImage
-/// class to establish a format for this string, but it should
+/// class to establish a format for this std::string, but it should
 /// generally contain some indication of the operating system
 /// and the processor.
-/// \return the identifier string
+/// \return the identifier std::string
 
 /// \fn void LoadImage::loadFill(uint1 *ptr,int4 size,const Address &addr)
 /// This is the \e core routine of a LoadImage.  Given a particular

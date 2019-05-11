@@ -39,7 +39,7 @@ public:
 
 // All offsets are byte based (as opposed to unit based)
 
-// Structure for internal map layout
+// Structure for internal std::map layout
 struct MapRange {
   uintb start;			// Start of range
   int4 size;
@@ -66,8 +66,8 @@ public:
 private:
   const Funcdata *fd;	// getFuncdata to search for aliases
   AddrSpace *spaceid;		// Space in which to search
-  mutable vector<AddBase> addbase; // Collection of pointer exprs
-  mutable vector<uintb> alias;	// List of aliased addresses
+  mutable std::vector<AddBase> addbase; // Collection of pointer exprs
+  mutable std::vector<uintb> alias;	// List of aliased addresses
   mutable bool calculated;	// Are aliases cached
   uintb localextreme;		// Local varible which is deepest on stack
   uintb localboundary;		// Boundary between locals and parameters
@@ -80,17 +80,17 @@ public:
   void gather(const Funcdata *f,AddrSpace *spc,bool defer);
   bool hasLocalAlias(Varnode *vn) const;
   void sortAlias(void) const;
-  const vector<AddBase> &getAddBase(void) const { return addbase; }
-  const vector<uintb> &getAlias(void) const { return alias; }
-  static void gatherAdditiveBase(Varnode *startvn,vector<AddBase> &addbase); // Gather result varnodes for all \e sums that \b startvn is involved in
+  const std::vector<AddBase> &getAddBase(void) const { return addbase; }
+  const std::vector<uintb> &getAlias(void) const { return alias; }
+  static void gatherAdditiveBase(Varnode *startvn,std::vector<AddBase> &addbase); // Gather result varnodes for all \e sums that \b startvn is involved in
   static uintb gatherOffset(Varnode *vn); // If \b vn is a sum result, return the constant portion of this sum
 };
 
 class MapState {
   AddrSpace *spaceid;
   RangeList range;
-  vector<MapRange *> maplist;
-  vector<MapRange *>::iterator iter;
+  std::vector<MapRange *> maplist;
+  std::vector<MapRange *>::iterator iter;
   Datatype *default_type;
   AliasChecker checker;
 public:
@@ -106,7 +106,7 @@ public:
   void addRange(const EntryMap *rangemap);
   bool initialize(void);
   void sortAlias(void) { checker.sortAlias(); }
-  const vector<uintb> &getAlias(void) { return checker.getAlias(); }
+  const std::vector<uintb> &getAlias(void) { return checker.getAlias(); }
   void gatherVarnodes(const Funcdata &fd);
   void gatherHighs(const Funcdata &fd);
   void gatherOpen(const Funcdata &fd);
@@ -121,13 +121,13 @@ class ScopeLocal : public ScopeInternal {
   RangeList localrange;		// Address ranges that might hold mapped locals (not parameters)
   bool overlapproblems;		// Cached problem flag
   uint4 qflags;
-  map<AddressSorter,string> name_recommend;
+  std::map<AddressSorter,std::string> name_recommend;
   bool adjustFit(MapRange &a) const;
   void createEntry(const MapRange &a);
   bool rangeAbsorb(MapRange *a,MapRange *b);
   void rangeUnion(MapRange *a,MapRange *b,bool warning);
   void restructure(MapState &state,bool warning);
-  void markUnaliased(const vector<uintb> &alias);
+  void markUnaliased(const std::vector<uintb> &alias);
   void fakeInputSymbols(void);
   void collectNameRecs(void);
 public:
@@ -139,18 +139,18 @@ public:
   void markNotMapped(AddrSpace *spc,uintb first,int4 sz,bool param);
 
 				// Routines that are specific to one address space
-  virtual void saveXml(ostream &s) const;
+  virtual void saveXml(std::ostream &s) const;
   virtual void restoreXml(const Element *el);
-  virtual string buildVariableName(const Address &addr,
+  virtual std::string buildVariableName(const Address &addr,
 				   const Address &pc,
 				   Datatype *ct,
 				   int4 &index,uint4 flags) const;
   void resetLocalWindow(void);
   void restructureVarnode(bool aliasyes);
   void restructureHigh(void);
-  bool makeNameRecommendation(string &res,const Address &addr,const Address &usepoint) const;
-  void makeNameRecommendationsForSymbols(vector<string> &resname,vector<Symbol *> &ressym) const;
-  void addRecommendName(const Address &addr,const Address &usepoint,const string &nm,int4 sz);
+  bool makeNameRecommendation(std::string &res,const Address &addr,const Address &usepoint) const;
+  void makeNameRecommendationsForSymbols(std::vector<std::string> &resname,std::vector<Symbol *> &ressym) const;
+  void addRecommendName(const Address &addr,const Address &usepoint,const std::string &nm,int4 sz);
 };
 
 }

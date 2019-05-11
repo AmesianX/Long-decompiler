@@ -29,7 +29,7 @@ class JumpTable;
 
 /// \brief Factory and static initializer for the "c-language" back-end to the decompiler
 ///
-/// The singleton adds itself to the list of possible back-end languages for the decompiler
+/// The singleton adds itself to the std::list of possible back-end languages for the decompiler
 /// and it acts as a factory for producing the PrintC object for emitting c-language tokens.
 class PrintCCapability : public PrintLanguageCapability {
   static PrintCCapability printCCapability;			///< The singleton instance
@@ -48,7 +48,7 @@ struct PartialSymbolEntry {
   const OpToken *token;		///< Operator used to drill-down to the field
   const TypeField *field;	///< The component object describing the field
   const Datatype *parent;	///< The parent data-type owning the field
-  string fieldname;		///< The name of the field
+  std::string fieldname;		///< The name of the field
   EmitXml::syntax_highlight hilite;	///< Highlight information for the field token
 };
 
@@ -118,11 +118,11 @@ protected:
   bool option_convention;	///< Set to \b true if we should print calling convention
   bool option_nocasts;		///< Don't print a cast if \b true
   bool option_unplaced;		///< Set to \b true if we should display unplaced comments
-  string nullToken;		///< Token to use for 'null'
+  std::string nullToken;		///< Token to use for 'null'
   CommentSorter commsorter;	///< Container/organizer for comments in the current function
 
   // Routines that are specific to C/C++
-  void buildTypeStack(const Datatype *ct,vector<const Datatype *> &typestack);	///< Prepare to push components of a data-type declaration
+  void buildTypeStack(const Datatype *ct,std::vector<const Datatype *> &typestack);	///< Prepare to push components of a data-type declaration
   void pushPrototypeInputs(const FuncProto *proto);				///< Push input parameters
   virtual void pushTypeStart(const Datatype *ct,bool noident);	///< Push part of a data-type declaration onto the RPN stack, up to the identifier
   virtual void pushTypeEnd(const Datatype *ct);			///< Push the tail ends of a data-type declaration onto the RPN stack
@@ -157,7 +157,7 @@ protected:
   void opFunc(const PcodeOp *op);			///< Push a \e functional expression based on the given p-code op to the RPN stack
   void opTypeCast(const PcodeOp *op);			///< Pus the given p-code op using type-cast syntax to the RPN stack
   static bool hasCharTerminator(uint1 *buffer,int4 size,int4 charsize);
-  bool printCharacterConstant(ostream &s,const Address &addr,int4 charsize) const;
+  bool printCharacterConstant(std::ostream &s,const Address &addr,int4 charsize) const;
   virtual void pushConstant(uintb val,const Datatype *ct,
 			    const Varnode *vn,const PcodeOp *op);
   virtual bool pushEquate(uintb val,int4 sz,const EquateSymbol *sym,
@@ -176,10 +176,10 @@ protected:
 			    const PcodeOp *op);
   virtual void push_float(uintb val,int4 sz,const Varnode *vn,
 			  const PcodeOp *op);
-  virtual void printUnicode(ostream &s,int4 onechar) const;
+  virtual void printUnicode(std::ostream &s,int4 onechar) const;
   virtual void pushType(const Datatype *ct);
-  virtual string genericFunctionName(const Address &addr);
-  virtual string genericTypeName(const Datatype *ct);
+  virtual std::string genericFunctionName(const Address &addr);
+  virtual std::string genericTypeName(const Datatype *ct);
 
   virtual void emitExpression(const PcodeOp *op);
   virtual void emitVarDecl(const Symbol *sym);
@@ -189,7 +189,7 @@ protected:
   virtual void emitTypeDefinition(const Datatype *ct);
   virtual bool checkPrintNegation(const Varnode *vn);
 public:
-  PrintC(Architecture *g,const string &nm="c-language");	///< Constructor
+  PrintC(Architecture *g,const std::string &nm="c-language");	///< Constructor
   void setNULLPrinting(bool val) { option_NULL = val; }		///< Toggle the printing of a 'NULL' token
   void setInplaceOps(bool val) { option_inplace_ops = val; }	///< Toggle the printing of \e in-place operators
   void setConvention(bool val) { option_convention = val; }	///< Toggle whether calling conventions are printed
@@ -199,7 +199,7 @@ public:
   void setDisplayUnplaced(bool val) { option_unplaced = val; }	///< Toggle whether \e unplaced comments are displayed in the header
   virtual ~PrintC(void) {}
   virtual void adjustTypeOperators(void);
-  virtual void setCommentStyle(const string &nm);
+  virtual void setCommentStyle(const std::string &nm);
   virtual bool isCharacterConstant(const uint1 *buf,int4 size,int4 charsize) const;
   virtual void docTypeDefinitions(const TypeFactory *typegrp);
   virtual void docAllGlobals(void);

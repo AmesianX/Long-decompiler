@@ -90,7 +90,7 @@ OpCode get_opcode(const std::string &nm)
 /// the opposite output on the same inputs. Set \b reorder to true if
 /// the complimentary operation involves reordering the input parameters.
 /// \param opc is the OpCode to complement
-/// \param reorder is set to \b true if the inputs need to be reordered
+/// \param reorder is std::set to \b true if the inputs need to be reordered
 /// \return the complementary OpCode or CPUI_MAX if not given a comparison operation
 OpCode get_booleanflip(OpCode opc,bool &reorder)
 

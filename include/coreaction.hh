@@ -150,7 +150,7 @@ public:
   virtual int4 apply(Funcdata &data);
 };
 
-/// \brief Check for one CPUI_MULTIEQUAL input set defining more than one Varnode
+/// \brief Check for one CPUI_MULTIEQUAL input std::set defining more than one Varnode
 class ActionShadowVar : public Action {
 public:
   ActionShadowVar(const std::string &g) : Action(0,"shadowvar",g) {}	///< Constructor
@@ -202,7 +202,7 @@ public:
 /// Label a varnode with the \b directwrite attribute if:
 /// that varnode can trace at least part of its data-flow ancestry to legal inputs,
 /// where \b legal inputs include:  globals, spacebase registers, and normal function parameters.
-/// The directwrite attribute is set on these inputs initially and then propagated
+/// The directwrite attribute is std::set on these inputs initially and then propagated
 /// to other varnodes through all other ops except CPUI_INDIRECT. The attribute propagates
 /// through CPUI_INDIRECT depending on the setting of -propagateIndirect-.
 /// For normal decompilation, propagation through CPUI_INDIRECTs is important for stack and other
@@ -234,7 +234,7 @@ public:
   virtual int4 apply(Funcdata &data);
 };
 
-/// \brief Mark Varnode objects that hold stack-pointer values and set-up special data-type
+/// \brief Mark Varnode objects that hold stack-pointer values and std::set-up special data-type
 class ActionSpacebase : public Action {
 public:
   ActionSpacebase(const std::string &g) : Action(0,"spacebase",g) {}	///< Constructor
@@ -384,7 +384,7 @@ class ActionMarkExplicit : public Action {
     OpStackElement(Varnode *v);	///< Constructor
   };
   static int4 baseExplicit(Varnode *vn,int4 maxref);	///< Make initial determination if a Varnode should be \e explicit
-  static int4 multipleInteraction(vector<Varnode *> &multlist);	///< Find multiple descendant chains
+  static int4 multipleInteraction(std::vector<Varnode *> &multlist);	///< Find multiple descendant chains
   static void processMultiplier(Varnode *vn,int4 max);	///< For a given multi-descendant Varnode, decide if it should be explicit
   static void checkNewToConstructor(Funcdata &data,Varnode *vn);	///< Set special properties on output of CPUI_NEW
 public:
@@ -401,7 +401,7 @@ class ActionMarkImplied : public Action {
   /// This class holds a single entry in a stack used to forward traverse Varnode expressions
   struct DescTreeElement {
     Varnode *vn;				///< The Varnode at this particular point in the path
-    list<PcodeOp *>::const_iterator desciter;	///< The current edge being traversed
+	std::list<PcodeOp *>::const_iterator desciter;	///< The current edge being traversed
     DescTreeElement(Varnode *v) {
       vn = v; desciter = v->beginDescend(); }	///< Constructor
   };
@@ -424,10 +424,10 @@ class ActionNameVars : public Action {
     Datatype *ct;		///< The data-type associated with a name
     std::string namerec;		///< A possible name for a variable
   };
-  static void makeRec(ProtoParameter *param,Varnode *vn,map<HighVariable *,OpRecommend> &recmap);
+  static void makeRec(ProtoParameter *param,Varnode *vn,std::map<HighVariable *,OpRecommend> &recmap);
   static void lookForBadJumpTables(Funcdata &data);	///< Mark the switch variable for bad jump-tables
   static void lookForRecommendedNames(Funcdata &data);	///< Try to apply names from unlocked symbols
-  static void lookForFuncParamNames(Funcdata &data,const vector<Varnode *> &varlist);
+  static void lookForFuncParamNames(Funcdata &data,const std::vector<Varnode *> &varlist);
 public:
   ActionNameVars(const std::string &g) : Action(rule_onceperfunc,"namevars",g) {}	///< Constructor
   virtual Action *clone(const ActionGroupList &grouplist) const {
@@ -488,20 +488,20 @@ public:
 /// Varnode itself.  Each Varnode has a \e consumed word, which
 /// indicates if a bit in the Varnode is being used, and it has
 /// two flags layed out as follows:
-///    - Varnode::lisconsume = varnode is in the working list
+///    - Varnode::lisconsume = varnode is in the working std::list
 ///    - Varnode::vacconsume = vacuously used bit
 ///            there is a path from the varnode through assignment
 ///            op outputs down to a varnode that is used
 ///
 /// The algorithm works by back propagating the \e consumed value
 /// up from the output of the op to its inputs, starting with
-/// a set of seed Varnodes which are marked as completely used
+/// a std::set of seed Varnodes which are marked as completely used
 /// (function inputs, branch conditions, ...) For each propagation
 /// the particular op being passed through can transform the
-/// "bit usage" vector of the output to obtain the input.
+/// "bit usage" std::vector of the output to obtain the input.
 class ActionDeadCode : public Action {
-  static void pushConsumed(uintb val,Varnode *vn,vector<Varnode *> &worklist);
-  static void propagateConsumed(vector<Varnode *> &worklist);
+  static void pushConsumed(uintb val,Varnode *vn,std::vector<Varnode *> &worklist);
+  static void propagateConsumed(std::vector<Varnode *> &worklist);
   static bool neverConsumed(Varnode *vn,Funcdata &data);
 public:
   ActionDeadCode(const std::string &g) : Action(0,"deadcode",g) {}	///< Constructor
@@ -562,7 +562,7 @@ public:
 /// \brief Lay down locked input and output data-type information.
 ///
 /// Build forced input/output Varnodes and extend them as appropriate.
-/// Set types on output forced Varnodes (input types are set automatically by the database).
+/// Set types on output forced Varnodes (input types are std::set automatically by the database).
 /// Initialize output recovery process.
 class ActionPrototypeTypes: public Action {
 public:
@@ -756,7 +756,7 @@ public:
 /// allows the spurious references to the register to be removed.
 class ActionLikelyTrash : public Action {
   static uint4 countMarks(PcodeOp *op);
-  static bool traceTrash(Varnode *vn,vector<PcodeOp *> &indlist);
+  static bool traceTrash(Varnode *vn,std::vector<PcodeOp *> &indlist);
 public:
   ActionLikelyTrash(const std::string &g) : Action(0,"likelytrash",g) {}	///< Constructor
   virtual Action *clone(const ActionGroupList &grouplist) const {
@@ -766,7 +766,7 @@ public:
   virtual int4 apply(Funcdata &data);
 };
 
-/// \brief Create symbols that map out the local stack-frame for the function.
+/// \brief Create symbols that std::map out the local stack-frame for the function.
 ///
 /// This produces on intermediate view of symbols on the stack.
 class ActionRestructureVarnode : public Action {
@@ -781,9 +781,9 @@ public:
   virtual int4 apply(Funcdata &data);
 };
 
-/// \brief Create symbols that map out the local stack-frame for the function.
+/// \brief Create symbols that std::map out the local stack-frame for the function.
 ///
-/// This produces the final set of symbols on the stack.
+/// This produces the final std::set of symbols on the stack.
 class ActionRestructureHigh : public Action {
 public:
   ActionRestructureHigh(const std::string &g) : Action(0,"restructure_high",g) {}	///< Constructor
@@ -869,8 +869,8 @@ public:
 /// TYPE_SPACEBASE is a problem because we have to make sure that it doesn't
 /// propagate.
 /// Also, offsets off of pointers to TYPE_SPACEBASE look up the data-type in the
-/// local map. Then ActionRestructure uses data-type information recovered by
-/// this algorithm to reconstruct the local map.  This causes a feedback loop
+/// local std::map. Then ActionRestructure uses data-type information recovered by
+/// this algorithm to reconstruct the local std::map.  This causes a feedback loop
 /// which allows type information recovered about mapped Varnodes to be propagated
 /// to pointer Varnodes which point to the mapped object.  Unfortunately under
 /// rare circumstances, this feedback-loop does not converge for some reason.
@@ -973,7 +973,7 @@ extern void build_defaultactions(ActionDatabase &allacts);	///< Build the defaul
 class PropagationState {
 public:
   Varnode *vn;					///< The root Varnode
-  list<PcodeOp *>::const_iterator iter;		///< Iterator to current descendant being enumerated
+  std::list<PcodeOp *>::const_iterator iter;		///< Iterator to current descendant being enumerated
   PcodeOp *op;					///< The current descendant or the defining PcodeOp
   int4 inslot;					///< Slot holding Varnode for descendant PcodeOp
   int4 slot;					///< Current edge relative to current PcodeOp
@@ -1003,15 +1003,15 @@ public:
 /// sorting of the terms to facilitate constant collapse and factoring simplifications.
 class TermOrder {
   PcodeOp *root;			///< The final PcodeOp in the expression
-  vector<PcodeOpEdge> terms;		///< Collected terms
-  vector<PcodeOpEdge *> sorter;		///< An array of references to terms for quick sorting
+  std::vector<PcodeOpEdge> terms;		///< Collected terms
+  std::vector<PcodeOpEdge *> sorter;		///< An array of references to terms for quick sorting
   static bool additiveCompare(const PcodeOpEdge *op1,const PcodeOpEdge *op2);
 public:
   TermOrder(PcodeOp *rt) { root = rt; }	///< Construct given root PcodeOp
   int4 getSize(void) const { return terms.size(); }	///< Get the number of terms in the expression
   void collect(void);			///< Collect all the terms in the expression
   void sortTerms(void);			///< Sort the terms using additiveCompare()
-  const vector<PcodeOpEdge *> &getSort(void) { return sorter; }	///< Get the sorted list of references
+  const std::vector<PcodeOpEdge *> &getSort(void) { return sorter; }	///< Get the sorted std::list of references
 };
 
 /// \brief A comparison operator for ordering terms in a sum

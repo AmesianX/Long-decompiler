@@ -288,7 +288,7 @@ bool ConditionMarker::andOrComplement(PcodeOp *bin1op,PcodeOp *bin2op)
 ///
 /// A common Varnode in the two expressions is given.  If the boolean expressions are
 /// uncorrelated, \b false is returned, otherwise \b true is returned.  If the expressions
-/// are correlated but always hold opposite values, the field \b matchflip is set to \b true.
+/// are correlated but always hold opposite values, the field \b matchflip is std::set to \b true.
 /// \param vn is the common Varnode
 /// \return \b true if the expressions are correlated
 bool ConditionMarker::finalJudgement(Varnode *vn)
@@ -528,7 +528,7 @@ void ConditionalExecution::predefineDirectMulti(PcodeOp *op)
 void ConditionalExecution::adjustDirectMulti(void)
 
 {
-  list<PcodeOp *>::const_iterator iter;
+  std::list<PcodeOp *>::const_iterator iter;
   PcodeOp *op;
   iter = posta_block->beginOp();
   int4 inslot = iblock->getOutRevIndex(posta_outslot);
@@ -566,7 +566,7 @@ Varnode *ConditionalExecution::getNewMulti(PcodeOp *op,BlockBasic *bl)
   fd->opSetOpcode(newop,CPUI_MULTIEQUAL);
 
   // We create NEW references to outvn, these refs will get put
-  // at the end of the dependency list and will get handled in
+  // at the end of the dependency std::list and will get handled in
   // due course
   for(int4 i=0;i<bl->sizeIn();++i)
     fd->opSetInput(newop,outvn,i);
@@ -588,7 +588,7 @@ Varnode *ConditionalExecution::getNewMulti(PcodeOp *op,BlockBasic *bl)
 Varnode *ConditionalExecution::getReplacementRead(PcodeOp *op,BlockBasic *bl)
 
 {
-  map<int4,Varnode *>::const_iterator iter;
+  std::map<int4,Varnode *>::const_iterator iter;
   iter = replacement.find(bl->getIndex());
   if (iter != replacement.end())
     return (*iter).second;
@@ -634,7 +634,7 @@ void ConditionalExecution::doReplacement(PcodeOp *op)
   if (directsplit)
     predefineDirectMulti(op);
   Varnode *vn = op->getOut();
-  list<PcodeOp *>::const_iterator iter = vn->beginDescend();
+  std::list<PcodeOp *>::const_iterator iter = vn->beginDescend();
   while(iter != vn->endDescend()) {
     PcodeOp *readop = *iter;
     int4 slot = readop->getSlot(vn);
@@ -692,7 +692,7 @@ void ConditionalExecution::fixReturnOp(void)
 bool ConditionalExecution::testRemovability(PcodeOp *op)
 
 {
-  list<PcodeOp *>::const_iterator iter;
+  std::list<PcodeOp *>::const_iterator iter;
   PcodeOp *readop;
   Varnode *vn;
 
@@ -747,7 +747,7 @@ bool ConditionalExecution::verify(void)
   postb_block = (BlockBasic *)iblock->getOut(1-posta_outslot);
 
   returnop.clear();
-  list<PcodeOp *>::const_iterator iter;
+  std::list<PcodeOp *>::const_iterator iter;
   iter = iblock->endOp();
   if (iter != iblock->beginOp())
     --iter;			// Skip branch
@@ -824,7 +824,7 @@ bool ConditionalExecution::trial(BlockBasic *ib)
 void ConditionalExecution::execute(void)
 
 {
-  list<PcodeOp *>::iterator iter;
+  std::list<PcodeOp *>::iterator iter;
   PcodeOp *op;
 
   fixReturnOp();		// Patch any data-flow thru to CPUI_RETURN
@@ -906,7 +906,7 @@ bool RuleOrPredicate::MultiPredicate::discoverZeroSlot(Varnode *vn)
   return false;
 }
 
-/// \brief Find CBRANCH operation that determines whether zero is set or not
+/// \brief Find CBRANCH operation that determines whether zero is std::set or not
 ///
 /// Assuming that \b op is a 2-branch MULTIEQUAL as per discoverZeroSlot(),
 /// try to find a single CBRANCH whose two \b out edges correspond to the
@@ -946,7 +946,7 @@ bool RuleOrPredicate::MultiPredicate::discoverCbranch(void)
 
 /// \brief Does the \b condBlock \b true outgoing edge flow to the block that sets zero
 ///
-/// The \b zeroPathIsTrue variable is set based on the current configuration
+/// The \b zeroPathIsTrue variable is std::set based on the current configuration
 void RuleOrPredicate::MultiPredicate::discoverPathIsTrue(void)
 
 {
@@ -955,14 +955,14 @@ void RuleOrPredicate::MultiPredicate::discoverPathIsTrue(void)
   else if (condBlock->getFalseOut() == zeroBlock)
     zeroPathIsTrue = false;
   else {	// condBlock must be zeroBlock
-    zeroPathIsTrue = (condBlock->getTrueOut() == op->getParent());	// True if "true" path does not override zero set
+    zeroPathIsTrue = (condBlock->getTrueOut() == op->getParent());	// True if "true" path does not override zero std::set
   }
 }
 
 /// \brief Verify that CBRANCH boolean expression is either (\b vn == 0) or (\b vn != 0)
 ///
 /// Modify \b zeroPathIsTrue so that if it is \b true, then: A \b vn value equal to zero,
-/// causes execution to flow to where the output of MULTIEQUAL is set to zero.
+/// causes execution to flow to where the output of MULTIEQUAL is std::set to zero.
 /// \param vn is the given Varnode
 /// \return \b true if the boolean expression has a matching form
 bool RuleOrPredicate::MultiPredicate::discoverConditionalZero(Varnode *vn)
@@ -992,7 +992,7 @@ bool RuleOrPredicate::MultiPredicate::discoverConditionalZero(Varnode *vn)
   return true;
 }
 
-void RuleOrPredicate::getOpList(vector<uint4> &oplist) const
+void RuleOrPredicate::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_INT_OR);
@@ -1021,7 +1021,7 @@ int4 RuleOrPredicate::checkSingle(Varnode *vn,MultiPredicate &branch,PcodeOp *op
   if (branch.op->getOut()->loneDescend() != op) return 0;	// Must only be one use of MULTIEQUAL, because we rewrite it
   branch.discoverPathIsTrue();
   if (!branch.discoverConditionalZero(vn)) return 0;
-  if (branch.zeroPathIsTrue) return 0;		// true condition (vn == 0) must not go to zero set
+  if (branch.zeroPathIsTrue) return 0;		// true condition (vn == 0) must not go to zero std::set
   data.opSetInput(branch.op,vn,branch.zeroSlot);
   data.opRemoveInput(op,1);
   data.opSetOpcode(op,CPUI_COPY);

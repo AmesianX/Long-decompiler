@@ -50,11 +50,11 @@ void HighVariable::updateCover(void) const
 
 /// Only update if flags are marked as \e dirty.
 /// Generally if any member Varnode possesses the property, \b this HighVariable should
-/// inherit it.  The Varnode::typelock field is not set here, but in updateType().
+/// inherit it.  The Varnode::typelock field is not std::set here, but in updateType().
 void HighVariable::updateFlags(void) const
 
 {
-  vector<Varnode *>::const_iterator iter;
+  std::vector<Varnode *>::const_iterator iter;
   uint4 fl;
 
   if ((highflags & HighVariable::flagsdirty)==0) return; // flags are up to date
@@ -74,7 +74,7 @@ void HighVariable::updateFlags(void) const
 Varnode *HighVariable::getTypeRepresentative(void) const
 
 {
-  vector<Varnode *>::const_iterator iter;
+  std::vector<Varnode *>::const_iterator iter;
   Varnode *vn,*rep;
   
   iter = inst.begin();
@@ -168,7 +168,7 @@ bool HighVariable::compareName(Varnode *vn1,Varnode *vn2)
 Varnode *HighVariable::getNameRepresentative(void) const
 
 {
-  vector<Varnode *>::const_iterator iter;
+  std::vector<Varnode *>::const_iterator iter;
   Varnode *rep,*vn;
 
   iter = inst.begin();
@@ -182,12 +182,12 @@ Varnode *HighVariable::getNameRepresentative(void) const
   return rep;
 }
 
-/// Search for the given Varnode and cut it out of the list, marking all properties as \e dirty.
+/// Search for the given Varnode and cut it out of the std::list, marking all properties as \e dirty.
 /// \param vn is the given Varnode member to remove
 void HighVariable::remove(Varnode *vn)
 
 {
-  vector<Varnode *>::iterator iter;
+  std::vector<Varnode *>::iterator iter;
 
   iter = lower_bound(inst.begin(),inst.end(),vn,compareJustLoc);
   for(;iter!=inst.end();++iter) {
@@ -231,7 +231,7 @@ void HighVariable::merge(HighVariable *tv2,bool isspeculative)
       vn->setHigh(this,vn->getMergeGroup());
     }
   }
-  vector<Varnode *> instcopy(inst);
+  std::vector<Varnode *> instcopy(inst);
   inst.resize(inst.size()+tv2->inst.size(),(Varnode *)0);
   std::merge(instcopy.begin(),instcopy.end(),tv2->inst.begin(),tv2->inst.end(),inst.begin(),compareJustLoc);
   tv2->inst.clear();
@@ -308,21 +308,21 @@ Varnode *HighVariable::getInputVarnode(void) const
 
 /// This is generally used for debug purposes.
 /// \param s is the output stream
-void HighVariable::printInfo(ostream &s) const
+void HighVariable::printInfo(std::ostream &s) const
 
 {
-  vector<Varnode *>::const_iterator viter;
+  std::vector<Varnode *>::const_iterator viter;
   Varnode *vn;
 
   updateType();
   if (symbol == (Symbol *)0) {
-    s << "Variable: UNNAMED" << endl;
+    s << "Variable: UNNAMED" << std::endl;
   }
   else {
     s << "Variable: " << symbol->getName();
     if (symboloffset!=-1)
       s << "(partial)";
-    s << endl;
+    s << std::endl;
   }
   s << "Type: ";
   type->printRaw(s);
@@ -330,7 +330,7 @@ void HighVariable::printInfo(ostream &s) const
 				
   for(viter=inst.begin();viter!=inst.end();++viter) {
     vn = *viter;
-    s << dec << vn->getMergeGroup() << ": ";
+    s << std::dec << vn->getMergeGroup() << ": ";
     vn->printInfo(s);
   }
 }
@@ -352,7 +352,7 @@ int4 HighVariable::instanceIndex(const Varnode *vn) const
 // Varnode *HighVariable::findGlobalRep(void) const
 
 // {
-//   vector<Varnode *>::const_iterator iter;
+//   std::vector<Varnode *>::const_iterator iter;
 //   Varnode *vn = (Varnode *)0;
 //   Varnode *vn2;
 

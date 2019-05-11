@@ -20,7 +20,7 @@ namespace GhidraDec {
 /// This instance assumes the identity of the given Varnode and the defining index is
 /// cached to facilitate quick sorting.
 /// \param v is the given Varnode
-void BlockVarnode::set(Varnode *v)
+void BlockVarnode::std::set(Varnode *v)
 
 {
   vn = v;
@@ -34,19 +34,19 @@ void BlockVarnode::set(Varnode *v)
 
 /// \brief Find the first Varnode defined in the BlockBasic of the given index
 ///
-/// A BlockVarnode is identified from a sorted \b list. The position of the first BlockVarnode
-/// in this list that has the given BlockBasic \e index is returned.
+/// A BlockVarnode is identified from a sorted \b std::list. The position of the first BlockVarnode
+/// in this std::list that has the given BlockBasic \e index is returned.
 /// \param blocknum is the index of the BlockBasic to search for
-/// \param list is the sorted list of BlockVarnodes
-/// \return the index of the BlockVarnode within the list or -1 if no Varnode in the block is found
-int4 BlockVarnode::findFront(int4 blocknum,const vector<BlockVarnode> &list)
+/// \param std::list is the sorted std::list of BlockVarnodes
+/// \return the index of the BlockVarnode within the std::list or -1 if no Varnode in the block is found
+int4 BlockVarnode::findFront(int4 blocknum,const std::vector<BlockVarnode> &std::list)
 
 {
   int4 min = 0;
-  int4 max = list.size()-1;
+  int4 max = std::list.size()-1;
   while(min < max) {
     int4 cur = (min + max)/2;
-    int4 curblock = list[cur].getIndex();
+    int4 curblock = std::list[cur].getIndex();
     if (curblock >= blocknum)
       max = cur;
     else
@@ -54,7 +54,7 @@ int4 BlockVarnode::findFront(int4 blocknum,const vector<BlockVarnode> &list)
   }
   if (min > max)
     return -1;
-  if (list[min].getIndex() != blocknum)
+  if (std::list[min].getIndex() != blocknum)
     return -1;
   return min;
 }
@@ -183,17 +183,17 @@ bool Merge::mergeTestBasic(Varnode *vn)
   return true;
 }
 
-/// \brief Speculatively merge all HighVariables in the given list as well as possible
+/// \brief Speculatively merge all HighVariables in the given std::list as well as possible
 ///
 /// The variables are first sorted by the index of the earliest block in their range.
 /// Then proceeding in order, an attempt is made to merge each variable with the first.
 /// The attempt fails if the \e speculative test doesn't pass or if there are Cover
 /// intersections, in which case that particular merge is skipped.
-void Merge::mergeLinear(vector<HighVariable *> &highvec)
+void Merge::mergeLinear(std::vector<HighVariable *> &highvec)
 
 {
-  vector<HighVariable *> highstack;
-  vector<HighVariable *>::iterator initer,outiter;
+  std::vector<HighVariable *> highstack;
+  std::vector<HighVariable *>::iterator initer,outiter;
   HighVariable *high;
 
   if (highvec.size() <= 1) return;
@@ -213,7 +213,7 @@ void Merge::mergeLinear(vector<HighVariable *> &highvec)
 
 /// \brief Force the merge of a ranges of Varnodes with the same size and storage address
 ///
-/// The list of Varnodes to be merged is provided as a range in the main location sorted
+/// The std::list of Varnodes to be merged is provided as a range in the main location sorted
 /// container.  Any Cover intersection is assumed to already be \b snipped, so any problems
 /// with merging cause an exception to be thrown.
 /// \param startiter is the beginning of the range of Varnodes with the same storage address
@@ -253,7 +253,7 @@ void Merge::mergeOpcode(OpCode opc)
 
 {
   BlockBasic *bl;
-  list<PcodeOp *>::iterator iter;
+  std::list<PcodeOp *>::iterator iter;
   PcodeOp *op;
   Varnode *vn1,*vn2;
   const BlockGraph &bblocks(data.getBasicBlocks());
@@ -285,10 +285,10 @@ void Merge::mergeOpcode(OpCode opc)
 void Merge::mergeByDatatype(VarnodeLocSet::const_iterator startiter,VarnodeLocSet::const_iterator enditer)
 
 {
-  vector<HighVariable *> highvec;
-  list<HighVariable *> highlist;
+  std::vector<HighVariable *> highvec;
+  std::list<HighVariable *> highlist;
 
-  list<HighVariable *>::iterator hiter;
+  std::list<HighVariable *>::iterator hiter;
   VarnodeLocSet::const_iterator iter;
   Varnode *vn;
   HighVariable *high;
@@ -326,14 +326,14 @@ void Merge::mergeByDatatype(VarnodeLocSet::const_iterator startiter,VarnodeLocSe
   }
 }
 
-/// \brief Snip off set of \e read p-code ops for a given Varnode
+/// \brief Snip off std::set of \e read p-code ops for a given Varnode
 ///
 /// The data-flow for the given Varnode is truncated by creating a COPY p-code from the Varnode
-/// into a new temporary Varnode, then replacing the Varnode reads for a specific set of
+/// into a new temporary Varnode, then replacing the Varnode reads for a specific std::set of
 /// p-code ops with the temporary.
 /// \param vn is the given Varnode
-/// \param markedop is the specific set of PcodeOps reading the Varnode
-void Merge::snipReads(Varnode *vn,list<PcodeOp *> &markedop)
+/// \param markedop is the specific std::set of PcodeOps reading the Varnode
+void Merge::snipReads(Varnode *vn,std::list<PcodeOp *> &markedop)
 
 {
   if (markedop.empty()) return;
@@ -370,7 +370,7 @@ void Merge::snipReads(Varnode *vn,list<PcodeOp *> &markedop)
   else
     data.opInsertAfter(copyop,afterop);
 
-  list<PcodeOp *>::iterator iter;
+  std::list<PcodeOp *>::iterator iter;
   for(iter=markedop.begin();iter!=markedop.end();++iter) {
     op = *iter;
     for(slot=0;slot<op->numInput();++slot)
@@ -379,19 +379,19 @@ void Merge::snipReads(Varnode *vn,list<PcodeOp *> &markedop)
   }
 }
 
-/// \brief Eliminate intersections of given Varnode with other Varnodes in a list
+/// \brief Eliminate intersections of given Varnode with other Varnodes in a std::list
 ///
-/// Both the given Varnode and those in the list are assumed to be at the same storage address.
+/// Both the given Varnode and those in the std::list are assumed to be at the same storage address.
 /// For any intersection, identify the PcodeOp reading the given Varnode which causes the
 /// intersection and \e snip the read by inserting additional COPY ops.
 /// \param vn is the given Varnode
-/// \param blocksort is the list of other Varnodes sorted by their defining basic block
-void Merge::eliminateIntersect(Varnode *vn,const vector<BlockVarnode> &blocksort)
+/// \param blocksort is the std::list of other Varnodes sorted by their defining basic block
+void Merge::eliminateIntersect(Varnode *vn,const std::vector<BlockVarnode> &blocksort)
 
 {
-  list<PcodeOp *> markedop;
-  list<PcodeOp *>::const_iterator oiter;
-  map<int4,CoverBlock>::const_iterator iter,enditer;
+  std::list<PcodeOp *> markedop;
+  std::list<PcodeOp *>::const_iterator oiter;
+  std::map<int4,CoverBlock>::const_iterator iter,enditer;
   Varnode *vn2;
   int4 boundtype;
   bool insertop;
@@ -459,7 +459,7 @@ void Merge::eliminateIntersect(Varnode *vn,const vector<BlockVarnode> &blocksort
 
 /// \brief Make sure all Varnodes with the same storage address and size can be merged
 ///
-/// The list of Varnodes to be merged is provided as a range in the main location sorted
+/// The std::list of Varnodes to be merged is provided as a range in the main location sorted
 /// container.  Any discovered intersection is \b snipped by splitting data-flow for one of
 /// the Varnodes into two or more flows, which involves insert new COPY ops and temporaries.
 /// \param startiter is the beginning of the range of Varnodes with the same storage address
@@ -469,8 +469,8 @@ void Merge::unifyAddress(VarnodeLocSet::const_iterator startiter,VarnodeLocSet::
 {
   VarnodeLocSet::const_iterator iter;
   Varnode *vn;
-  vector<Varnode *> isectlist;
-  vector<BlockVarnode> blocksort;
+  std::vector<Varnode *> isectlist;
+  std::vector<BlockVarnode> blocksort;
 
   for(iter=startiter;iter!=enditer;++iter) {
     vn = *iter;
@@ -478,7 +478,7 @@ void Merge::unifyAddress(VarnodeLocSet::const_iterator startiter,VarnodeLocSet::
   }
   blocksort.resize(isectlist.size());
   for(int4 i=0;i<isectlist.size();++i)
-    blocksort[i].set(isectlist[i]);
+    blocksort[i].std::set(isectlist[i]);
   stable_sort(blocksort.begin(),blocksort.end());
 				// BEWARE, its possible that eliminate_intersect
 				// will insert new varnodes in the original range
@@ -488,7 +488,7 @@ void Merge::unifyAddress(VarnodeLocSet::const_iterator startiter,VarnodeLocSet::
 
 /// \brief Force the merge of \e address \e tried Varnodes
 ///
-/// For each set of address tied Varnodes with the same size and storage address, merge
+/// For each std::set of address tied Varnodes with the same size and storage address, merge
 /// them into a single HighVariable. The merges are \e forced, so any Cover intersections must
 /// be resolved by altering data-flow, which involves inserting additional COPY ops and
 /// \e unique Varnodes.
@@ -584,7 +584,7 @@ void Merge::trimOpInput(PcodeOp *op,int4 slot)
 void Merge::mergeOp(PcodeOp *op)
 
 {
-  vector<HighVariable *> testlist;
+  std::vector<HighVariable *> testlist;
   HighVariable *high_out;
   int4 i,nexttrim,max;
 
@@ -629,7 +629,7 @@ void Merge::mergeOp(PcodeOp *op)
     if (!mergeTestRequired(op->getOut()->getHigh(),op->getIn(i)->getHigh()))
       throw LowlevelError("Non-cover related merge restriction violated, despite trims");
     if (!merge(op->getOut()->getHigh(),op->getIn(i)->getHigh(),false)) {
-      ostringstream errstr;
+      std::ostringstream errstr;
       errstr << "Unable to force merge of op at " << op->getSeqNum();
       throw LowlevelError(errstr.str());
     }
@@ -639,11 +639,11 @@ void Merge::mergeOp(PcodeOp *op)
 /// \brief Collect all instances of the given HighVariable whose Cover intersects a p-code op
 ///
 /// Efficiently test if each instance Varnodes contains the specific p-code op in its Cover
-/// and return a list of the instances that do.
-/// \param vlist will hold the resulting list of intersecting instances
+/// and return a std::list of the instances that do.
+/// \param vlist will hold the resulting std::list of intersecting instances
 /// \param high is the given HighVariable
 /// \param op is the specific PcodeOp to test intersection with
-void Merge::collectCovering(vector<Varnode *> &vlist,HighVariable *high,PcodeOp *op)
+void Merge::collectCovering(std::vector<Varnode *> &vlist,HighVariable *high,PcodeOp *op)
 
 {
   int4 blk = op->getParent()->getIndex();
@@ -656,19 +656,19 @@ void Merge::collectCovering(vector<Varnode *> &vlist,HighVariable *high,PcodeOp 
 
 /// \brief Check for for p-code op intersections that are correctable
 ///
-/// Given a list of Varnodes that intersect a specific PcodeOp, check that each intersection is
+/// Given a std::list of Varnodes that intersect a specific PcodeOp, check that each intersection is
 /// on the boundary, and if so, pass back the \e read op(s) that cause the intersection.
-/// \param vlist is the given list of intersecting Varnodes
+/// \param vlist is the given std::list of intersecting Varnodes
 /// \param oplist will hold the boundary intersecting \e read ops
 /// \param slotlist will hold the corresponding input slots of the instance
 /// \param op is the specific intersecting PcodeOp
-/// \return \b false if any instance in the list intersects the PcodeOp on the interior
-bool Merge::collectCorrectable(const vector<Varnode *> &vlist,list<PcodeOp *> &oplist,
-			       vector<int4> &slotlist,PcodeOp *op)
+/// \return \b false if any instance in the std::list intersects the PcodeOp on the interior
+bool Merge::collectCorrectable(const std::vector<Varnode *> &vlist,std::list<PcodeOp *> &oplist,
+			       std::vector<int4> &slotlist,PcodeOp *op)
 {
   int4 blk = op->getParent()->getIndex();
-  vector<Varnode *>::const_iterator viter;
-  list<PcodeOp *>::const_iterator oiter;
+  std::vector<Varnode *>::const_iterator viter;
+  std::list<PcodeOp *>::const_iterator oiter;
   Varnode *vn;
   PcodeOp *edgeop;
   int4 slot,bound;
@@ -702,9 +702,9 @@ void Merge::snipIndirect(PcodeOp *indop)
 
 {
   PcodeOp *op = PcodeOp::getOpFromConst(indop->getIn(1)->getAddr()); // Indirect effect op
-  vector<Varnode *> problemvn;
-  list<PcodeOp *> correctable;
-  vector<int4> correctslot;
+  std::vector<Varnode *> problemvn;
+  std::list<PcodeOp *> correctable;
+  std::vector<int4> correctslot;
 				// Collect instances of output->high that are defined
 				// before (and right up to) op. These need to be snipped.
   collectCovering(problemvn,indop->getOut()->getHigh(),op);
@@ -731,7 +731,7 @@ void Merge::snipIndirect(PcodeOp *indop)
   data.opSetOutput(snipop,snipvn);
   data.opSetInput(snipop,refvn,0);
   data.opInsertBefore(snipop,op);
-  list<PcodeOp *>::iterator oiter;
+  std::list<PcodeOp *>::iterator oiter;
   int4 i,slot;
   for(oiter=correctable.begin(),i=0;i<correctslot.size();++oiter,++i) {
     insertop = *oiter;
@@ -787,7 +787,7 @@ void Merge::mergeMarker(void)
 
 {
   PcodeOp *op;
-  list<PcodeOp *>::const_iterator iter;
+  std::list<PcodeOp *>::const_iterator iter;
   for(iter=data.beginOpAlive();iter!=data.endOpAlive();++iter) {
     op = *iter;
     if ((!op->isMarker())||op->isIndirectCreation()) continue;
@@ -806,7 +806,7 @@ void Merge::mergeMarker(void)
 void Merge::mergeAdjacent(void)
 
 {
-  list<PcodeOp *>::const_iterator oiter;
+  std::list<PcodeOp *>::const_iterator oiter;
   PcodeOp *op;
   int4 i;
   HighVariable *high_in,*high_out;
@@ -840,8 +840,8 @@ void Merge::mergeAdjacent(void)
 /// Find all Varnodes in the HighVariable which are defined by a COPY from another
 /// Varnode which is \e not part of the same HighVariable.
 /// \param high is the given HighVariable
-/// \param singlelist will hold the resulting list of copied instances
-void Merge::findSingleCopy(HighVariable *high,vector<Varnode *> &singlelist)
+/// \param singlelist will hold the resulting std::list of copied instances
+void Merge::findSingleCopy(HighVariable *high,std::vector<Varnode *> &singlelist)
 
 {
   int4 i;
@@ -872,7 +872,7 @@ void Merge::findSingleCopy(HighVariable *high,vector<Varnode *> &singlelist)
 bool Merge::hideShadows(HighVariable *high)
 
 {
-  vector<Varnode *> singlelist;
+  std::vector<Varnode *> singlelist;
   Varnode *vn1,*vn2;
   int4 i,j;
   bool res = false;
@@ -918,11 +918,11 @@ bool Merge::merge(HighVariable *high1,HighVariable *high2,bool isspeculative)
   if (intersection(high1,high2)) return false;
 
 				// Translate any tests for high2 into tests for high1
-  vector<HighVariable *> yesinter;		// Highs that high2 intersects
-  vector<HighVariable *> nointer;		// Highs that high2 does not intersect
-  map<HighEdge,bool>::iterator iterfirst = highedgemap.lower_bound( HighEdge(high2,(HighVariable *)0) );
-  map<HighEdge,bool>::iterator iterlast = highedgemap.lower_bound( HighEdge(high2,(HighVariable *)~((uintp)0)) );
-  map<HighEdge,bool>::iterator iter;
+  std::vector<HighVariable *> yesinter;		// Highs that high2 intersects
+  std::vector<HighVariable *> nointer;		// Highs that high2 does not intersect
+  std::map<HighEdge,bool>::iterator iterfirst = highedgemap.lower_bound( HighEdge(high2,(HighVariable *)0) );
+  std::map<HighEdge,bool>::iterator iterlast = highedgemap.lower_bound( HighEdge(high2,(HighVariable *)~((uintp)0)) );
+  std::map<HighEdge,bool>::iterator iter;
 
   for(iter=iterfirst;iter!=iterlast;++iter) {
     HighVariable *b = (*iter).first.b; 
@@ -956,7 +956,7 @@ bool Merge::merge(HighVariable *high1,HighVariable *high2,bool isspeculative)
     else			// Keep any intersection==true tests
       ++iter;
   }
-  vector<HighVariable *>::iterator titer;
+  std::vector<HighVariable *>::iterator titer;
   for(titer=nointer.begin();titer!=nointer.end();++titer)
     (*titer)->clearMark();
 				// Reinsert high2's intersection==true tests for high1 now
@@ -972,7 +972,7 @@ bool Merge::merge(HighVariable *high1,HighVariable *high2,bool isspeculative)
 
 /// As manipulations are made, Cover information gets out of date. A \e dirty flag is used to
 /// indicate a particular HighVariable Cover is out-of-date.  This routine checks the \e dirty
-/// flag and updates the Cover information if it is set.
+/// flag and updates the Cover information if it is std::set.
 /// \param a is the HighVariable to update
 /// \return \b true if the HighVariable was not originally dirty
 bool Merge::updateHigh(HighVariable *a)
@@ -993,12 +993,12 @@ bool Merge::updateHigh(HighVariable *a)
 void Merge::purgeHigh(HighVariable *high)
 
 {
-  map<HighEdge,bool>::iterator iterfirst = highedgemap.lower_bound( HighEdge(high,(HighVariable *)0) );
-  map<HighEdge,bool>::iterator iterlast = highedgemap.lower_bound( HighEdge(high,(HighVariable *)~((uintp)0)) );
+  std::map<HighEdge,bool>::iterator iterfirst = highedgemap.lower_bound( HighEdge(high,(HighVariable *)0) );
+  std::map<HighEdge,bool>::iterator iterlast = highedgemap.lower_bound( HighEdge(high,(HighVariable *)~((uintp)0)) );
 
   if (iterfirst == iterlast) return;
   --iterlast;			// Move back 1 to prevent deleting under the iterator
-  map<HighEdge,bool>::iterator iter;
+  std::map<HighEdge,bool>::iterator iter;
   for(iter=iterfirst;iter!=iterlast;++iter)
     highedgemap.erase( HighEdge( (*iter).first.b, (*iter).first.a) );
   highedgemap.erase( HighEdge( (*iter).first.b, (*iter).first.a) );
@@ -1022,14 +1022,14 @@ bool Merge::intersection(HighVariable *a,HighVariable *b)
   bool ares = updateHigh(a);
   bool bres = updateHigh(b);
   if (ares && bres) {		// If neither high was dirty
-    map<HighEdge,bool>::iterator iter = highedgemap.find( HighEdge(a,b) );
+    std::map<HighEdge,bool>::iterator iter = highedgemap.find( HighEdge(a,b) );
     if (iter != highedgemap.end()) // If previous test is present
       return (*iter).second;	// Use it
   }
 
   bool res = false;
   int4 blk;
-  vector<int4> blockisect;
+  std::vector<int4> blockisect;
   a->wholecover.intersectList(blockisect,b->wholecover,2);
   for(blk=0;blk<blockisect.size();++blk) {
     if (blockIntersection(a,b,blockisect[blk])) {
@@ -1052,7 +1052,7 @@ bool Merge::intersection(HighVariable *a,HighVariable *b)
 bool Merge::blockIntersection(HighVariable *a,HighVariable *b,int4 blk)
 
 {
-  vector<Varnode *> blist;
+  std::vector<Varnode *> blist;
 
   for(int4 i=0;i<b->numInstances();++i) {
     Varnode *vn = b->getInstance(i);
@@ -1120,15 +1120,15 @@ bool Merge::inflateTest(Varnode *a,HighVariable *high)
   return res;
 }
 
-/// \brief Test for intersections between a given HighVariable and a list of other HighVariables
+/// \brief Test for intersections between a given HighVariable and a std::list of other HighVariables
 ///
-/// If there is any Cover intersection between the given HighVariable and one in the list,
+/// If there is any Cover intersection between the given HighVariable and one in the std::list,
 /// this routine returns \b false.  Otherwise, the given HighVariable is added to the end of
-/// the list and \b true is returned.
+/// the std::list and \b true is returned.
 /// \param high is the given HighVariable
-/// \param tmplist is the list of HighVariables to test against
+/// \param tmplist is the std::list of HighVariables to test against
 /// \return \b true if there are no pairwise intersections.
-bool Merge::mergeTest(HighVariable *high,vector<HighVariable *> &tmplist)
+bool Merge::mergeTest(HighVariable *high,std::vector<HighVariable *> &tmplist)
 
 {
   if (!high->hasCover()) return false;

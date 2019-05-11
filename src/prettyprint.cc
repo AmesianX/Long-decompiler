@@ -59,7 +59,7 @@ void EmitXml::endFunction(int4 id) {
 /// \param bl is the block structure object associated with the section
 /// \return an id associated with the section
 int4 EmitXml::beginBlock(const FlowBlock *bl) {
-  *s << "<block " << highlight[(int4)no_color] << " blockref=\"0x" << hex <<
+  *s << "<block " << highlight[(int4)no_color] << " blockref=\"0x" << std::dec <<
     bl->getIndex() << "\">";
   return 0;
 }
@@ -72,7 +72,7 @@ void EmitXml::endBlock(int4 id) {
 
 /// Tell the emitter that a new line is desired at the current indent level
 void EmitXml::tagLine(void) {
-  *s << "<break " << highlight[(int4)no_color] << " indent=\"0x" << hex <<
+  *s << "<break " << highlight[(int4)no_color] << " indent=\"0x" << std::dec <<
     indentlevel << "\"/>";
 }
 
@@ -80,7 +80,7 @@ void EmitXml::tagLine(void) {
 /// is overridden only for the line, then it returns to its previous value.
 /// \param indent is the desired indent level for the new line
 void EmitXml::tagLine(int4 indent) {
-  *s << "<break " << highlight[(int4)no_color] << " indent=\"0x" << hex <<
+  *s << "<break " << highlight[(int4)no_color] << " indent=\"0x" << std::dec <<
     indent << "\"/>";
 }
 
@@ -90,7 +90,7 @@ void EmitXml::tagLine(int4 indent) {
 int4 EmitXml::beginReturnType(const Varnode *vn) {
   *s << "<return_type " << highlight[(int4)no_color];
   if (vn != (const Varnode *)0)
-    *s << " varref=\"0x" << hex << vn->getCreateIndex() << "\">";
+    *s << " varref=\"0x" << std::dec << vn->getCreateIndex() << "\">";
   else
     *s << '>';
   return 0;
@@ -107,7 +107,7 @@ void EmitXml::endReturnType(int4 id) {
 /// \return an id associated with the declaration
 int4 EmitXml::beginVarDecl(const Symbol *sym) {
   *s << "<vardecl " << highlight[(int4)no_color];
-  *s << " symref=\"0x" << hex << sym->getId() << "\">";
+  *s << " symref=\"0x" << std::dec << sym->getId() << "\">";
   return 0;
 }
 
@@ -123,7 +123,7 @@ void EmitXml::endVarDecl(int4 id) {
 int4 EmitXml::beginStatement(const PcodeOp *op) {
   *s << "<statement " << highlight[(int4)no_color];
   if (op != (const PcodeOp *)0)
-    *s << " opref=\"0x" << hex << op->getTime() << "\">";
+    *s << " opref=\"0x" << std::dec << op->getTime() << "\">";
   else
     *s << '>';
   return 0;
@@ -150,7 +150,7 @@ void EmitXml::endFuncProto(int4 id) {
 
 /// \brief Emit a variable token
 ///
-/// An identifier string representing the variable is output, possibly with additional markup.
+/// An identifier std::string representing the variable is output, possibly with additional markup.
 /// \param ptr is the character data for the identifier
 /// \param hl indicates how the identifier should be highlighted
 /// \param vn is the Varnode representing the variable within the syntax tree
@@ -160,9 +160,9 @@ void EmitXml::tagVariable(const char *ptr,syntax_highlight hl,
 {
   *s << "<variable " << highlight[(int4)hl];
   if (vn != (const Varnode *)0)
-    *s << " varref=\"0x" << hex << vn->getCreateIndex() << '\"';
+    *s << " varref=\"0x" << std::dec << vn->getCreateIndex() << '\"';
   if (op != (const PcodeOp *)0)
-    *s << " opref=\"0x" << hex << op->getTime() << '\"';
+    *s << " opref=\"0x" << std::dec << op->getTime() << '\"';
   *s << '>';
   xml_escape(*s,ptr);
   *s << "</variable>";
@@ -170,7 +170,7 @@ void EmitXml::tagVariable(const char *ptr,syntax_highlight hl,
 
 /// \brief Emit an operation token
 ///
-/// The string representing the operation as appropriate for the source language is emitted,
+/// The std::string representing the operation as appropriate for the source language is emitted,
 /// possibly with additional markup.
 /// \param ptr is the character data for the emitted representation
 /// \param hl indicates how the token should be highlighted
@@ -180,7 +180,7 @@ void EmitXml::tagOp(const char *ptr,syntax_highlight hl,
 {
   *s << "<op " << highlight[(int4)hl];
   if (op != (const PcodeOp *)0)
-    *s << " opref=\"0x" << hex << op->getTime() << "\">";
+    *s << " opref=\"0x" << std::dec << op->getTime() << "\">";
   else
     *s << '>';
   xml_escape(*s,ptr);
@@ -189,7 +189,7 @@ void EmitXml::tagOp(const char *ptr,syntax_highlight hl,
 
 /// \brief Emit a function identifier
 ///
-/// An identifier string representing the symbol name of the function is emitted, possible
+/// An identifier std::string representing the symbol name of the function is emitted, possible
 /// with additional markup.
 /// \param ptr is the character data for the identifier
 /// \param hl indicates how the identifier should be highlighted
@@ -200,7 +200,7 @@ void EmitXml::tagFuncName(const char *ptr,syntax_highlight hl,
 {
   *s << "<funcname " << highlight[(int4)hl];
   if (op != (const PcodeOp *)0)
-    *s << " opref=\"0x" << hex << op->getTime() << "\">";
+    *s << " opref=\"0x" << std::dec << op->getTime() << "\">";
   else
     *s << '>';
   xml_escape(*s,ptr);
@@ -209,7 +209,7 @@ void EmitXml::tagFuncName(const char *ptr,syntax_highlight hl,
 
 /// \brief Emit a data-type identifier
 ///
-/// A string representing the name of a data-type, as appropriate for the source language
+/// A std::string representing the name of a data-type, as appropriate for the source language
 /// is emitted, possibly with additional markup.
 /// \param ptr is the character data for the identifier
 /// \param hl indicates how the identifier should be highlighted
@@ -217,7 +217,7 @@ void EmitXml::tagFuncName(const char *ptr,syntax_highlight hl,
 void EmitXml::tagType(const char *ptr,syntax_highlight hl,const Datatype *ct) {
   *s << "<type " << highlight[(int4)hl];
   if (ct->getId() != 0) {
-    *s << " id=\"0x" << hex << ct->getId() << '\"';
+    *s << " id=\"0x" << std::dec << ct->getId() << '\"';
   }
   *s << '>';
   xml_escape(*s,ptr);
@@ -226,7 +226,7 @@ void EmitXml::tagType(const char *ptr,syntax_highlight hl,const Datatype *ct) {
 
 /// \brief Emit an identifier for a field within a structured data-type
 ///
-/// A string representing an individual component of a structured data-type is emitted,
+/// A std::string representing an individual component of a structured data-type is emitted,
 /// possibly with additional markup.
 /// \param ptr is the character data for the identifier
 /// \param hl indicates how the identifier should be highlighted
@@ -238,17 +238,17 @@ void EmitXml::tagField(const char *ptr,syntax_highlight hl,const Datatype *ct,in
     *s << " name=\"";
     xml_escape(*s,ct->getName().c_str());
     if (ct->getId() != 0) {
-      *s << "\" id=\"0x" << hex << ct->getId();
+      *s << "\" id=\"0x" << std::dec << ct->getId();
     }
     
-    *s << "\" off=\"" << dec << o << '\"';
+    *s << "\" off=\"" << std::dec << o << '\"';
   }
   *s << '>';
   xml_escape(*s,ptr);
   *s << "</field>";
 }
 
-/// \brief Emit a comment string as part of the generated source code
+/// \brief Emit a comment std::string as part of the generated source code
 ///
 /// Individual comments can be broken up and emitted using multiple calls to this method,
 /// but ultimately the comment delimiters and the body of the comment are both emitted with
@@ -261,14 +261,14 @@ void EmitXml::tagComment(const char *ptr,syntax_highlight hl,
 			   const AddrSpace *spc,uintb off) {
   *s << "<comment " << highlight[(int4)hl];
   *s << " space=\"" << spc->getName();
-  *s << "\" off=\"0x" << hex << off << "\">";
+  *s << "\" off=\"0x" << std::dec << off << "\">";
   xml_escape(*s,ptr);
   *s << "</comment>";
 }
 
 /// \brief Emit a code label identifier
 ///
-/// A string describing a control-flow destination, as appropriate for the source language
+/// A std::string describing a control-flow destination, as appropriate for the source language
 /// is output, possibly with additional markup.
 /// \param ptr is the character data of the label
 /// \param hl indicates how the label should be highlighted
@@ -278,7 +278,7 @@ void EmitXml::tagLabel(const char *ptr,syntax_highlight hl,
 			 const AddrSpace *spc,uintb off) {
   *s << "<label " << highlight[(int4)hl];
   *s << " space=\"" << spc->getName();
-  *s << "\" off=\"0x" << hex << off << "\">";
+  *s << "\" off=\"0x" << std::dec << off << "\">";
   xml_escape(*s,ptr);
   *s << "</label>";
 }
@@ -306,7 +306,7 @@ int4 EmitXml::openParen(char o,int4 id)
 
 {
   *s << "<syntax " << highlight[(int4)no_color];
-  *s << " open=\"" << dec << id << "\">";
+  *s << " open=\"" << std::dec << id << "\">";
   *s << o;
   *s << "</syntax>";
   parenlevel += 1;
@@ -321,7 +321,7 @@ void EmitXml::closeParen(char c,int4 id)
 
 {
   *s << "<syntax " << highlight[(int4)no_color];
-  *s << " close=\"" << dec << id << "\">";
+  *s << " close=\"" << std::dec << id << "\">";
   *s << c;
   *s << "</syntax>";
   parenlevel -= 1;
@@ -338,7 +338,7 @@ void EmitXml::spaces(int4 num,int4 bump)
   if (num <= 10)
     print(tenspaces+(10-num));
   else {
-    string spc;
+    std::string spc;
     for(int4 i=0;i<num;++i)
       spc += ' ';
     print(spc.c_str());
@@ -442,7 +442,7 @@ void TokenSplit::print(EmitXml *emit) const
 }
 
 #ifdef PRETTY_DEBUG
-void TokenSplit::printDebug(ostream &s) const
+void TokenSplit::printDebug(std::ostream &s) const
 
 {
   switch(tagtype) {
@@ -577,7 +577,7 @@ void EmitPrettyPrint::expand(void)
   scanqueue.expand(200);
 }
 
-/// (Permanently) adjust the current set of indent levels to guarantee a minimum
+/// (Permanently) adjust the current std::set of indent levels to guarantee a minimum
 /// amount of space and issue a line break.  This disrupts currently established indenting
 /// but makes sure that at least half the line is available for the next token.
 void EmitPrettyPrint::overflow(void)
@@ -817,28 +817,28 @@ void EmitPrettyPrint::checkstring(void)
 }
 
 /// Make sure there is some content either in the current print group or following the
-/// last line break, inserting an empty string token if necessary, before emitting
+/// last line break, inserting an empty std::string token if necessary, before emitting
 /// an \e end token.
 void EmitPrettyPrint::checkend(void)
 
 {
   if (!needbreak) {
     TokenSplit &tok( tokqueue.push() );
-    tok.print("",EmitXml::no_color); // Add a blank string
+    tok.print("",EmitXml::no_color); // Add a blank std::string
     scan();
   }
   needbreak = true;
 }
 
 /// Make sure there is some content either in the current print group or following the
-/// last line break, inserting an empty string token if necessary, before emitting
+/// last line break, inserting an empty std::string token if necessary, before emitting
 /// a \e line \e break token.
 void EmitPrettyPrint::checkbreak(void)
 
 {
   if (!needbreak) {
     TokenSplit &tok( tokqueue.push() );
-    tok.print("",EmitXml::no_color); // Add a blank string
+    tok.print("",EmitXml::no_color); // Add a blank std::string
     scan();
   }
   needbreak = false;
@@ -1194,7 +1194,7 @@ void EmitPrettyPrint::flush(void)
 void EmitPrettyPrint::setXML(bool val)
 
 {
-  ostream *t = lowlevel->getOutputStream();
+  std::ostream *t = lowlevel->getOutputStream();
   delete lowlevel;
   if (val)
     lowlevel = new EmitXml;

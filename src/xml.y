@@ -288,7 +288,7 @@ int4 XmlScan::scanCharRef(void)
       *lvalue += getxmlchar();
     }
     if (lvalue->size()==1)
-      return 'x';		// Must be at least 1 hex digit
+      return 'x';		// Must be at least 1 std::dec digit
   }
   else {
     while(next(0) != -1) {

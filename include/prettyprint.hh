@@ -76,14 +76,14 @@ class Symbol;
 /// This class can be used as the low-level back-end to EmitPrettyPrint to provide a solution
 /// that does both pretty printing and XML markup.
 class EmitXml {
-  static const char *highlight[];	///< Map from syntax_highlight enumeration to color attribute string
+  static const char *highlight[];	///< Map from syntax_highlight enumeration to color attribute std::string
 protected:
-  ostream *s;				///< Stream being emitted to
+  std::ostream *s;				///< Stream being emitted to
   int4 indentlevel;			///< Current indent level (in fixed width characters)
   int4 parenlevel;			///< Current depth of parentheses
   int4 indentincrement;			///< Change in indentlevel per level of nesting
 public:
-  EmitXml(void) { s = (ostream *)0; indentlevel=0; parenlevel=0; indentincrement=2; }	///< Constructor
+  EmitXml(void) { s = (std::ostream *)0; indentlevel=0; parenlevel=0; indentincrement=2; }	///< Constructor
 
   /// \brief Possible types of syntax highlighting
   enum syntax_highlight {
@@ -138,8 +138,8 @@ public:
   /// \param id is the id associated with the group (as returned by openGroup)
   virtual void closeGroup(int4 id) {}
   virtual void clear(void) { parenlevel = 0; indentlevel=0; }	///< Reset the emitter to its initial state
-  virtual void setOutputStream(ostream *t) { s = t; }		///< Set the output stream for the emitter
-  virtual ostream *getOutputStream(void) const { return s; }	///< Get the current output stream
+  virtual void setOutputStream(std::ostream *t) { s = t; }		///< Set the output stream for the emitter
+  virtual std::ostream *getOutputStream(void) const { return s; }	///< Get the current output stream
   virtual void spaces(int4 num,int4 bump=0);
 
   /// \brief Start a new indent level
@@ -157,13 +157,13 @@ public:
 
   /// \brief Start a comment block within the emitted source code
   ///
-  /// Inform the emitter that a set of comment tokens/lines is starting.
+  /// Inform the emitter that a std::set of comment tokens/lines is starting.
   /// \return an id associated with the comment block
   virtual int4 startComment(void) { return 0; }
 
   /// \brief End a comment block
   ///
-  /// Inform the emitter that a set of comment tokens/lines is ending.
+  /// Inform the emitter that a std::set of comment tokens/lines is ending.
   /// \param id is the id associated with the block (as returned by startComment)
   virtual void stopComment(int4 id) {}
 
@@ -177,7 +177,7 @@ public:
   /// \brief Provide a maximum line size to the pretty printer
   ///
   /// The emitter may insert line breaks to enforce this maximum.
-  /// \param mls is the number of characters to set for the maximum line size
+  /// \param mls is the number of characters to std::set for the maximum line size
   virtual void setMaxLineSize(int4 mls) {}
 
   /// \brief Get the current maximum line size
@@ -189,9 +189,9 @@ public:
   /// \brief Set the comment fill characters for when line breaks are forced
   ///
   /// If the pretty printer forces a line break in the middle of a comment, this
-  /// string is emitted to provide proper syntax and indenting to continue the comment.
-  /// \param fill is the set of fill characters
-  virtual void setCommentFill(const string &fill) {}
+  /// std::string is emitted to provide proper syntax and indenting to continue the comment.
+  /// \param fill is the std::set of fill characters
+  virtual void setCommentFill(const std::string &fill) {}
 
   /// \brief Determine if \b this is an XML markup emitter
   ///
@@ -229,7 +229,7 @@ public:
   virtual int4 beginBlock(const FlowBlock *bl) { return 0; }
   virtual void endBlock(int4 id) {}
   virtual void tagLine(int4 indent) {
-    *s << endl; for(int4 i=indent;i>0;--i) *s << ' '; }
+    *s << std::endl; for(int4 i=indent;i>0;--i) *s << ' '; }
   virtual int4 beginReturnType(const Varnode *vn) { return 0; }
   virtual void endReturnType(int4 id) {}
   virtual int4 beginVarDecl(const Symbol *sym) { return 0; }
@@ -292,7 +292,7 @@ public:
     ignore		///< Mark-up that doesn't affect pretty printing
   };
 
-  /// \brief The exhaustive list of possible token types
+  /// \brief The exhaustive std::list of possible token types
   enum tag_type {
     docu_b,		///< Start of a document
     docu_e,		///< End of a document
@@ -327,7 +327,7 @@ public:
 private:
   tag_type tagtype;		///< Type of token
   printclass delimtype;		///< The general class of the token
-  string tok;			///< Characters of token (if any)
+  std::string tok;			///< Characters of token (if any)
   EmitXml::syntax_highlight hl;	///< Highlighting for token
   // Additional markup elements for token
   const PcodeOp *op;		///< Pcode-op associated with \b this token
@@ -485,7 +485,7 @@ public:
     tok = ptr; size = tok.size();
     tagtype=field_t; delimtype=tokenstring; hl=h; ptr_second.ct=ct; off=(uintb)o; }
 
-  /// \brief Create a comment string in the generated source code
+  /// \brief Create a comment std::string in the generated source code
   ///
   /// \param ptr is the character data for the comment
   /// \param h indicates how the comment should be highlighted
@@ -593,7 +593,7 @@ public:
   tag_type getTag(void) const { return tagtype; }	///< Get \b this tag type
 #ifdef PRETTY_DEBUG
   int4 getCount(void) const { return count; }		///< Get the delimiter id
-  void printDebug(ostream &s) const;			///< Print \b this token to stream for debugging
+  void printDebug(std::ostream &s) const;			///< Print \b this token to stream for debugging
 #endif
 };
 
@@ -701,17 +701,17 @@ void circularqueue<_type>::expand(int4 amount)
 /// stream and may add XML markup.
 class EmitPrettyPrint : public EmitXml {
 #ifdef PRETTY_DEBUG
-  vector<int4> checkid;
+  std::vector<int4> checkid;
 #endif
   EmitXml *lowlevel;		///< The low-level emitter
-  vector<int4> indentstack;	///< Space available for currently active nesting levels
+  std::vector<int4> indentstack;	///< Space available for currently active nesting levels
   int4 spaceremain;		///< Space remaining in current line
   int4 maxlinesize;		///< Maximum number of characters allowed in a line
   int4 leftotal;		///< # of characters committed from the current line
   int4 rightotal;		///< # of characters yet to be committed from the current line
   bool needbreak;   		///< \b true if break needed before next token
   bool commentmode;		///< \b true if in the middle of a comment
-  string commentfill;		///< Used to fill comments if line breaks are forced
+  std::string commentfill;		///< Used to fill comments if line breaks are forced
   circularqueue<int4> scanqueue; ///< References to current \e open and \e whitespace tokens
   circularqueue<TokenSplit> tokqueue;	///< The full stream of tokens
   void expand(void);		///< Expand the stream buffer
@@ -758,8 +758,8 @@ public:
   virtual int4 openGroup(void);
   virtual void closeGroup(int4 id);
   virtual void clear(void);
-  virtual void setOutputStream(ostream *t) { lowlevel->setOutputStream(t); }
-  virtual ostream *getOutputStream(void) const { return lowlevel->getOutputStream(); }
+  virtual void setOutputStream(std::ostream *t) { lowlevel->setOutputStream(t); }
+  virtual std::ostream *getOutputStream(void) const { return lowlevel->getOutputStream(); }
   virtual void spaces(int4 num,int4 bump=0);
   virtual int4 startIndent(void);
   virtual void stopIndent(int4 id);
@@ -768,7 +768,7 @@ public:
   virtual void flush(void);
   virtual void setMaxLineSize(int4 val);
   virtual int4 getMaxLineSize(void) const { return maxlinesize; }
-  virtual void setCommentFill(const string &fill) { commentfill = fill; }
+  virtual void setCommentFill(const std::string &fill) { commentfill = fill; }
   virtual bool emitsXml(void) const { return lowlevel->emitsXml(); }
   void setXML(bool val);	///< Toggle whether the low-level emitter emits XML markup or not
 };

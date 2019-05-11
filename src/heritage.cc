@@ -27,7 +27,7 @@ namespace GhidraDec {
 /// \param size is the number of bytes in the range
 /// \param pass is the pass number when the range was heritaged
 /// \param intersect is a reference for passing back the intersect code
-/// \return the iterator to the map element containing the added range
+/// \return the iterator to the std::map element containing the added range
 LocationMap::iterator LocationMap::add(Address addr,int4 size,int4 pass,int4 &intersect)
 
 {
@@ -84,7 +84,7 @@ LocationMap::iterator LocationMap::find(Address addr)
 int4 LocationMap::findPass(Address addr) const
 
 {
-  map<Address,SizePass>::const_iterator iter = themap.upper_bound(addr); // First range after address
+  std::map<Address,SizePass>::const_iterator iter = themap.upper_bound(addr); // First range after address
   if (iter == themap.begin()) return -1;
   --iter;			// First range before or equal to address
   if (-1!=addr.overlap(0,(*iter).first,(*iter).second.size))
@@ -93,7 +93,7 @@ int4 LocationMap::findPass(Address addr) const
 }
 
 /// Any basic blocks currently in \b this queue are removed. Space is
-/// reserved for a new set of prioritized stacks.
+/// reserved for a new std::set of prioritized stacks.
 /// \param maxdepth is the number of stacks to allocate
 void PriorityQueue::reset(int4 maxdepth) 
 
@@ -144,7 +144,7 @@ Heritage::Heritage(Funcdata *data)
 void Heritage::clearInfoList(void)
 
 {
-  vector<HeritageInfo>::iterator iter;
+  std::vector<HeritageInfo>::iterator iter;
   for(iter=infolist.begin();iter!=infolist.end();++iter) {
     (*iter).deadremoved = 0;
     (*iter).deadcodedelay = (*iter).delay;
@@ -161,8 +161,8 @@ void Heritage::clearInfoList(void)
 /// \param input will hold any input Varnodes
 /// \return the maximum size of a write
 int4 Heritage::collect(Address addr,int4 size,
-		      vector<Varnode *> &read,vector<Varnode *> &write,
-		      vector<Varnode *> &input) const
+		      std::vector<Varnode *> &read,std::vector<Varnode *> &write,
+		      std::vector<Varnode *> &input) const
 
 {
   Varnode *vn;
@@ -234,7 +234,7 @@ Varnode *Heritage::normalizeReadSize(Varnode *vn,const Address &addr,int4 size)
   Varnode *vn1,*vn2;
   PcodeOp *op,*newop;
 
-  list<PcodeOp *>::const_iterator oiter = vn->beginDescend();
+  std::list<PcodeOp *>::const_iterator oiter = vn->beginDescend();
   op = *oiter++;
   if (oiter != vn->endDescend())
     throw LowlevelError("Free varnode with multiple reads");
@@ -346,24 +346,24 @@ Varnode *Heritage::normalizeWriteSize(Varnode *vn,const Address &addr,int4 size)
   return bigout;		// Replace small write with big write
 }
 
-/// \brief Concatenate a list of Varnodes together at the given location
+/// \brief Concatenate a std::list of Varnodes together at the given location
 ///
-/// There must be at least 2 Varnodes in list, they must be in order
-/// from most to least significant.  The Varnodes in the list become
+/// There must be at least 2 Varnodes in std::list, they must be in order
+/// from most to least significant.  The Varnodes in the std::list become
 /// inputs to a single expression of PIECE ops resulting in a
 /// final specified Varnode
-/// \param vnlist is the list of Varnodes to concatenate
+/// \param vnlist is the std::list of Varnodes to concatenate
 /// \param insertop is the point where the expression should be inserted (before)
 /// \param finalvn is the final specified output Varnode of the expression
 /// \return the final unified Varnode
-Varnode *Heritage::concatPieces(const vector<Varnode *> &vnlist,PcodeOp *insertop,Varnode *finalvn)
+Varnode *Heritage::concatPieces(const std::vector<Varnode *> &vnlist,PcodeOp *insertop,Varnode *finalvn)
 
 {
   Varnode *preexist = vnlist[0];
   bool isbigendian = preexist->getAddr().isBigEndian();
   Address opaddress;
   BlockBasic *bl;
-  list<PcodeOp *>::iterator insertiter;
+  std::list<PcodeOp *>::iterator insertiter;
 
   if (insertop == (PcodeOp *)0) { // Insert at the beginning
     bl = (BlockBasic *)fd->getBasicBlocks().getStartBlock();
@@ -401,18 +401,18 @@ Varnode *Heritage::concatPieces(const vector<Varnode *> &vnlist,PcodeOp *inserto
   return preexist;
 }
 
-/// \brief Build a set of Varnode piece expression at the given location
+/// \brief Build a std::set of Varnode piece expression at the given location
 ///
-/// Given a list of small Varnodes and the address range they are a piece of,
+/// Given a std::list of small Varnodes and the address range they are a piece of,
 /// construct a SUBPIECE op that defines each piece.  The truncation parameters
 /// are calculated based on the overlap of the piece with the whole range,
 /// and a single input Varnode is used for all SUBPIECE ops.
-/// \param vnlist is the list of piece Varnodes
+/// \param vnlist is the std::list of piece Varnodes
 /// \param insertop is the point where the op expressions are inserted (before)
 /// \param addr is the first address of the whole range
 /// \param size is the number of bytes in the whole range
 /// \param startvn is designated input Varnode
-void Heritage::splitPieces(const vector<Varnode *> &vnlist,PcodeOp *insertop,
+void Heritage::splitPieces(const std::vector<Varnode *> &vnlist,PcodeOp *insertop,
 			   const Address &addr,int4 size,Varnode *startvn)
 
 {
@@ -420,7 +420,7 @@ void Heritage::splitPieces(const vector<Varnode *> &vnlist,PcodeOp *insertop,
   uintb baseoff;
   bool isbigendian;
   BlockBasic *bl;
-  list<PcodeOp *>::iterator insertiter;
+  std::list<PcodeOp *>::iterator insertiter;
 
   isbigendian = addr.isBigEndian();
   if (isbigendian)
@@ -464,16 +464,16 @@ void Heritage::splitPieces(const vector<Varnode *> &vnlist,PcodeOp *insertop,
 /// of LOAD/STORE/CALL ops.
 /// \param addr is the starting address of the given range
 /// \param size is the number of bytes in the given range
-/// \param read is the set of Varnode values reading from the range
-/// \param write is the set of written Varnodes in the range
-/// \param inputvars is the set of Varnodes in the range already marked as input
-void Heritage::guard(const Address &addr,int4 size,vector<Varnode *> &read,vector<Varnode *> &write,
-		     vector<Varnode *> &inputvars)
+/// \param read is the std::set of Varnode values reading from the range
+/// \param write is the std::set of written Varnodes in the range
+/// \param inputvars is the std::set of Varnodes in the range already marked as input
+void Heritage::guard(const Address &addr,int4 size,std::vector<Varnode *> &read,std::vector<Varnode *> &write,
+		     std::vector<Varnode *> &inputvars)
 
 {
   uint4 flags;
   Varnode *vn;
-  vector<Varnode *>::iterator iter;
+  std::vector<Varnode *>::iterator iter;
   bool guardneeded = true;
 
   for(iter=read.begin();iter!=read.end();++iter) {
@@ -527,12 +527,12 @@ void Heritage::guard(const Address &addr,int4 size,vector<Varnode *> &read,vecto
 /// For the given address range, we decide what the data-flow effect is
 /// across each call site in the function.  If an effect is unknown, an
 /// INDIRECT op is added, prepopulating data-flow through the call.
-/// Any new INDIRECT causes a new Varnode to be added to the \b write list.
+/// Any new INDIRECT causes a new Varnode to be added to the \b write std::list.
 /// \param flags are any boolean properties associated with the address range
 /// \param addr is the first address of given range
 /// \param size is the number of bytes in the range
-/// \param write is the list of written Varnodes in the range (may be updated)
-void Heritage::guardCalls(uint4 flags,const Address &addr,int4 size,vector<Varnode *> &write)
+/// \param write is the std::list of written Varnodes in the range (may be updated)
+void Heritage::guardCalls(uint4 flags,const Address &addr,int4 size,std::vector<Varnode *> &write)
 
 {
   FuncCallSpecs *fc;
@@ -610,14 +610,14 @@ void Heritage::guardCalls(uint4 flags,const Address &addr,int4 size,vector<Varno
 /// Depending on the pointer, a STORE operation may affect data-flow across the
 /// given address range. This method adds an INDIRECT op, prepopulating
 /// data-flow across the STORE.
-/// Any new INDIRECT causes a new Varnode to be added to the \b write list.
+/// Any new INDIRECT causes a new Varnode to be added to the \b write std::list.
 /// \param addr is the first address of the given range
 /// \param size is the number of bytes in the given range
-/// \param write is the list of written Varnodes in the range (may be updated)
-void Heritage::guardStores(const Address &addr,int4 size,vector<Varnode *> &write)
+/// \param write is the std::list of written Varnodes in the range (may be updated)
+void Heritage::guardStores(const Address &addr,int4 size,std::vector<Varnode *> &write)
 
 {
-  list<PcodeOp *>::const_iterator iter,iterend;
+  std::list<PcodeOp *>::const_iterator iter,iterend;
   PcodeOp *op,*indop;
 
   iterend = fd->endOp(CPUI_STORE);
@@ -644,11 +644,11 @@ void Heritage::guardStores(const Address &addr,int4 size,vector<Varnode *> &writ
 /// \param flags are any boolean properties associated with the address range
 /// \param addr is the first address of the given range
 /// \param size is the number of bytes in the range
-/// \param write is the list of written Varnodes in the range (unused)
-void Heritage::guardReturns(uint4 flags,const Address &addr,int4 size,vector<Varnode *> &write)
+/// \param write is the std::list of written Varnodes in the range (unused)
+void Heritage::guardReturns(uint4 flags,const Address &addr,int4 size,std::vector<Varnode *> &write)
 
 {
-  list<PcodeOp *>::const_iterator iter,iterend;
+  std::list<PcodeOp *>::const_iterator iter,iterend;
   PcodeOp *op,*copyop;
 
   ParamActive *active = fd->getActiveOutput();
@@ -683,10 +683,10 @@ void Heritage::guardReturns(uint4 flags,const Address &addr,int4 size,vector<Var
   }
 }
 
-// void Heritage::guardLoads(uint4 flags,const Address &addr,int4 size,vector<Varnode *> &write)
+// void Heritage::guardLoads(uint4 flags,const Address &addr,int4 size,std::vector<Varnode *> &write)
 
 // {
-//   list<PcodeOp *>::const_iterator iter,iterend;
+//   std::list<PcodeOp *>::const_iterator iter,iterend;
 //   PcodeOp *op,*copyop;
 
 //   iterend = fd->endOp(CPUI_LOAD);
@@ -708,18 +708,18 @@ void Heritage::guardReturns(uint4 flags,const Address &addr,int4 size,vector<Var
 //   }
 // }
 
-/// \brief Build a refinement array given an address range and a list of Varnodes
+/// \brief Build a refinement array given an address range and a std::list of Varnodes
 ///
 /// The array is a preallocated array of ints, one for each byte in the address
-/// range. Each Varnode in the given list has a 1 entered in the refinement
+/// range. Each Varnode in the given std::list has a 1 entered in the refinement
 /// array, at the position corresponding to the starting address of the Varnode
 /// and at the position corresponding to the address immediately following the
 /// Varnode.
 /// \param refine is the refinement array
 /// \param addr is the starting address of the given range
 /// \param size is the number of bytes in the range
-/// \param vnlist is the list of Varnodes to add to the array
-void Heritage::buildRefinement(vector<int4> &refine,const Address &addr,int4 size,const vector<Varnode *> &vnlist)
+/// \param vnlist is the std::list of Varnodes to add to the array
+void Heritage::buildRefinement(std::vector<int4> &refine,const Address &addr,int4 size,const std::vector<Varnode *> &vnlist)
 
 {
   for(uint4 i=0;i<vnlist.size();++i) {
@@ -741,14 +741,14 @@ void Heritage::buildRefinement(vector<int4> &refine,const Address &addr,int4 siz
 /// The given Varnode must be contained in the address range that the
 /// refinement array describes.
 ///
-/// A new set of Varnode pieces are returned in the \b split container, where
+/// A new std::set of Varnode pieces are returned in the \b split container, where
 /// the pieces form a disjoint cover of the original Varnode, and where the
 /// piece boundaries match the refinement.
 /// \param vn is the given Varnode to split
 /// \param addr is the starting address of the range described by the refinement
 /// \param refine is the refinement array
 /// \param split will hold the new Varnode pieces
-void Heritage::splitByRefinement(Varnode *vn,const Address &addr,const vector<int4> &refine,vector<Varnode *> &split)
+void Heritage::splitByRefinement(Varnode *vn,const Address &addr,const std::vector<int4> &refine,std::vector<Varnode *> &split)
 
 {
   Address curaddr = vn->getAddr();
@@ -786,7 +786,7 @@ void Heritage::splitByRefinement(Varnode *vn,const Address &addr,const vector<in
 /// \param addr is the starting address of the address range being refined
 /// \param refine is the refinement array
 /// \param newvn is preallocated space for the holding the array of Varnode pieces
-void Heritage::refineRead(Varnode *vn,const Address &addr,const vector<int4> &refine,vector<Varnode *> &newvn)
+void Heritage::refineRead(Varnode *vn,const Address &addr,const std::vector<int4> &refine,std::vector<Varnode *> &newvn)
 
 {
   newvn.clear();
@@ -820,7 +820,7 @@ void Heritage::refineRead(Varnode *vn,const Address &addr,const vector<int4> &re
 /// \param addr is the starting address of the address range being refined
 /// \param refine is the refinement array
 /// \param newvn is preallocated space for the holding the array of Varnode pieces
-void Heritage::refineWrite(Varnode *vn,const Address &addr,const vector<int4> &refine,vector<Varnode *> &newvn)
+void Heritage::refineWrite(Varnode *vn,const Address &addr,const std::vector<int4> &refine,std::vector<Varnode *> &newvn)
 
 {
   newvn.clear();
@@ -850,7 +850,7 @@ void Heritage::refineWrite(Varnode *vn,const Address &addr,const vector<int4> &r
 /// \param addr is the starting address of the address range being refined
 /// \param refine is the refinement array
 /// \param newvn is preallocated space for the holding the array of Varnode pieces
-void Heritage::refineInput(Varnode *vn,const Address &addr,const vector<int4> &refine,vector<Varnode *> &newvn)
+void Heritage::refineInput(Varnode *vn,const Address &addr,const std::vector<int4> &refine,std::vector<Varnode *> &newvn)
 
 {
   newvn.clear();
@@ -871,7 +871,7 @@ void Heritage::refineInput(Varnode *vn,const Address &addr,const vector<int4> &r
 /// [4,0,0,0,4,0,0,0] indicates the address range is 8-bytes long covered by
 /// two elements of length 4, starting at offsets 0 and 4 respectively.
 /// \param refine is the refinement array
-void Heritage::remove13Refinement(vector<int4> &refine)
+void Heritage::remove13Refinement(std::vector<int4> &refine)
 
 {
   if (refine.empty()) return;
@@ -905,11 +905,11 @@ void Heritage::remove13Refinement(vector<int4> &refine)
 /// \param writevars is all written Varnodes overlapping the address range
 /// \param inputvars is all known input Varnodes overlapping the address range
 /// \return \b true if there is a non-trivial refinement
-bool Heritage::refinement(const Address &addr,int4 size,const vector<Varnode *> &readvars,const vector<Varnode *> &writevars,const vector<Varnode *> &inputvars)
+bool Heritage::refinement(const Address &addr,int4 size,const std::vector<Varnode *> &readvars,const std::vector<Varnode *> &writevars,const std::vector<Varnode *> &inputvars)
 
 {
   if (size > 1024) return false;
-  vector<int4> refine(size+1,0);
+  std::vector<int4> refine(size+1,0);
   buildRefinement(refine,addr,size,readvars);
   buildRefinement(refine,addr,size,writevars);
   buildRefinement(refine,addr,size,inputvars);
@@ -923,7 +923,7 @@ bool Heritage::refinement(const Address &addr,int4 size,const vector<Varnode *> 
   if (lastpos == 0) return false; // No non-trivial refinements
   refine[lastpos] = size-lastpos;
   remove13Refinement(refine);
-  vector<Varnode *> newvn;
+  std::vector<Varnode *> newvn;
   for(uint4 i=0;i<readvars.size();++i)
     refineRead(readvars[i],addr,refine,newvn);
   for(uint4 i=0;i<writevars.size();++i)
@@ -956,11 +956,11 @@ bool Heritage::refinement(const Address &addr,int4 size,const vector<Varnode *> 
 /// already marked as input.  If there are any holes in coverage, new
 /// input Varnodes are created to cover them. A final unified Varnode
 /// covering the whole range is built out of the pieces. In any event,
-/// things are set up so the renaming algorithm sees only a single Varnode.
+/// things are std::set up so the renaming algorithm sees only a single Varnode.
 /// \param addr is the first address in the given range
 /// \param size is the number of bytes in the range
 /// \param input are the pre-existing inputs, given in address order
-void Heritage::guardInput(const Address &addr,int4 size,vector<Varnode *> &input)
+void Heritage::guardInput(const Address &addr,int4 size,std::vector<Varnode *> &input)
 
 {
   if (input.empty()) return;
@@ -974,7 +974,7 @@ void Heritage::guardInput(const Address &addr,int4 size,vector<Varnode *> &input
   uintb end = cur + size;
   //  bool seenunspliced = false;
   Varnode *vn;
-  vector<Varnode *> newinput;
+  std::vector<Varnode *> newinput;
 
   // Make sure the input range is filled
   while(cur < end) {
@@ -1021,14 +1021,14 @@ void Heritage::guardInput(const Address &addr,int4 size,vector<Varnode *> &input
 }
 
 #ifdef DFSVERIFY_DEBUG
-static void verify_dfs(const vector<FlowBlock *> &list,vector<vector<FlowBlock *>> &domchild)
+static void verify_dfs(const std::vector<FlowBlock *> &std::list,std::vector<std::vector<FlowBlock *>> &domchild)
 
 {
   int4 count = 0;
-  vector<int4> path;
+  std::vector<int4> path;
 
   path.push_back(0);
-  if (list[0]->getIndex() != 0)
+  if (std::list[0]->getIndex() != 0)
     throw LowlevelError("Initial block is not index 0");
   count += 1;
   while(!path.empty()) {
@@ -1047,7 +1047,7 @@ static void verify_dfs(const vector<FlowBlock *> &list,vector<vector<FlowBlock *
       count += 1;
     }
   }
-  if (count != list.size())
+  if (count != std::list.size())
     throw LowlevelError("dfs does not verify");
 }
 #endif
@@ -1059,10 +1059,10 @@ static void verify_dfs(const vector<FlowBlock *> &list,vector<vector<FlowBlock *
 /// \b nextlev contains the two split pieces for each Varnode in \b lastcombo.
 /// If a Varnode is not split this level, an extra \b null is put into
 /// \b nextlev to maintain the 2-1 mapping.
-/// \param lastcombo is the list of Varnodes to split
+/// \param lastcombo is the std::list of Varnodes to split
 /// \param nextlev will hold the new split Varnodes in a 2-1 ratio
 /// \param joinrec is the splitting specification we are trying to match
-void Heritage::splitJoinLevel(vector<Varnode *> &lastcombo,vector<Varnode *> &nextlev,JoinRecord *joinrec)
+void Heritage::splitJoinLevel(std::vector<Varnode *> &lastcombo,std::vector<Varnode *> &nextlev,JoinRecord *joinrec)
 
 {
   int4 numpieces = joinrec->numPieces();
@@ -1118,8 +1118,8 @@ void Heritage::splitJoinRead(Varnode *vn,JoinRecord *joinrec)
 {
   PcodeOp *op = vn->loneDescend(); // vn isFree, so loneDescend must be non-null
   
-  vector<Varnode *> lastcombo;
-  vector<Varnode *> nextlev;
+  std::vector<Varnode *> lastcombo;
+  std::vector<Varnode *> nextlev;
   lastcombo.push_back(vn);
   while(lastcombo.size() < joinrec->numPieces()) {
     nextlev.clear();
@@ -1163,8 +1163,8 @@ void Heritage::splitJoinWrite(Varnode *vn,JoinRecord *joinrec)
   PcodeOp *op = vn->getDef();	// vn cannot be free, either it has def, or it is input
   BlockBasic *bb = (BlockBasic *)fd->getBasicBlocks().getBlock(0);
 
-  vector<Varnode *> lastcombo;
-  vector<Varnode *> nextlev;
+  std::vector<Varnode *> lastcombo;
+  std::vector<Varnode *> nextlev;
   lastcombo.push_back(vn);
   while(lastcombo.size() < joinrec->numPieces()) {
     nextlev.clear();
@@ -1195,7 +1195,7 @@ void Heritage::splitJoinWrite(Varnode *vn,JoinRecord *joinrec)
       fd->opSetInput(split,curvn,0);
       fd->opSetInput(split,fd->newConstant(4,0),1);
       fd->opInsertAfter(split,op);
-      mosthalf->setPrecisHi();	// Make sure we set the precision flags to trigger "double precision" rules
+      mosthalf->setPrecisHi();	// Make sure we std::set the precision flags to trigger "double precision" rules
       leasthalf->setPrecisLo();
       op = split;		// Keep -op- as the latest op in the split construction
     }
@@ -1302,11 +1302,11 @@ void Heritage::buildADT(void)
 {
   const BlockGraph &bblocks(fd->getBasicBlocks());
   int4 size = bblocks.getSize();
-  vector<int4> a(size);
-  vector<int4> b(size,0);
-  vector<int4> t(size,0);
-  vector<int4> z(size);
-  vector<FlowBlock *> upstart,upend;	// Up edges (node pair)
+  std::vector<int4> a(size);
+  std::vector<int4> b(size,0);
+  std::vector<int4> t(size,0);
+  std::vector<int4> z(size);
+  std::vector<FlowBlock *> upstart,upend;	// Up edges (node pair)
   FlowBlock *x,*u,*v;
   int4 i,j,k,l;
 
@@ -1380,7 +1380,7 @@ void Heritage::visitIncr(FlowBlock *qnode,FlowBlock *vnode)
 {
   int4 i,j,k;
   FlowBlock *v,*child;
-  vector<FlowBlock *>::iterator iter,enditer;
+  std::vector<FlowBlock *>::iterator iter,enditer;
   
   i = vnode->getIndex();
   j = qnode->getIndex();
@@ -1414,13 +1414,13 @@ void Heritage::visitIncr(FlowBlock *qnode,FlowBlock *vnode)
 /// \brief Calculate blocks that should contain MULTIEQUALs for one address range
 ///
 /// This is the main entry point for the phi-node placement algorithm. It is
-/// provided the normalized list of written Varnodes in this range.
+/// provided the normalized std::list of written Varnodes in this range.
 /// All refinement and guarding must already be performed for the Varnodes, and
 /// the dominance tree and its augmentation must already be computed.
 /// After this executes, the \b merge array holds blocks that should contain
 /// a MULTIEQUAL.
-/// \param write is the list of written Varnodes
-void Heritage::calcMultiequals(const vector<Varnode *> &write)
+/// \param write is the std::list of written Varnodes
+void Heritage::calcMultiequals(const std::vector<Varnode *> &write)
 
 {
   pq.reset(maxdepth);
@@ -1453,7 +1453,7 @@ void Heritage::calcMultiequals(const vector<Varnode *> &write)
 ///
 /// From the given block, recursively walk the dominance tree. At each
 /// block, visit the PcodeOps in execution order looking for Varnodes that
-/// need to be renamed.  As write Varnodes are encountered, a set of stack
+/// need to be renamed.  As write Varnodes are encountered, a std::set of stack
 /// containers, differentiated by the Varnode's address, are updated so the
 /// so the current \e active Varnode is always ready for any \e free Varnode that
 /// is encountered. In this was all \e free Varnodes are replaced with the
@@ -1463,9 +1463,9 @@ void Heritage::calcMultiequals(const vector<Varnode *> &write)
 void Heritage::renameRecurse(BlockBasic *bl,VariableStack &varstack)
 
 {
-  vector<Varnode *> writelist;	// List varnodes that are written in this block
+  std::vector<Varnode *> writelist;	// List varnodes that are written in this block
   BlockBasic *subbl;
-  list<PcodeOp *>::iterator oiter,suboiter;
+  std::list<PcodeOp *>::iterator oiter,suboiter;
   PcodeOp *op,*multiop;
   Varnode *vnout,*vnin,*vnnew;
   int4 i,slot;
@@ -1479,7 +1479,7 @@ void Heritage::renameRecurse(BlockBasic *bl,VariableStack &varstack)
 	if (vnin->isHeritageKnown()) continue; // not free
 	if (!vnin->isActiveHeritage()) continue; // Not being heritaged this round
 	vnin->clearActiveHeritage();
-	vector<Varnode *> &stack( varstack[ vnin->getAddr() ] );
+	std::vector<Varnode *> &stack( varstack[ vnin->getAddr() ] );
 	if (stack.empty()) {
 	  vnnew = fd->newVarnode(vnin->getSize(),vnin->getAddr());
 	  vnnew = fd->setInputVarnode(vnnew);
@@ -1520,7 +1520,7 @@ void Heritage::renameRecurse(BlockBasic *bl,VariableStack &varstack)
       if (multiop->code()!=CPUI_MULTIEQUAL) break; // For each MULTIEQUAL
       vnin = multiop->getIn(slot);
       if (!vnin->isHeritageKnown()) {
-	vector<Varnode *> &stack( varstack[ vnin->getAddr() ] );
+	std::vector<Varnode *> &stack( varstack[ vnin->getAddr() ] );
 	if (stack.empty()) {
 	  vnnew = fd->newVarnode(vnin->getSize(),vnin->getAddr());
 	  vnnew = fd->setInputVarnode(vnnew);
@@ -1566,7 +1566,7 @@ void Heritage::bumpDeadcodeDelay(Varnode *vn)
   fd->setRestartPending(true);
 }
 
-/// \brief Perform the renaming algorithm for the current set of address ranges
+/// \brief Perform the renaming algorithm for the current std::set of address ranges
 ///
 /// Phi-node placement must already have happened.
 void Heritage::rename(void)
@@ -1577,7 +1577,7 @@ void Heritage::rename(void)
   disjoint.clear();
 }
 
-/// \brief Perform phi-node placement for the current set of address ranges
+/// \brief Perform phi-node placement for the current std::set of address ranges
 ///
 /// Main entry point for performing the phi-node placement algorithm.
 /// Assume \b disjoint is filled with all the free Varnodes to be heritaged
@@ -1585,9 +1585,9 @@ void Heritage::placeMultiequals(void)
 
 {
   LocationMap::iterator iter;
-  vector<Varnode *> readvars;
-  vector<Varnode *> writevars;
-  vector<Varnode *> inputvars;
+  std::vector<Varnode *> readvars;
+  std::vector<Varnode *> writevars;
+  std::vector<Varnode *> inputvars;
   PcodeOp *multiop;
   Varnode *vnin;
   BlockBasic *bl;
@@ -1714,7 +1714,7 @@ void Heritage::heritage(void)
     if (needwarning) {
       if (!info->warningissued) {
 	info->warningissued = true;
-	ostringstream errmsg;
+	std::ostringstream errmsg;
 	errmsg << "Heritage AFTER dead removal. Example location: ";
 	warnvn->printRawNoMarkup(errmsg);
 	if (!warnvn->hasNoDescend()) {

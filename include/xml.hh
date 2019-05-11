@@ -184,7 +184,7 @@ inline void a_v_i(std::ostream &s,const std::string &attr,intb val)
 inline void a_v_u(std::ostream &s,const std::string &attr,uintb val)
 
 {
-  s << ' ' << attr << "=\"0x" << std::hex << val << "\"";
+  s << ' ' << attr << "=\"0x" << std::dec << val << "\"";
 }
 
 inline void a_v_b(std::ostream &s,const std::string &attr,bool val)

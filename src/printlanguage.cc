@@ -18,9 +18,9 @@
 #include "funcdata.hh"
 
 namespace GhidraDec {
-vector<PrintLanguageCapability *> PrintLanguageCapability::thelist;
+std::vector<PrintLanguageCapability *> PrintLanguageCapability::thelist;
 
-/// This retrieves the capability with its \b isdefault field set or
+/// This retrieves the capability with its \b isdefault field std::set or
 /// the first capability registered.
 /// \return the default language capability
 PrintLanguageCapability *PrintLanguageCapability::getDefault(void)
@@ -42,7 +42,7 @@ void PrintLanguageCapability::initialize(void)
 
 /// \param name is the language name to search for
 /// \return the matching language capability or NULL
-PrintLanguageCapability *PrintLanguageCapability::findCapability(const string &name)
+PrintLanguageCapability *PrintLanguageCapability::findCapability(const std::string &name)
 
 {
   for(uint4 i=0;i<thelist.size();++i) {
@@ -104,7 +104,7 @@ bool OpToken::parentheses(const OpToken &op2,int4 stage) const
 
 /// \param g is the Architecture that owns and will use this PrintLanguage
 /// \param nm is the formal name of the language
-PrintLanguage::PrintLanguage(Architecture *g,const string &nm)
+PrintLanguage::PrintLanguage(Architecture *g,const std::string &nm)
 
 {
   glb = g;
@@ -139,11 +139,11 @@ void PrintLanguage::setLineCommentIndent(int4 val)
 
 /// By default, comments are indicated in the high-level language by preceding
 /// them with a specific sequence of delimiter characters, and optionally
-/// by ending the comment with another set of delimiter characters.
+/// by ending the comment with another std::set of delimiter characters.
 /// \param start is the initial sequence of characters delimiting a comment
 /// \param stop if not empty is the sequence delimiting the end of the comment
 /// \param usecommentfill is \b true if the delimiter needs to be emitted after every line break
-void PrintLanguage::setCommentDelimeter(const string &start,const string &stop,bool usecommentfill)
+void PrintLanguage::setCommentDelimeter(const std::string &start,const std::string &stop,bool usecommentfill)
 
 {
   commentstart = start;
@@ -151,7 +151,7 @@ void PrintLanguage::setCommentDelimeter(const string &start,const string &stop,b
   if (usecommentfill)
     emit->setCommentFill(start);
   else {
-    string spaces;
+    std::string spaces;
     for(int4 i=0;i<start.size();++i)
       spaces += ' ';
     emit->setCommentFill(spaces);
@@ -231,7 +231,7 @@ void PrintLanguage::pushAtom(const Atom &atom)
 /// single p-code op, the inputs must be pushed in reverse order.
 /// \param vn is the given implied Varnode
 /// \param op is PcodeOp taking the Varnode as input
-/// \param m is the set of printing modifications to apply for this sub-expression
+/// \param m is the std::set of printing modifications to apply for this sub-expression
 void PrintLanguage::pushVnImplied(const Varnode *vn,const PcodeOp *op,uint4 m)
 
 {
@@ -386,7 +386,7 @@ void PrintLanguage::emitAtom(const Atom &atom)
   }
 }
 
-/// Separate unicode characters that can be clearly emitted in a source code string
+/// Separate unicode characters that can be clearly emitted in a source code std::string
 /// (letters, numbers, punctuation, symbols) from characters that are better represented
 /// in source code with an escape sequence (control characters, unusual spaces, separators,
 /// private use characters etc.
@@ -472,7 +472,7 @@ bool PrintLanguage::unicodeNeedsEscape(int4 codepoint)
 /// write the bytes to the stream.
 /// \param s is the output stream
 /// \param codepoint is the unicode codepoint
-void PrintLanguage::writeUtf8(ostream &s,int4 codepoint)
+void PrintLanguage::writeUtf8(std::ostream &s,int4 codepoint)
 
 {
   uint1 bytes[4];
@@ -607,7 +607,7 @@ int4 PrintLanguage::getCodepoint(const uint1 *buf,int4 charsize,bool bigend,int4
 /// \param charsize is 1 for UTF8, 2 for UTF16, or 4 for UTF32
 /// \param bigend is \b true for a big endian encoding of UTF elements
 /// \return \b true if we reach a terminator character
-bool PrintLanguage::escapeCharacterData(ostream &s,const uint1 *buf,int4 count,int4 charsize,bool bigend) const
+bool PrintLanguage::escapeCharacterData(std::ostream &s,const uint1 *buf,int4 count,int4 charsize,bool bigend) const
 
 {
   int4 i=0;
@@ -684,7 +684,7 @@ void PrintLanguage::opUnary(const OpToken *tok,const PcodeOp *op)
 void PrintLanguage::emitLineComment(int4 indent,const Comment *comm)
 
 {
-  const string &text( comm->getText() );
+  const std::string &text( comm->getText() );
   const AddrSpace *spc = comm->getAddr().getSpace();
   uintb off = comm->getAddr().getOffset();
   if (indent <0)
@@ -720,7 +720,7 @@ void PrintLanguage::emitLineComment(int4 indent,const Comment *comm)
 	count += 1;
 	pos += 1;
       }
-      string sub = text.substr(pos-count,count);
+      std::string sub = text.substr(pos-count,count);
       emit->tagComment(sub.c_str(),EmitXml::comment_color,
 			spc,off);
     }
@@ -771,16 +771,16 @@ void PrintLanguage::clear(void)
 }
 
 /// This determines how integers are displayed by default. Possible
-/// values are "hex" and "dec" to force a given format, or "best" can
+/// values are "std::dec" and "std::dec" to force a given format, or "best" can
 /// be used to let the decompiler select what it thinks best for each individual integer.
-/// \param nm is "hex", "dec", or "best"
-void PrintLanguage::setIntegerFormat(const string &nm)
+/// \param nm is "std::dec", "std::dec", or "best"
+void PrintLanguage::setIntegerFormat(const std::string &nm)
 
 {
   uint4 mod;
-  if (nm.compare(0,3,"hex")==0)
+  if (nm.compare(0,3,"std::dec")==0)
     mod = force_hex;
-  else if (nm.compare(0,3,"dec")==0)
+  else if (nm.compare(0,3,"std::dec")==0)
     mod = force_dec;
   else if (nm.compare(0,4,"best")==0)
     mod = 0;
@@ -853,10 +853,10 @@ int4 PrintLanguage::mostNaturalBase(uintb val)
   return (countdec > counthex) ? 10 : 16;
 }
 
-/// Print a string a '0' and '1' characters representing the given value
+/// Print a std::string a '0' and '1' characters representing the given value
 /// \param s is the output stream
 /// \param val is the given value
-void PrintLanguage::formatBinary(ostream &s,uintb val)
+void PrintLanguage::formatBinary(std::ostream &s,uintb val)
 
 {
   int4 pos = mostsigbit_set(val);

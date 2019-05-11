@@ -33,13 +33,13 @@ void LoadTable::restoreXml(const Element *el,Architecture *glb)
 
 {
   std::istringstream s1(el->getAttributeValue("size"));	
-  s1.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+  s1.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
   s1 >> size;
   std::istringstream s2(el->getAttributeValue("num"));	
-  s2.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+  s2.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
   s2 >> num;
-  const List &list( el->getChildren() );
-  List::const_iterator iter = list.begin();
+  const List &std::list( el->getChildren() );
+  List::const_iterator iter = std::list.begin();
   addr = Address::restoreXml( *iter, glb);
 }
 
@@ -130,7 +130,7 @@ void EmulateFunction::setExecuteAddress(const Address &addr)
 
   currentOp = fd->target(addr);
   if (currentOp == (PcodeOp *)0)
-    throw LowlevelError("Could not set execute address");
+    throw LowlevelError("Could not std::set execute address");
   currentBehave = currentOp->getOpcode()->getBehavior();
 }
 
@@ -193,7 +193,7 @@ uintb EmulateFunction::emulatePath(uintb val,const PathMeld &pathMeld,
       executeCurrentOp();
     }
     catch(DataUnavailError &err) {
-      ostringstream msg;
+      std::ostringstream msg;
       msg << "Could not emulate address calculation at " << curop->getAddr();
       throw LowlevelError(msg.str());
     }
@@ -472,7 +472,7 @@ void JumpBasic::findDeterminingVarnodes(PcodeOp *op,int4 slot)
     if (isprune(curvn)) {	// Here is a node of the tree
       if (ispoint(curvn)) {	// Is it a possible switch variable
 	if (!firstpoint) {	// If it is the first possible
-	  pathMeld.set(path,slotpath);	// Take the current path as the result
+	  pathMeld.std::set(path,slotpath);	// Take the current path as the result
 	  firstpoint = true;
 	}
 	else			// If we have already seen at least one possible
@@ -495,7 +495,7 @@ void JumpBasic::findDeterminingVarnodes(PcodeOp *op,int4 slot)
   if (pathMeld.empty()) {	// Never found a likely point, which means that
 				// it looks like the address is uniquely determined
 				// but the constants/readonlys haven't been collapsed
-    pathMeld.set(op,op->getIn(slot));
+    pathMeld.std::set(op,op->getIn(slot));
   }
 }
 
@@ -770,14 +770,14 @@ void PathMeld::truncatePaths(int4 cutPoint)
   commonVn.resize(cutPoint);			// Since intersection is ordered, just resize to cutPoint
 }
 
-void PathMeld::set(const PathMeld &op2)
+void PathMeld::std::set(const PathMeld &op2)
 
 {
   commonVn = op2.commonVn;
   opMeld = op2.opMeld;
 }
 
-void PathMeld::set(const std::vector<PcodeOp *> &path,const std::vector<int4> &slot)
+void PathMeld::std::set(const std::vector<PcodeOp *> &path,const std::vector<int4> &slot)
 
 {
   for(int4 i=0;i<path.size();++i) {
@@ -788,9 +788,9 @@ void PathMeld::set(const std::vector<PcodeOp *> &path,const std::vector<int4> &s
   }
 }
 
-void PathMeld::set(PcodeOp *op,Varnode *vn)
+void PathMeld::std::set(PcodeOp *op,Varnode *vn)
 
-{ // set a single varnode and op as the path
+{ // std::set a single varnode and op as the path
   commonVn.push_back(vn);
   opMeld.push_back(RootedOp(op,0));
 }
@@ -857,7 +857,7 @@ void JumpBasic::analyzeGuards(BlockBasic *bl,int4 pathout)
   // (if pathout>=0, also analyze the CBRANCH in -bl- that chooses this path)
   // Analyze the range restrictions on the various variables which allow
   // control flow to pass through the CBRANCHs to the switch.
-  // Make note of all these restrictions in the guard list
+  // Make note of all these restrictions in the guard std::list
   // For later determination of the correct switch variable.
   int4 i,j,indpath;
   int4 maxbranch = 2;		// Maximum number of CBRANCHs to consider
@@ -1004,7 +1004,7 @@ void JumpBasic::findNormalized(Funcdata *fd,BlockBasic *rootbl,int4 pathout,uint
     // entries are readonly even if they aren't labelled properly
     // The exception is if the jumptable has only one branch
     // as it very common to have semi-dynamic vectors that are
-    // set up by the system. But the original LoadImage values
+    // std::set up by the system. But the original LoadImage values
     // are likely incorrect. So for 1 branch, we insist on readonly
     Architecture *glb = fd->getArch();
     Varnode *vn = pathMeld.getVarnode(0);
@@ -1320,14 +1320,14 @@ void JumpBasic2::initializeStart(const PathMeld &pathMeld)
     return;
   }
   extravn = pathMeld.getVarnode(pathMeld.numCommonVarnode()-1);
-  origPathMeld.set(pathMeld);
+  origPathMeld.std::set(pathMeld);
 }
 
 bool JumpBasic2::recoverModel(Funcdata *fd,PcodeOp *indop,uint4 matchsize,uint4 maxtablesize)
 
 { // Try to recover a jumptable using the second model
   // Basically there is a guard on the main switch variable,
-  // Along one path, an intermediate value is set to a default constant.
+  // Along one path, an intermediate value is std::set to a default constant.
   // Along the other path, the intermediate value results in a straight line calculation from the switch var
   // The two-pathed intermediate value comes together in a MULTIEQUAL, and there is a straightline
   // calculation to the BRANCHIND
@@ -1336,7 +1336,7 @@ bool JumpBasic2::recoverModel(Funcdata *fd,PcodeOp *indop,uint4 matchsize,uint4 
   Varnode *othervn = (Varnode *)0;
   PcodeOp *copyop = (PcodeOp *)0;
   uintb extravalue = 0;
-  Varnode *joinvn = extravn;	// extravn should be set to as far back as model 1 could trace
+  Varnode *joinvn = extravn;	// extravn should be std::set to as far back as model 1 could trace
   if (joinvn == (Varnode *)0) return false;
   if (!joinvn->isWritten()) return false;
   PcodeOp *multiop = joinvn->getDef(); 
@@ -1444,7 +1444,7 @@ void JumpBasicOverride::setAddresses(const std::vector<Address> &adtable)
 int4 JumpBasicOverride::findStartOp(Varnode *vn)
 
 { // Return the op (within determop) that takes -vn- as input, otherwise return null
-  list<PcodeOp *>::const_iterator iter,enditer;
+  std::list<PcodeOp *>::const_iterator iter,enditer;
   iter = vn->beginDescend();
   enditer = vn->endDescend();
   for(;iter!=enditer;++iter)
@@ -1463,7 +1463,7 @@ int4 JumpBasicOverride::findStartOp(Varnode *vn)
 
 int4 JumpBasicOverride::trialNorm(Funcdata *fd,Varnode *trialvn,uint4 tolerance)
 
-{ // Given a potential normalized switch variable, try to figure out the set of values that
+{ // Given a potential normalized switch variable, try to figure out the std::set of values that
   // produce the addresses in the -adset-.   Basically we start with value -startingvalue-
   // and increment from there, allowing for duplicates and misses.  Once we see all addresses
   // in -adset- we returning the index of the starting op, otherwise return -1
@@ -1521,7 +1521,7 @@ int4 JumpBasicOverride::trialNorm(Funcdata *fd,Varnode *trialvn,uint4 tolerance)
 
 void JumpBasicOverride::setupTrivial(void)
 
-{ // Since we have an absolute set of addresses, if all else fails we can use the indirect variable
+{ // Since we have an absolute std::set of addresses, if all else fails we can use the indirect variable
   // as the normalized switch and the addresses as the values, similar to the trivial model
   std::set<Address>::const_iterator iter;
   if (addrtable.empty()) {
@@ -1681,10 +1681,10 @@ void JumpBasicOverride::saveXml(std::ostream &s) const
     s << "  <normaddr";
     normaddress.getSpace()->saveXmlAttributes(s,normaddress.getOffset());
     s << "/>\n";
-    s << "  <normhash>0x" << hex << hash << "</normhash>\n";
+    s << "  <normhash>0x" << std::dec << hash << "</normhash>\n";
   }
   if (startingvalue != 0) {
-    s << "  <startval>0x" << hex << startingvalue << "</startval>\n";
+    s << "  <startval>0x" << std::dec << startingvalue << "</startval>\n";
   }
   s << "</basicoverride>\n";
 }
@@ -1692,9 +1692,9 @@ void JumpBasicOverride::saveXml(std::ostream &s) const
 void JumpBasicOverride::restoreXml(const Element *el,Architecture *glb)
 
 {
-  const List &list( el->getChildren() );
-  List::const_iterator iter = list.begin();
-  while(iter != list.end()) {
+  const List &std::list( el->getChildren() );
+  List::const_iterator iter = std::list.begin();
+  while(iter != std::list.end()) {
     const Element *subel = *iter;
     ++iter;
     if (subel->getName() == "dest") {
@@ -1704,12 +1704,12 @@ void JumpBasicOverride::restoreXml(const Element *el,Architecture *glb)
       normaddress = Address::restoreXml(subel,glb);
     else if (subel->getName() == "normhash") {
       std::istringstream s1(subel->getContent());	
-      s1.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+      s1.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
       s1 >> hash;
     }
     else if (subel->getName() == "startval") {
       std::istringstream s2(subel->getContent());	
-      s2.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+      s2.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
       s2 >> startingvalue;
     }
   }
@@ -1816,7 +1816,7 @@ void JumpAssisted::foldInNormalization(Funcdata *fd,PcodeOp *indop)
 {
   // Replace all outputs of jumpassist op with switchvn (including BRANCHIND)
   Varnode *outvn = assistOp->getOut();
-  list<PcodeOp *>::const_iterator iter = outvn->beginDescend();
+  std::list<PcodeOp *>::const_iterator iter = outvn->beginDescend();
   while(iter != outvn->endDescend()) {
     PcodeOp *op = *iter;
     ++iter;
@@ -1901,7 +1901,7 @@ void JumpTable::sanityCheck(Funcdata *fd)
     }
   }
   if (!jmodel->sanityCheck(fd,indirect,addresstable)) {
-    ostringstream err;
+    std::ostringstream err;
     err << "Jumptable at " << opaddress << " did not pass sanity check.";
     throw LowlevelError(err.str());
   }
@@ -2052,7 +2052,7 @@ int4 JumpTable::getIndexByBlock(const FlowBlock *bl,int4 i) const
 
 void JumpTable::setMostCommonIndex(uint4 tableind)
 
-{  // set the most common address jump destination by supplying the (an) index for its address
+{  // std::set the most common address jump destination by supplying the (an) index for its address
   mostcommon = blocktable[tableind]; // Translate addresstable index to switch block out index
 }
 
@@ -2124,12 +2124,12 @@ void JumpTable::recoverAddresses(Funcdata *fd)
 				// recover just the jumptable addresses
   recoverModel(fd);
   if (jmodel == (JumpModel *)0) {
-    ostringstream err;
+    std::ostringstream err;
     err << "Could not recover jumptable at " << opaddress << ". Too many branches";
     throw LowlevelError(err.str());
   }
   if (jmodel->getTableSize() == 0) {
-    ostringstream err;
+    std::ostringstream err;
     err << "Impossible to reach jumptable at " << opaddress;
     throw JumptableNotReachableError(err.str());
   }
@@ -2282,12 +2282,12 @@ void JumpTable::saveXml(std::ostream &s) const
 void JumpTable::restoreXml(const Element *el)
 
 {
-  const List &list( el->getChildren() );
-  List::const_iterator iter = list.begin();
+  const List &std::list( el->getChildren() );
+  List::const_iterator iter = std::list.begin();
   opaddress = Address::restoreXml( *iter, glb);
   bool missedlabel = false;
   ++iter;
-  while(iter != list.end()) {
+  while(iter != std::list.end()) {
     const Element *subel = *iter;
     if (subel->getName() == "dest") {
       addresstable.push_back( Address::restoreXml( subel, glb) );
@@ -2300,7 +2300,7 @@ void JumpTable::restoreXml(const Element *el)
 	if (missedlabel)
 	  throw LowlevelError("Jumptable entries are missing labels");
 	std::istringstream s1(subel->getAttributeValue(i));	
-	s1.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+	s1.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
 	uintb lab;
 	s1 >> lab;
 	label.push_back(lab);

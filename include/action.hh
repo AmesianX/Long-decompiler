@@ -25,21 +25,21 @@
 
 namespace GhidraDec {
 
-/// \brief The list of groups defining a \e root Action
+/// \brief The std::list of groups defining a \e root Action
 ///
 /// Any Rule or \e leaf Action belongs to a \b group. This class
 /// is a \b grouplist defined by a collection of these \b group names.
-/// The set of Rule and Action objects belong to any of the groups in this list
+/// The std::set of Rule and Action objects belong to any of the groups in this std::list
 /// together form a \b root Action.
 class ActionGroupList {
   friend class ActionDatabase;
-  std::set<std::string> list;		///< List of group names
+  std::set<std::string> std::list;		///< List of group names
 public:
   /// \brief Check if \b this ActionGroupList contains a given group
   ///
   /// \param nm is the given group to check for
   /// \return true if \b this contains the group
-  bool contains(const std::string &nm) const { return (list.find(nm)!=list.end()); }
+  bool contains(const std::string &nm) const { return (std::list.find(nm)!=std::list.end()); }
 };
 
 class Rule;
@@ -101,7 +101,7 @@ public:
   virtual bool turnOnDebug(const std::string &nm);			///< Turn on debugging
   virtual bool turnOffDebug(const std::string &nm);			///< Turn off debugging
 #endif
-  virtual void printStatistics(ostream &s) const;		///< Dump statistics to stream
+  virtual void printStatistics(std::ostream &s) const;		///< Dump statistics to stream
   int4 perform(Funcdata &data); 				///< Perform this action (if necessary)
   bool setBreakPoint(uint4 tp,const std::string &specify);		///< Set a breakpoint on this action
   bool setWarning(bool val,const std::string &specify);		///< Set a warning on this action
@@ -116,7 +116,7 @@ public:
   ///
   /// If \b this Action is a member of one of the groups in the grouplist,
   /// this returns a clone of the Action, otherwise NULL is returned.
-  /// \param grouplist is the list of groups being cloned
+  /// \param grouplist is the std::list of groups being cloned
   /// \return the cloned Action or NULL
   virtual Action *clone(const ActionGroupList &grouplist) const=0;
   virtual void reset(Funcdata &data);				///< Reset the Action for a new function
@@ -130,9 +130,9 @@ public:
   /// \param data is the function to inspect/modify
   /// \return 0 for a complete application, -1 for a partial completion (due to breakpoint)
   virtual int4 apply(Funcdata &data)=0;
-  virtual int4 print(ostream &s,int4 num,int4 depth) const;	///< Print a description of this Action to stream
-  virtual void printState(ostream &s) const;			///< Print status to stream
-  virtual void saveXml(ostream &s) const {} 			///< Save specifics of this action to stream
+  virtual int4 print(std::ostream &s,int4 num,int4 depth) const;	///< Print a description of this Action to stream
+  virtual void printState(std::ostream &s) const;			///< Print status to stream
+  virtual void saveXml(std::ostream &s) const {} 			///< Save specifics of this action to stream
   virtual void restoreXml(const Element *el,Funcdata *fd) {}	///< Load specifics of action from XML
   virtual Action *getSubAction(const std::string &specify);		///< Retrieve a specific sub-action by name
   virtual Rule *getSubRule(const std::string &specify);		///< Retrieve a specific sub-rule by name
@@ -140,14 +140,14 @@ public:
 
 /// \brief A group of actions (generally) applied in sequence
 ///
-/// This is a a list of Action objects, which are usually applied in sequence.
+/// This is a a std::list of Action objects, which are usually applied in sequence.
 /// But the behavior properties of each individual Action may affect this.
 /// Properties (like rule_repeatapply) may be put directly to this group
 /// that also affect how the Actions are applied.
 class ActionGroup : public Action {
 protected:
-  vector<Action *> list;				///< List of actions to perform in the group
-  vector<Action *>::iterator state;			///< Current action being applied
+  std::vector<Action *> std::list;				///< List of actions to perform in the group
+  std::vector<Action *>::iterator state;			///< Current action being applied
 public:
   ActionGroup(uint4 f,const std::string &nm) : Action(f,nm,"") {}	///< Construct given properties and a name
   virtual ~ActionGroup(void);				///< Destructor
@@ -156,15 +156,15 @@ public:
   virtual void reset(Funcdata &data);
   virtual void resetStats(void);
   virtual int4 apply(Funcdata &data);
-  virtual int4 print(ostream &s,int4 num,int4 depth) const;
-  virtual void printState(ostream &s) const;
+  virtual int4 print(std::ostream &s,int4 num,int4 depth) const;
+  virtual void printState(std::ostream &s) const;
   virtual Action *getSubAction(const std::string &specify);
   virtual Rule *getSubRule(const std::string &specify);
 #ifdef OPACTION_DEBUG
   virtual bool turnOnDebug(const std::string &nm);
   virtual bool turnOffDebug(const std::string &nm);
 #endif
-  virtual void printStatistics(ostream &s) const;
+  virtual void printStatistics(std::ostream &s) const;
 };
 
 /// \brief Action which checks if restart (sub)actions have been generated
@@ -189,7 +189,7 @@ public:
 /// A Rule, through its applyOp() method, is handed a specific PcodeOp as a potential
 /// point to apply. It determines if it can apply at that point, then makes any changes.
 /// Rules inform the system of what types of PcodeOps they can possibly apply to through
-/// the getOpList() method. A set of Rules are pooled together into a single Action via
+/// the getOpList() method. A std::set of Rules are pooled together into a single Action via
 /// the ActionPool, which efficiently applies each Rule across a whole function.
 /// A Rule supports the same breakpoint properties as an Action.
 /// A Rule is allowed to keep state that is specific to a given function (Funcdata).
@@ -233,10 +233,10 @@ public:
   ///
   /// If \b this Rule is a member of one of the groups in the grouplist,
   /// this returns a clone of the Rule, otherwise NULL is returned.
-  /// \param grouplist is the list of groups being cloned
+  /// \param grouplist is the std::list of groups being cloned
   /// \return the cloned Rule or NULL
   virtual Rule *clone(const ActionGroupList &grouplist) const=0;
-  virtual void getOpList(vector<uint4> &oplist) const;		///< List of op codes this rule operates on
+  virtual void getOpList(std::vector<uint4> &oplist) const;		///< List of op codes this rule operates on
 
   /// \brief Attempt to apply \b this Rule
   ///
@@ -248,7 +248,7 @@ public:
   virtual int4 applyOp(PcodeOp *op,Funcdata &data) { return 0; }
   virtual void reset(Funcdata &data);				///< Reset \b this Rule
   virtual void resetStats(void);				///< Reset Rule statistics
-  virtual void printStatistics(ostream &s) const;		///< Print statistics for \b this Rule
+  virtual void printStatistics(std::ostream &s) const;		///< Print statistics for \b this Rule
 #ifdef OPACTION_DEBUG
   virtual bool turnOnDebug(const std::string &nm);			///< Turn on debugging
   virtual bool turnOffDebug(const std::string &nm);			///< Turn off debugging
@@ -257,13 +257,13 @@ public:
 
 /// \brief A pool of Rules that apply simultaneously
 ///
-/// This class groups together a set of Rules as a formal Action.
+/// This class groups together a std::set of Rules as a formal Action.
 /// Rules are given an opportunity to apply to every PcodeOp in a function.
 /// Usually rule_repeatapply is enabled for this action, which causes
 /// all Rules to apply repeatedly until no Rule can make an additional change.
 class ActionPool : public Action {
-  vector<Rule *> allrules;				///< The set of Rules in this ActionPool
-  vector<Rule *> perop[CPUI_MAX];			///< Rules associated with each OpCode
+  std::vector<Rule *> allrules;				///< The std::set of Rules in this ActionPool
+  std::vector<Rule *> perop[CPUI_MAX];			///< Rules associated with each OpCode
   PcodeOpTree::const_iterator op_state; 		///< Current PcodeOp up for rule application
   int4 rule_index;					///< Iterator over Rules for one OpCode
   int4 processOp(PcodeOp *op,Funcdata &data);		///< Apply the next possible Rule to a PcodeOp
@@ -275,10 +275,10 @@ public:
   virtual void reset(Funcdata &data);
   virtual void resetStats(void);
   virtual int4 apply(Funcdata &data);
-  virtual int4 print(ostream &s,int4 num,int4 depth) const;
-  virtual void printState(ostream &s) const;
+  virtual int4 print(std::ostream &s,int4 num,int4 depth) const;
+  virtual void printState(std::ostream &s) const;
   virtual Rule *getSubRule(const std::string &specify);
-  virtual void printStatistics(ostream &s) const;
+  virtual void printStatistics(std::ostream &s) const;
 #ifdef OPACTION_DEBUG
   virtual bool turnOnDebug(const std::string &nm);
   virtual bool turnOffDebug(const std::string &nm);
@@ -299,8 +299,8 @@ public:
 class ActionDatabase {
   Action *currentact;				///< This is the current root Action
   std::string currentactname;			///< The name associated with the current root Action
-  map<std::string,ActionGroupList> groupmap;		///< Map from root Action name to the grouplist it uses
-  map<std::string,Action *> actionmap;		///< Map from name to root Action
+  std::map<std::string,ActionGroupList> groupmap;		///< Map from root Action name to the grouplist it uses
+  std::map<std::string,Action *> actionmap;		///< Map from name to root Action
   static const char universalname[];		///< The name of the \e universal root Action
   void registerAction(const std::string &nm,Action *act);	///< Register a \e root Action
   Action *getAction(const std::string &nm) const;				///< Look up a \e root Action by name

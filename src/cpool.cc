@@ -47,14 +47,14 @@ void CPoolRecord::saveXml(std::ostream &s) const
   s << ">\n";
   if (tag == primitive) {
     s << "  <value>0x";
-    s << hex << value;
+    s << std::dec << value;
     s << "</value>\n";
   }
   if (byteData != (uint1 *)0) {
-    s << "  <data length=\"" << dec << byteDataLen << "\">\n";
+    s << "  <data length=\"" << std::dec << byteDataLen << "\">\n";
     int4 wrap = 0;
     for(int4 i=0;i<byteDataLen;++i) {
-      s << setfill('0') << setw(2) << hex << byteData[i] << ' ';
+      s << std::setfill('0') << std::setw(2) << std::dec << byteData[i] << ' ';
       wrap += 1;
       if (wrap > 15) {
 	s << '\n';
@@ -121,8 +121,8 @@ void CPoolRecord::restoreXml(const Element *el,TypeFactory &typegrp)
   const Element *subel;
   if (tag == primitive) {	// First tag must be value
     subel = *iter;
-    istringstream s1(subel->getContent());
-    s1.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+    std::istringstream s1(subel->getContent());
+    s1.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
     s1 >> value;
     ++iter;
   }
@@ -131,14 +131,14 @@ void CPoolRecord::restoreXml(const Element *el,TypeFactory &typegrp)
   if (subel->getName() == "token")
     token = subel->getContent();
   else {
-    istringstream s2(subel->getAttributeValue("length"));
-    s2.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+    std::istringstream s2(subel->getAttributeValue("length"));
+    s2.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
     s2 >> byteDataLen;
-    istringstream s3(subel->getContent());
+    std::istringstream s3(subel->getContent());
     byteData = new uint1[byteDataLen];
     for(int4 i=0;i<byteDataLen;++i) {
       uint4 val;
-      s3 >> ws >> hex >> val;
+      s3 >> std::ws >> std::dec >> val;
       byteData[i] = (uint1)val;
     }
   }
@@ -188,11 +188,11 @@ void ConstantPoolInternal::CheapSorter::saveXml(std::ostream &s) const
 void ConstantPoolInternal::CheapSorter::restoreXml(const Element *el)
 
 {
-  istringstream s1(el->getAttributeValue("a"));
-  s1.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+  std::istringstream s1(el->getAttributeValue("a"));
+  s1.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
   s1 >> a;
-  istringstream s2(el->getAttributeValue("b"));
-  s2.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+  std::istringstream s2(el->getAttributeValue("b"));
+  s2.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
   s2 >> b;
 }
 
@@ -200,8 +200,8 @@ CPoolRecord *ConstantPoolInternal::createRecord(const std::vector<uintb> &refs)
 
 {
   CheapSorter sorter(refs);
-  pair<std::map<CheapSorter,CPoolRecord>::iterator,bool> res;
-  res = cpoolMap.insert(pair<CheapSorter,CPoolRecord>(sorter,CPoolRecord()));
+  std::pair<std::map<CheapSorter,CPoolRecord>::iterator,bool> res;
+  res = cpoolMap.insert(std::pair<CheapSorter,CPoolRecord>(sorter,CPoolRecord()));
   if (res.second == false)
     throw LowlevelError("Creating duplicate entry in constant pool: "+(*res.first).second.getToken());
   return &(*res.first).second;

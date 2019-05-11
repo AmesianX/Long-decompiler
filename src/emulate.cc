@@ -21,11 +21,11 @@ namespace GhidraDec {
 /// for freeing the breakpoint object.
 /// \param name is the name of the user-defined pcode op
 /// \param func is the breakpoint object to associate with the pcode op
-void BreakTableCallBack::registerPcodeCallback(const string &name,BreakCallBack *func)
+void BreakTableCallBack::registerPcodeCallback(const std::string &name,BreakCallBack *func)
 
 {
   func->setEmulate(emulate);
-  vector<string> userops;
+  vectorstd::string userops;
   trans->getUserOpNames(userops);
   for(int4 i=0;i<userops.size();++i) {
     if (userops[i] == name) {
@@ -54,12 +54,12 @@ void BreakTableCallBack::setEmulate(Emulate *emu)
 
 { // Make sure all callbbacks are aware of new emulator
   emulate = emu;
-  map<Address,BreakCallBack *>::iterator iter1;
+  std::map<Address,BreakCallBack *>::iterator iter1;
 
   for(iter1=addresscallback.begin();iter1!=addresscallback.end();++iter1)
     (*iter1).second->setEmulate(emu);
 
-  map<uintb,BreakCallBack *>::iterator iter2;
+  std::map<uintb,BreakCallBack *>::iterator iter2;
 
 
   for(iter2=pcodecallback.begin();iter2!=pcodecallback.end();++iter2)
@@ -74,7 +74,7 @@ bool BreakTableCallBack::doPcodeOpBreak(PcodeOpRaw *curop)
 
 {
   uintb val = curop->getInput(0)->offset;
-  map<uintb,BreakCallBack *>::const_iterator iter;
+  std::map<uintb,BreakCallBack *>::const_iterator iter;
 
   iter = pcodecallback.find(val);
   if (iter == pcodecallback.end()) return false;
@@ -88,7 +88,7 @@ bool BreakTableCallBack::doPcodeOpBreak(PcodeOpRaw *curop)
 bool BreakTableCallBack::doAddressBreak(const Address &addr)
 
 {
-  map<Address,BreakCallBack *>::const_iterator iter;
+  std::map<Address,BreakCallBack *>::const_iterator iter;
   
   iter = addresscallback.find(addr);
   if (iter == addresscallback.end()) return false;
@@ -98,10 +98,10 @@ bool BreakTableCallBack::doAddressBreak(const Address &addr)
 /// Provide the emitter with the containers that will hold the cached p-code ops and varnodes.
 /// \param ocache is the container for cached PcodeOpRaw
 /// \param vcache is the container for cached VarnodeData
-/// \param in is the map of OpBehavior
+/// \param in is the std::map of OpBehavior
 /// \param uniqReserve is the starting offset for temporaries in the \e unique space
-PcodeEmitCache::PcodeEmitCache(vector<PcodeOpRaw *> &ocache,vector<VarnodeData *> &vcache,
-			       const vector<OpBehavior *> &in,uintb uniqReserve)
+PcodeEmitCache::PcodeEmitCache(std::vector<PcodeOpRaw *> &ocache,std::vector<VarnodeData *> &vcache,
+			       const std::vector<OpBehavior *> &in,uintb uniqReserve)
   : opcache(ocache), varcache(vcache), inst(in)
 {
   uniq = uniqReserve;

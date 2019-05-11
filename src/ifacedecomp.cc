@@ -63,8 +63,8 @@ void IfaceDecompCapability::registerCommands(IfaceStatus *status)
   status->registerCom(new IfcDump(),"dump");
   status->registerCom(new IfcDumpbinary(),"binary");
   status->registerCom(new IfcForcegoto(),"force","goto");
-  status->registerCom(new IfcForceHex(),"force","hex");
-  status->registerCom(new IfcForceDec(),"force","dec");
+  status->registerCom(new IfcForceHex(),"force","std::dec");
+  status->registerCom(new IfcForceDec(),"force","std::dec");
   status->registerCom(new IfcProtooverride(),"override","prototype");
   status->registerCom(new IfcJumpOverride(),"override","jumptable");
   status->registerCom(new IfcFlowOverride(),"override","flow");
@@ -89,11 +89,11 @@ void IfaceDecompCapability::registerCommands(IfaceStatus *status)
   status->registerCom(new IfcPrintRaw(),"print","raw");
   status->registerCom(new IfcPrintInputs(),"print","inputs");
   status->registerCom(new IfcPrintInputsAll(),"print","inputs","all");
-  status->registerCom(new IfcListaction(),"list","action");
-  status->registerCom(new IfcListOverride(),"list","override");
-  status->registerCom(new IfcListprototypes(),"list","prototypes");
-  status->registerCom(new IfcSetcontextrange(),"set","context");
-  status->registerCom(new IfcSettrackedrange(),"set","track");
+  status->registerCom(new IfcListaction(),"std::list","action");
+  status->registerCom(new IfcListOverride(),"std::list","override");
+  status->registerCom(new IfcListprototypes(),"std::list","prototypes");
+  status->registerCom(new IfcSetcontextrange(),"std::set","context");
+  status->registerCom(new IfcSettrackedrange(),"std::set","track");
   status->registerCom(new IfcBreakstart(),"break","start");
   status->registerCom(new IfcBreakaction(),"break","action");
   status->registerCom(new IfcPrintSpaces(),"print","spaces");
@@ -124,7 +124,7 @@ void IfaceDecompCapability::registerCommands(IfaceStatus *status)
   status->registerCom(new IfcCallGraphBuildQuick(),"callgraph","build","quick");
   status->registerCom(new IfcCallGraphDump(),"callgraph","dump");
   status->registerCom(new IfcCallGraphLoad(),"callgraph","load");
-  status->registerCom(new IfcCallGraphList(),"callgraph","list");
+  status->registerCom(new IfcCallGraphList(),"callgraph","std::list");
   status->registerCom(new IfcCallFixup(),"fixup","call");
   status->registerCom(new IfcCallOtherFixup(),"fixup","callother");
   status->registerCom(new IfcVolatile(),"volatile");
@@ -142,7 +142,7 @@ void IfaceDecompCapability::registerCommands(IfaceStatus *status)
   status->registerCom(new IfcTraceEnable(),"trace","enable");
   status->registerCom(new IfcTraceDisable(),"trace","disable");
   status->registerCom(new IfcTraceClear(),"trace","clear");
-  status->registerCom(new IfcTraceList(),"trace","list");
+  status->registerCom(new IfcTraceList(),"trace","std::list");
   status->registerCom(new IfcBreakjump(),"break","jumptable");
 #endif
 }
@@ -228,7 +228,7 @@ void IfaceDecompData::abortFunction(std::ostream &s)
 
 {				// Clear references to current function
   if (fd == (Funcdata *)0) return;
-  s << "Unable to proceed with function: " << fd->getName() << endl;
+  s << "Unable to proceed with function: " << fd->getName() << std::endl;
   conf->clearAnalysis(fd);
   fd = (Funcdata *)0;
 }
@@ -250,8 +250,8 @@ void IfcComment::execute(istream &s)
 void IfcOption::execute(istream &s)
 
 { // Adjust a generic option
-  string optname;
-  string p1,p2,p3;
+  std::string optname;
+  std::string p1,p2,p3;
   
   if (dcp->conf == (Architecture *)0)
     throw IfaceExecutionError("No load image present");
@@ -271,15 +271,15 @@ void IfcOption::execute(istream &s)
   }
   
   try {
-    string res = dcp->conf->options->set(optname,p1,p2,p3);
-    *status->optr << res << endl;
+    std::string res = dcp->conf->options->std::set(optname,p1,p2,p3);
+    *status->optr << res << std::endl;
   }
   catch(ParseError &err) {
-    *status->optr << err.explain << endl;
+    *status->optr << err.explain << std::endl;
     throw IfaceParseError("Bad option");
   }
   catch(RecovError &err) {
-    *status->optr << err.explain << endl;
+    *status->optr << err.explain << std::endl;
     throw IfaceExecutionError("Bad option");
   }
 }
@@ -290,7 +290,7 @@ void IfcParseFile::execute(istream &s)
   if (dcp->conf == (Architecture *)0) 
     throw IfaceExecutionError("No load image present");
 
-  string filename;
+  std::string filename;
   ifstream fs;
 
   s >> ws >> filename;
@@ -305,7 +305,7 @@ void IfcParseFile::execute(istream &s)
     parse_C(dcp->conf,fs);
   }
   catch(ParseError &err) {
-    *status->optr << "Error in C syntax: " << err.explain << endl;
+    *status->optr << "Error in C syntax: " << err.explain << std::endl;
     throw IfaceExecutionError("Bad C syntax");
   }
   fs.close();
@@ -325,7 +325,7 @@ void IfcParseLine::execute(istream &s)
     parse_C(dcp->conf,s);
   }
   catch(ParseError &err) {
-    *status->optr << "Error in C syntax: " << err.explain << endl;
+    *status->optr << "Error in C syntax: " << err.explain << std::endl;
     throw IfaceExecutionError("Bad C syntax");
   }
 }
@@ -338,7 +338,7 @@ void IfcAdjustVma::execute(istream &s)
   adjust = 0uL;
   if (dcp->conf == (Architecture *)0)
     throw IfaceExecutionError("No load image present");
-  s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct); // Let user specify base
+  s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct); // Let user specify base
   s >> ws >> adjust;
   if (adjust == 0uL)
     throw IfaceParseError("No adjustment parameter");
@@ -366,16 +366,16 @@ static void IfcFollowFlow(std::ostream &s,IfaceDecompData *dcp,const Address &of
       dcp->fd->followFlow(offset,offset+size,0);
     s << "Function " << dcp->fd->getName() << ": ";
     dcp->fd->getAddress().printRaw(s);
-    s << endl;
+    s << std::endl;
   } catch(RecovError &err) {
-    s << "Function " << dcp->fd->getName() << ": " << err.explain << endl;
+    s << "Function " << dcp->fd->getName() << ": " << err.explain << std::endl;
   }
 }
 
 void IfcFuncload::execute(istream &s)
 
 {				// Load a function into memory
-  string funcname;
+  std::string funcname;
   Address offset;
 
   s >> funcname;
@@ -383,7 +383,7 @@ void IfcFuncload::execute(istream &s)
   if (dcp->conf == (Architecture *)0)
     throw IfaceExecutionError("No image loaded");
 
-  string basename;
+  std::string basename;
   Scope *funcscope = dcp->conf->symboltab->resolveScopeSymbolName(funcname,"::",basename,(Scope *)0);
   if (funcscope == (Scope *)0)
     throw IfaceExecutionError("Bad namespace: "+funcname);
@@ -399,7 +399,7 @@ void IfcAddrrangeLoad::execute(istream &s)
 
 {				// Load address range as function
   int4 size;
-  string name;
+  std::string name;
   Address offset=parse_machaddr(s,size,*dcp->conf->types); // Read required address
 
   s >> ws;
@@ -436,7 +436,7 @@ void IfcMapaddress::execute(istream &s)
 
 {
   Datatype *ct;
-  string name;
+  std::string name;
   int4 size;
   Address addr = parse_machaddr(s,size,*dcp->conf->types); // Read required address;
 
@@ -462,12 +462,12 @@ void IfcMaphash::execute(istream &s)
   if (dcp->fd == (Funcdata *)0)
     throw IfaceExecutionError("No function loaded");
   Datatype *ct;
-  string name;
+  std::string name;
   uint8 hash;
   int4 size;
   Address addr = parse_machaddr(s,size,*dcp->conf->types); // Read pc address of hash
 
-  s >> hex >> hash;		// Parse the hash value
+  s >> std::dec >> hash;		// Parse the hash value
   s >> ws;
   ct = parse_type(s,name,dcp->conf); // Parse the required type and name
 
@@ -478,7 +478,7 @@ void IfcMaphash::execute(istream &s)
 void IfcMapfunction::execute(istream &s)
 
 {				// Notate a function start with loading the instructions
-  string name;
+  std::string name;
   int4 size;
   if ((dcp->conf == (Architecture *)0)||(dcp->conf->loader == (LoadImage *)0))
     throw IfaceExecutionError("No binary loaded");
@@ -490,7 +490,7 @@ void IfcMapfunction::execute(istream &s)
     dcp->conf->nameFunction(addr,name); // Pick default name if necessary
   dcp->fd = dcp->conf->symboltab->getGlobalScope()->addFunction(addr,name)->getFunction();
 
-  string nocode;
+  std::string nocode;
   s >> ws >> nocode;
   if (nocode == "nocode")
     dcp->fd->setNoCode(true);
@@ -502,7 +502,7 @@ void IfcMapexternalref::execute(istream &s)
   int4 size1,size2;
   Address addr1 = parse_machaddr(s,size1,*dcp->conf->types); // Read externalref address
   Address addr2 = parse_machaddr(s,size2,*dcp->conf->types); // Read referred to address
-  string name;
+  std::string name;
 
   s >> name;			// Read optional name
 
@@ -512,7 +512,7 @@ void IfcMapexternalref::execute(istream &s)
 void IfcMaplabel::execute(istream &s)
 
 { // Put a code label at a given address
-  string name;
+  std::string name;
   s >> name;
   if (name.size()==0)
     throw IfaceParseError("Need label name and address");
@@ -541,7 +541,7 @@ void IfcPrintdisasm::execute(istream &s)
   if (s.eof()) {
     if (dcp->fd == (Funcdata *)0)
       throw IfaceExecutionError("No function selected");
-    *status->fileoptr << "Assembly listing for " << dcp->fd->getName() << endl;
+    *status->fileoptr << "Assembly listing for " << dcp->fd->getName() << std::endl;
     addr = dcp->fd->getAddress();
     size = dcp->fd->getSize();
     glb = dcp->fd->getArch();
@@ -564,7 +564,7 @@ void IfcPrintdisasm::execute(istream &s)
 
 void IfcDump::execute(istream &s)
 
-{				// Do hex listing of memory region
+{				// Do std::dec listing of memory region
   int4 size;
   uint1 *buffer;
   Address offset = parse_machaddr(s,size,*dcp->conf->types);
@@ -580,7 +580,7 @@ void IfcDumpbinary::execute(istream &s)
   int4 size;
   uint1 *buffer;
   Address offset = parse_machaddr(s,size,*dcp->conf->types);
-  string filename;
+  std::string filename;
 
   s >> ws;
   if (s.eof())
@@ -606,15 +606,15 @@ void IfcDecompile::execute(istream &s)
     throw IfaceExecutionError("No function selected");
 
   if (dcp->fd->hasNoCode()) {
-    *status->optr << "No code for " << dcp->fd->getName() << endl;
+    *status->optr << "No code for " << dcp->fd->getName() << std::endl;
     return;
   }
   if (dcp->fd->isProcStarted()) { // Free up old decompile
-    *status->optr << "Clearing old decompilation" << endl;
+    *status->optr << "Clearing old decompilation" << std::endl;
     dcp->conf->clearAnalysis(dcp->fd);
   }
     
-  *status->optr << "Decompiling " << dcp->fd->getName() << endl;
+  *status->optr << "Decompiling " << dcp->fd->getName() << std::endl;
   dcp->conf->allacts.getCurrent()->reset(*dcp->fd);
   res = dcp->conf->allacts.getCurrent()->perform( *dcp->fd );
   if (res<0) {
@@ -626,7 +626,7 @@ void IfcDecompile::execute(istream &s)
     if (res==0)
       *status->optr << " (no change)";
   }
-  *status->optr << endl;
+  *status->optr << std::endl;
 }
 
 void IfcPrintCFlat::execute(istream &s)
@@ -696,11 +696,11 @@ void IfcPrintLanguage::execute(istream &s)
   s >> ws;
   if (s.eof())
     throw IfaceParseError("No print language specified");
-  string langroot;
+  std::string langroot;
   s >> langroot;
   langroot = langroot + "-language";
 
-  string curlangname = dcp->conf->print->getName();
+  std::string curlangname = dcp->conf->print->getName();
   dcp->conf->setPrintLanguage(langroot);
   dcp->conf->print->setOutputStream(status->fileoptr);
   dcp->conf->print->docFunction(dcp->fd);
@@ -730,7 +730,7 @@ void IfcListOverride::execute(istream &s)
   if (dcp->fd == (Funcdata *)0)
     throw IfaceExecutionError("No function selected");
 
-  *status->optr << "Function: " << dcp->fd->getName() << endl;
+  *status->optr << "Function: " << dcp->fd->getName() << std::endl;
   dcp->fd->getOverride().printRaw(*status->optr,dcp->conf);
 }
 
@@ -740,7 +740,7 @@ void IfcListprototypes::execute(istream &s)
   if (dcp->conf == (Architecture *)0)
     throw IfaceExecutionError("No load image present");
   
-  std::map<string,ProtoModel *>::const_iterator iter;
+  std::map<std::string,ProtoModel *>::const_iterator iter;
   for(iter=dcp->conf->protoModels.begin();iter!=dcp->conf->protoModels.end();++iter) {
     ProtoModel *model = (*iter).second;
     *status->optr << model->getName();
@@ -750,7 +750,7 @@ void IfcListprototypes::execute(istream &s)
       *status->optr << " eval called";
     else if (model == dcp->conf->evalfp_current)
       *status->optr << " eval current";
-    *status->optr << endl;
+    *status->optr << std::endl;
   }
 }
 
@@ -760,13 +760,13 @@ void IfcSetcontextrange::execute(istream &s)
   if (dcp->conf == (Architecture *)0)
     throw IfaceExecutionError("No load image present");
 
-  string name;
+  std::string name;
   s >> name >> ws;
 
   if (name.size()==0)
     throw IfaceParseError("Missing context variable name");
 
-  s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct); // Let user specify base
+  s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct); // Let user specify base
   uintm value = 0xbadbeef;
   s >> value;
   if (value == 0xbadbeef)
@@ -798,12 +798,12 @@ void IfcSettrackedrange::execute(istream &s)
   if (dcp->conf == (Architecture *)0)
     throw IfaceExecutionError("No load image present");
 
-  string name;
+  std::string name;
   s >> name >> ws;
   if (name.size() ==0)
     throw IfaceParseError("Missing tracked register name");
 
-  s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct); // Let user specify base
+  s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct); // Let user specify base
   uintb value = 0xbadbeef;
   s >> value;
   if (value == 0xbadbeef)
@@ -839,7 +839,7 @@ void IfcBreakaction::execute(istream &s)
 
 {				// Set an action breakpoint
   bool res;
-  string specify;
+  std::string specify;
 
   s >> specify >> ws;		// Which action or rule to put breakpoint on
 
@@ -858,7 +858,7 @@ void IfcBreakstart::execute(istream &s)
 
 {				// Set a start breakpoint
   bool res;
-  string specify;
+  std::string specify;
 
   s >> specify >> ws;		// Which action or rule to put breakpoint on
 
@@ -895,7 +895,7 @@ void IfcPrintSpaces::execute(istream &s)
   int4 num = manage->numSpaces();
   for(int4 i=0;i<num;++i) {
     AddrSpace *spc = manage->getSpace(i);
-    *status->fileoptr << dec << spc->getIndex() << " : '" << spc->getShortcut() << "' " << spc->getName();
+    *status->fileoptr << std::dec << spc->getIndex() << " : '" << spc->getShortcut() << "' " << spc->getName();
     if (spc->getType() == IPTR_CONSTANT)
       *status->fileoptr << " constant ";
     else if (spc->getType() == IPTR_PROCESSOR)
@@ -912,14 +912,14 @@ void IfcPrintSpaces::execute(istream &s)
       *status->fileoptr << " small";
     *status->fileoptr << " addrsize=" << spc->getAddrSize() << " wordsize=" << spc->getWordSize();
     *status->fileoptr << " delay=" << spc->getDelay();
-    *status->fileoptr << endl;
+    *status->fileoptr << std::endl;
   }
 }
 
 void IfcPrintHigh::execute(istream &s)
 
 {				// List varnodes under one high
-  string varname;
+  std::string varname;
   HighVariable *high;
 
   if (dcp->fd == (Funcdata *)0)
@@ -971,7 +971,7 @@ void IfcPrintParamMeasuresXml::execute(istream &s)
 void IfcRename::execute(istream &s)
 
 {				// Change the name of a symbol
-  string oldname,newname;
+  std::string oldname,newname;
   
   s >> ws >> oldname >> ws >> newname >> ws;
   if (oldname.size()==0)
@@ -1002,7 +1002,7 @@ void IfcRename::execute(istream &s)
 void IfcRemove::execute(istream &s)
 
 {				// Remove a symbol
-  string name;
+  std::string name;
   
   s >> ws >> name;
   if (name.size()==0)
@@ -1025,7 +1025,7 @@ void IfcRetype::execute(istream &s)
 
 {				// Change the type of a symbol
   Datatype *ct;
-  string name,newname;
+  std::string name,newname;
 
   s >> ws >> name;
   if (name.size()==0)
@@ -1107,7 +1107,7 @@ void IfcPrintCover::execute(istream &s)
 
 {				// Print4 coverage information about a high
   HighVariable *high;
-  string name;
+  std::string name;
 
   s >> ws >> name;
   if (name.size()==0)
@@ -1130,13 +1130,13 @@ void IfcVarnodehighCover::execute(istream &s)
   if (vn->getHigh() != (HighVariable *)0)
     vn->getHigh()->printCover(*status->optr);
   else
-    *status->optr << "Unmerged" << endl;
+    *status->optr << "Unmerged" << std::endl;
 }
 
 void IfcPrintExtrapop::execute(istream &s)
 
 {
-  string name;
+  std::string name;
 
   s >> ws >> name;
   if (name.size() == 0) {
@@ -1151,23 +1151,23 @@ void IfcPrintExtrapop::execute(istream &s)
 	if (expop == ProtoModel::extrapop_unknown)
 	  *status->optr << "unknown";
 	else
-	  *status->optr << dec << expop;
+	  *status->optr << std::dec << expop;
 	*status->optr << '(';
 	expop = fc->getExtraPop();
 	if (expop == ProtoModel::extrapop_unknown)
 	  *status->optr << "unknown";
 	else
-	  *status->optr << dec << expop;
-	*status->optr << ')' << endl;
+	  *status->optr << std::dec << expop;
+	*status->optr << ')' << std::endl;
       }
     }
     else {
       int4 expop = dcp->conf->defaultfp->getExtraPop();
       *status->optr << "Default extra pop = ";
       if (expop == ProtoModel::extrapop_unknown)
-	*status->optr << "unknown" << endl;
+	*status->optr << "unknown" << std::endl;
       else
-	*status->optr << dec << expop << endl;
+	*status->optr << std::dec << expop << std::endl;
     }
   }
   else {
@@ -1178,9 +1178,9 @@ void IfcPrintExtrapop::execute(istream &s)
     int4 expop = fd->getFuncProto().getExtraPop();
     *status->optr << "ExtraPop for function " << name << " is ";
     if (expop == ProtoModel::extrapop_unknown)
-      *status->optr << "unknown" << endl;
+      *status->optr << "unknown" << std::endl;
     else
-      *status->optr << dec << expop << endl;
+      *status->optr << std::dec << expop << std::endl;
     if (dcp->fd != (Funcdata *)0) {
       int4 num = dcp->fd->numCalls();
       for(int4 i=0;i<num;++i) {
@@ -1191,14 +1191,14 @@ void IfcPrintExtrapop::execute(istream &s)
 	  if (expop == ProtoModel::extrapop_unknown)
 	    *status->optr << "unknown";
 	  else
-	    *status->optr << dec << expop;
+	    *status->optr << std::dec << expop;
 	  *status->optr << '(';
 	  expop = fc->getExtraPop();
 	  if (expop == ProtoModel::extrapop_unknown)
 	    *status->optr << "unknown";
 	  else
-	    *status->optr << dec << expop;
-	  *status->optr << ')' << endl;
+	    *status->optr << std::dec << expop;
+	  *status->optr << ')' << std::endl;
 	}
       }
     }
@@ -1219,7 +1219,7 @@ void IfcVarnodeCover::execute(istream &s)
 void IfcNameVarnode::execute(istream &s)
 
 {
-  string token;
+  std::string token;
   int4 size;
   uintm uq;
 
@@ -1244,7 +1244,7 @@ void IfcNameVarnode::execute(istream &s)
   scope->setAttribute(sym,Varnode::namelock);
 
   *status->fileoptr << "Successfully added " << token;
-  *status->fileoptr << " to scope " << scope->getFullName() << endl;
+  *status->fileoptr << " to scope " << scope->getFullName() << std::endl;
 }
 
 void IfcTypeVarnode::execute(istream &s)
@@ -1253,7 +1253,7 @@ void IfcTypeVarnode::execute(istream &s)
   int4 size;
   uintm uq;
   Datatype *ct;
-  string name;
+  std::string name;
 
   if (dcp->fd == (Funcdata *)0)
     throw IfaceExecutionError("No function selected");
@@ -1273,7 +1273,7 @@ void IfcTypeVarnode::execute(istream &s)
     scope->setAttribute(sym,Varnode::namelock);
   
   *status->fileoptr << "Successfully added " << sym->getName();
-  *status->fileoptr << " to scope " << scope->getFullName() << endl;
+  *status->fileoptr << " to scope " << scope->getFullName() << std::endl;
 }
 
 static Varnode *find_varnode_via_op(istream &s,Funcdata *fd,const TypeFactory &typegrp)
@@ -1287,7 +1287,7 @@ static Varnode *find_varnode_via_op(istream &s,Funcdata *fd,const TypeFactory &t
 
   int4 slot;
   slot = -2;
-  s >> dec >> slot;
+  s >> std::dec >> slot;
   if (slot == -2)
     throw IfaceParseError("Missing op slot number");
   Varnode *vn;
@@ -1309,17 +1309,17 @@ void IfcForceHex::execute(istream &s)
 
   Varnode *vn = find_varnode_via_op(s,dcp->fd,*dcp->conf->types);
   if (!vn->isConstant())
-    throw IfaceExecutionError("Can only force hex on a constant");
+    throw IfaceExecutionError("Can only force std::dec on a constant");
   type_metatype mt = vn->getType()->getMetatype();
   if ((mt!=TYPE_INT)&&(mt!=TYPE_UINT)&&(mt!=TYPE_UNKNOWN))
-    throw IfaceExecutionError("Can only force hex on integer type constant");
+    throw IfaceExecutionError("Can only force std::dec on integer type constant");
   dcp->fd->buildDynamicSymbol(vn);
   Symbol *sym = vn->getHigh()->getSymbol();
   if (sym == (Symbol *)0)
     throw IfaceExecutionError("Unable to create symbol");
   sym->getScope()->setDisplayFormat(sym,Symbol::force_hex);
   sym->getScope()->setAttribute(sym,Varnode::typelock);
-  *status->optr << "Successfully forced hex display" << endl;
+  *status->optr << "Successfully forced std::dec display" << std::endl;
 }
 
 void IfcForceDec::execute(istream &s)
@@ -1330,17 +1330,17 @@ void IfcForceDec::execute(istream &s)
 
   Varnode *vn = find_varnode_via_op(s,dcp->fd,*dcp->conf->types);
   if (!vn->isConstant())
-    throw IfaceExecutionError("Can only force hex on a constant");
+    throw IfaceExecutionError("Can only force std::dec on a constant");
   type_metatype mt = vn->getType()->getMetatype();
   if ((mt!=TYPE_INT)&&(mt!=TYPE_UINT)&&(mt!=TYPE_UNKNOWN))
-    throw IfaceExecutionError("Can only force dec on integer type constant");
+    throw IfaceExecutionError("Can only force std::dec on integer type constant");
   dcp->fd->buildDynamicSymbol(vn);
   Symbol *sym = vn->getHigh()->getSymbol();
   if (sym == (Symbol *)0)
     throw IfaceExecutionError("Unable to create symbol");
   sym->getScope()->setDisplayFormat(sym,Symbol::force_dec);
   sym->getScope()->setAttribute(sym,Varnode::typelock);
-  *status->optr << "Successfully forced dec display" << endl;
+  *status->optr << "Successfully forced std::dec display" << std::endl;
 }
 
 void IfcForcegoto::execute(istream &s)
@@ -1398,7 +1398,7 @@ void IfcJumpOverride::execute(istream &s)
   Address naddr;
   uintb h=0;
   uintb sv = 0;
-  string token;
+  std::string token;
   s >> token;
 //   if (token == "norm") {
 //     naddr = parse_machaddr(s,discard,*dcp->conf->types);
@@ -1407,7 +1407,7 @@ void IfcJumpOverride::execute(istream &s)
 //     s >> token;
 //   }
   if (token == "startval") {
-    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct); // Let user specify base
+    s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct); // Let user specify base
     s >> sv;
     s >> token;
   }
@@ -1421,7 +1421,7 @@ void IfcJumpOverride::execute(istream &s)
   if (adtable.empty())
     throw IfaceExecutionError("Missing jumptable address entries");
   jt->setOverride(adtable,naddr,h,sv);
-  *status->optr << "Successfully installed jumptable override" << endl;
+  *status->optr << "Successfully installed jumptable override" << std::endl;
 }
 
 void IfcFlowOverride::execute(istream &s)
@@ -1429,7 +1429,7 @@ void IfcFlowOverride::execute(istream &s)
 {
   int4 discard;
   uint4 type;
-  string token;
+  std::string token;
 
   if (dcp->fd == (Funcdata *)0)
     throw IfaceExecutionError("No function selected");
@@ -1444,13 +1444,13 @@ void IfcFlowOverride::execute(istream &s)
     throw IfaceParseError("Bad override type");
 
   dcp->fd->getOverride().insertFlowOverride(addr,type);
-  *status->optr << "Successfully added override" << endl;
+  *status->optr << "Successfully added override" << std::endl;
 }
 
 void IfcDeadcodedelay::execute(istream &s)
 
 {
-  string name;
+  std::string name;
   int4 delay = -1;
   AddrSpace *spc;
   
@@ -1465,11 +1465,11 @@ void IfcDeadcodedelay::execute(istream &s)
     throw IfaceParseError("Need delay integer");
   if (dcp->fd != (Funcdata *)0) {
     dcp->fd->getOverride().insertDeadcodeDelay(spc,delay);
-    *status->optr << "Successfully overrided deadcode delay for single function" << endl;
+    *status->optr << "Successfully overrided deadcode delay for single function" << std::endl;
   }
   else {
     dcp->conf->setDeadcodeDelay(spc->getIndex(),delay);
-    *status->optr << "Successfully overrided deadcode delay for all functions" << endl;
+    *status->optr << "Successfully overrided deadcode delay for all functions" << std::endl;
   }
 }
 
@@ -1509,7 +1509,7 @@ void IfcGlobalify::execute(istream &s)
   if (dcp->conf == (Architecture *)0)
     throw IfaceExecutionError("No load image present");
   dcp->conf->globalify();
-  *status->optr << "Successfully made all registers/memory locations global" << endl;
+  *status->optr << "Successfully made all registers/memory locations global" << std::endl;
 }
 
 void IfcGlobalRegisters::execute(istream &s)
@@ -1517,9 +1517,9 @@ void IfcGlobalRegisters::execute(istream &s)
 {
   if (dcp->conf == (Architecture *)0)
     throw IfaceExecutionError("No load image present");
-  std::map<VarnodeData,string> reglist;
+  std::map<VarnodeData,std::string> reglist;
   dcp->conf->translate->getAllRegisters(reglist);
-  std::map<VarnodeData,string>::const_iterator iter;
+  std::map<VarnodeData,std::string>::const_iterator iter;
   AddrSpace *spc = (AddrSpace *)0;
   uintb lastoff=0;
   Scope *globalscope = dcp->conf->symboltab->getGlobalScope();
@@ -1542,9 +1542,9 @@ void IfcGlobalRegisters::execute(istream &s)
     }
   }
   if (count == 0)
-    *status->optr << "No global registers" << endl;
+    *status->optr << "No global registers" << std::endl;
   else
-    *status->optr << "Successfully made a global symbol for " << count << " registers" << endl;
+    *status->optr << "Successfully made a global symbol for " << count << " registers" << std::endl;
 }
 
 static bool nontrivial_use(Varnode *vn)
@@ -1557,7 +1557,7 @@ static bool nontrivial_use(Varnode *vn)
   while(proc < vnlist.size()) {
     Varnode *tmpvn = vnlist[proc];
     proc += 1;
-    list<PcodeOp *>::const_iterator iter;
+    std::list<PcodeOp *>::const_iterator iter;
     for(iter=tmpvn->beginDescend();iter!=tmpvn->endDescend();++iter) {
       PcodeOp *op = *iter;
       if ((op->code() == CPUI_COPY)||
@@ -1665,7 +1665,7 @@ static void print_function_inputs(Funcdata *fd,std::ostream &s)
 {
   VarnodeDefSet::const_iterator iter,enditer;
 
-  s << "Function: " << fd->getName() << endl;
+  s << "Function: " << fd->getName() << std::endl;
   iter = fd->beginDef(Varnode::input);
   enditer = fd->endDef(Varnode::input);
   while(iter != enditer) {
@@ -1683,7 +1683,7 @@ static void print_function_inputs(Funcdata *fd,std::ostream &s)
       s << "     restored";
     else if (nontriv)
       s << "     nontriv";
-    s << endl;
+    s << std::endl;
   }
 }
 
@@ -1709,7 +1709,7 @@ void IfcPrintInputsAll::iterationCallback(Funcdata *fd)
 
 {
   if (fd->hasNoCode()) {
-    *status->optr << "No code for " << fd->getName() << endl;
+    *status->optr << "No code for " << fd->getName() << std::endl;
     return;
   }
   try {
@@ -1719,7 +1719,7 @@ void IfcPrintInputsAll::iterationCallback(Funcdata *fd)
     print_function_inputs(fd,*status->fileoptr);
   }
   catch(LowlevelError &err) {
-    *status->optr << "Skipping " << fd->getName() << ": " << err.explain << endl;
+    *status->optr << "Skipping " << fd->getName() << ": " << err.explain << std::endl;
   }
   dcp->conf->clearAnalysis(fd);
 }
@@ -1756,7 +1756,7 @@ void IfcPrintLocalrange::execute(istream &s)
 void IfcPrintMap::execute(istream &s)
 
 {
-  string name;
+  std::string name;
   Scope *scope;
 
   s >> name;
@@ -1776,7 +1776,7 @@ void IfcPrintMap::execute(istream &s)
       throw IfaceExecutionError("No std::map named: "+name);
   }
 
-  *status->fileoptr << scope->getFullName() << endl;
+  *status->fileoptr << scope->getFullName() << std::endl;
   scope->printBounds(*status->fileoptr);
   scope->printEntries(*status->fileoptr);
 }
@@ -1784,7 +1784,7 @@ void IfcPrintMap::execute(istream &s)
 void IfcProduceC::execute(istream &s)
 
 {				// Produce C output of every known function
-  string name;
+  std::string name;
   
   s >> ws >> name;
   if (name.size()==0)
@@ -1806,7 +1806,7 @@ void IfcProduceC::iterationCallback(Funcdata *fd)
   float duration;
 
   if (fd->hasNoCode()) {
-    *status->optr << "No code for " << fd->getName() << endl;
+    *status->optr << "No code for " << fd->getName() << std::endl;
     return;
   }
   try {
@@ -1816,15 +1816,15 @@ void IfcProduceC::iterationCallback(Funcdata *fd)
     dcp->conf->allacts.getCurrent()->perform( *fd );
     end_time = clock();
     *status->optr << "Decompiled " << fd->getName();
-    //	  *status->optr << ": " << hex << fd->getAddress().getOffset();
-    *status->optr << '(' << dec << fd->getSize() << ')';
+    //	  *status->optr << ": " << std::dec << fd->getAddress().getOffset();
+    *status->optr << '(' << std::dec << fd->getSize() << ')';
     duration = ((float)(end_time-start_time))/CLOCKS_PER_SEC;
     duration *= 1000.0;
-    *status->optr << " time=" << fixed << setprecision(0) << duration << " ms" << endl;
+    *status->optr << " time=" << fixed << setprecision(0) << duration << " ms" << std::endl;
     dcp->conf->print->docFunction(fd);
   }
   catch(LowlevelError &err) {
-    *status->optr << "Skipping " << fd->getName() << ": " << err.explain << endl;
+    *status->optr << "Skipping " << fd->getName() << ": " << err.explain << std::endl;
   }
   dcp->conf->clearAnalysis(fd);
 }
@@ -1837,18 +1837,18 @@ void IfcProducePrototypes::execute(istream &s)
   if (dcp->cgraph == (CallGraph *)0)
     throw IfaceExecutionError("Callgraph has not been built");
   if (dcp->conf->evalfp_current == (ProtoModel *)0) {
-    *status->optr << "Always using default prototype" << endl;
+    *status->optr << "Always using default prototype" << std::endl;
     return;
   }
 
   if (!dcp->conf->evalfp_current->isMerged()) {
-    *status->optr << "Always using prototype " << dcp->conf->evalfp_current->getName() << endl;
+    *status->optr << "Always using prototype " << dcp->conf->evalfp_current->getName() << std::endl;
     return;
   }
   ProtoModelMerged *model = (ProtoModelMerged *)dcp->conf->evalfp_current;
-  *status->optr << "Trying to distinguish between prototypes:" << endl;
+  *status->optr << "Trying to distinguish between prototypes:" << std::endl;
   for(int4 i=0;i<model->numModels();++i)
-    *status->optr << "  " << model->getModel(i)->getName() << endl;
+    *status->optr << "  " << model->getModel(i)->getName() << std::endl;
 
   iterateFunctionsLeafOrder();
 }
@@ -1861,11 +1861,11 @@ void IfcProducePrototypes::iterationCallback(Funcdata *fd)
 
   *status->optr << fd->getName() << ' ';
   if (fd->hasNoCode()) {
-    *status->optr << "has no code" << endl;
+    *status->optr << "has no code" << std::endl;
     return;
   }
   if (fd->getFuncProto().isInputLocked()) {
-    *status->optr << "has locked prototype" << endl;
+    *status->optr << "has locked prototype" << std::endl;
     return;
   }
   try {
@@ -1875,15 +1875,15 @@ void IfcProducePrototypes::iterationCallback(Funcdata *fd)
     dcp->conf->allacts.getCurrent()->perform( *fd );
     end_time = clock();
     //    *status->optr << "Decompiled " << fd->getName();
-    //    *status->optr << '(' << dec << fd->getSize() << ')';
+    //    *status->optr << '(' << std::dec << fd->getSize() << ')';
     *status->optr << "proto=" << fd->getFuncProto().getModelName();
     fd->getFuncProto().setModelLock(true);
     duration = ((float)(end_time-start_time))/CLOCKS_PER_SEC;
     duration *= 1000.0;
-    *status->optr << " time=" << fixed << setprecision(0) << duration << " ms" << endl;
+    *status->optr << " time=" << fixed << setprecision(0) << duration << " ms" << std::endl;
   }
   catch(LowlevelError &err) {
-    *status->optr << "Skipping " << fd->getName() << ": " << err.explain << endl;
+    *status->optr << "Skipping " << fd->getName() << ": " << err.explain << std::endl;
   }
   dcp->conf->clearAnalysis(fd);
 }
@@ -1914,13 +1914,13 @@ void IfcContinue::execute(istream &s)
     if (res==0)
       *status->optr << " (no change)";
   }
-  *status->optr << endl;
+  *status->optr << std::endl;
 }
 
 void IfcGraphDataflow::execute(istream &s)
 
 {				// Dump data-flow graph
-  string filename;
+  std::string filename;
 
   s >> filename;
   if (filename.size()==0)
@@ -1938,7 +1938,7 @@ void IfcGraphDataflow::execute(istream &s)
 void IfcGraphControlflow::execute(istream &s)
 
 {				// Dump control-flow graph
-  string filename;
+  std::string filename;
 
   s >> filename;
   if (filename.size()==0)
@@ -1956,7 +1956,7 @@ void IfcGraphControlflow::execute(istream &s)
 void IfcGraphDom::execute(istream &s)
 
 {				// Dump forward dominator graph
-  string filename;
+  std::string filename;
 
   s >> filename;
   if (filename.size()==0)
@@ -1983,7 +1983,7 @@ void IfcCommentInstr::execute(istream &s)
   int4 size;
   Address addr = parse_machaddr(s,size,*dcp->conf->types);
   s >> ws;
-  string comment;
+  std::string comment;
   char tok;
   s.get(tok);
   while(!s.eof()) {
@@ -2001,7 +2001,7 @@ static void duplicate_hash(Funcdata *fd,std::ostream &s)
   DynamicHash dhash;
 
   VarnodeLocSet::const_iterator iter,enditer;
-  pair<set<uint8>::iterator,bool> res;
+  pair<std::set<uint8>::iterator,bool> res;
   iter = fd->beginLoc();
   enditer = fd->endLoc();
   while(iter != enditer) {
@@ -2033,7 +2033,7 @@ static void duplicate_hash(Funcdata *fd,std::ostream &s)
       vn->printRaw(s);
       s << " : ";
       op->printRaw(s);
-      s << endl;
+      s << std::endl;
       return;
     }
     uint4 total = DynamicHash::getTotalFromHash(dhash.getHash());
@@ -2044,11 +2044,11 @@ static void duplicate_hash(Funcdata *fd,std::ostream &s)
       else
 	op = vn->getDef();
       s << "Duplicate : ";
-      s << dec << DynamicHash::getPositionFromHash(dhash.getHash()) << " out of " << total << " : ";
+      s << std::dec << DynamicHash::getPositionFromHash(dhash.getHash()) << " out of " << total << " : ";
       vn->printRaw(s);
       s << " : ";
       op->printRaw(s);
-      s << endl;
+      s << std::endl;
     }
   }
 }
@@ -2066,7 +2066,7 @@ void IfcDuplicateHash::iterationCallback(Funcdata *fd)
   float duration;
 
   if (fd->hasNoCode()) {
-    *status->optr << "No code for " << fd->getName() << endl;
+    *status->optr << "No code for " << fd->getName() << std::endl;
     return;
   }
   try {
@@ -2076,15 +2076,15 @@ void IfcDuplicateHash::iterationCallback(Funcdata *fd)
     dcp->conf->allacts.getCurrent()->perform( *fd );
     end_time = clock();
     *status->optr << "Decompiled " << fd->getName();
-    //	  *status->optr << ": " << hex << fd->getAddress().getOffset();
-    *status->optr << '(' << dec << fd->getSize() << ')';
+    //	  *status->optr << ": " << std::dec << fd->getAddress().getOffset();
+    *status->optr << '(' << std::dec << fd->getSize() << ')';
     duration = ((float)(end_time-start_time))/CLOCKS_PER_SEC;
     duration *= 1000.0;
-    *status->optr << " time=" << fixed << setprecision(0) << duration << " ms" << endl;
+    *status->optr << " time=" << fixed << setprecision(0) << duration << " ms" << std::endl;
     duplicate_hash(fd,*status->optr);
   }
   catch(LowlevelError &err) {
-    *status->optr << "Skipping " << fd->getName() << ": " << err.explain << endl;
+    *status->optr << "Skipping " << fd->getName() << ": " << err.explain << std::endl;
   }
   dcp->conf->clearAnalysis(fd);
 }
@@ -2101,7 +2101,7 @@ void IfcCallGraphBuild::execute(istream &s)
   dcp->cgraph->buildAllNodes();		// Build a node in the graph for existing symbols
   quick = false;
   iterateFunctionsAddrOrder();
-  *status->optr << "Successfully built callgraph" << endl;
+  *status->optr << "Successfully built callgraph" << std::endl;
 }
 
 void IfcCallGraphBuild::iterationCallback(Funcdata *fd)
@@ -2111,7 +2111,7 @@ void IfcCallGraphBuild::iterationCallback(Funcdata *fd)
   float duration;
 
   if (fd->hasNoCode()) {
-    *status->optr << "No code for " << fd->getName() << endl;
+    *status->optr << "No code for " << fd->getName() << std::endl;
     return;
   }
   if (quick) {
@@ -2126,14 +2126,14 @@ void IfcCallGraphBuild::iterationCallback(Funcdata *fd)
       dcp->conf->allacts.getCurrent()->perform( *fd );
       end_time = clock();
       *status->optr << "Decompiled " << fd->getName();
-      //	  *status->optr << ": " << hex << fd->getAddress().getOffset();
-      *status->optr << '(' << dec << fd->getSize() << ')';
+      //	  *status->optr << ": " << std::dec << fd->getAddress().getOffset();
+      *status->optr << '(' << std::dec << fd->getSize() << ')';
       duration = ((float)(end_time-start_time))/CLOCKS_PER_SEC;
       duration *= 1000.0;
-      *status->optr << " time=" << fixed << setprecision(0) << duration << " ms" << endl;
+      *status->optr << " time=" << fixed << setprecision(0) << duration << " ms" << std::endl;
     }
     catch(LowlevelError &err) {
-      *status->optr << "Skipping " << fd->getName() << ": " << err.explain << endl;
+      *status->optr << "Skipping " << fd->getName() << ": " << err.explain << std::endl;
     }
   }
   dcp->cgraph->buildEdges(fd);
@@ -2151,7 +2151,7 @@ void IfcCallGraphBuildQuick::execute(istream &s)
   dcp->cgraph->buildAllNodes();	// Build a node in the graph for existing symbols
   quick = true;
   iterateFunctionsAddrOrder();
-  *status->optr << "Successfully built callgraph" << endl;
+  *status->optr << "Successfully built callgraph" << std::endl;
 }
 
 void IfcCallGraphDump::execute(istream &s)
@@ -2160,7 +2160,7 @@ void IfcCallGraphDump::execute(istream &s)
   if (dcp->cgraph == (CallGraph *)0)
     throw IfaceExecutionError("No callgraph has been built");
 
-  string name;
+  std::string name;
   s >> ws >> name;
   if (name.size() == 0)
     throw IfaceParseError("Need file name to write callgraph to");
@@ -2172,7 +2172,7 @@ void IfcCallGraphDump::execute(istream &s)
 
   dcp->cgraph->saveXml(os);
   os.close();
-  *status->optr << "Successfully saved callgraph to " << name << endl;
+  *status->optr << "Successfully saved callgraph to " << name << std::endl;
 }
 
 void IfcCallGraphLoad::execute(istream &s)
@@ -2183,7 +2183,7 @@ void IfcCallGraphLoad::execute(istream &s)
   if (dcp->cgraph != (CallGraph *)0)
     throw IfaceExecutionError("Callgraph already loaded");
 
-  string name;
+  std::string name;
 
   s >> ws >> name;
   if (name.size() == 0)
@@ -2198,7 +2198,7 @@ void IfcCallGraphLoad::execute(istream &s)
 
   dcp->cgraph = new CallGraph(dcp->conf);
   dcp->cgraph->restoreXml(doc->getRoot());
-  *status->optr << "Successfully read in callgraph" << endl;
+  *status->optr << "Successfully read in callgraph" << std::endl;
 
   Scope *gscope = dcp->conf->symboltab->getGlobalScope();
   std::map<Address,CallGraphNode>::iterator iter,enditer;
@@ -2214,7 +2214,7 @@ void IfcCallGraphLoad::execute(istream &s)
     node->setFuncdata(fd);
   }
 
-  *status->optr << "Successfully associated functions with callgraph nodes" << endl;
+  *status->optr << "Successfully associated functions with callgraph nodes" << std::endl;
 }
 
 void IfcCallGraphList::execute(istream &s)
@@ -2229,10 +2229,10 @@ void IfcCallGraphList::execute(istream &s)
 void IfcCallGraphList::iterationCallback(Funcdata *fd)
 
 {
-  *status->optr << fd->getName() << endl;
+  *status->optr << fd->getName() << std::endl;
 }
 
-static void readPcodeSnippet(istream &s,string &name,string &outname,std::vector<string> &inname,string &pcodestring)
+static void readPcodeSnippet(istream &s,std::string &name,std::string &outname,std::vectorstd::string &inname,std::string &pcodestring)
 
 {
   char bracket;
@@ -2244,7 +2244,7 @@ static void readPcodeSnippet(istream &s,string &name,string &outname,std::vector
   if (bracket != '(')
     throw IfaceParseError("Missing '('");
   while(bracket != ')') {
-    string param;
+    std::string param;
     parse_toseparator(s,param);
     s >> bracket;
     if (param.size() != 0)
@@ -2259,15 +2259,15 @@ static void readPcodeSnippet(istream &s,string &name,string &outname,std::vector
 void IfcCallFixup::execute(istream &s)
 
 {
-  string name,outname,pcodestring;
-  std::vector<string> inname;
+  std::string name,outname,pcodestring;
+  std::vectorstd::string inname;
 
   readPcodeSnippet(s,name,outname,inname,pcodestring);
   int4 id = -1;
   try {
     id = dcp->conf->pcodeinjectlib->manualCallFixup(name,pcodestring);
   } catch(LowlevelError &err) {
-    *status->optr << "Error compiling pcode: " << err.explain << endl;
+    *status->optr << "Error compiling pcode: " << err.explain << std::endl;
     return;
   }
   InjectPayload *payload = dcp->conf->pcodeinjectlib->getPayload(id);
@@ -2277,13 +2277,13 @@ void IfcCallFixup::execute(istream &s)
 void IfcCallOtherFixup::execute(istream &s)
 
 {
-  string useropname,outname,pcodestring;
-  std::vector<string> inname;
+  std::string useropname,outname,pcodestring;
+  std::vectorstd::string inname;
 
   readPcodeSnippet(s,useropname,outname,inname,pcodestring);
   dcp->conf->userops.manualCallOtherFixup(useropname,outname,inname,pcodestring,dcp->conf);
 
-  *status->optr << "Successfully registered callotherfixup" << endl;
+  *status->optr << "Successfully registered callotherfixup" << std::endl;
 }
 
 void IfcVolatile::execute(istream &s)
@@ -2299,7 +2299,7 @@ void IfcVolatile::execute(istream &s)
   Range range( addr.getSpace(), addr.getOffset(), addr.getOffset() + (size-1));
   dcp->conf->symboltab->setPropertyRange(Varnode::volatil,range);
 
-  *status->optr << "Successfully marked range as volatile" << endl;
+  *status->optr << "Successfully marked range as volatile" << std::endl;
 }
 
 void IfcPreferSplit::execute(istream &s)
@@ -2316,7 +2316,7 @@ void IfcPreferSplit::execute(istream &s)
   s >> ws; 
   if (s.eof())
     throw IfaceParseError("Missing split offset");
-  s >> dec >> split;
+  s >> std::dec >> split;
   if (split == -1)
     throw IfaceParseError("Bad split offset");
   dcp->conf->splitrecords.push_back(PreferSplitRecord());
@@ -2327,7 +2327,7 @@ void IfcPreferSplit::execute(istream &s)
   rec.storage.size = size;
   rec.splitoffset = split;
 
-  *status->optr << "Successfully added split record" << endl;
+  *status->optr << "Successfully added split record" << std::endl;
 }
 
 void IfcStructureBlocks::execute(istream &s)
@@ -2336,7 +2336,7 @@ void IfcStructureBlocks::execute(istream &s)
   if (dcp->conf == (Architecture *)0)
     throw IfaceExecutionError("No load image present");
 
-  string infile,outfile;
+  std::string infile,outfile;
   s >> infile;
   s >> outfile;
 
@@ -2376,7 +2376,7 @@ void IfcStructureBlocks::execute(istream &s)
     sout.close();
   }
   catch(LowlevelError &err) {
-    *status->optr << err.explain << endl;
+    *status->optr << err.explain << std::endl;
   }
 }
 
@@ -2384,7 +2384,7 @@ void IfcStructureBlocks::execute(istream &s)
 void IfcParseRule::execute(istream &s)
 
 { // Parse a rule and print it out as a C routine
-  string filename;
+  std::string filename;
   bool debug = false;
 
   s >> filename;
@@ -2393,7 +2393,7 @@ void IfcParseRule::execute(istream &s)
 
   s >> ws;
   if (!s.eof()) {
-    string val;
+    std::string val;
     s >> val;
     if ((val=="true")||(val=="debug"))
       debug = true;
@@ -2406,7 +2406,7 @@ void IfcParseRule::execute(istream &s)
   ruler.setErrorStream(*status->optr);
   ruler.run(thefile,debug);
   if (ruler.numErrors() != 0) {
-    *status->optr << "Parsing aborted on error" << endl;
+    *status->optr << "Parsing aborted on error" << std::endl;
     return;
   }
   int4 opparam;
@@ -2421,7 +2421,7 @@ void IfcParseRule::execute(istream &s)
 void IfcExperimentalRules::execute(istream &s)
 
 {
-  string filename;
+  std::string filename;
 
   if (dcp->conf != (Architecture *)0)
     throw IfaceExecutionError("Experimental rules must be registered before loading architecture");
@@ -2429,7 +2429,7 @@ void IfcExperimentalRules::execute(istream &s)
   if (filename.size() == 0)
     throw IfaceParseError("Missing name of file containing experimental rules");
   dcp->experimental_file = filename;
-  *status->optr << "Successfully registered experimental file " << filename << endl;
+  *status->optr << "Successfully registered experimental file " << filename << std::endl;
 }
 #endif
 
@@ -2439,7 +2439,7 @@ void IfcPrintActionstats::execute(istream &s)
   if (dcp->conf == (Architecture *)0)
     throw IfaceExecutionError("Image not loaded");
   if (dcp->conf->allacts.getCurrent() == (Action *)0)
-    throw IfaceExecutionError("No action set");
+    throw IfaceExecutionError("No action std::set");
 
   dcp->conf->allacts.getCurrent()->printStatistics(*status->fileoptr);
 }
@@ -2450,7 +2450,7 @@ void IfcResetActionstats::execute(istream &s)
   if (dcp->conf == (Architecture *)0)
     throw IfaceExecutionError("Image not loaded");
   if (dcp->conf->allacts.getCurrent() == (Action *)0)
-    throw IfaceExecutionError("No action set");
+    throw IfaceExecutionError("No action std::set");
 
   dcp->conf->allacts.getCurrent()->resetStats();
 }
@@ -2465,14 +2465,14 @@ void IfcCountPcode::execute(istream &s)
     throw IfaceExecutionError("No function selected");
 
   uint4 count = 0;
-  list<PcodeOp *>::const_iterator iter,enditer;
+  std::list<PcodeOp *>::const_iterator iter,enditer;
   iter = dcp->fd->beginOpAlive();
   enditer = dcp->fd->endOpAlive();
   while(iter != enditer) {
     count += 1;
     ++iter;
   }
-  *status->optr << "Count - pcode = " << dec << count << endl;
+  *status->optr << "Count - pcode = " << std::dec << count << std::endl;
 }
 
 #ifdef OPACTION_DEBUG
@@ -2482,7 +2482,7 @@ void IfcDebugAction::execute(istream &s)
 {
   if (dcp->fd == (Funcdata *)0)
     throw IfaceExecutionError("No function selected");
-  string actionname;
+  std::string actionname;
   s >> ws >> actionname;
   if (actionname.empty())
     throw IfaceParseError("Missing name of action to debug");
@@ -2499,7 +2499,7 @@ void IfcTraceBreak::execute(istream &s)
     throw IfaceExecutionError("No function selected");
 
   s >> ws;
-  s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct); // Let user specify base
+  s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct); // Let user specify base
   count = -1;
   s >> count;
   if (count == -1)
@@ -2530,11 +2530,11 @@ void IfcTraceAddress::execute(istream &s)
   }
   uqhigh = uqlow = ~((uintm)0);
   if (!s.eof()) {
-    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct); // Let user specify base
+    s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct); // Let user specify base
     s >> uqlow >> uqhigh >> ws;
   }
   dcp->fd->debugSetRange(pclow,pchigh,uqlow,uqhigh);
-  *status->optr << "OK (" << dec << dcp->fd->debugSize() << " ranges)\n";
+  *status->optr << "OK (" << std::dec << dcp->fd->debugSize() << " ranges)\n";
 }
 
 void IfcTraceEnable::execute(istream &s)
@@ -2563,7 +2563,7 @@ void IfcTraceClear::execute(istream &s)
   if (dcp->fd == (Funcdata *)0)
     throw IfaceExecutionError("No function selected");
 
-  *status->optr << dec << dcp->fd->debugSize() << " ranges cleared\n";
+  *status->optr << std::dec << dcp->fd->debugSize() << " ranges cleared\n";
   dcp->fd->debugDisable();
   dcp->fd->debugClear();
 }
@@ -2581,7 +2581,7 @@ void IfcTraceList::execute(istream &s)
     *status->optr << "Trace enabled (";
   else
     *status->optr << "Trace disabled (";
-  *status->optr << dec << size << " total ranges)\n";
+  *status->optr << std::dec << size << " total ranges)\n";
   for(i=0;i<size;++i)
     dcp->fd->debugPrintRange(i);
 }
@@ -2598,7 +2598,7 @@ static void jump_callback(Funcdata &orig,Funcdata &fd)
   jumpstack.push_back(newdcp->fd);
 
   // We create a new "sub" interface using the same input output
-  ostringstream s1;
+  std::ostringstream s1;
   s1 << fd.getName() << "> ";
   // We keep the commands already registered.
   // We should probably "de"-register some of the commands
@@ -2613,13 +2613,13 @@ static void jump_callback(Funcdata &orig,Funcdata &fd)
   int4 res = rootaction->perform( *newdcp->fd );
   if (res >= 0)
     throw LowlevelError("Did not catch jumptable breakpoint");
-  *newstatus->optr << "Breaking for jumptable partial function" << endl;
-  *newstatus->optr << newdcp->fd->getName() << endl;
-  *newstatus->optr << "Type \"cont\" to continue debugging." << endl;
-  *newstatus->optr << "After completion type \"quit\" to continue in parent." << endl;
+  *newstatus->optr << "Breaking for jumptable partial function" << std::endl;
+  *newstatus->optr << newdcp->fd->getName() << std::endl;
+  *newstatus->optr << "Type \"cont\" to continue debugging." << std::endl;
+  *newstatus->optr << "After completion type \"quit\" to continue in parent." << std::endl;
   mainloop(newstatus);
   newstatus->done = false;	// "quit" only terminates one level
-  *newstatus->optr << "Finished jumptable partial function" << endl;
+  *newstatus->optr << "Finished jumptable partial function" << std::endl;
   newdcp->fd = jumpstack.back();
   jumpstack.pop_back();
 }
@@ -2630,7 +2630,7 @@ void IfcBreakjump::execute(istream &s)
   dcp->jumptabledebug = true;
   dcp_callback = dcp;
   status_callback = status;
-  *status->optr << "Jumptable debugging enabled" << endl;
+  *status->optr << "Jumptable debugging enabled" << std::endl;
   if (dcp->fd != (Funcdata *)0)
     dcp->fd->enableJTCallback(jump_callback);
 }
@@ -2645,26 +2645,26 @@ void execute(IfaceStatus *status,IfaceDecompData *dcp)
     return;
   }
   catch(IfaceParseError &err) {
-    *status->optr << "Command parsing error: " << err.explain << endl;
+    *status->optr << "Command parsing error: " << err.explain << std::endl;
   }
   catch(IfaceExecutionError &err) {
-    *status->optr << "Execution error: " << err.explain << endl;
+    *status->optr << "Execution error: " << err.explain << std::endl;
   }
   catch(IfaceError &err) {
-    *status->optr << "ERROR: " << err.explain << endl;
+    *status->optr << "ERROR: " << err.explain << std::endl;
   }
   catch(ParseError &err) {
-    *status->optr << "Parse ERROR: " << err.explain << endl;
+    *status->optr << "Parse ERROR: " << err.explain << std::endl;
   }
   catch(RecovError &err) {
-    *status->optr << "Function ERROR: " << err.explain << endl;
+    *status->optr << "Function ERROR: " << err.explain << std::endl;
   }
   catch(LowlevelError &err) {
-    *status->optr << "Low-level ERROR: " << err.explain << endl;
+    *status->optr << "Low-level ERROR: " << err.explain << std::endl;
     dcp->abortFunction(*status->optr);
   }
   catch(XmlError &err) {
-    *status->optr << "XML ERROR: " << err.explain << endl;
+    *status->optr << "XML ERROR: " << err.explain << std::endl;
     dcp->abortFunction(*status->optr);
   }
   status->evaluateError();
@@ -2686,7 +2686,7 @@ void mainloop(IfaceStatus *status) {
 void IfcSource::execute(istream &s)
 
 {
-  string filename;
+  std::string filename;
 
   s >> ws;
   if (s.eof())

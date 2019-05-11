@@ -23,7 +23,7 @@ void TruncationTag::restoreXml(const Element *el)
 {
   spaceName = el->getAttributeValue("space");
   std::istringstream s(el->getAttributeValue("size"));
-  s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+  s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
   s >> size;
 }
 
@@ -36,7 +36,7 @@ void TruncationTag::restoreXml(const Element *el)
 /// \param sz is the size of the space
 /// \param base is the containing space
 /// \param dl is the heritage delay
-SpacebaseSpace::SpacebaseSpace(AddrSpaceManager *m,const Translate *t,const string &nm,int4 ind,int4 sz,
+SpacebaseSpace::SpacebaseSpace(AddrSpaceManager *m,const Translate *t,const std::string &nm,int4 ind,int4 sz,
 			       AddrSpace *base,int4 dl)
   : AddrSpace(m,t,IPTR_SPACEBASE,nm,sz,base->getWordSize(),ind,0,dl)
 {
@@ -103,7 +103,7 @@ const VarnodeData &SpacebaseSpace::getSpacebaseFull(int4 i) const
   return baseOrig;
 }
 
-void SpacebaseSpace::saveXml(ostream &s) const
+void SpacebaseSpace::saveXml(std::ostream &s) const
 
 {
   s << "<space_base";
@@ -166,7 +166,7 @@ AddrSpace *AddrSpaceManager::restoreXmlSpace(const Element *el,const Translate *
 
 {
   AddrSpace *res;
-  const string &tp(el->getName());
+  const std::string &tp(el->getName());
   if (tp == "space_base")
     res = new SpacebaseSpace(this,trans);
   else if (tp == "space_unique")
@@ -194,7 +194,7 @@ void AddrSpaceManager::restoreXmlSpaces(const Element *el,const Translate *trans
   // The first space should always be the constant space
   insertSpace(new ConstantSpace(this,trans,"const",0));
 
-  string defname(el->getAttributeValue("defaultspace"));
+  std::string defname(el->getAttributeValue("defaultspace"));
   const List &list(el->getChildren());
   List::const_iterator iter;
   iter = list.begin();
@@ -427,7 +427,7 @@ char AddrSpaceManager::assignShortcut(spacetype tp) const
 /// desired name.
 /// \param nm is the name of the address space
 /// \return a pointer to the AddrSpace object
-AddrSpace *AddrSpaceManager::getSpaceByName(const string &nm) const
+AddrSpace *AddrSpaceManager::getSpaceByName(const std::string &nm) const
 
 {
   for(int4 i=0;i<baselist.size();++i)
@@ -483,9 +483,9 @@ AddrSpace *AddrSpaceManager::getNextSpaceInOrder(AddrSpace *spc) const
   return (AddrSpace *) ~((uintp)0);
 }
 
-/// Given a list of memory locations, the \e pieces, either find a pre-existing JoinRecord or
+/// Given a std::list of memory locations, the \e pieces, either find a pre-existing JoinRecord or
 /// create a JoinRecord that represents the logical joining of the pieces.
-/// \param pieces if the list memory locations to be joined
+/// \param pieces if the std::list memory locations to be joined
 /// \param logicalsize of a \e single \e piece join, or zero
 /// \return a pointer to the JoinRecord
 JoinRecord *AddrSpaceManager::findAddJoin(const std::vector<VarnodeData> &pieces,uint4 logicalsize)

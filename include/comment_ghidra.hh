@@ -47,7 +47,7 @@ public:
     throw LowlevelError("deleteComment unimplemented"); }
   virtual CommentSet::const_iterator beginComment(const Address &fad) const;
   virtual CommentSet::const_iterator endComment(const Address &fad) const;
-  virtual void saveXml(ostream &s) const {
+  virtual void saveXml(std::ostream &s) const {
     throw LowlevelError("commentdb::saveXml unimplemented"); }
   virtual void restoreXml(const Element *el,const AddrSpaceManager *trans) {
     throw LowlevelError("commentdb::restoreXml unimplemented"); }

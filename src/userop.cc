@@ -34,10 +34,10 @@ void InjectedUserOp::restoreXml(const Element *el)
 
 /// This allows a single user defined operator to have multiple symbol names
 /// based on the size of its operands in context.
-/// \param base is the string to append the suffix to
+/// \param base is the std::string to append the suffix to
 /// \param size is the size to encode expressed as the number of bytes
-/// \return the appended string
-string VolatileOp::appendSize(const string &base,int4 size)
+/// \return the appended std::string
+std::string VolatileOp::appendSize(const std::string &base,int4 size)
 
 {
   if (size==1)
@@ -48,12 +48,12 @@ string VolatileOp::appendSize(const string &base,int4 size)
     return base + "_4";
   if (size==8)
     return base + "_8";
-  ostringstream s;
-  s << base << '_' << dec << size;
+  std::ostringstream s;
+  s << base << '_' << std::dec << size;
   return s.str();
 }
 
-string VolatileReadOp::getOperatorName(const PcodeOp *op) const
+std::string VolatileReadOp::getOperatorName(const PcodeOp *op) const
 
 {
   if (op->getOut() == (Varnode *)0) return name;
@@ -66,7 +66,7 @@ void VolatileReadOp::restoreXml(const Element *el)
   name = el->getAttributeValue("inputop");
 }
 
-string VolatileWriteOp::getOperatorName(const PcodeOp *op) const
+std::string VolatileWriteOp::getOperatorName(const PcodeOp *op) const
 
 {
   if (op->numInput() < 3) return name;
@@ -85,7 +85,7 @@ void VolatileWriteOp::restoreXml(const Element *el)
 void OpFollow::restoreXml(const Element *el)
 
 {
-  const string &name(el->getAttributeValue("code"));
+  const std::string &name(el->getAttributeValue("code"));
   if (name=="INT_ZEXT")
     opc = CPUI_INT_ZEXT;
   else if (name=="INT_LEFT")
@@ -101,13 +101,13 @@ void OpFollow::restoreXml(const Element *el)
   for(int4 i=0;i<el->getNumAttributes();++i) {
     if (el->getAttributeName(i) == "code") continue;
     else if (el->getAttributeName(i) == "value") {
-      istringstream s(el->getAttributeValue(i));
-      s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+      std::istringstream s(el->getAttributeValue(i));
+      s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
       s >> val;
     }
     else if (el->getAttributeName(i) == "slot") {
-      istringstream s(el->getAttributeValue(i));
-      s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+      std::istringstream s(el->getAttributeValue(i));
+      s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
       s >> slot;
     }
     else
@@ -119,7 +119,7 @@ void OpFollow::restoreXml(const Element *el)
 /// \param g is the owning Architecture for this instance of the segment operation
 /// \param nm is the low-level name of the segment operation
 /// \param ind is the constant id identifying the specific CALLOTHER variant
-SegmentOp::SegmentOp(Architecture *g,const string &nm,int4 ind)
+SegmentOp::SegmentOp(Architecture *g,const std::string &nm,int4 ind)
   : TermPatternOp(g,nm,ind)
 {
   constresolve.space = (AddrSpace *)0;
@@ -129,10 +129,10 @@ SegmentOp::SegmentOp(Architecture *g,const string &nm,int4 ind)
 ///
 /// Each operation is performed in turn, with output from the previous becoming
 /// input of the next.  The final output is returned.
-/// \param follow is the ordered set of operations to perform
+/// \param follow is the ordered std::set of operations to perform
 /// \param input is the constant input for the first operation
 /// \return the final constant output
-uintb SegmentOp::executeSide(const vector<OpFollow> &follow,uintb input)
+uintb SegmentOp::executeSide(const std::vector<OpFollow> &follow,uintb input)
 
 {
   for(int4 i=0;i<follow.size();++i) {
@@ -151,7 +151,7 @@ uintb SegmentOp::executeSide(const vector<OpFollow> &follow,uintb input)
 }
 
 bool SegmentOp::unify(Funcdata &data,PcodeOp *op,
-				 vector<Varnode *> &bindlist) const
+				 std::vector<Varnode *> &bindlist) const
 {
   Varnode *basevn,*innervn;
 
@@ -179,7 +179,7 @@ bool SegmentOp::unify(Funcdata &data,PcodeOp *op,
   return true;
 }
 
-uintb SegmentOp::execute(const vector<uintb> &input) const
+uintb SegmentOp::execute(const std::vector<uintb> &input) const
 
 {
   uintb base,inner;
@@ -204,16 +204,16 @@ void SegmentOp::restoreXml(const Element *el)
   supportsfarpointer = false;
   name = "segment"; 		// Default name, might be overridden by userop attribute
   for(int4 i=0;i<el->getNumAttributes();++i) {
-    const string &nm(el->getAttributeName(i));
+    const std::string &nm(el->getAttributeName(i));
     if (nm == "space") continue;
     else if (nm == "baseinsize") {
-      istringstream s(el->getAttributeValue(i));
-      s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+      std::istringstream s(el->getAttributeValue(i));
+      s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
       s >> baseinsize;
     }
     else if (nm == "innerinsize") {
-      istringstream s1(el->getAttributeValue(i));
-      s1.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+      std::istringstream s1(el->getAttributeValue(i));
+      s1.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
       s1 >> innerinsize;
     }
     else if (nm == "farpointer")
@@ -237,9 +237,9 @@ void SegmentOp::restoreXml(const Element *el)
     throw LowlevelError("Missing userop attribute in segmentop tag");
   basepresent = (baseinsize != 0);
 
-  const List &list(el->getChildren());
+  const List &std::list(el->getChildren());
   List::const_iterator iter;
-  for(iter=list.begin();iter!=list.end();++iter) {
+  for(iter=std::list.begin();iter!=std::list.end();++iter) {
     const Element *subel = *iter;
     if (subel->getName()=="baseop") {
       basefollow.push_back(OpFollow());
@@ -266,7 +266,7 @@ void SegmentOp::restoreXml(const Element *el)
   }
 }
 
-/// \param g is the Architecture owning this set of jump assist scripts
+/// \param g is the Architecture owning this std::set of jump assist scripts
 JumpAssistOp::JumpAssistOp(Architecture *g)
   : UserPcodeOp(g,"",0)
 {
@@ -284,9 +284,9 @@ void JumpAssistOp::restoreXml(const Element *el)
   index2addr = -1;
   defaultaddr = -1;
   calcsize = -1;
-  const List &list(el->getChildren());
+  const List &std::list(el->getChildren());
   List::const_iterator iter;
-  for(iter=list.begin();iter!=list.end();++iter) {
+  for(iter=std::list.begin();iter!=std::list.end();++iter) {
     const Element *subel = *iter;
     if (subel->getName() == "case_pcode") {
       if (index2case != -1)
@@ -338,7 +338,7 @@ UserOpManage::UserOpManage(void)
 UserOpManage::~UserOpManage(void)
 
 {
-  vector<UserPcodeOp *>::iterator iter;
+  std::vector<UserPcodeOp *>::iterator iter;
 
   for(iter=useroplist.begin();iter!=useroplist.end();++iter) {
     UserPcodeOp *userop = *iter;
@@ -353,7 +353,7 @@ UserOpManage::~UserOpManage(void)
 void UserOpManage::initialize(Architecture *glb)
 
 {
-  vector<string> basicops;
+  vectorstd::string basicops;
   glb->translate->getUserOpNames(basicops);
   for(uint4 i=0;i<basicops.size();++i) {
     if (basicops[i].size()==0) continue;
@@ -380,10 +380,10 @@ void UserOpManage::setDefaults(Architecture *glb)
 
 /// \param nm is the low-level operation name
 /// \return the matching description object or NULL
-UserPcodeOp *UserOpManage::getOp(const string &nm) const
+UserPcodeOp *UserOpManage::getOp(const std::string &nm) const
 
 {
-  map<string,UserPcodeOp *>::const_iterator iter;
+  std::map<std::string,UserPcodeOp *>::const_iterator iter;
   iter = useropmap.find(nm);
   if (iter == useropmap.end()) return (UserPcodeOp *)0;
   return (*iter).second;
@@ -399,7 +399,7 @@ void UserOpManage::registerOp(UserPcodeOp *op)
   int4 ind = op->getIndex();
   if (ind < 0) throw LowlevelError("UserOp not assigned an index");
 
-  map<string,UserPcodeOp *>::iterator iter;
+  std::map<std::string,UserPcodeOp *>::iterator iter;
   iter = useropmap.find(op->getName());
   if (iter != useropmap.end()) {
     UserPcodeOp *other = (*iter).second;
@@ -532,14 +532,14 @@ void UserOpManage::parseJumpAssist(const Element *el,Architecture *glb)
 /// \brief Manually install an InjectedUserOp given just names of the user defined op and the p-code snippet
 ///
 /// An alternate way to attach a call-fixup to user defined p-code ops, without using XML. The
-/// p-code to inject is presented as a raw string to be handed to the p-code parser.
+/// p-code to inject is presented as a raw std::string to be handed to the p-code parser.
 /// \param useropname is the name of the user defined op
 /// \param outname is the name of the output variable in the snippet
-/// \param inname is the list of input variable names in the snippet
+/// \param inname is the std::list of input variable names in the snippet
 /// \param snippet is the raw p-code source snippet
 /// \param glb is the owning Architecture
-void UserOpManage::manualCallOtherFixup(const string &useropname,const string &outname,
-					const vector<string> &inname,const string &snippet,Architecture *glb)
+void UserOpManage::manualCallOtherFixup(const std::string &useropname,const std::string &outname,
+					const vectorstd::string &inname,const std::string &snippet,Architecture *glb)
 
 {
   UserPcodeOp *userop = getOp(useropname);

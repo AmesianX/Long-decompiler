@@ -31,24 +31,24 @@ namespace GhidraDec {
   char ch;
   uintb *i;
   intb *big;
-  string *str;
-  vector<string> *strlist;
-  vector<intb> *biglist;
-  vector<ExprTree *> *param;
+  std::string *str;
+  vectorstd::string *strlist;
+  std::vector<intb> *biglist;
+  std::vector<ExprTree *> *param;
   SpaceQuality *spacequal;
   FieldQuality *fieldqual;
   StarQuality *starqual;
   VarnodeTpl *varnode;
   ExprTree *tree;
-  vector<OpTpl *> *stmt;
+  std::vector<OpTpl *> *stmt;
   ConstructTpl *sem;
   SectionVector *sectionstart;
   Constructor *construct;
   PatternEquation *pateq;
   PatternExpression *patexp;
 
-  vector<SleighSymbol *> *symlist;
-  vector<ContextChange *> *contop;
+  std::vector<SleighSymbol *> *symlist;
+  std::vector<ContextChange *> *contop;
   SleighSymbol *anysym;
   SpaceSymbol *spacesym;
   SectionSymbol *sectionsym;
@@ -184,7 +184,7 @@ tokendef: tokenprop ';'                {}
   ;
 tokenprop: DEFINE_KEY TOKEN_KEY STRING '(' INTEGER ')' { $$ = slgh->defineToken($3,$5); }
   | tokenprop fielddef		       { $$ = $1; slgh->addTokenField($1,$2); }
-  | DEFINE_KEY TOKEN_KEY anysymbol     { string errmsg=$3->getName()+": redefined as a token"; yyerror(errmsg.c_str()); YYERROR; }
+  | DEFINE_KEY TOKEN_KEY anysymbol     { std::string errmsg=$3->getName()+": redefined as a token"; yyerror(errmsg.c_str()); YYERROR; }
   ;
 contextdef: contextprop ';'            {}
   ;
@@ -193,22 +193,22 @@ contextprop: DEFINE_KEY CONTEXT_KEY VARSYM { $$ = $3; }
                                             { yyerror("All context definitions must come before constructors"); YYERROR; } }
   ;
 fielddef: STRING '=' '(' INTEGER ',' INTEGER ')' { $$ = new FieldQuality($1,$4,$6); }
-  | anysymbol '=' '(' INTEGER ',' INTEGER ')' { delete $4; delete $6; string errmsg = $1->getName()+": redefined as field"; yyerror(errmsg.c_str()); YYERROR; }
+  | anysymbol '=' '(' INTEGER ',' INTEGER ')' { delete $4; delete $6; std::string errmsg = $1->getName()+": redefined as field"; yyerror(errmsg.c_str()); YYERROR; }
   | fielddef SIGNED_KEY			{ $$ = $1; $$->signext = true; }
-  | fielddef HEX_KEY			{ $$ = $1; $$->hex = true; }
-  | fielddef DEC_KEY			{ $$ = $1; $$->hex = false; }
+  | fielddef HEX_KEY			{ $$ = $1; $$->std::dec = true; }
+  | fielddef DEC_KEY			{ $$ = $1; $$->std::dec = false; }
   ;
 contextfielddef: STRING '=' '(' INTEGER ',' INTEGER ')' { $$ = new FieldQuality($1,$4,$6); }
-  | anysymbol '=' '(' INTEGER ',' INTEGER ')' { delete $4; delete $6; string errmsg = $1->getName()+": redefined as field"; yyerror(errmsg.c_str()); YYERROR; }
+  | anysymbol '=' '(' INTEGER ',' INTEGER ')' { delete $4; delete $6; std::string errmsg = $1->getName()+": redefined as field"; yyerror(errmsg.c_str()); YYERROR; }
   | contextfielddef SIGNED_KEY			{ $$ = $1; $$->signext = true; }
   | contextfielddef NOFLOW_KEY			{ $$ = $1; $$->flow = false; }
-  | contextfielddef HEX_KEY			{ $$ = $1; $$->hex = true; }
-  | contextfielddef DEC_KEY			{ $$ = $1; $$->hex = false; }
+  | contextfielddef HEX_KEY			{ $$ = $1; $$->std::dec = true; }
+  | contextfielddef DEC_KEY			{ $$ = $1; $$->std::dec = false; }
   ;
 spacedef: spaceprop ';'			{ slgh->newSpace($1); }
   ;
 spaceprop: DEFINE_KEY SPACE_KEY STRING	{ $$ = new SpaceQuality(*$3); delete $3; }
-  | DEFINE_KEY SPACE_KEY anysymbol	{ string errmsg = $3->getName()+": redefined as space"; yyerror(errmsg.c_str()); YYERROR; }
+  | DEFINE_KEY SPACE_KEY anysymbol	{ std::string errmsg = $3->getName()+": redefined as space"; yyerror(errmsg.c_str()); YYERROR; }
   | spaceprop TYPE_KEY '=' RAM_KEY	{ $$ = $1; $$->type = SpaceQuality::ramtype; }
   | spaceprop TYPE_KEY '=' REGISTER_KEY { $$ = $1; $$->type = SpaceQuality::registertype; }
   | spaceprop SIZE_KEY '=' INTEGER	{ $$ = $1; $$->size = *$4; delete $4; }
@@ -271,7 +271,7 @@ constructprint: subtablestart STRING	{ $$ = $1; $$->addSyntax(*$2); delete $2; }
   | constructprint '^'				{ $$ = $1; }
   | constructprint STRING			{ $$ = $1; $$->addSyntax(*$2); delete $2; }
   | constructprint charstring		{ $$ = $1; $$->addSyntax(*$2); delete $2; }
-  | constructprint ' '				{ $$ = $1; $$->addSyntax(string(" ")); }
+  | constructprint ' '				{ $$ = $1; $$->addSyntax(std::string(" ")); }
   | constructprint SYMBOLSTRING		{ $$ = $1; slgh->newOperand($1,$2); }
   ;
 subtablestart: SUBTABLESYM ':'	{ $$ = slgh->createConstructor($1); }
@@ -282,7 +282,7 @@ subtablestart: SUBTABLESYM ':'	{ $$ = slgh->createConstructor($1); }
 pexpression: INTB			{ $$ = new ConstantValue(*$1); delete $1; }
 // familysymbol is not acceptable in an action expression because it isn't attached to an offset
   | familysymbol			{ if ((actionon==1)&&($1->getType() != SleighSymbol::context_symbol))
-                                             { string errmsg="Global symbol "+$1->getName(); errmsg += " is not allowed in action expression"; yyerror(errmsg.c_str()); } $$ = $1->getPatternValue(); }
+                                             { std::string errmsg="Global symbol "+$1->getName(); errmsg += " is not allowed in action expression"; yyerror(errmsg.c_str()); } $$ = $1->getPatternValue(); }
 //  | CONTEXTSYM                          { $$ = $1->getPatternValue(); }
   | specificsymbol			{ $$ = $1->getPatternExpression(); }
   | '(' pexpression ')'			{ $$ = $2; }
@@ -320,21 +320,21 @@ constraint: familysymbol '=' pexpression { $$ = new EqualEquation($1->getPattern
   | familysymbol OP_GREATEQUAL pexpression { $$ = new GreaterEqualEquation($1->getPatternValue(),$3); }
   | OPERANDSYM '=' pexpression		{ $$ = slgh->constrainOperand($1,$3); 
                                           if ($$ == (PatternEquation *)0) 
-                                            { string errmsg="Constraining currently undefined operand "+$1->getName(); yyerror(errmsg.c_str()); } }
+                                            { std::string errmsg="Constraining currently undefined operand "+$1->getName(); yyerror(errmsg.c_str()); } }
   | OPERANDSYM				{ $$ = new OperandEquation($1->getIndex()); slgh->selfDefine($1); }
   | SPECSYM                             { $$ = new UnconstrainedEquation($1->getPatternExpression()); }
   | familysymbol                        { $$ = slgh->defineInvisibleOperand($1); }
   | SUBTABLESYM                         { $$ = slgh->defineInvisibleOperand($1); }
   ;
-contextblock:				{ $$ = (vector<ContextChange *> *)0; }
+contextblock:				{ $$ = (std::vector<ContextChange *> *)0; }
   | '[' contextlist ']'			{ $$ = $2; }
   ;
-contextlist: 				{ $$ = new vector<ContextChange *>; }
-  | contextlist CONTEXTSYM '=' pexpression ';'  { $$ = $1; if (!slgh->contextMod($1,$2,$4)) { string errmsg="Cannot use 'inst_next' to set context variable: "+$2->getName(); yyerror(errmsg.c_str()); YYERROR; } }
+contextlist: 				{ $$ = new std::vector<ContextChange *>; }
+  | contextlist CONTEXTSYM '=' pexpression ';'  { $$ = $1; if (!slgh->contextMod($1,$2,$4)) { std::string errmsg="Cannot use 'inst_next' to std::set context variable: "+$2->getName(); yyerror(errmsg.c_str()); YYERROR; } }
   | contextlist GLOBALSET_KEY '(' familysymbol ',' CONTEXTSYM ')' ';' { $$ = $1; slgh->contextSet($1,$4,$6); }
   | contextlist GLOBALSET_KEY '(' specificsymbol ',' CONTEXTSYM ')' ';' { $$ = $1; slgh->contextSet($1,$4,$6); }
   | contextlist OPERANDSYM '=' pexpression ';' { $$ = $1; slgh->defineOperand($2,$4); }
-  | contextlist STRING                  { string errmsg="Expecting context symbol, not "+*$2; delete $2; yyerror(errmsg.c_str()); YYERROR; }
+  | contextlist STRING                  { std::string errmsg="Expecting context symbol, not "+*$2; delete $2; yyerror(errmsg.c_str()); YYERROR; }
   ;
 section_def: OP_LEFT STRING OP_RIGHT    { $$ = slgh->newSectionSymbol( *$2 ); delete $2; }
   | OP_LEFT SECTIONSYM OP_RIGHT         { $$ = $2; }
@@ -347,8 +347,8 @@ rtlcontinue: rtlfirstsection { $$ = $1; }
 rtl: rtlmid { $$ = $1; if ($$->getOpvec().empty() && ($$->getResult() == (HandleTpl *)0)) slgh->recordNop(); }
   | rtlmid EXPORT_KEY exportvarnode ';' { $$ = slgh->setResultVarnode($1,$3); }
   | rtlmid EXPORT_KEY sizedstar lhsvarnode ';' { $$ = slgh->setResultStarVarnode($1,$3,$4); }
-  | rtlmid EXPORT_KEY STRING		{ string errmsg="Unknown export varnode: "+*$3; delete $3; yyerror(errmsg.c_str()); YYERROR; }
-  | rtlmid EXPORT_KEY sizedstar STRING	{ string errmsg="Unknown pointer varnode: "+*$4; delete $3; delete $4; yyerror(errmsg.c_str()); YYERROR; }
+  | rtlmid EXPORT_KEY STRING		{ std::string errmsg="Unknown export varnode: "+*$3; delete $3; yyerror(errmsg.c_str()); YYERROR; }
+  | rtlmid EXPORT_KEY sizedstar STRING	{ std::string errmsg="Unknown pointer varnode: "+*$4; delete $3; delete $4; yyerror(errmsg.c_str()); YYERROR; }
   ;
 rtlmid: /* EMPTY */			{ $$ = new ConstructTpl(); }
   | rtlmid statement			{ $$ = $1; if (!$$->addOpList(*$2)) { delete $2; yyerror("Multiple delayslot declarations"); YYERROR; } delete $2; }
@@ -360,7 +360,7 @@ statement: lhsvarnode '=' expr ';'	{ $3->setOutput($1); $$ = ExprTree::toVector(
   | STRING '=' expr ';'			{ $$ = slgh->pcode.newOutput(false,$3,$1); }
   | LOCAL_KEY STRING ':' INTEGER '=' expr ';'	{ $$ = slgh->pcode.newOutput(true,$6,$2,*$4); delete $4; }
   | STRING ':' INTEGER '=' expr ';'	{ $$ = slgh->pcode.newOutput(true,$5,$1,*$3); delete $3; }
-  | LOCAL_KEY specificsymbol '=' { $$ = (vector<OpTpl *> *)0; string errmsg = "Redefinition of symbol: "+$2->getName(); yyerror(errmsg.c_str()); YYERROR; }
+  | LOCAL_KEY specificsymbol '=' { $$ = (std::vector<OpTpl *> *)0; std::string errmsg = "Redefinition of symbol: "+$2->getName(); yyerror(errmsg.c_str()); YYERROR; }
   | sizedstar expr '=' expr ';'		{ $$ = slgh->pcode.createStore($1,$2,$4); }
   | USEROPSYM '(' paramlist ')' ';'	{ $$ = slgh->pcode.createUserOpNoOut($1,$3); }
   | lhsvarnode '[' INTEGER ',' INTEGER ']' '=' expr ';' { $$ = slgh->pcode.assignBitRange($1,(uint4)*$3,(uint4)*$5,$8); delete $3, delete $5; }
@@ -445,7 +445,7 @@ expr: varnode { $$ = new ExprTree($1); }
   | specificsymbol '[' INTEGER ',' INTEGER ']' { $$ = slgh->pcode.createBitRange($1,(uint4)*$3,(uint4)*$5); delete $3, delete $5; }
   | BITSYM                      { $$=slgh->pcode.createBitRange($1->getParentSymbol(),$1->getBitOffset(),$1->numBits()); }
   | USEROPSYM '(' paramlist ')' { $$ = slgh->pcode.createUserOp($1,$3); }
-  | OP_CPOOLREF '(' paramlist ')'  { if ((*$3).size() < 2) { string errmsg = "Must at least two inputs to cpool"; yyerror(errmsg.c_str()); YYERROR; } $$ = slgh->pcode.createVariadic(CPUI_CPOOLREF,$3); }
+  | OP_CPOOLREF '(' paramlist ')'  { if ((*$3).size() < 2) { std::string errmsg = "Must at least two inputs to cpool"; yyerror(errmsg.c_str()); YYERROR; } $$ = slgh->pcode.createVariadic(CPUI_CPOOLREF,$3); }
   ;  
 sizedstar: '*' '[' SPACESYM ']' ':' INTEGER { $$ = new StarQuality; $$->size = *$6; delete $6; $$->id=ConstTpl($3->getSpace()); }
   | '*' '[' SPACESYM ']'	{ $$ = new StarQuality; $$->size = 0; $$->id=ConstTpl($3->getSpace()); }
@@ -459,12 +459,12 @@ jumpdest: STARTSYM		{ VarnodeTpl *sym = $1->getVarnode(); $$ = new VarnodeTpl(Co
   | OPERANDSYM			{ $$ = $1->getVarnode(); $1->setCodeAddress(); }
   | INTEGER '[' SPACESYM ']'	{ AddrSpace *spc = $3->getSpace(); $$ = new VarnodeTpl(ConstTpl(spc),ConstTpl(ConstTpl::real,*$1),ConstTpl(ConstTpl::real,spc->getAddrSize())); delete $1; }
   | label                       { $$ = new VarnodeTpl(ConstTpl(slgh->getConstantSpace()),ConstTpl(ConstTpl::j_relative,$1->getIndex()),ConstTpl(ConstTpl::real,sizeof(uintm))); $1->incrementRefCount(); }
-  | STRING			{ string errmsg = "Unknown jump destination: "+*$1; delete $1; yyerror(errmsg.c_str()); YYERROR; }
+  | STRING			{ std::string errmsg = "Unknown jump destination: "+*$1; delete $1; yyerror(errmsg.c_str()); YYERROR; }
   ;
 varnode: specificsymbol		{ $$ = $1->getVarnode(); }
   | integervarnode		{ $$ = $1; }
-  | STRING			{ string errmsg = "Unknown varnode parameter: "+*$1; delete $1; yyerror(errmsg.c_str()); YYERROR; }
-  | SUBTABLESYM                 { string errmsg = "Subtable not attached to operand: "+$1->getName(); yyerror(errmsg.c_str()); YYERROR; }
+  | STRING			{ std::string errmsg = "Unknown varnode parameter: "+*$1; delete $1; yyerror(errmsg.c_str()); YYERROR; }
+  | SUBTABLESYM                 { std::string errmsg = "Subtable not attached to operand: "+$1->getName(); yyerror(errmsg.c_str()); YYERROR; }
   ;
 integervarnode: INTEGER		{ $$ = new VarnodeTpl(ConstTpl(slgh->getConstantSpace()),ConstTpl(ConstTpl::real,*$1),ConstTpl(ConstTpl::real,0)); delete $1; }
   | BADINTEGER                  { $$ = new VarnodeTpl(ConstTpl(slgh->getConstantSpace()),ConstTpl(ConstTpl::real,0),ConstTpl(ConstTpl::real,0)); yyerror("Parsed integer is too big (overflow)"); }
@@ -473,8 +473,8 @@ integervarnode: INTEGER		{ $$ = new VarnodeTpl(ConstTpl(slgh->getConstantSpace()
   | '&' ':' INTEGER varnode     { $$ = slgh->pcode.addressOf($4,*$3); delete $3; }
   ;
 lhsvarnode: specificsymbol	{ $$ = $1->getVarnode(); }
-  | STRING			{ string errmsg = "Unknown assignment varnode: "+*$1; delete $1; yyerror(errmsg.c_str()); YYERROR; }
-  | SUBTABLESYM                 { string errmsg = "Subtable not attached to operand: "+$1->getName(); yyerror(errmsg.c_str()); YYERROR; }
+  | STRING			{ std::string errmsg = "Unknown assignment varnode: "+*$1; delete $1; yyerror(errmsg.c_str()); YYERROR; }
+  | SUBTABLESYM                 { std::string errmsg = "Subtable not attached to operand: "+$1->getName(); yyerror(errmsg.c_str()); YYERROR; }
   ;
 label: '<' LABELSYM '>'         { $$ = $2; }
   | '<' STRING '>'              { $$ = slgh->pcode.defineLabel( $2 ); }
@@ -483,8 +483,8 @@ exportvarnode: specificsymbol	{ $$ = $1->getVarnode(); }
   | '&' varnode                 { $$ = slgh->pcode.addressOf($2,0); }
   | '&' ':' INTEGER varnode     { $$ = slgh->pcode.addressOf($4,*$3); delete $3; }
   | INTEGER ':' INTEGER		{ $$ = new VarnodeTpl(ConstTpl(slgh->getConstantSpace()),ConstTpl(ConstTpl::real,*$1),ConstTpl(ConstTpl::real,*$3)); delete $1; delete $3; }
-  | STRING			{ string errmsg="Unknown export varnode: "+*$1; delete $1; yyerror(errmsg.c_str()); YYERROR; }
-  | SUBTABLESYM                 { string errmsg = "Subtable not attached to operand: "+$1->getName(); yyerror(errmsg.c_str()); YYERROR; }
+  | STRING			{ std::string errmsg="Unknown export varnode: "+*$1; delete $1; yyerror(errmsg.c_str()); YYERROR; }
+  | SUBTABLESYM                 { std::string errmsg = "Subtable not attached to operand: "+$1->getName(); yyerror(errmsg.c_str()); YYERROR; }
   ;
 familysymbol: VALUESYM		{ $$ = $1; }
   | VALUEMAPSYM                 { $$ = $1; }
@@ -498,62 +498,62 @@ specificsymbol: VARSYM		{ $$ = $1; }
   | STARTSYM			{ $$ = $1; }
   | ENDSYM			{ $$ = $1; }
   ;
-charstring: CHAR		{ $$ = new string; (*$$) += $1; }
+charstring: CHAR		{ $$ = new std::string; (*$$) += $1; }
   | charstring CHAR		{ $$ = $1; (*$$) += $2; }
   ;
 intblist: '[' intbpart ']'	{ $$ = $2; }
-  | INTEGER                     { $$ = new vector<intb>; $$->push_back(intb(*$1)); delete $1; }
-  | '-' INTEGER                 { $$ = new vector<intb>; $$->push_back(-intb(*$2)); delete $2; }
+  | INTEGER                     { $$ = new std::vector<intb>; $$->push_back(intb(*$1)); delete $1; }
+  | '-' INTEGER                 { $$ = new std::vector<intb>; $$->push_back(-intb(*$2)); delete $2; }
   ;
-intbpart: INTEGER		{ $$ = new vector<intb>; $$->push_back(intb(*$1)); delete $1; }
-  | '-' INTEGER                 { $$ = new vector<intb>; $$->push_back(-intb(*$2)); delete $2; }
-  | STRING                      { if (*$1!="_") { string errmsg = "Expecting integer but saw: "+*$1; delete $1; yyerror(errmsg.c_str()); YYERROR; }
-                                  $$ = new vector<intb>; $$->push_back((intb)0xBADBEEF); delete $1; }
+intbpart: INTEGER		{ $$ = new std::vector<intb>; $$->push_back(intb(*$1)); delete $1; }
+  | '-' INTEGER                 { $$ = new std::vector<intb>; $$->push_back(-intb(*$2)); delete $2; }
+  | STRING                      { if (*$1!="_") { std::string errmsg = "Expecting integer but saw: "+*$1; delete $1; yyerror(errmsg.c_str()); YYERROR; }
+                                  $$ = new std::vector<intb>; $$->push_back((intb)0xBADBEEF); delete $1; }
   | intbpart INTEGER            { $$ = $1; $$->push_back(intb(*$2)); delete $2; }
   | intbpart '-' INTEGER        { $$ = $1; $$->push_back(-intb(*$3)); delete $3; }
-  | intbpart STRING             { if (*$2!="_") { string errmsg = "Expecting integer but saw: "+*$2; delete $2; yyerror(errmsg.c_str()); YYERROR; }
+  | intbpart STRING             { if (*$2!="_") { std::string errmsg = "Expecting integer but saw: "+*$2; delete $2; yyerror(errmsg.c_str()); YYERROR; }
                                   $$ = $1; $$->push_back((intb)0xBADBEEF); delete $2; }
   ;
 stringlist: '[' stringpart ']'	{ $$ = $2; }
-  | STRING			{ $$ = new vector<string>; $$->push_back(*$1); delete $1; }
+  | STRING			{ $$ = new vectorstd::string; $$->push_back(*$1); delete $1; }
   ;
-stringpart: STRING		{ $$ = new vector<string>; $$->push_back( *$1 ); delete $1; }
+stringpart: STRING		{ $$ = new vectorstd::string; $$->push_back( *$1 ); delete $1; }
   | stringpart STRING		{ $$ = $1; $$->push_back(*$2); delete $2; }
-  | stringpart anysymbol	{ string errmsg = $2->getName()+": redefined"; yyerror(errmsg.c_str()); YYERROR; }
+  | stringpart anysymbol	{ std::string errmsg = $2->getName()+": redefined"; yyerror(errmsg.c_str()); YYERROR; }
   ;
 anystringlist: '[' anystringpart ']' { $$ = $2; }
   ;
-anystringpart: STRING           { $$ = new vector<string>; $$->push_back( *$1 ); delete $1; }
-  | anysymbol                   { $$ = new vector<string>; $$->push_back( $1->getName() ); }
+anystringpart: STRING           { $$ = new vectorstd::string; $$->push_back( *$1 ); delete $1; }
+  | anysymbol                   { $$ = new vectorstd::string; $$->push_back( $1->getName() ); }
   | anystringpart STRING        { $$ = $1; $$->push_back(*$2); delete $2; }
   | anystringpart anysymbol     { $$ = $1; $$->push_back($2->getName()); }
   ;
 valuelist: '[' valuepart ']'	{ $$ = $2; }
-  | VALUESYM			{ $$ = new vector<SleighSymbol *>; $$->push_back($1); }
-  | CONTEXTSYM                  { $$ = new vector<SleighSymbol *>; $$->push_back($1); }
+  | VALUESYM			{ $$ = new std::vector<SleighSymbol *>; $$->push_back($1); }
+  | CONTEXTSYM                  { $$ = new std::vector<SleighSymbol *>; $$->push_back($1); }
   ;
-valuepart: VALUESYM		{ $$ = new vector<SleighSymbol *>; $$->push_back( $1 ); }
-  | CONTEXTSYM                  { $$ = new vector<SleighSymbol *>; $$->push_back($1); }
+valuepart: VALUESYM		{ $$ = new std::vector<SleighSymbol *>; $$->push_back( $1 ); }
+  | CONTEXTSYM                  { $$ = new std::vector<SleighSymbol *>; $$->push_back($1); }
   | valuepart VALUESYM		{ $$ = $1; $$->push_back($2); }
   | valuepart CONTEXTSYM        { $$ = $1; $$->push_back($2); }
-  | valuepart STRING		{ string errmsg = *$2+": is not a value pattern"; delete $2; yyerror(errmsg.c_str()); YYERROR; }
+  | valuepart STRING		{ std::string errmsg = *$2+": is not a value pattern"; delete $2; yyerror(errmsg.c_str()); YYERROR; }
   ;
 varlist: '[' varpart ']'	{ $$ = $2; }
-  | VARSYM			{ $$ = new vector<SleighSymbol *>; $$->push_back($1); }
+  | VARSYM			{ $$ = new std::vector<SleighSymbol *>; $$->push_back($1); }
   ;
-varpart: VARSYM			{ $$ = new vector<SleighSymbol *>; $$->push_back($1); }
-  | STRING                      { if (*$1!="_") { string errmsg = *$1+": is not a varnode symbol"; delete $1; yyerror(errmsg.c_str()); YYERROR; }
-				  $$ = new vector<SleighSymbol *>; $$->push_back((SleighSymbol *)0); delete $1; }
+varpart: VARSYM			{ $$ = new std::vector<SleighSymbol *>; $$->push_back($1); }
+  | STRING                      { if (*$1!="_") { std::string errmsg = *$1+": is not a varnode symbol"; delete $1; yyerror(errmsg.c_str()); YYERROR; }
+				  $$ = new std::vector<SleighSymbol *>; $$->push_back((SleighSymbol *)0); delete $1; }
   | varpart VARSYM		{ $$ = $1; $$->push_back($2); }
-  | varpart STRING		{ if (*$2!="_") { string errmsg = *$2+": is not a varnode symbol"; delete $2; yyerror(errmsg.c_str()); YYERROR; }
+  | varpart STRING		{ if (*$2!="_") { std::string errmsg = *$2+": is not a varnode symbol"; delete $2; yyerror(errmsg.c_str()); YYERROR; }
                                   $$ = $1; $$->push_back((SleighSymbol *)0); delete $2; }
   ;
-paramlist: /* EMPTY */		{ $$ = new vector<ExprTree *>; }
-  | expr			{ $$ = new vector<ExprTree *>; $$->push_back($1); }
+paramlist: /* EMPTY */		{ $$ = new std::vector<ExprTree *>; }
+  | expr			{ $$ = new std::vector<ExprTree *>; $$->push_back($1); }
   | paramlist ',' expr		{ $$ = $1; $$->push_back($3); }
   ;
-oplist: /* EMPTY */		{ $$ = new vector<string>; }
-  | STRING			{ $$ = new vector<string>; $$->push_back(*$1); delete $1; }
+oplist: /* EMPTY */		{ $$ = new vectorstd::string; }
+  | STRING			{ $$ = new vectorstd::string; $$->push_back(*$1); delete $1; }
   | oplist ',' STRING		{ $$ = $1; $$->push_back(*$3); delete $3; }
   ;
 anysymbol: SPACESYM		{ $$ = $1; }

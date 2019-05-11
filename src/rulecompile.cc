@@ -26,7 +26,7 @@ class MyLoadImage : public LoadImage { // Dummy loadimage
 public:
   MyLoadImage(void) : LoadImage("nofile") {}
   virtual void loadFill(uint1 *ptr,int4 size,const Address &addr) { for(int4 i=0;i<size;++i) ptr[i] = 0; }
-  virtual string getArchType(void) const { return "myload"; }
+  virtual std::string getArchType(void) const { return "myload"; }
   virtual void adjustVma(long adjust) { }
 };
 
@@ -92,8 +92,8 @@ int4 RuleLexer::scanIdentifier(void)
 int4 RuleLexer::scanNumber(void)
   
 {
-  istringstream s(identifier);
-  s.unsetf(ios::dec | ios::hex | ios::oct);
+  std::istringstream s(identifier);
+  s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
   uint8 val;
   s >> val;
   if (!s)
@@ -111,21 +111,21 @@ int4 RuleLexer::buildString(int4 tokentype)
   }
 
   if (identifier[0] == '.') {
-    ruleparselval.str = new string(identifier+1);
+    ruleparselval.str = new std::string(identifier+1);
     return tokentype;
   }
     
   if (identifier[0] == '#')
     identifier[0] = 'c';
-  ruleparselval.str = new string(identifier);
+  ruleparselval.str = new std::string(identifier);
   return tokentype;
 }
 
 int4 RuleLexer::otherIdentifiers(void)
 
 {
-  map<string,int4>::const_iterator iter;
-  iter = keywordmap.find(string(identifier));
+  std::map<std::string,int4>::const_iterator iter;
+  iter = keywordmap.find(std::string(identifier));
   if (iter != keywordmap.end())
     return (*iter).second;
   return -1;
@@ -163,7 +163,7 @@ void RuleLexer::initKeywords(void)
   keywordmap["before"] = BEFORE_KEYWORD;
   keywordmap["after"] = AFTER_KEYWORD;
   keywordmap["remove"] = REMOVE_KEYWORD;
-  keywordmap["set"] = SET_KEYWORD;
+  keywordmap["std::set"] = SET_KEYWORD;
   keywordmap["istrue"] = ISTRUE_KEYWORD;
   keywordmap["isfalse"] = ISFALSE_KEYWORD;
 }
@@ -394,7 +394,7 @@ RuleCompile::RuleCompile(void)
 
 {
   DummyTranslate dummy;
-  error_stream = (ostream *)0;
+  error_stream = (std::ostream *)0;
   errors = 0;
   finalrule = (ConstraintGroup *)0;
   OpBehavior::registerInstructions(inst,&dummy);
@@ -415,18 +415,18 @@ RuleCompile::~RuleCompile(void)
 void RuleCompile::ruleError(const char *s)
 
 {
-  if (error_stream != (ostream *)0) {
-    *error_stream << "Error at line " << dec << lexer.getLineNo() << endl;
-    *error_stream << "   " << s << endl;
+  if (error_stream != (std::ostream *)0) {
+    *error_stream << "Error at line " << std::dec << lexer.getLineNo() << std::endl;
+    *error_stream << "   " << s << std::endl;
   }
   errors += 1;
 }
 
-int4 RuleCompile::findIdentifier(string *nm)
+int4 RuleCompile::findIdentifier(std::string *nm)
 
 {
   int4 resid;
-  map<string,int4>::const_iterator iter;
+  std::map<std::string,int4>::const_iterator iter;
   iter = namemap.find(*nm);
   if (iter == namemap.end()) {
     resid = namemap.size();
@@ -571,7 +571,7 @@ ConstraintGroup *RuleCompile::varUniqueDescend(ConstraintGroup *base,int4 opid)
   return base;
 }
 
-ConstraintGroup *RuleCompile::opCodeConstraint(ConstraintGroup *base,vector<OpCode> *oplist)
+ConstraintGroup *RuleCompile::opCodeConstraint(ConstraintGroup *base,std::vector<OpCode> *oplist)
 
 {
   if (oplist->size() != 1)
@@ -734,7 +734,7 @@ RHSConstant *RuleCompile::constVarnodeSize(int4 varindex)
   return res;
 }
 
-RHSConstant *RuleCompile::dotIdentifier(int4 id,string *str)
+RHSConstant *RuleCompile::dotIdentifier(int4 id,std::string *str)
 
 {
   RHSConstant *res;
@@ -751,7 +751,7 @@ RHSConstant *RuleCompile::dotIdentifier(int4 id,string *str)
   else if ((*str) == "nzmask")
     res = new ConstantNZMask(id);
   else {
-    string errmsg = "Unknown variable attribute: " + *str;
+    std::string errmsg = "Unknown variable attribute: " + *str;
     ruleError(errmsg.c_str());
     res = new ConstantAbsolute(0);
   }
@@ -767,8 +767,8 @@ void RuleCompile::run(istream &s,bool debug)
 #endif
 
   if (!s) {
-    if (error_stream != (ostream *)0)
-      *error_stream << "Bad input stream to rule compiler" << endl;
+    if (error_stream != (std::ostream *)0)
+      *error_stream << "Bad input stream to rule compiler" << std::endl;
     return;
   }
   errors = 0;
@@ -782,13 +782,13 @@ void RuleCompile::run(istream &s,bool debug)
   int4 parseres = ruleparseparse(); // Try to parse
   if (parseres!=0) {
     errors += 1;
-    if (error_stream != (ostream *)0)
-      *error_stream << "Parsing error" << endl;
+    if (error_stream != (std::ostream *)0)
+      *error_stream << "Parsing error" << std::endl;
   }
     
   if (errors!=0) {
-    if (error_stream != (ostream *)0)
-      *error_stream << "Parsing incomplete" << endl;
+    if (error_stream != (std::ostream *)0)
+      *error_stream << "Parsing incomplete" << std::endl;
   }
 }
 
@@ -800,7 +800,7 @@ void RuleCompile::postProcess(void)
   finalrule->setId(id);		// Set id for everybody
 }
 
-int4 RuleCompile::postProcessRule(vector<OpCode> &opcodelist)
+int4 RuleCompile::postProcessRule(std::vector<OpCode> &opcodelist)
 
 { // Do normal post processing but also remove initial opcode check
   finalrule->removeDummy();
@@ -817,11 +817,11 @@ int4 RuleCompile::postProcessRule(vector<OpCode> &opcodelist)
   return opinit;
 }
 
-ConstraintGroup *RuleCompile::buildUnifyer(const string &rule,const vector<string> &idlist,
-					   vector<int4> &res)
+ConstraintGroup *RuleCompile::buildUnifyer(const std::string &rule,const vectorstd::string &idlist,
+					   std::vector<int4> &res)
 {
   RuleCompile ruler;
-  istringstream s(rule);
+  std::istringstream s(rule);
   ruler.run(s,false);
   if (ruler.numErrors() != 0)
     throw LowlevelError("Could not build rule");
@@ -829,7 +829,7 @@ ConstraintGroup *RuleCompile::buildUnifyer(const string &rule,const vector<strin
   for(int4 i=0;i<idlist.size();++i) {
     char initc;
     int4 id = -1;
-    map<string,int4>::const_iterator iter;
+    std::map<std::string,int4>::const_iterator iter;
     if (idlist[i].size() != 0) {
       initc = idlist[i][0];
       if ((initc == 'o')||(initc == 'O')||(initc == 'v')||(initc == 'V')||(initc == '#')) {
@@ -845,7 +845,7 @@ ConstraintGroup *RuleCompile::buildUnifyer(const string &rule,const vector<strin
   return resconst;
 }
 
-RuleGeneric::RuleGeneric(const string &g,const string &nm,const vector<OpCode> &sops,int4 opi,ConstraintGroup *c)
+RuleGeneric::RuleGeneric(const std::string &g,const std::string &nm,const std::vector<OpCode> &sops,int4 opi,ConstraintGroup *c)
   : Rule(g,0,nm), state(c)
 {
   starterops = sops;
@@ -853,7 +853,7 @@ RuleGeneric::RuleGeneric(const string &g,const string &nm,const vector<OpCode> &
   constraint = c;
 }
 
-void RuleGeneric::getOpList(vector<uint4> &oplist) const
+void RuleGeneric::getOpList(std::vector<uint4> &oplist) const
 
 {
   for(int4 i=0;i<starterops.size();++i)
@@ -869,16 +869,16 @@ int4 RuleGeneric::applyOp(PcodeOp *op,Funcdata &data)
   return constraint->step(state);
 }
 
-RuleGeneric *RuleGeneric::build(const string &nm,const string &gp,const string &content)
+RuleGeneric *RuleGeneric::build(const std::string &nm,const std::string &gp,const std::string &content)
 
 {
   RuleCompile compiler;
-  istringstream s(content);
+  std::istringstream s(content);
   compiler.run(s,false);
   if (compiler.numErrors() != 0)
     throw LowlevelError("Unable to parse dynamic rule: "+nm);
   
-  vector<OpCode> opcodelist;
+  std::vector<OpCode> opcodelist;
   int4 opinit = compiler.postProcessRule(opcodelist);
   RuleGeneric *res = new RuleGeneric(gp,nm,opcodelist,opinit,compiler.releaseRule());
   return res;
@@ -902,8 +902,8 @@ extern RuleCompile *rulecompile;
 int4 scan_number(char *numtext,YYSTYPE *lval)
 
 {
-  istringstream s(numtext);
-  s.unsetf(ios::dec | ios::hex | ios::oct);
+  std::istringstream s(numtext);
+  s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
   uintb val;
   s >> val;
   if (!s)
@@ -915,7 +915,7 @@ int4 scan_number(char *numtext,YYSTYPE *lval)
 int4 find_op_identifier(void)
 
 {
-  string ident(yytext);
+  std::string ident(yytext);
   ruleparselval.id = rulecompile->findOpIdentifier(ident);
   return OP_IDENTIFIER;
 }
@@ -923,7 +923,7 @@ int4 find_op_identifier(void)
 int4 find_var_identifier(void)
 
 {
-  string ident(yytext);
+  std::string ident(yytext);
   ruleparselval.id = rulecompile->findVarIdentifier(ident);
   return VAR_IDENTIFIER;
 }
@@ -931,7 +931,7 @@ int4 find_var_identifier(void)
 int4 find_const_identifier(void)
 
 {
-  string ident(yytext);
+  std::string ident(yytext);
   ruleparselval.id = rulecompile->findConstIdentifier(ident);
   return CONST_IDENTIFIER;
 }

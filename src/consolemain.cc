@@ -41,7 +41,7 @@ public:
 void IfcLoadFile::execute(istream &s)
 
 {
-  string filename,target;
+  std::string filename,target;
 
   if (dcp->conf != (Architecture *)0) 
     throw IfaceExecutionError("Load image already present");
@@ -63,21 +63,21 @@ void IfcLoadFile::execute(istream &s)
 
 #ifdef CPUI_RULECOMPILE
   if (dcp->experimental_file.size() != 0) {
-    *status->optr << "Trying to parse " << dcp->experimental_file << " for experimental rules" << endl;
+    *status->optr << "Trying to parse " << dcp->experimental_file << " for experimental rules" << std::endl;
     try {
       Element *root = store.openDocument(dcp->experimental_file)->getRoot();
       if (root->getName() == "experimental_rules")
 	store.registerTag(root);
       else
-	*status->optr << "Wrong tag type for experimental rules: "+root->getName() << endl;
+	*status->optr << "Wrong tag type for experimental rules: "+root->getName() << std::endl;
     }
     catch(XmlError &err) {
-      *status->optr << err.explain << endl;
-      *status->optr << "Skipping experimental rules" << endl;
+      *status->optr << err.explain << std::endl;
+      *status->optr << "Skipping experimental rules" << std::endl;
     }
   }
 #endif
-  string errmsg;
+  std::string errmsg;
   bool iserror = false;
   try {
     dcp->conf->init(store);
@@ -89,8 +89,8 @@ void IfcLoadFile::execute(istream &s)
     iserror = true;
   }
   if (iserror) {
-    *status->optr << errmsg << endl;
-    *status->optr << "Could not create architecture" << endl;
+    *status->optr << errmsg << std::endl;
+    *status->optr << "Could not create architecture" << std::endl;
     delete dcp->conf;
     dcp->conf = (Architecture *)0;
     return;
@@ -100,13 +100,13 @@ void IfcLoadFile::execute(istream &s)
 #ifdef OPACTION_DEBUG
   dcp->conf->setDebugStream(status->optr);
 #endif
-  *status->optr << filename << " successfully loaded: " << dcp->conf->getDescription() << endl;
+  *status->optr << filename << " successfully loaded: " << dcp->conf->getDescription() << std::endl;
 }
 
 void IfcAddpath::execute(istream &s)
 
 {
-  string newpath;
+  std::string newpath;
 
   s >> newpath;
   if (newpath.empty())
@@ -114,7 +114,7 @@ void IfcAddpath::execute(istream &s)
   SleighArchitecture::specpaths.addDir2Path(newpath);
 }
 
-static string savefile;
+static std::string savefile;
 
 void IfcSave::execute(istream &s)
 
@@ -162,7 +162,7 @@ void IfcRestore::execute(istream &s)
 #ifdef OPACTION_DEBUG
   dcp->conf->setDebugStream(status->optr);
 #endif
-  *status->optr << savefile << " successfully loaded: " << dcp->conf->getDescription() << endl;
+  *status->optr << savefile << " successfully loaded: " << dcp->conf->getDescription() << std::endl;
 }
 
 int main(int argc,char **argv)
@@ -170,7 +170,7 @@ int main(int argc,char **argv)
 {
   const char *initscript = (const char *)0;
 
-  vector<string> extrapaths;
+  vectorstd::string extrapaths;
   int4 i=1;
   while((i<argc)&&(argv[i][0]=='-')) {
     if (argv[i][1]=='i')
@@ -180,12 +180,12 @@ int main(int argc,char **argv)
     i += 1;
   }
 
-  string ghidraroot = FileManage::discoverGhidraRoot(argv[0]);
+  std::string ghidraroot = FileManage::discoverGhidraRoot(argv[0]);
   if (ghidraroot.size() == 0) {
     const char *sleighhomepath = getenv("SLEIGHHOME");
     if (sleighhomepath == (const char *)0) {
       if (extrapaths.empty()) {
-	cerr << "Could not discover root of Ghidra installation" << endl;
+	cerr << "Could not discover root of Ghidra installation" << std::endl;
 	exit(1);
       }
     }
@@ -198,7 +198,7 @@ int main(int argc,char **argv)
   try {
     status = new IfaceTerm("[decomp]> ",cin,cout); // Set up interface
   } catch(IfaceError &err) {
-    cerr << "Interface error during setup: " << err.explain << endl;
+    cerr << "Interface error during setup: " << err.explain << std::endl;
     exit(1);
   }
   IfaceCapability::registerAllCommands(status);	// Register commands for decompiler and all modules
@@ -225,7 +225,7 @@ int main(int argc,char **argv)
   try {
     delete status;
   } catch(IfaceError &err) {
-    cerr << err.explain << endl;
+    cerr << err.explain << std::endl;
   }
 
   shutdownDecompilerLibrary();

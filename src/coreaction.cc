@@ -28,12 +28,12 @@ struct StackEqn {
 
 /// \brief A class that solves for stack-pointer changes across unknown sub-functions
 class StackSolver {
-  vector<StackEqn> eqs;		///< Known equations based on operations that explicitly change the stack-pointer
-  vector<StackEqn> guess;	///< Guessed equations for underdetermined systems
-  vector<Varnode *> vnlist;	///< The indexed set of variables, one for each reference to the stack-pointer
-  vector<int4> companion;	///< Index of companion input for variable produced by CPUI_INDIRECT
+  std::vector<StackEqn> eqs;		///< Known equations based on operations that explicitly change the stack-pointer
+  std::vector<StackEqn> guess;	///< Guessed equations for underdetermined systems
+  std::vector<Varnode *> vnlist;	///< The indexed std::set of variables, one for each reference to the stack-pointer
+  std::vector<int4> companion;	///< Index of companion input for variable produced by CPUI_INDIRECT
   Address spacebase;		///< Starting address of the stack-pointer
-  vector<int4> soln;		///< Collected solutions (corresponding to array of variables)
+  std::vector<int4> soln;		///< Collected solutions (corresponding to array of variables)
   int4 missedvariables;		///< Number of variables for which we are missing an equation
   void duplicate(void);		///< Duplicate each equation, multiplying by -1
   void propagate(int4 varnum,int4 val);	///< Propagate solution for one variable to other variables
@@ -68,10 +68,10 @@ void StackSolver::propagate(int4 varnum,int4 val)
   soln[varnum] = val;
 
   StackEqn eqn;
-  vector<int4> workstack;
+  std::vector<int4> workstack;
   workstack.reserve(soln.size());
   workstack.push_back(varnum);
-  vector<StackEqn>::iterator top;
+  std::vector<StackEqn>::iterator top;
 
   while(!workstack.empty()) {
     varnum = workstack.back();
@@ -113,7 +113,7 @@ void StackSolver::solve(void)
   int4 i,size,var1,var2,count,lastcount;
 
   soln.clear();
-  soln.resize(vnlist.size(),65535); // Initialize solutions vector
+  soln.resize(vnlist.size(),65535); // Initialize solutions std::vector
   duplicate();			// Duplicate and sort the equations
 
   propagate(0,0);		// We know one variable
@@ -162,7 +162,7 @@ void StackSolver::build(const Funcdata &data,AddrSpace *id,int4 spcbase)
   if (!vnlist[0]->isInput())
     throw LowlevelError("Input value of stackpointer is not used");
 
-  vector<Varnode *>::iterator iter;
+  std::vector<Varnode *>::iterator iter;
   StackEqn eqn;
   for(int4 i=1;i<vnlist.size();++i) {
     Varnode *vn = vnlist[i];
@@ -267,7 +267,7 @@ void ActionStackPtrFlow::analyzeExtraPop(Funcdata &data,AddrSpace *stackspace,in
   try {
     solver.build(data,stackspace,spcbase);
   } catch(LowlevelError &err) {
-    ostringstream s;
+    std::ostringstream s;
     s << "Stack frame is not setup normally: " << err.explain;
     data.warningHeader(s.str());
     return;
@@ -304,7 +304,7 @@ void ActionStackPtrFlow::analyzeExtraPop(Funcdata &data,AddrSpace *stackspace,in
 	}
       }
     }
-    vector<Varnode *> paramlist;
+    std::vector<Varnode *> paramlist;
     paramlist.push_back(invn);
     int4 sz = invn->getSize();
     paramlist.push_back(data.newConstant(sz,soln&calc_mask(sz)));
@@ -377,8 +377,8 @@ int4 ActionStackPtrFlow::repair(Funcdata &data,AddrSpace *id,Varnode *spcbasein,
 {
   int4 loadsize = loadop->getOut()->getSize();
   BlockBasic *curblock = loadop->getParent();
-  list<PcodeOp *>::iterator begiter = curblock->beginOp();
-  list<PcodeOp *>::iterator iter = loadop->getBasicIter();
+  std::list<PcodeOp *>::iterator begiter = curblock->beginOp();
+  std::list<PcodeOp *>::iterator iter = loadop->getBasicIter();
   for(;;) {
     if (iter == begiter) {
       if (curblock->sizeIn() != 1) return 0; // Can trace back to next basic block if only one path
@@ -503,7 +503,7 @@ int4 ActionSegmentize::apply(Funcdata &data)
   if (localcount>0) return 0;	// Only perform once
   localcount = 1;		// Mark as having performed once
 
-  vector<Varnode *> bindlist;
+  std::vector<Varnode *> bindlist;
   bindlist.push_back((Varnode *)0);
   bindlist.push_back((Varnode *)0);
   
@@ -512,7 +512,7 @@ int4 ActionSegmentize::apply(Funcdata &data)
     if (segdef == (SegmentOp *)0) continue;
     AddrSpace *spc = segdef->getSpace();
 
-    list<PcodeOp *>::const_iterator iter,enditer;
+    std::list<PcodeOp *>::const_iterator iter,enditer;
     iter = data.beginOp(CPUI_CALLOTHER);
     enditer = data.endOp(CPUI_CALLOTHER);
     int4 uindex = segdef->getIndex();
@@ -521,7 +521,7 @@ int4 ActionSegmentize::apply(Funcdata &data)
       if (segroot->isDead()) continue;
       if (segroot->getIn(0)->getOffset() != uindex) continue;
       if (!segdef->unify(data,segroot,bindlist)) {
-	ostringstream err;
+	std::ostringstream err;
 	err << "Segment op in wrong form at ";
 	segroot->getAddr().printRaw(err);
 	throw LowlevelError(err.str());
@@ -582,27 +582,27 @@ int4 ActionConstbase::apply(Funcdata &data)
 // int4 ActionCse::apply(Funcdata &data)
 
 // {
-//   vector< pair<uintm,PcodeOp *> > list;
-//   vector<Varnode *> vlist;
+//   std::vector< pair<uintm,PcodeOp *> > std::list;
+//   std::vector<Varnode *> vlist;
 //   PcodeOp *op;
-//   list<PcodeOp *>::const_iterator iter;
+//   std::list<PcodeOp *>::const_iterator iter;
 //   uintm hash;
   
 //   for(iter=data.op_alive_begin();iter!=data.op_alive_end();++iter) {
 //     op = *iter;
 //     hash = op->getCseHash();
 //     if (hash == 0) continue;
-//     list.push_back(pair<uintm,PcodeOp *>(hash,op));
+//     std::list.push_back(pair<uintm,PcodeOp *>(hash,op));
 //   }
-//   if (list.empty()) return 0;
+//   if (std::list.empty()) return 0;
 
-//   cseEliminateList(data,list,vlist);
+//   cseEliminateList(data,std::list,vlist);
 //   while(!vlist.empty()) {
 //     count += 1;			// Indicate that changes have been made
-//     list.clear();
-//     cse_build_fromvarnode(list,vlist);
+//     std::list.clear();
+//     cse_build_fromvarnode(std::list,vlist);
 //     vlist.clear();
-//     cseEliminateList(data,list,vlist);
+//     cseEliminateList(data,std::list,vlist);
 //   }
 //   return 0;
 // }
@@ -616,7 +616,7 @@ bool ActionMultiCse::preferredOutput(Varnode *out1,Varnode *out2)
 
 {
   // Prefer the output that is used in a CPUI_RETURN
-  list<PcodeOp *>::const_iterator iter,enditer;
+  std::list<PcodeOp *>::const_iterator iter,enditer;
   enditer = out1->endDescend();
   for(iter=out1->beginDescend();iter!=enditer;++iter) {
     PcodeOp *op = *iter;
@@ -651,7 +651,7 @@ bool ActionMultiCse::preferredOutput(Varnode *out1,Varnode *out2)
 PcodeOp *ActionMultiCse::findMatch(BlockBasic *bl,PcodeOp *target,Varnode *in)
 
 {
-  list<PcodeOp *>::iterator iter = bl->beginOp();
+  std::list<PcodeOp *>::iterator iter = bl->beginOp();
 
   for(;;) {
     PcodeOp *op = *iter;
@@ -696,11 +696,11 @@ PcodeOp *ActionMultiCse::findMatch(BlockBasic *bl,PcodeOp *target,Varnode *in)
 bool ActionMultiCse::processBlock(Funcdata &data,BlockBasic *bl)
 
 {
-  vector<Varnode *> vnlist;
+  std::vector<Varnode *> vnlist;
   PcodeOp *targetop = (PcodeOp *)0;
   PcodeOp *pairop;
-  list<PcodeOp *>::iterator iter = bl->beginOp();
-  list<PcodeOp *>::iterator enditer = bl->endOp();
+  std::list<PcodeOp *>::iterator iter = bl->beginOp();
+  std::list<PcodeOp *>::iterator enditer = bl->endOp();
   while(iter != enditer) {
     PcodeOp *op = *iter;
     ++iter;
@@ -770,8 +770,8 @@ int4 ActionShadowVar::apply(Funcdata &data)
   BlockBasic *bl;
   PcodeOp *op;
   Varnode *vn;
-  vector<Varnode *> vnlist;
-  list<PcodeOp *> oplist;
+  std::vector<Varnode *> vnlist;
+  std::list<PcodeOp *> oplist;
   uintb startoffset;
   for(int4 i=0;i<bblocks.getSize();++i) {
     vnlist.clear();
@@ -781,7 +781,7 @@ int4 ActionShadowVar::apply(Funcdata &data)
     // We cannot stop at first non-MULTIEQUAL because
     // other ops creep in because of multi_collapse
     startoffset = bl->getStart().getOffset();
-    list<PcodeOp *>::iterator iter = bl->beginOp();
+    std::list<PcodeOp *>::iterator iter = bl->beginOp();
     while(iter != bl->endOp()) {
       op = *iter++;
       if (op->getAddr().getOffset() != startoffset) break;
@@ -797,7 +797,7 @@ int4 ActionShadowVar::apply(Funcdata &data)
     for(int4 j=0;j<vnlist.size();++j)
       vnlist[j]->clearMark();
   }
-  list<PcodeOp *>::iterator oiter;
+  std::list<PcodeOp *>::iterator oiter;
   for(oiter=oplist.begin();oiter!=oplist.end();++oiter) {
     op = *oiter;
     PcodeOp *op2;
@@ -808,7 +808,7 @@ int4 ActionShadowVar::apply(Funcdata &data)
 	if (op->getIn(i) != op2->getIn(i)) break;
       if (i != op->numInput()) continue; // All branches did not match
 
-      vector<Varnode *> plist;
+      std::vector<Varnode *> plist;
       plist.push_back(op2->getOut());
       data.opSetOpcode(op,CPUI_COPY);
       data.opSetAllInput(op,plist);
@@ -1012,7 +1012,7 @@ int4 ActionDeindirect::apply(Funcdata &data)
 	  }
 	}
 	// FIXME: If fc's input IS locked presumably this means
-	// that this prototype is already set, but it MIGHT mean
+	// that this prototype is already std::set, but it MIGHT mean
 	// we have conflicting locked prototypes
       }
     }
@@ -1072,10 +1072,10 @@ int4 ActionDirectWrite::apply(Funcdata &data)
 
 {
   VarnodeLocSet::const_iterator iter;
-  list<PcodeOp *>::const_iterator oiter;
+  std::list<PcodeOp *>::const_iterator oiter;
   Varnode *vn,*dvn;
   PcodeOp *op;
-  vector<Varnode *> worklist;
+  std::vector<Varnode *> worklist;
 
 				// Collect legal inputs and other auto direct writes
   for(iter=data.beginLoc();iter!=data.endLoc();++iter) {
@@ -1188,7 +1188,7 @@ int4 ActionExtraPopSetup::apply(Funcdata &data)
 /// \brief Set up the parameter recovery process for a single sub-function call
 ///
 /// If the prototype is known (locked), insert stub Varnodes
-/// If the prototype is varargs (dotdotdot), set up recovery of variable Varnodes
+/// If the prototype is varargs (dotdotdot), std::set up recovery of variable Varnodes
 /// \param fc is the given sub-function
 /// \param data is the function being analyzed
 void ActionFuncLink::funcLinkInput(FuncCallSpecs *fc,Funcdata &data)
@@ -1238,7 +1238,7 @@ void ActionFuncLink::funcLinkInput(FuncCallSpecs *fc,Funcdata &data)
 /// \brief Set up the return value recovery process for a single sub-function call
 ///
 /// If the prototype is known(locked), insert an output Varnode on the call
-/// If the prototype is unknown set-up the ParamActive, so that outputs will be "gathered"
+/// If the prototype is unknown std::set-up the ParamActive, so that outputs will be "gathered"
 /// \param fc is the given sub-function
 /// \param data is the function being analyzed
 void ActionFuncLink::funcLinkOutput(FuncCallSpecs *fc,Funcdata &data)
@@ -1370,8 +1370,8 @@ int4 ActionParamDouble::apply(Funcdata &data)
   const FuncProto &fp( data.getFuncProto() );
   if (fp.isInputLocked() && data.isDoublePrecisOn()) {
     // Search for locked parameters that are being split into hi and lo components
-    vector<Varnode *> lovec;
-    vector<Varnode *> hivec;
+    std::vector<Varnode *> lovec;
+    std::vector<Varnode *> hivec;
     int4 minDoubleSize = data.getArch()->getDefaultSize();	// Minimum size to consider
     int4 numparams = fp.numParams();
     for(int4 i=0;i<numparams;++i) {
@@ -1386,7 +1386,7 @@ int4 ActionParamDouble::apply(Funcdata &data)
       lovec.clear();
       hivec.clear();
       bool otherUse = false;		// Have we seen use other than splitting into hi and lo
-      list<PcodeOp *>::const_iterator iter,enditer;
+      std::list<PcodeOp *>::const_iterator iter,enditer;
       iter = vn->beginDescend();
       enditer = vn->endDescend();
       while(iter != enditer) {
@@ -1461,7 +1461,7 @@ int4 ActionActiveParam::apply(Funcdata &data)
       }
     }
     catch(LowlevelError &err) {
-      ostringstream s;
+      std::ostringstream s;
       s << "Error processing " << fc->getName();
       PcodeOp *op = fc->getOp();
       if (op != (PcodeOp *)0)
@@ -1483,7 +1483,7 @@ int4 ActionActiveReturn::apply(Funcdata &data)
     fc = data.getCallSpecs(i);
     if (fc->isOutputActive()) {
       ParamActive *activeoutput = fc->getActiveOutput();
-      vector<Varnode *> trialvn;
+      std::vector<Varnode *> trialvn;
       fc->checkOutputTrialUse(data,trialvn);
       fc->deriveOutputMap(activeoutput);
       fc->buildOutputFromTrials(data,trialvn);
@@ -1539,7 +1539,7 @@ int4 ActionActiveReturn::apply(Funcdata &data)
 void ActionReturnRecovery::buildReturnOutput(ParamActive *active,PcodeOp *retop,Funcdata &data)
 
 {
-  vector<Varnode *> newparam;
+  std::vector<Varnode *> newparam;
 
   newparam.push_back(retop->getIn(0)); // Keep the first param (the return indirect reference)
   for(int4 i=0;i<active->getNumTrials();++i) { // Gather all the used varnodes to this return in proper order
@@ -1613,7 +1613,7 @@ int4 ActionReturnRecovery::apply(Funcdata &data)
   if (active != (ParamActive *)0) {
     PcodeOp *op;
     Varnode *vn;
-    list<PcodeOp *>::const_iterator iter,iterend;
+    std::list<PcodeOp *>::const_iterator iter,iterend;
     int4 i;
     
     int4 maxancestor = data.getArch()->trim_recurse_max;
@@ -1659,11 +1659,11 @@ int4 ActionRestrictLocal::apply(Funcdata &data)
 
 {
   FuncCallSpecs *fc;
-  list<PcodeOp *>::const_iterator iter;
+  std::list<PcodeOp *>::const_iterator iter;
   PcodeOp *op;
   Varnode *vn;
   int4 i;
-  vector<EffectRecord>::const_iterator eiter,endeiter;
+  std::vector<EffectRecord>::const_iterator eiter,endeiter;
   
   for(i=0;i<data.numCalls();++i) {
     fc = data.getCallSpecs(i);
@@ -1702,9 +1702,9 @@ int4 ActionRestrictLocal::apply(Funcdata &data)
   return 0;
 }
 
-/// Count the number of inputs to \b op which have their mark set
+/// Count the number of inputs to \b op which have their mark std::set
 /// \param op is the PcodeOp to count
-/// \return the number of marks set
+/// \return the number of marks std::set
 uint4 ActionLikelyTrash::countMarks(PcodeOp *op)
 
 {
@@ -1726,7 +1726,7 @@ uint4 ActionLikelyTrash::countMarks(PcodeOp *op)
 
 /// \brief Decide if the given Varnode only ever flows into CPUI_INDIRECT
 ///
-/// Return all the CPUI_INDIRECT ops that the Varnode hits in a list.
+/// Return all the CPUI_INDIRECT ops that the Varnode hits in a std::list.
 /// Trace forward down all paths from -vn-, if we hit
 ///    - CPUI_INDIRECT  -> trim that path and store that op in the resulting -indlist-
 ///    - CPUI_SUBPIECE
@@ -1737,14 +1737,14 @@ uint4 ActionLikelyTrash::countMarks(PcodeOp *op)
 ///
 /// For any CPUI_MULTIEQUAL and CPUI_PIECE that are hit, all the other inputs must be hit as well
 /// \param vn is the given Varnode
-/// \param indlist is the list to populate with CPUI_INDIRECT ops
+/// \param indlist is the std::list to populate with CPUI_INDIRECT ops
 /// \return \b true if all flows look like trash
-bool ActionLikelyTrash::traceTrash(Varnode *vn,vector<PcodeOp *> &indlist)
+bool ActionLikelyTrash::traceTrash(Varnode *vn,std::vector<PcodeOp *> &indlist)
 
 {
-  vector<PcodeOp *> allroutes;	// Keep track of merging ops (with more than 1 input)
-  vector<Varnode *> markedlist;	// All varnodes we have visited on paths from -vn-
-  list<PcodeOp *>::const_iterator iter,enditer;
+  std::vector<PcodeOp *> allroutes;	// Keep track of merging ops (with more than 1 input)
+  std::vector<Varnode *> markedlist;	// All varnodes we have visited on paths from -vn-
+  std::list<PcodeOp *>::const_iterator iter,enditer;
   Varnode *outvn;
   uintb val;
   uint4 traced = 0;
@@ -1829,7 +1829,7 @@ bool ActionLikelyTrash::traceTrash(Varnode *vn,vector<PcodeOp *> &indlist)
 int4 ActionLikelyTrash::apply(Funcdata &data)
 
 {
-  vector<PcodeOp *> indlist;
+  std::vector<PcodeOp *> indlist;
 
   int4 num = data.getFuncProto().numLikelyTrash();
   for(int4 j=0;j<num;++j) {
@@ -1867,7 +1867,7 @@ int4 ActionRestructureVarnode::apply(Funcdata &data)
   numpass += 1;
 #ifdef OPACTION_DEBUG
   if ((flags&rule_debug)==0) return 0;
-  ostringstream s;
+  std::ostringstream s;
   data.getScopeLocal()->printEntries(s);
   data.getArch()->printDebug(s.str());
 #endif
@@ -1892,7 +1892,7 @@ int4 ActionRestructureHigh::apply(Funcdata &data)
 #ifdef OPACTION_DEBUG
   if ((flags&rule_debug)==0) return 0;
   l1->turnOffDebug();
-  ostringstream s;
+  std::ostringstream s;
   data.getScopeLocal()->printEntries(s);
   data.getArch()->printDebug(s.str());
 #endif
@@ -2033,7 +2033,7 @@ int4 ActionSetCasts::castInput(PcodeOp *op,int4 slot,Funcdata &data,CastStrategy
 int4 ActionSetCasts::apply(Funcdata &data)
 
 {
-  list<PcodeOp *>::const_iterator iter;
+  std::list<PcodeOp *>::const_iterator iter;
   PcodeOp *op;
 
   data.startCastPhase();
@@ -2094,7 +2094,7 @@ void ActionNameVars::lookForBadJumpTables(Funcdata &data)
       if (sym == (Symbol *)0) continue;
       if (sym->isNameLocked()) continue; // Override any unlocked name
       if (sym->getScope() != localmap) continue; // Only name this in the local scope
-      string newname = "UNRECOVERED_JUMPTABLE";
+      std::string newname = "UNRECOVERED_JUMPTABLE";
       sym->getScope()->renameSymbol(sym,localmap->makeNameUnique(newname));
     }
   }
@@ -2107,8 +2107,8 @@ void ActionNameVars::lookForRecommendedNames(Funcdata &data)
 
 {
   ScopeLocal *localmap = data.getScopeLocal();
-  vector<string> names;
-  vector<Symbol *> symbols;
+  vectorstd::string names;
+  std::vector<Symbol *> symbols;
 
   localmap->makeNameRecommendationsForSymbols(names,symbols);
   for(uint4 i=0;i<names.size();++i) {
@@ -2120,14 +2120,14 @@ void ActionNameVars::lookForRecommendedNames(Funcdata &data)
 /// \brief Add a recommendation to the database based on a particular sub-function parameter.
 ///
 /// We know \b vn holds data-flow for parameter \b param,  try to attach its name to \b vn's symbol.
-/// We update map from \b vn to a name recommendation record.
+/// We update std::map from \b vn to a name recommendation record.
 /// If \b vn is input to multiple functions, the one whose parameter has the most specified type
 /// will be preferred. If \b vn is passed to the function via a cast, this name will only be used
 /// if there is no other function that takes \b vn as a parameter.
 /// \param param is function prototype symbol
 /// \param vn is the Varnode associated with the parameter
-/// \param recmap is the recommendation map
-void ActionNameVars::makeRec(ProtoParameter *param,Varnode *vn,map<HighVariable *,OpRecommend> &recmap)
+/// \param recmap is the recommendation std::map
+void ActionNameVars::makeRec(ProtoParameter *param,Varnode *vn,std::map<HighVariable *,OpRecommend> &recmap)
 
 {
   if (!param->isNameLocked()) return;
@@ -2144,7 +2144,7 @@ void ActionNameVars::makeRec(ProtoParameter *param,Varnode *vn,map<HighVariable 
   HighVariable *high = vn->getHigh();
   if (!high->isMark()) return;	// Not one of the 
 
-  map<HighVariable *,OpRecommend>::iterator iter = recmap.find(high);
+  std::map<HighVariable *,OpRecommend>::iterator iter = recmap.find(high);
   if (iter != recmap.end()) {	// We have seen this varnode before
     if (ct == (Datatype *)0) return; // Cannot override with null (casted) type
     Datatype *oldtype = (*iter).second.ct;
@@ -2168,8 +2168,8 @@ void ActionNameVars::makeRec(ProtoParameter *param,Varnode *vn,map<HighVariable 
 /// names for current Varnodes used to pass the parameters. For these Varnodes,
 /// select from among these names.
 /// \param data is the function being analyzed
-/// \param varlist is a list of Varnodes representing HighVariables that need names
-void ActionNameVars::lookForFuncParamNames(Funcdata &data,const vector<Varnode *> &varlist)
+/// \param varlist is a std::list of Varnodes representing HighVariables that need names
+void ActionNameVars::lookForFuncParamNames(Funcdata &data,const std::vector<Varnode *> &varlist)
 
 {
   int4 numfunc = data.numCalls();
@@ -2186,7 +2186,7 @@ void ActionNameVars::lookForFuncParamNames(Funcdata &data,const vector<Varnode *
     vn->getHigh()->setMark();
   }
   if (markcount == 0) return;
-  map<HighVariable *,OpRecommend> recmap;
+  std::map<HighVariable *,OpRecommend> recmap;
 
   ScopeLocal *localmap = data.getScopeLocal();
   for(int4 i=0;i<numfunc;++i) {	// Run through all calls to functions
@@ -2203,7 +2203,7 @@ void ActionNameVars::lookForFuncParamNames(Funcdata &data,const vector<Varnode *
     }
   }
 
-  map<HighVariable *,OpRecommend>::iterator iter;
+  std::map<HighVariable *,OpRecommend>::iterator iter;
   for(uint4 i=0;i<varlist.size();++i) {	// Do the actual naming in the original (address based) order
     Varnode *vn = varlist[i];
     HighVariable *high = vn->getHigh();
@@ -2223,9 +2223,9 @@ int4 ActionNameVars::apply(Funcdata &data)
   const AddrSpaceManager *manage = data.getArch();
   VarnodeLocSet::const_iterator iter,enditer;
   AddrSpace *spc;
-  vector<Varnode *> namerec;	// Name representatives of symbols that need names
+  std::vector<Varnode *> namerec;	// Name representatives of symbols that need names
 
-  for(int4 i=0;i<manage->numSpaces();++i) { // Build a list of nameable highs
+  for(int4 i=0;i<manage->numSpaces();++i) { // Build a std::list of nameable highs
     spc = manage->getSpace(i);
     enditer = data.endLoc(spc);
     for(iter=data.beginLoc(spc);iter!=enditer;++iter) {
@@ -2262,7 +2262,7 @@ int4 ActionNameVars::apply(Funcdata &data)
     HighVariable *high = vn->getHigh();
     Symbol *sym = high->getSymbol();
     if (sym->isNameUndefined()) {
-      string newname;
+      std::string newname;
       Address usepoint;
       if (!vn->isAddrTied())
 	usepoint = vn->getUsePoint(data);
@@ -2289,7 +2289,7 @@ int4 ActionNameVars::apply(Funcdata &data)
 int4 ActionMarkExplicit::baseExplicit(Varnode *vn,int4 maxref)
 
 {
-  list<PcodeOp *>::const_iterator iter;
+  std::list<PcodeOp *>::const_iterator iter;
 
   PcodeOp *def = vn->getDef();
   if (def == (PcodeOp *)0) return -1;
@@ -2327,7 +2327,7 @@ int4 ActionMarkExplicit::baseExplicit(Varnode *vn,int4 maxref)
   }
   else if (vn->isMapped()) {
     // If NOT addrtied but is still mapped, there must be either a first use (register) mapping
-    // or a dynamic mapping causing the bit to be set. In either case, it should probably be explicit
+    // or a dynamic mapping causing the bit to be std::set. In either case, it should probably be explicit
     return -1;
   }
   if (vn->hasNoDescend()) return -1;	// Must have at least one descendant
@@ -2351,19 +2351,19 @@ int4 ActionMarkExplicit::baseExplicit(Varnode *vn,int4 maxref)
 }
 
 /// Look for certain situations where one Varnode with multiple descendants has one descendant who also has
-/// multiple descendants.  This routine is handed the list of Varnodes with multiple descendants;
-/// These all must already have their mark set.
+/// multiple descendants.  This routine is handed the std::list of Varnodes with multiple descendants;
+/// These all must already have their mark std::set.
 /// For the situations we can find with one flowing into another, mark the top Varnode
 /// as \e explicit.
-/// \param multlist is the list Varnodes with multiple descendants
+/// \param multlist is the std::list Varnodes with multiple descendants
 /// \return the number Varnodes that were marked as explicit
-int4 ActionMarkExplicit::multipleInteraction(vector<Varnode *> &multlist)
+int4 ActionMarkExplicit::multipleInteraction(std::vector<Varnode *> &multlist)
 
 {
-  vector<Varnode *> purgelist;
+  std::vector<Varnode *> purgelist;
 
   for(int4 i=0;i<multlist.size();++i) {
-    Varnode *vn = multlist[i];	// All elements in this list should have a defining op
+    Varnode *vn = multlist[i];	// All elements in this std::list should have a defining op
     PcodeOp *op = vn->getDef();
     OpCode opc = op->code();
     if (op->isBoolOutput() || (opc == CPUI_INT_ZEXT) || (opc == CPUI_INT_SEXT) || (opc == CPUI_PTRADD)) {
@@ -2400,7 +2400,7 @@ int4 ActionMarkExplicit::multipleInteraction(vector<Varnode *> &multlist)
   return purgelist.size();
 }
 
-/// Record the Varnode just encountered and set-up the next (backward) edges to traverse.
+/// Record the Varnode just encountered and std::set-up the next (backward) edges to traverse.
 /// \param v is the Varnode just encountered
 ActionMarkExplicit::OpStackElement::OpStackElement(Varnode *v)
 
@@ -2431,7 +2431,7 @@ ActionMarkExplicit::OpStackElement::OpStackElement(Varnode *v)
 void ActionMarkExplicit::processMultiplier(Varnode *vn,int4 max)
 
 {
-  vector<OpStackElement> opstack;
+  std::vector<OpStackElement> opstack;
   Varnode *vncur;
   int4 finalcount = 0;
 
@@ -2464,7 +2464,7 @@ void ActionMarkExplicit::processMultiplier(Varnode *vn,int4 max)
 }
 
 /// Assume \b vn is produced via a CPUI_NEW operation. If it is immediately fed to a constructor,
-/// set special printing flags on the Varnode.
+/// std::set special printing flags on the Varnode.
 /// \param data is the function being analyzed
 /// \param vn is the given Varnode
 void ActionMarkExplicit::checkNewToConstructor(Funcdata &data,Varnode *vn)
@@ -2472,7 +2472,7 @@ void ActionMarkExplicit::checkNewToConstructor(Funcdata &data,Varnode *vn)
 {  PcodeOp *op = vn->getDef();
   BlockBasic *bb = op->getParent();
   PcodeOp *firstuse = (PcodeOp *)0;
-  list<PcodeOp *>::const_iterator iter;
+  std::list<PcodeOp *>::const_iterator iter;
   for(iter=vn->beginDescend();iter!=vn->endDescend();++iter) {
     PcodeOp *curop = *iter;
     if (curop->getParent() != bb) continue;
@@ -2503,7 +2503,7 @@ int4 ActionMarkExplicit::apply(Funcdata &data)
 
 {
   VarnodeDefSet::const_iterator viter,enditer;
-  vector<Varnode *> multlist;		// implied varnodes with >1 descendants
+  std::vector<Varnode *> multlist;		// implied varnodes with >1 descendants
   int4 maxref;
 
   maxref = data.getArch()->max_implied_ref;
@@ -2647,7 +2647,7 @@ bool ActionMarkImplied::checkImpliedCover(Funcdata &data,Varnode *vn)
 
   op = vn->getDef();
   if (op->code() == CPUI_LOAD) { // Check for loads crossing stores
-    list<PcodeOp *>::const_iterator oiter,iterend;
+    std::list<PcodeOp *>::const_iterator oiter,iterend;
     iterend = data.endOp(CPUI_STORE);
     for(oiter=data.beginOp(CPUI_STORE);oiter!=iterend;++oiter) {
       storeop = *oiter;
@@ -2682,10 +2682,10 @@ int4 ActionMarkImplied::apply(Funcdata &data)
 
 {
   VarnodeLocSet::const_iterator viter;
-  list<PcodeOp *>::const_iterator oiter;
+  std::list<PcodeOp *>::const_iterator oiter;
   Varnode *vn,*vncur,*defvn,*outvn;
   PcodeOp *op;
-  vector<DescTreeElement> varstack; // Depth first varnode traversal stack
+  std::vector<DescTreeElement> varstack; // Depth first varnode traversal stack
 
   for(viter=data.beginLoc();viter!=data.endLoc();++viter) {
     vn = *viter;
@@ -2789,7 +2789,7 @@ int4 ActionRedundBranch::apply(Funcdata &data)
       if (bb->getOut(j) != bl) break;
     if (j!=bb->sizeOut()) continue;
 
-    //    ostringstream s;
+    //    std::ostringstream s;
     //    s << "Removing redundant branch out of block ";
     //    s << "code_" << bb->start.Target().getShortcut();
     //    bb->start.Target().printRaw(s);
@@ -2823,20 +2823,20 @@ int4 ActionDeterminedBranch::apply(Funcdata &data)
 }
 
 /// Given a new \e consume value to push to a Varnode, determine if this changes
-/// the Varnodes consume value and whether to push the Varnode onto the work-list.
+/// the Varnodes consume value and whether to push the Varnode onto the work-std::list.
 /// \param val is the new consume value
 /// \param vn is the Varnode to push to
-/// \param worklist is the current work-list
-inline void ActionDeadCode::pushConsumed(uintb val,Varnode *vn,vector<Varnode *> &worklist)
+/// \param worklist is the current work-std::list
+inline void ActionDeadCode::pushConsumed(uintb val,Varnode *vn,std::vector<Varnode *> &worklist)
 
 {
   uintb newval = (val | vn->getConsume())&calc_mask(vn->getSize());
   if ((newval == vn->getConsume())&&vn->isConsumeVacuous()) return;
   vn->setConsumeVacuous();
-  if (!vn->isConsumeList()) { // Check if already in list
-    vn->setConsumeList();	// Mark as in the list
+  if (!vn->isConsumeList()) { // Check if already in std::list
+    vn->setConsumeList();	// Mark as in the std::list
     if (vn->isWritten())
-      worklist.push_back(vn);	// add to list
+      worklist.push_back(vn);	// add to std::list
   }
   vn->setConsume(newval);
 }
@@ -2847,7 +2847,7 @@ inline void ActionDeadCode::pushConsumed(uintb val,Varnode *vn,vector<Varnode *>
 /// \e consumed value is propagated  backward to the inputs of the op
 /// that produced it.
 /// \param worklist is the current stack of dirty Varnodes
-void ActionDeadCode::propagateConsumed(vector<Varnode *> &worklist)
+void ActionDeadCode::propagateConsumed(std::vector<Varnode *> &worklist)
 
 {
   Varnode *vn = worklist.back();
@@ -2865,7 +2865,7 @@ void ActionDeadCode::propagateConsumed(vector<Varnode *> &worklist)
   case CPUI_INT_ADD:
   case CPUI_INT_SUB:
     a = outc | (outc>>1);	// Make sure all 1 bits below
-    a = a | (a>>2);		// highest 1 bit are set
+    a = a | (a>>2);		// highest 1 bit are std::set
     a = a | (a>>4);
     a = a | (a>>8);		
     a = a | (a>>16);
@@ -3036,7 +3036,7 @@ bool ActionDeadCode::neverConsumed(Varnode *vn,Funcdata &data)
 
 {
   if (vn->getSize() > sizeof(uintb)) return false; // Not enough precision to really tell
-  list<PcodeOp *>::const_iterator iter;
+  std::list<PcodeOp *>::const_iterator iter;
   PcodeOp *op;
   iter = vn->beginDescend();
   while(iter != vn->endDescend()) {
@@ -3061,10 +3061,10 @@ int4 ActionDeadCode::apply(Funcdata &data)
 
 {
   int4 i;
-  list<PcodeOp *>::const_iterator iter;
+  std::list<PcodeOp *>::const_iterator iter;
   PcodeOp *op;
   Varnode *vn;
-  vector<Varnode *> worklist;
+  std::vector<Varnode *> worklist;
   VarnodeLocSet::const_iterator viter,endviter;
   const AddrSpaceManager *manage = data.getArch();
   AddrSpace *spc;
@@ -3176,7 +3176,7 @@ int4 ActionDeadCode::apply(Funcdata &data)
 void ActionConditionalConst::propagateConstant(Varnode *varVn,Varnode *constVn,FlowBlock *constBlock,Funcdata &data)
 
 {
-  list<PcodeOp *>::const_iterator iter,enditer;
+  std::list<PcodeOp *>::const_iterator iter,enditer;
   iter = varVn->beginDescend();
   enditer = varVn->endDescend();
   FlowBlock *rootBlock = (FlowBlock *)0;
@@ -3324,7 +3324,7 @@ int4 ActionPrototypeTypes::apply(Funcdata &data)
   int4 i;
   PcodeOp *op;
   Varnode *vn;
-  list<PcodeOp *>::const_iterator iter,iterend;
+  std::list<PcodeOp *>::const_iterator iter,iterend;
 
   // Set the evalutation prototype if we are not already locked
   ProtoModel *evalfp = data.getArch()->evalfp_current;
@@ -3419,7 +3419,7 @@ int4 ActionPrototypeTypes::apply(Funcdata &data)
 int4 ActionInputPrototype::apply(Funcdata &data)
 
 {
-  vector<Varnode *> triallist;
+  std::vector<Varnode *> triallist;
   ParamActive active(false);
   Varnode *vn;
 
@@ -3464,7 +3464,7 @@ int4 ActionInputPrototype::apply(Funcdata &data)
   data.clearDeadVarnodes();
 #ifdef OPACTION_DEBUG
   if ((flags&rule_debug)==0) return 0;
-  ostringstream s;
+  std::ostringstream s;
   data.getScopeLocal()->printEntries(s);
   data.getArch()->printDebug(s.str());
 #endif
@@ -3477,7 +3477,7 @@ int4 ActionOutputPrototype::apply(Funcdata &data)
   ProtoParameter *outparam = data.getFuncProto().getOutput();
   if ((!outparam->isTypeLocked())||outparam->isSizeTypeLocked()) {
     PcodeOp *op = data.canonicalReturnOp();
-    vector<Varnode *> vnlist;
+    std::vector<Varnode *> vnlist;
     if (op != (PcodeOp *)0) {
       for(int4 i=1;i<op->numInput();++i)
 	vnlist.push_back(op->getIn(i));
@@ -3580,7 +3580,7 @@ bool ActionCopyMarker::shadowedVarnode(const Varnode *vn)
 int4 ActionCopyMarker::apply(Funcdata &data)
 
 {
-  list<PcodeOp *>::const_iterator iter;
+  std::list<PcodeOp *>::const_iterator iter;
   PcodeOp *op;
   HighVariable *h1,*h2,*h3;
   Varnode *v1,*v2,*v3;
@@ -3639,7 +3639,7 @@ int4 ActionDynamicMapping::apply(Funcdata &data)
 
 {
   ScopeLocal *localmap = data.getScopeLocal();
-  list<SymbolEntry>::iterator iter,enditer;
+  std::list<SymbolEntry>::iterator iter,enditer;
   iter = localmap->beginDynamic();
   enditer = localmap->endDynamic();
   DynamicHash dhash;
@@ -3656,7 +3656,7 @@ int4 ActionDynamicSymbols::apply(Funcdata &data)
 
 {
   ScopeLocal *localmap = data.getScopeLocal();
-  list<SymbolEntry>::const_iterator iter,enditer;
+  std::list<SymbolEntry>::const_iterator iter,enditer;
   iter = localmap->beginDynamic();
   enditer = localmap->endDynamic();
   DynamicHash dhash;
@@ -3667,12 +3667,12 @@ int4 ActionDynamicSymbols::apply(Funcdata &data)
     dhash.clear();
     Varnode *vn = dhash.findVarnode(&data,entry.getFirstUseAddress(),entry.getHash());
     if (vn == (Varnode *)0) {
-      //      localmap->removeSymbol(sym); // If it didn't map to anything, remove it
+      //      localmap->removeSymbol(sym); // If it didn't std::map to anything, remove it
       continue;
     }
     if (vn->getSymbolEntry() == &entry) continue; // Already applied it
     if (vn->getSize() != entry.getSize()) {
-      ostringstream s;
+      std::ostringstream s;
       s << "Unable to use symbol ";
       if (!sym->isNameUndefined())
 	s << sym->getName() << ' ';
@@ -3708,13 +3708,13 @@ int4 ActionDynamicSymbols::apply(Funcdata &data)
       localmap->retypeSymbol(sym,vn->getType()); // use the type propagated into the varnode
     }
     else if (sym->getType() != vn->getType()) {
-      ostringstream s;
+      std::ostringstream s;
       s << "Unable to use type for symbol " << sym->getName();
       data.warningHeader(s.str());
       localmap->retypeSymbol(sym,vn->getType()); // use the type propagated into the varnode
     }
     // FIXME: Setting the symbol here (for the first time) gives the type no time to propagate properly
-    // Currently the casts aren't set properly
+    // Currently the casts aren't std::set properly
 
     count += 1;
   }
@@ -3724,7 +3724,7 @@ int4 ActionDynamicSymbols::apply(Funcdata &data)
 int4 ActionPrototypeWarnings::apply(Funcdata &data)
 
 {
-  vector<string> overridemessages;
+  vectorstd::string overridemessages;
   data.getOverride().generateOverrideMessages(overridemessages,data.getArch());
   for(int4 i=0;i<overridemessages.size();++i)
     data.warningHeader(overridemessages[i]);
@@ -3745,7 +3745,7 @@ int4 ActionPrototypeWarnings::apply(Funcdata &data)
     FuncCallSpecs *fc = data.getCallSpecs(i);
     Funcdata *fd = fc->getFuncdata();
     if (fc->hasInputErrors()) {
-      ostringstream s;
+      std::ostringstream s;
       s << "Cannot assign parameter location for function ";
       if (fd != (Funcdata *)0)
 	s << fd->getName();
@@ -3755,7 +3755,7 @@ int4 ActionPrototypeWarnings::apply(Funcdata &data)
       data.warning(s.str(),fc->getEntryAddress());
     }
     if (fc->hasOutputErrors()) {
-      ostringstream s;
+      std::ostringstream s;
       s << "Cannot assign location of return value for function ";
       if (fd != (Funcdata *)0)
 	s << fd->getName();
@@ -3782,7 +3782,7 @@ int4 ActionPrototypeWarnings::apply(Funcdata &data)
 void ActionInferTypes::propagationDebug(Architecture *glb,Varnode *vn,const Datatype *newtype,PcodeOp *op,int4 slot,Varnode *ptralias)
 
 {
-  ostringstream s;
+  std::ostringstream s;
 
   vn->printRaw(s);
   s << " : ";
@@ -3797,7 +3797,7 @@ void ActionInferTypes::propagationDebug(Architecture *glb,Varnode *vn,const Data
   else {
     s << " from ";
     op->printRaw(s);
-    s << " slot=" << dec << slot;
+    s << " slot=" << std::dec << slot;
   }
   glb->printDebug(s.str());
 }
@@ -4193,7 +4193,7 @@ void ActionInferTypes::propagateOneType(TypeFactory *typegrp,Varnode *vn)
 
 {
   PropagationState *ptr;
-  vector<PropagationState> state;
+  std::vector<PropagationState> state;
 
   state.push_back(PropagationState(vn));
   vn->setMark();
@@ -4292,7 +4292,7 @@ void ActionInferTypes::propagateSpacebaseRef(Funcdata &data,Varnode *spcvn)
   spctype = ((TypePointer *)spctype)->getPtrTo();
   if (spctype->getMetatype() != TYPE_SPACEBASE) return;
   TypeSpacebase *sbtype = (TypeSpacebase *)spctype;
-  list<PcodeOp *>::const_iterator iter;
+  std::list<PcodeOp *>::const_iterator iter;
   Address addr;
 
   for(iter=spcvn->beginDescend();iter!=spcvn->endDescend();++iter) {
@@ -4336,8 +4336,8 @@ int4 ActionInferTypes::apply(Funcdata &data)
   VarnodeLocSet::const_iterator iter;
 
 #ifdef TYPEPROP_DEBUG
-  ostringstream s;
-  s << "Type propagation pass - " << dec << localcount;
+  std::ostringstream s;
+  s << "Type propagation pass - " << std::dec << localcount;
   data.getArch()->printDebug(s.str());
 #endif
   if (localcount >= 7) {       // This constant arrived at empirically
@@ -4374,8 +4374,8 @@ void TermOrder::collect(void)
   PcodeOp *curop;
   PcodeOp *subop,*multop;
 
-  vector<PcodeOp *> opstack;	// Depth first traversal path
-  vector<PcodeOp *> multstack;
+  std::vector<PcodeOp *> opstack;	// Depth first traversal path
+  std::vector<PcodeOp *> multstack;
 
   opstack.push_back(root);
   multstack.push_back((PcodeOp *)0);
@@ -4419,7 +4419,7 @@ void TermOrder::collect(void)
 void TermOrder::sortTerms(void)
 
 {
-  for(vector<PcodeOpEdge>::iterator iter=terms.begin();iter!=terms.end();++iter)
+  for(std::vector<PcodeOpEdge>::iterator iter=terms.begin();iter!=terms.end();++iter)
     sorter.push_back( &(*iter) );
 
   sort(sorter.begin(),sorter.end(),additiveCompare);
@@ -4470,7 +4470,7 @@ void build_defaultactions(ActionDatabase &allacts)
 void universal_action(Architecture *conf)
 
 {
-  vector<Rule *>::iterator iter;
+  std::vector<Rule *>::iterator iter;
   ActionGroup *act;
   ActionGroup *actmainloop;
   ActionGroup *actfullloop;

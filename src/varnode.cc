@@ -224,7 +224,7 @@ void Varnode::clearCover(void) const
   }
 }
 
-/// Initialize a new Cover and set dirty bit so that updateCover will rebuild
+/// Initialize a new Cover and std::set dirty bit so that updateCover will rebuild
 void Varnode::calcCover(void) const
 
 {
@@ -237,23 +237,23 @@ void Varnode::calcCover(void) const
 }
 
 /// Print, to a stream, textual information about where \b this Varnode is in scope within its
-/// particular Funcdata. This amounts to a list of address ranges bounding the writes and reads
+/// particular Funcdata. This amounts to a std::list of address ranges bounding the writes and reads
 /// of the Varnode
 /// \param s is the output stream
-void Varnode::printCover(ostream &s) const
+void Varnode::printCover(std::ostream &s) const
 
 {
   if (cover == (Cover *)0)
     throw LowlevelError("No cover to print");
   if ((flags & Varnode::coverdirty)!=0)
-    s << "Cover is dirty" << endl;
+    s << "Cover is dirty" << std::endl;
   else
     cover->print(s);
 }
 
 /// Print boolean attribute information about \b this as keywords to a stream
 /// \param s is the output stream
-void Varnode::printInfo(ostream &s) const
+void Varnode::printInfo(std::ostream &s) const
 
 {
   type->printRaw(s);
@@ -279,27 +279,27 @@ void Varnode::printInfo(ostream &s) const
     s << " addrforce";
   if (isReadOnly())
     s << " readonly";
-  s << " (consumed=0x" << hex << consumed << ')';
-  s << " (internal=" << hex << this << ')';
-  s << " (create=0x" << hex << create_index << ')';
-  s << endl;
+  s << " (consumed=0x" << std::dec << consumed << ')';
+  s << " (internal=" << std::dec << this << ')';
+  s << " (create=0x" << std::dec << create_index << ')';
+  s << std::endl;
 }
 
-/// Erase the operation from our descendant list and set the cover dirty flag
+/// Erase the operation from our descendant std::list and std::set the cover dirty flag
 /// \param op is the PcodeOp to remove
 void Varnode::eraseDescend(PcodeOp *op)
 
 {
-  list<PcodeOp *>::iterator iter;
+  std::list<PcodeOp *>::iterator iter;
 
   iter = descend.begin();
-  while (*iter != op)		// Find this op in list of vn's descendants
+  while (*iter != op)		// Find this op in std::list of vn's descendants
     iter++;
-  descend.erase(iter);		// Remove it from list
+  descend.erase(iter);		// Remove it from std::list
   setFlags(Varnode::coverdirty);
 }
 
-/// Put a new operator in the descendant list and set the cover dirty flag
+/// Put a new operator in the descendant std::list and std::set the cover dirty flag
 /// \param op is PcodeOp to add
 void Varnode::addDescend(PcodeOp *op)
 
@@ -313,7 +313,7 @@ void Varnode::addDescend(PcodeOp *op)
   setFlags(Varnode::coverdirty);
 }
 
-/// Completely clear the descendant list
+/// Completely clear the descendant std::list
 /// Only called if Varnode is about to be irrevocably destroyed
 void Varnode::destroyDescend(void)
 
@@ -321,8 +321,8 @@ void Varnode::destroyDescend(void)
   descend.clear();
 }
 
-/// Set desired boolean attributes on this Varnode and then set dirty bits if appropriate
-/// \param fl is the mask containing the list of attributes to set
+/// Set desired boolean attributes on this Varnode and then std::set dirty bits if appropriate
+/// \param fl is the mask containing the std::list of attributes to std::set
 void Varnode::setFlags(uint4 fl) const
 
 {
@@ -334,8 +334,8 @@ void Varnode::setFlags(uint4 fl) const
   }
 }
 
-/// Clear desired boolean attributes on this Varnode and then set dirty bits if appropriate
-/// \param fl is the mask containing the list of attributes to clear
+/// Clear desired boolean attributes on this Varnode and then std::set dirty bits if appropriate
+/// \param fl is the mask containing the std::list of attributes to clear
 void Varnode::clearFlags(uint4 fl) const
 
 {
@@ -347,7 +347,7 @@ void Varnode::clearFlags(uint4 fl) const
   }
 }
 
-/// Directly change the defining PcodeOp and set appropriate dirty bits
+/// Directly change the defining PcodeOp and std::set appropriate dirty bits
 /// \param op is the pointer to the new PcodeOp, which can be \b null
 void Varnode::setDef(PcodeOp *op)
 
@@ -523,7 +523,7 @@ PcodeOp *Varnode::loneDescend(void) const
 
   if (descend.empty()) return (PcodeOp *)0; // No descendants
 
-  list<PcodeOp *>::const_iterator iter;
+  std::list<PcodeOp *>::const_iterator iter;
 
   iter = descend.begin();
   op = *iter++;			// First descendant
@@ -546,17 +546,17 @@ Address Varnode::getUsePoint(const Funcdata &fd) const
 }
 
 /// Print to the stream either the name of the Varnode, such as a register name, if it exists
-/// or print a shortcut character representing the AddrSpace and a hex representation of the offset.
+/// or print a shortcut character representing the AddrSpace and a std::dec representation of the offset.
 /// This function also computes and returns the \e expected size of the identifier it prints
 /// to facilitate the printing of size modifiers by other print routines
 /// \param s is the output stream
 /// \return the expected size
-int4 Varnode::printRawNoMarkup(ostream &s) const
+int4 Varnode::printRawNoMarkup(std::ostream &s) const
 
 {
   AddrSpace *spc = loc.getSpace();
   const Translate *trans = spc->getTrans();
-  string name;
+  std::string name;
   int4 expect;
 
   name = trans->getRegisterName(spc,loc.getOffset(),size);
@@ -566,7 +566,7 @@ int4 Varnode::printRawNoMarkup(ostream &s) const
     s << name;
     expect = point.size;
     if (off != 0)
-      s << '+' << dec << off;
+      s << '+' << std::dec << off;
   }
   else {
     s << loc.getShortcut();	// Print type shortcut character
@@ -581,7 +581,7 @@ int4 Varnode::printRawNoMarkup(ostream &s) const
 /// In particular, the identifiers have either "i" or defining op SeqNum information appended
 /// to them in parantheses.
 /// \param s is the output stream
-void Varnode::printRaw(ostream &s) const
+void Varnode::printRaw(std::ostream &s) const
 
 {
   if (this == (const Varnode *)0) {
@@ -605,7 +605,7 @@ void Varnode::printRaw(ostream &s) const
 /// Recursively print a terse textual representation of the data-flow (SSA) tree rooted at this Varnode
 /// \param s is the output stream
 /// \param depth is the current depth of the tree we are at
-void Varnode::printRawHeritage(ostream &s,int4 depth) const
+void Varnode::printRawHeritage(std::ostream &s,int4 depth) const
 
 {
   for(int4 i=0;i<depth;++i)
@@ -613,7 +613,7 @@ void Varnode::printRawHeritage(ostream &s,int4 depth) const
 
   if (isConstant()) {
     printRaw(s);
-    s << endl;
+    s << std::endl;
     return;
   }
   printRaw(s);
@@ -631,12 +631,12 @@ void Varnode::printRawHeritage(ostream &s,int4 depth) const
     s << " Code";
 
   if (def != (PcodeOp *)0) {
-    s << "\t\t" << def->getSeqNum() << endl;
+    s << "\t\t" << def->getSeqNum() << std::endl;
     for(int4 i=0;i<def->numInput();++i)
       def->getIn(i)->printRawHeritage(s,depth+5);
   }
   else 
-    s << endl;
+    s << std::endl;
 }
 
 /// If \b this is a constant, or is extended (INT_ZEXT,INT_SEXT) from a constant,
@@ -673,7 +673,7 @@ int4 Varnode::isConstantExtended(uintb &val) const
 }
 
 /// Make an initial determination of the Datatype of this Varnode. If a Datatype is already
-/// set and locked return it. Otherwise look through all the read PcodeOps and the write PcodeOp
+/// std::set and locked return it. Otherwise look through all the read PcodeOps and the write PcodeOp
 /// to determine if the Varnode is getting used as an \b int, \b float, or \b pointer, etc.
 /// Throw an exception if no Datatype can be found at all.
 /// \return the determined Datatype
@@ -690,7 +690,7 @@ Datatype *Varnode::getLocalType(void) const
   if (def != (PcodeOp *)0)
     ct = def->outputTypeLocal();
 
-  list<PcodeOp *>::const_iterator iter;
+  std::list<PcodeOp *>::const_iterator iter;
   PcodeOp *op;
   int4 i;
   for(iter=descend.begin();iter!=descend.end();++iter) {
@@ -767,7 +767,7 @@ int4 Varnode::termOrder(const Varnode *op) const
 ///
 /// Additionally the tag will contain other optional attributes.
 /// \param s is the stream to write the tag to
-void Varnode::saveXml(ostream &s) const
+void Varnode::saveXml(std::ostream &s) const
 
 {
   s << "<addr";
@@ -906,7 +906,7 @@ void VarnodeBank::makeFree(Varnode *vn)
 void VarnodeBank::replace(Varnode *oldvn,Varnode *newvn)
 
 {
-  list<PcodeOp *>::iterator iter,tmpiter;
+  std::list<PcodeOp *>::iterator iter,tmpiter;
   PcodeOp *op;
   int4 i;
 
@@ -946,7 +946,7 @@ Varnode *VarnodeBank::setInput(Varnode *vn)
 
 /// The Varnode must initially be \e free. It will be removed
 /// from the cross-referencing lists and reinserted as if its were
-/// the output of the given PcodeOp.  It still must be explicitly set
+/// the output of the given PcodeOp.  It still must be explicitly std::set
 /// as the output.
 /// \param vn is the Varnode to modify
 /// \param op is the given PcodeOp
@@ -955,14 +955,14 @@ Varnode *VarnodeBank::setDef(Varnode *vn,PcodeOp *op)
 
 {
   if (!vn->isFree()) {
-    ostringstream s;
+    std::ostringstream s;
     const Address &addr(op->getAddr());
     s << "Defining varnode which is not free at " << addr.getShortcut();
     addr.printRaw(s);
     throw LowlevelError(s.str());
   }
   if (vn->isConstant()) {
-    ostringstream s;
+    std::ostringstream s;
     const Address &addr(op->getAddr());
     s << "Assignment to constant at " << addr.getShortcut();
     addr.printRaw(s);
@@ -976,8 +976,8 @@ Varnode *VarnodeBank::setDef(Varnode *vn,PcodeOp *op)
   return xref(vn);
 }
 
-/// The new Varnode object will already be put in the \e definition list as if
-/// it were the output of the given PcodeOp. The Varnode must still be set as the output.
+/// The new Varnode object will already be put in the \e definition std::list as if
+/// it were the output of the given PcodeOp. The Varnode must still be std::set as the output.
 /// \param s is the size in bytes
 /// \param m is the starting address
 /// \param ct is the data-type to associate
@@ -992,8 +992,8 @@ Varnode *VarnodeBank::createDef(int4 s,const Address &m, Datatype *ct,PcodeOp *o
 }
 
 /// The new Varnode will be assigned from the \e unique space, and
-/// it will already be put in the \e definition list as if
-/// it were the output of the given PcodeOp. The Varnode must still be set as the output.
+/// it will already be put in the \e definition std::list as if
+/// it were the output of the given PcodeOp. The Varnode must still be std::set as the output.
 /// \param s is the size in bytes
 /// \param ct is the data-type to associate
 /// \param op is the given PcodeOp
@@ -1330,7 +1330,7 @@ VarnodeLocSet::const_iterator VarnodeBank::endLoc(int4 s,const Address &addr,
   return iter;
 }
 
-/// \brief Beginning of varnodes with set definition property
+/// \brief Beginning of varnodes with std::set definition property
 ///
 /// Get an iterator to Varnodes in definition order restricted with the
 /// following properties:
@@ -1368,7 +1368,7 @@ VarnodeDefSet::const_iterator VarnodeBank::beginDef(uint4 fl) const
   return iter;
 }
 
-/// \brief End of varnodes with set definition property
+/// \brief End of varnodes with std::set definition property
 ///
 /// Get an iterator to Varnodes in definition order restricted with the
 /// following properties:
@@ -1405,7 +1405,7 @@ VarnodeDefSet::const_iterator VarnodeBank::endDef(uint4 fl) const
   return def_tree.end();	// Highest free is end of def_tree
 }
 
-/// \brief Beginning of varnodes starting at a given address with a set definition property
+/// \brief Beginning of varnodes starting at a given address with a std::set definition property
 ///
 /// Get an iterator to Varnodes in definition order.  The starting address of the Varnodes
 /// must match the given address, and they are further restricted by the
@@ -1439,7 +1439,7 @@ VarnodeDefSet::const_iterator VarnodeBank::beginDef(uint4 fl,const Address &addr
   return iter;
 }
 
-/// \brief End of varnodes starting at a given address with a set definition property
+/// \brief End of varnodes starting at a given address with a std::set definition property
 ///
 /// Get an iterator to Varnodes in definition order.  The starting address of the Varnodes
 /// must match the given address, and they are further restricted by the

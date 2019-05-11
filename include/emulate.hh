@@ -134,16 +134,16 @@ inline void BreakCallBack::setEmulate(Emulate *emu)
 ///   - registerPcodeCallback()  or
 ///   = registerAddressCallback()
 ///
-/// Breakpoints are stored in map containers, and the core BreakTable methods
+/// Breakpoints are stored in std::map containers, and the core BreakTable methods
 /// are implemented to search in these containers
 class BreakTableCallBack : public BreakTable {
   Emulate *emulate;		///< The emulator associated with this table
   Translate *trans;		///< The translator 
-  map<Address,BreakCallBack *> addresscallback;	///< a container of pcode based breakpoints
-  map<uintb,BreakCallBack *> pcodecallback; ///< a container of addressed based breakpoints
+  std::map<Address,BreakCallBack *> addresscallback;	///< a container of pcode based breakpoints
+  std::map<uintb,BreakCallBack *> pcodecallback; ///< a container of addressed based breakpoints
 public:
   BreakTableCallBack(Translate *t); ///< Basic breaktable constructor
-  void registerPcodeCallback(const string &nm,BreakCallBack *func); ///< Register a pcode based breakpoint
+  void registerPcodeCallback(const std::string &nm,BreakCallBack *func); ///< Register a pcode based breakpoint
   void registerAddressCallback(const Address &addr,BreakCallBack *func); ///< Register an address based breakpoint
   virtual void setEmulate(Emulate *emu); ///< Associate an emulator with all breakpoints in the table
   virtual bool doPcodeOpBreak(PcodeOpRaw *curop); ///< Invoke any breakpoints for the given pcode op
@@ -212,7 +212,7 @@ public:
 /// Applications and breakpoints can use this method and its companion getHalt() to
 /// terminate and restart the main emulator loop as needed. The emulator itself makes no use
 /// of this routine or the associated state variable \b emu_halted.
-/// \param val is what the halt state of the emulator should be set to
+/// \param val is what the halt state of the emulator should be std::set to
 inline void Emulate::setHalt(bool val)
 
 {
@@ -278,14 +278,14 @@ inline MemoryState *EmulateMemory::getMemoryState(void) const
 ///
 /// This is used for emulation when full Varnode and PcodeOp objects aren't needed
 class PcodeEmitCache : public PcodeEmit {
-  vector<PcodeOpRaw *> &opcache;	///< The cache of current p-code ops
-  vector<VarnodeData *> &varcache;	///< The cache of current varnodes
-  const vector<OpBehavior *> &inst;	///< Array of behaviors for translating OpCode
+  std::vector<PcodeOpRaw *> &opcache;	///< The cache of current p-code ops
+  std::vector<VarnodeData *> &varcache;	///< The cache of current varnodes
+  const std::vector<OpBehavior *> &inst;	///< Array of behaviors for translating OpCode
   uintm uniq;				///< Starting offset for defining temporaries in \e unique space
   VarnodeData *createVarnode(const VarnodeData *var);	///< Clone and cache a raw VarnodeData
 public:
-  PcodeEmitCache(vector<PcodeOpRaw *> &ocache,vector<VarnodeData *> &vcache,
-		 const vector<OpBehavior *> &in,uintb uniqReserve);	///< Constructor
+  PcodeEmitCache(std::vector<PcodeOpRaw *> &ocache,std::vector<VarnodeData *> &vcache,
+		 const std::vector<OpBehavior *> &in,uintb uniqReserve);	///< Constructor
   virtual void dump(const Address &addr,OpCode opc,VarnodeData *outvar,VarnodeData *vars,int4 isize);
 };
 
@@ -293,13 +293,13 @@ public:
 ///
 /// This implementation uses a Translate object to translate machine instructions into
 /// pcode and caches pcode ops for later use by the emulator.  The pcode is cached as soon
-/// as the execution address is set, either explicitly, or via branches and fallthrus.  There
+/// as the execution address is std::set, either explicitly, or via branches and fallthrus.  There
 /// are additional methods for inspecting the pcode ops in the current instruction as a sequence.
 class EmulatePcodeCache : public EmulateMemory {
   Translate *trans;		///< The SLEIGH translator
-  vector<PcodeOpRaw *> opcache;	///< The cache of current p-code ops
-  vector<VarnodeData *> varcache;	///< The cache of current varnodes
-  vector<OpBehavior *> inst;	///< Map from OpCode to OpBehavior
+  std::vector<PcodeOpRaw *> opcache;	///< The cache of current p-code ops
+  std::vector<VarnodeData *> varcache;	///< The cache of current varnodes
+  std::vector<OpBehavior *> inst;	///< std::map from OpCode to OpBehavior
   BreakTable *breaktable;	///< The table of breakpoints
   Address current_address;	///< Address of current instruction being executed
   bool instruction_start;	///< \b true if next pcode op is start of instruction
@@ -387,7 +387,7 @@ inline Address EmulatePcodeCache::getExecuteAddress(void) const
   The MemoryState object holds the representation of registers and memory during emulation.  It
   understands the address spaces defined in the \b SLEIGH specification and how data is encoded
   in these spaces.  It also knows any register names defined by the specification, so these
-  can be used to set or query the state of these registers naturally.
+  can be used to std::set or query the state of these registers naturally.
 
   The emulation framework can be tailored to a particular environment by creating \b breakpoint
   objects, which derive off the BreakCallBack interface.  These can be used to create callbacks
@@ -470,7 +470,7 @@ inline Address EmulatePcodeCache::getExecuteAddress(void) const
   BreakCallBack::pcodeCallback().  Here is an example of a breakpoint that implements a
   standard C library \e puts call an the x86 architecture.  When the breakpoint is invoked,
   a call to \e puts has just been made, so the stack pointer is pointing to the return address
-  and the next 4 bytes on the stack are a pointer to the string being passed in.
+  and the next 4 bytes on the stack are a pointer to the std::string being passed in.
 
   \code
     class PutsCallBack : public BreakCallBack {
@@ -489,7 +489,7 @@ inline Address EmulatePcodeCache::getExecuteAddress(void) const
       uint4 param1 = mem->getValue(ram,esp+4,4);
       mem->getChunk(buffer,ram,param1,255);
 
-      cout << (char *)&buffer << endl;
+      cout << (char *)&buffer << std::endl;
 
       uint4 returnaddr = mem->getValue(ram,esp,4);
       mem->setValue("ESP",esp+8);
@@ -501,8 +501,8 @@ inline Address EmulatePcodeCache::getExecuteAddress(void) const
   \endcode
 
   Notice that the callback retrieves the value of the stack pointer by name.  Using this
-  value, the string pointer is retrieved, then the data for the actual string is retrieved.
-  After dumping the string to standard out, the return address is recovered and the \e return
+  value, the std::string pointer is retrieved, then the data for the actual std::string is retrieved.
+  After dumping the std::string to standard out, the return address is recovered and the \e return
   instruction is emulated by explicitly setting the next execution address to be the return value.
 
   \section emu_finalsetup Running the Emulator
@@ -534,7 +534,7 @@ inline Address EmulatePcodeCache::getExecuteAddress(void) const
 
   \endcode
 
-  Notice how the initial stack pointer and initial execute address is set up.  The breakpoint
+  Notice how the initial stack pointer and initial execute address is std::set up.  The breakpoint
   is registered with the BreakTable, giving it a specific address.  The executeInstruction method
   is called inside the loop, to actually run the emulator.  Notice that a disassembly of each
   instruction is printed after each step of the emulator.

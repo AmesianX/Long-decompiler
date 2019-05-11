@@ -24,14 +24,14 @@ namespace GhidraDec {
 class PatternBlock {
   int4 offset;			// Offset to non-zero byte of mask
   int4 nonzerosize;		// Last byte(+1) containing nonzero mask
-  vector<uintm> maskvec;	// Mask
-  vector<uintm> valvec;		// Value
+  std::vector<uintm> maskvec;	// Mask
+  std::vector<uintm> valvec;		// Value
   void normalize(void);
 public:
   PatternBlock(int4 off,uintm msk,uintm val);
   PatternBlock(bool tf);
   PatternBlock(const PatternBlock *a,const PatternBlock *b);
-  PatternBlock(vector<PatternBlock *> &list);
+  PatternBlock(std::vector<PatternBlock *> &std::list);
   PatternBlock *commonSubPattern(const PatternBlock *b) const;
   PatternBlock *intersect(const PatternBlock *b) const;
   bool specializes(const PatternBlock *op2) const;
@@ -45,7 +45,7 @@ public:
   bool alwaysFalse(void) const { return (nonzerosize==-1); }
   bool isInstructionMatch(ParserWalker &walker) const;
   bool isContextMatch(ParserWalker &walker) const;
-  void saveXml(ostream &s) const;
+  void saveXml(std::ostream &s) const;
   void restoreXml(const Element *el);
 };
 
@@ -64,7 +64,7 @@ public:
   virtual bool alwaysTrue(void) const=0;
   virtual bool alwaysFalse(void) const=0;
   virtual bool alwaysInstructionTrue(void) const=0;
-  virtual void saveXml(ostream &s) const=0;
+  virtual void saveXml(std::ostream &s) const=0;
   virtual void restoreXml(const Element *el)=0;
 };
 
@@ -100,7 +100,7 @@ public:
   virtual bool alwaysTrue(void) const { return maskvalue->alwaysTrue(); }
   virtual bool alwaysFalse(void) const { return maskvalue->alwaysFalse(); }
   virtual bool alwaysInstructionTrue(void) const { return maskvalue->alwaysTrue(); }
-  virtual void saveXml(ostream &s) const;
+  virtual void saveXml(std::ostream &s) const;
   virtual void restoreXml(const Element *el);
 };
 
@@ -121,7 +121,7 @@ public:
   virtual bool alwaysTrue(void) const { return maskvalue->alwaysTrue(); }
   virtual bool alwaysFalse(void) const { return maskvalue->alwaysFalse(); }
   virtual bool alwaysInstructionTrue(void) const { return true; }
-  virtual void saveXml(ostream &s) const;
+  virtual void saveXml(std::ostream &s) const;
   virtual void restoreXml(const Element *el);
 };
 
@@ -144,16 +144,16 @@ public:
   virtual Pattern *doOr(const Pattern *b,int4 sa) const;
   virtual Pattern *doAnd(const Pattern *b,int4 sa) const;
   virtual Pattern *commonSubPattern(const Pattern *b,int4 sa) const;
-  virtual void saveXml(ostream &s) const;
+  virtual void saveXml(std::ostream &s) const;
   virtual void restoreXml(const Element *el);
 };
 
 class OrPattern : public Pattern {
-  vector<DisjointPattern *> orlist;
+  std::vector<DisjointPattern *> orlist;
 public:
   OrPattern(void) {}		// For use with restoreXml
   OrPattern(DisjointPattern *a,DisjointPattern *b);
-  OrPattern(const vector<DisjointPattern *> &list);
+  OrPattern(const std::vector<DisjointPattern *> &std::list);
   virtual ~OrPattern(void);
   virtual Pattern *simplifyClone(void) const;
   virtual void shiftInstruction(int4 sa);
@@ -166,7 +166,7 @@ public:
   virtual Pattern *doOr(const Pattern *b,int4 sa) const;
   virtual Pattern *doAnd(const Pattern *b,int4 sa) const;
   virtual Pattern *commonSubPattern(const Pattern *b,int4 sa) const;
-  virtual void saveXml(ostream &s) const;
+  virtual void saveXml(std::ostream &s) const;
   virtual void restoreXml(const Element *el);
 };
 

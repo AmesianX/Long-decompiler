@@ -20,13 +20,13 @@ ExprTree::ExprTree(VarnodeTpl *vn)
 
 {
   outvn = vn;
-  ops = new vector<OpTpl *>;
+  ops = new std::vector<OpTpl *>;
 }
 
 ExprTree::ExprTree(OpTpl *op)
 
 {
-  ops = new vector<OpTpl *>;
+  ops = new std::vector<OpTpl *>;
   ops->push_back(op);
   if (op->getOut() != (VarnodeTpl *)0)
     outvn = new VarnodeTpl(*op->getOut());
@@ -39,18 +39,18 @@ ExprTree::~ExprTree(void)
 {
   if (outvn != (VarnodeTpl *)0)
     delete outvn;
-  if (ops != (vector<OpTpl *> *)0) {
+  if (ops != (std::vector<OpTpl *> *)0) {
     for(int4 i=0;i<ops->size();++i)
       delete (*ops)[i];
     delete ops;
   }
 }
 
-vector<OpTpl *> *ExprTree::appendParams(OpTpl *op,vector<ExprTree *> *param)
+std::vector<OpTpl *> *ExprTree::appendParams(OpTpl *op,std::vector<ExprTree *> *param)
 
-{				// Create op expression with entire list of expression
+{				// Create op expression with entire std::list of expression
 				// inputs
-  vector<OpTpl *> *res = new vector<OpTpl *>;
+  std::vector<OpTpl *> *res = new std::vector<OpTpl *>;
   
   for(int4 i=0;i<param->size();++i) {
     res->insert(res->end(),(*param)[i]->ops->begin(),(*param)[i]->ops->end());
@@ -64,11 +64,11 @@ vector<OpTpl *> *ExprTree::appendParams(OpTpl *op,vector<ExprTree *> *param)
   return res;
 }
 
-vector<OpTpl *> *ExprTree::toVector(ExprTree *expr)
+std::vector<OpTpl *> *ExprTree::toVector(ExprTree *expr)
 
-{				// Grab the op vector and delete the output expression
-  vector<OpTpl *> *res = expr->ops;
-  expr->ops = (vector<OpTpl *> *)0;
+{				// Grab the op std::vector and delete the output expression
+  std::vector<OpTpl *> *res = expr->ops;
+  expr->ops = (std::vector<OpTpl *> *)0;
   delete expr;
   return res;
 }
@@ -96,7 +96,7 @@ void ExprTree::setOutput(VarnodeTpl *newout)
   outvn = new VarnodeTpl(*newout);
 }
 
-void PcodeCompile::force_size(VarnodeTpl *vt,const ConstTpl &size,const vector<OpTpl *> &ops)
+void PcodeCompile::force_size(VarnodeTpl *vt,const ConstTpl &size,const std::vector<OpTpl *> &ops)
 
 {
   if ((vt->getSize().getType()!=ConstTpl::real)||(vt->getSize().getReal() != 0))
@@ -133,7 +133,7 @@ void PcodeCompile::force_size(VarnodeTpl *vt,const ConstTpl &size,const vector<O
   }
 }
 
-void PcodeCompile::matchSize(int4 j,OpTpl *op,bool inputonly,const vector<OpTpl *> &ops)
+void PcodeCompile::matchSize(int4 j,OpTpl *op,bool inputonly,const std::vector<OpTpl *> &ops)
 
 {				// Find something to fill in zero size varnode
 				// j is the slot we are trying to fill (-1=output)
@@ -158,7 +158,7 @@ void PcodeCompile::matchSize(int4 j,OpTpl *op,bool inputonly,const vector<OpTpl 
     force_size(vt,match->getSize(),ops);
 }
 
-void PcodeCompile::fillinZero(OpTpl *op,const vector<OpTpl *> &ops)
+void PcodeCompile::fillinZero(OpTpl *op,const std::vector<OpTpl *> &ops)
 
 {				// Try to get rid of zero size varnodes in op
   // Right now this is written assuming operands for the constructor are
@@ -258,8 +258,8 @@ bool PcodeCompile::propagateSize(ConstructTpl *ct)
 {				// Fill in size for varnodes with size 0
 				// Return first OpTpl with a size 0 varnode
 				// that cannot be filled in or NULL otherwise
-  vector<OpTpl *> zerovec,zerovec2;
-  vector<OpTpl *>::const_iterator iter;
+  std::vector<OpTpl *> zerovec,zerovec2;
+  std::vector<OpTpl *>::const_iterator iter;
   int4 lastsize;
 
   for(iter=ct->getOpvec().begin();iter!=ct->getOpvec().end();++iter)
@@ -293,7 +293,7 @@ VarnodeTpl *PcodeCompile::buildTemporary(void)
   return res;
 }
 
-LabelSymbol *PcodeCompile::defineLabel(string *name)
+LabelSymbol *PcodeCompile::defineLabel(std::string *name)
 
 { // Create a label symbol
   LabelSymbol *labsym = new LabelSymbol(*name,local_labelcount++);
@@ -302,16 +302,16 @@ LabelSymbol *PcodeCompile::defineLabel(string *name)
   return labsym;
 }
 
-vector<OpTpl *> *PcodeCompile::placeLabel(LabelSymbol *labsym)
+std::vector<OpTpl *> *PcodeCompile::placeLabel(LabelSymbol *labsym)
 
 { // Create placeholder OpTpl for a label
   if (labsym->isPlaced()) {
-    string errmsg = "Label " + labsym->getName();
+    std::string errmsg = "Label " + labsym->getName();
     errmsg += " is placed more than once";
     reportError(errmsg);
   }
   labsym->setPlaced();
-  vector<OpTpl *> *res = new vector<OpTpl *>;
+  std::vector<OpTpl *> *res = new std::vector<OpTpl *>;
   OpTpl *op = new OpTpl(LABELBUILD);
   VarnodeTpl *idvn = new VarnodeTpl(ConstTpl(constantspace),
 				      ConstTpl(ConstTpl::real,labsym->getIndex()),
@@ -321,7 +321,7 @@ vector<OpTpl *> *PcodeCompile::placeLabel(LabelSymbol *labsym)
   return res;
 }
 
-vector<OpTpl *> *PcodeCompile::newOutput(bool usesLocalKey,ExprTree *rhs,string *varname,uint4 size)
+std::vector<OpTpl *> *PcodeCompile::newOutput(bool usesLocalKey,ExprTree *rhs,std::string *varname,uint4 size)
 
 {
   VarnodeSymbol *sym;
@@ -341,7 +341,7 @@ vector<OpTpl *> *PcodeCompile::newOutput(bool usesLocalKey,ExprTree *rhs,string 
   return ExprTree::toVector(rhs);
 }
 
-void PcodeCompile::newLocalDefinition(string *varname,uint4 size)
+void PcodeCompile::newLocalDefinition(std::string *varname,uint4 size)
 
 { // Create a new temporary symbol (without generating any pcode)
   VarnodeSymbol *sym;
@@ -414,26 +414,26 @@ ExprTree *PcodeCompile::createOpOutUnary(VarnodeTpl *outvn,OpCode opc,ExprTree *
   return vn;
 }
 
-vector<OpTpl *> *PcodeCompile::createOpNoOut(OpCode opc,ExprTree *vn)
+std::vector<OpTpl *> *PcodeCompile::createOpNoOut(OpCode opc,ExprTree *vn)
 
 {				// Create new expression by creating op with given -opc-
 				// and single input vn.   Free the input expression
   OpTpl *op = new OpTpl(opc);
   op->addInput(vn->outvn);
   vn->outvn = (VarnodeTpl *)0;	// There is no longer an output to this expression
-  vector<OpTpl *> *res = vn->ops;
-  vn->ops = (vector<OpTpl *> *)0;
+  std::vector<OpTpl *> *res = vn->ops;
+  vn->ops = (std::vector<OpTpl *> *)0;
   delete vn;
   res->push_back(op);
   return res;
 }
 
-vector<OpTpl *> *PcodeCompile::createOpNoOut(OpCode opc,ExprTree *vn1,ExprTree *vn2)
+std::vector<OpTpl *> *PcodeCompile::createOpNoOut(OpCode opc,ExprTree *vn1,ExprTree *vn2)
 
 {				// Create new expression by creating op with given -opc-
 				// and inputs vn1 and vn2. Free the input expressions
-  vector<OpTpl *> *res = vn1->ops;
-  vn1->ops = (vector<OpTpl *> *)0;
+  std::vector<OpTpl *> *res = vn1->ops;
+  vn1->ops = (std::vector<OpTpl *> *)0;
   res->insert(res->end(),vn2->ops->begin(),vn2->ops->end());
   vn2->ops->clear();
   OpTpl *op = new OpTpl(opc);
@@ -447,13 +447,13 @@ vector<OpTpl *> *PcodeCompile::createOpNoOut(OpCode opc,ExprTree *vn1,ExprTree *
   return res;
 }
 
-vector<OpTpl *> *PcodeCompile::createOpConst(OpCode opc,uintb val)
+std::vector<OpTpl *> *PcodeCompile::createOpConst(OpCode opc,uintb val)
 
 {
   VarnodeTpl *vn = new VarnodeTpl(ConstTpl(constantspace),
 				    ConstTpl(ConstTpl::real,val),
 				    ConstTpl(ConstTpl::real,4));
-  vector<OpTpl *> *res = new vector<OpTpl *>;
+  std::vector<OpTpl *> *res = new std::vector<OpTpl *>;
   OpTpl *op = new OpTpl(opc);
   op->addInput(vn);
   res->push_back(op);
@@ -483,11 +483,11 @@ ExprTree *PcodeCompile::createLoad(StarQuality *qual,ExprTree *ptr)
   return ptr;
 }
 
-vector<OpTpl *> *PcodeCompile::createStore(StarQuality *qual,
+std::vector<OpTpl *> *PcodeCompile::createStore(StarQuality *qual,
 					      ExprTree *ptr,ExprTree *val)
 {
-  vector<OpTpl *> *res = ptr->ops;
-  ptr->ops = (vector<OpTpl *> *)0;
+  std::vector<OpTpl *> *res = ptr->ops;
+  ptr->ops = (std::vector<OpTpl *> *)0;
   res->insert(res->end(),val->ops->begin(),val->ops->end());
   val->ops->clear();
   OpTpl *op = new OpTpl(CPUI_STORE);
@@ -511,7 +511,7 @@ vector<OpTpl *> *PcodeCompile::createStore(StarQuality *qual,
   return res;
 }
 
-ExprTree *PcodeCompile::createUserOp(UserOpSymbol *sym,vector<ExprTree *> *param)
+ExprTree *PcodeCompile::createUserOp(UserOpSymbol *sym,std::vector<ExprTree *> *param)
 
 { // Create userdefined pcode op, given symbol and parameters
   VarnodeTpl *outvn = buildTemporary();
@@ -522,7 +522,7 @@ ExprTree *PcodeCompile::createUserOp(UserOpSymbol *sym,vector<ExprTree *> *param
   return res;
 }
 
-vector<OpTpl *> *PcodeCompile::createUserOpNoOut(UserOpSymbol *sym,vector<ExprTree *> *param)
+std::vector<OpTpl *> *PcodeCompile::createUserOpNoOut(UserOpSymbol *sym,std::vector<ExprTree *> *param)
 
 {
   OpTpl *op = new OpTpl(CPUI_CALLOTHER);
@@ -533,7 +533,7 @@ vector<OpTpl *> *PcodeCompile::createUserOpNoOut(UserOpSymbol *sym,vector<ExprTr
   return ExprTree::appendParams(op,param);
 }
 
-ExprTree *PcodeCompile::createVariadic(OpCode opc,vector<ExprTree *> *param)
+ExprTree *PcodeCompile::createVariadic(OpCode opc,std::vector<ExprTree *> *param)
 
 {
   VarnodeTpl *outvn = buildTemporary();
@@ -608,10 +608,10 @@ VarnodeTpl *PcodeCompile::buildTruncatedVarnode(VarnodeTpl *basevn,uint4 bitoffs
   return res;
 }
 
-vector<OpTpl *> *PcodeCompile::assignBitRange(VarnodeTpl *vn,uint4 bitoffset,uint4 numbits,ExprTree *rhs)
+std::vector<OpTpl *> *PcodeCompile::assignBitRange(VarnodeTpl *vn,uint4 bitoffset,uint4 numbits,ExprTree *rhs)
 
 { // Create an expression assigning the rhs to a bitrange within sym
-  string errmsg;
+  std::string errmsg;
   if (numbits == 0)
     errmsg = "Size of bitrange is zero";
   uint4 smallsize = (numbits+7)/8; // Size of input (output of rhs)
@@ -636,8 +636,8 @@ vector<OpTpl *> *PcodeCompile::assignBitRange(VarnodeTpl *vn,uint4 bitoffset,uin
   if (errmsg.size()>0) {	// Was there an error condition
     reportError(errmsg);	// Report the error
     delete vn;			// Clean up
-    vector<OpTpl *> *resops = rhs->ops; // Passthru old expression
-    rhs->ops = (vector<OpTpl *> *)0;
+    std::vector<OpTpl *> *resops = rhs->ops; // Passthru old expression
+    rhs->ops = (std::vector<OpTpl *> *)0;
     delete rhs;
     return resops;
   }
@@ -665,8 +665,8 @@ vector<OpTpl *> *PcodeCompile::assignBitRange(VarnodeTpl *vn,uint4 bitoffset,uin
   }
   if (errmsg.size() > 0)
     reportError(errmsg);
-  vector<OpTpl *> *resops = res->ops;
-  res->ops = (vector<OpTpl *> *)0;
+  std::vector<OpTpl *> *resops = res->ops;
+  res->ops = (std::vector<OpTpl *> *)0;
   delete res;
   return resops;
 }
@@ -677,7 +677,7 @@ ExprTree *PcodeCompile::createBitRange(SpecificSymbol *sym,uint4 bitoffset,uint4
   // The result is truncated to the smallest byte size that can
   // contain the indicated number of bits. The result has the
   // desired bits shifted all the way to the right
-  string errmsg;
+  std::string errmsg;
   if (numbits == 0)
     errmsg = "Size of bitrange is zero";
   VarnodeTpl *vn = sym->getVarnode();
@@ -686,7 +686,7 @@ ExprTree *PcodeCompile::createBitRange(SpecificSymbol *sym,uint4 bitoffset,uint4
   bool maskneeded = ((numbits%8)!=0);
   bool truncneeded = true;
 
-  // Special case where we can set the size, without invoking
+  // Special case where we can std::set the size, without invoking
   // a truncation operator
   if ((errmsg.size()==0)&&(bitoffset==0)&&(!maskneeded)) {
     if ((vn->getSpace().getType()==ConstTpl::handle)&&vn->isZeroSize()) {

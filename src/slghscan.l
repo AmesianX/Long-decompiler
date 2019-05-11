@@ -37,15 +37,15 @@ extern SleighCompile *slgh;
 int4 last_preproc;   // lex state before last preprocessing erasure
 int4 actionon;       // whether '&' '|' and '^' are treated as actionon in pattern section
 int4 withsection = 0; // whether we are between the 'with' keyword and its open brace '{'
-vector<FileStreamState> filebuffers;
-vector<int4> ifstack;
+std::vector<FileStreamState> filebuffers;
+std::vector<int4> ifstack;
 int4 negative_if = -1;
 
 void preproc_error(const std::string &err)
 
 {
   slgh->reportError(err,true);
-  cerr << "Terminating due to error in preprocessing" << endl;
+  cerr << "Terminating due to error in preprocessing" << std::endl;
   exit(1);
 }
 
@@ -232,7 +232,7 @@ int4 preprocess(int4 cur_state,int4 blank_state)
   std::string::size_type pos = str.find('#');
   if (pos != std::string::npos)
     str.erase(pos);
-  istringstream s(str);
+  std::istringstream s(str);
   std::string type;
 
   if (cur_state != blank_state)
@@ -466,8 +466,8 @@ int4 scan_number(char *numtext,YYSTYPE *lval,bool signednum)
       ++numtext;
     }
   } else {
-    istringstream s(numtext);
-    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+    std::istringstream s(numtext);
+    s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
     s >> val;
     if (!s)
       return BADINTEGER;
@@ -528,8 +528,8 @@ with   { BEGIN(pattern); withsection = 1; slgh->calcContextLayout(); return WITH
 <defblock>bitrange  { return BITRANGE_KEY; }
 <defblock>signed    { return SIGNED_KEY; }
 <defblock>noflow    { return NOFLOW_KEY; }
-<defblock>hex       { return HEX_KEY; }
-<defblock>dec       { return DEC_KEY; }
+<defblock>std::dec       { return HEX_KEY; }
+<defblock>std::dec       { return DEC_KEY; }
 <defblock>endian    { return ENDIAN_KEY; }
 <defblock>alignment { return ALIGN_KEY; }
 <defblock>big       { return BIG_KEY; }

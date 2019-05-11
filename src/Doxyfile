@@ -32,7 +32,7 @@ PROJECT_NUMBER         = 1.0.0
 
 OUTPUT_DIRECTORY       = ../doc
 
-# If the CREATE_SUBDIRS tag is set to YES, then doxygen will create 
+# If the CREATE_SUBDIRS tag is std::set to YES, then doxygen will create 
 # 4096 sub-directories (in 2 levels) under the output directory of each output 
 # format and will distribute the generated files over these directories. 
 # Enabling this option can be useful when feeding doxygen a huge amount of 
@@ -53,24 +53,24 @@ CREATE_SUBDIRS         = NO
 
 OUTPUT_LANGUAGE        = English
 
-# If the BRIEF_MEMBER_DESC tag is set to YES (the default) Doxygen will 
+# If the BRIEF_MEMBER_DESC tag is std::set to YES (the default) Doxygen will 
 # include brief member descriptions after the members that are listed in 
 # the file and class documentation (similar to JavaDoc). 
 # Set to NO to disable this.
 
 BRIEF_MEMBER_DESC      = YES
 
-# If the REPEAT_BRIEF tag is set to YES (the default) Doxygen will prepend 
+# If the REPEAT_BRIEF tag is std::set to YES (the default) Doxygen will prepend 
 # the brief description of a member or function before the detailed description. 
-# Note: if both HIDE_UNDOC_MEMBERS and BRIEF_MEMBER_DESC are set to NO, the 
+# Note: if both HIDE_UNDOC_MEMBERS and BRIEF_MEMBER_DESC are std::set to NO, the 
 # brief descriptions will be completely suppressed.
 
 REPEAT_BRIEF           = YES
 
 # This tag implements a quasi-intelligent brief description abbreviator 
-# that is used to form the text in various listings. Each string 
-# in this list, if found as the leading text of the brief description, will be 
-# stripped from the text and the result after processing the whole list, is 
+# that is used to form the text in various listings. Each std::string 
+# in this std::list, if found as the leading text of the brief description, will be 
+# stripped from the text and the result after processing the whole std::list, is 
 # used as the annotated text. Otherwise, the brief description is used as-is. 
 # If left blank, the following values are used ("$name" is automatically 
 # replaced with the name of the entity): "The $name class" "The $name widget" 
@@ -79,29 +79,29 @@ REPEAT_BRIEF           = YES
 
 ABBREVIATE_BRIEF       = 
 
-# If the ALWAYS_DETAILED_SEC and REPEAT_BRIEF tags are both set to YES then 
+# If the ALWAYS_DETAILED_SEC and REPEAT_BRIEF tags are both std::set to YES then 
 # Doxygen will generate a detailed section even if there is only a brief 
 # description.
 
 ALWAYS_DETAILED_SEC    = NO
 
-# If the INLINE_INHERITED_MEMB tag is set to YES, doxygen will show all 
+# If the INLINE_INHERITED_MEMB tag is std::set to YES, doxygen will show all 
 # inherited members of a class in the documentation of that class as if those 
 # members were ordinary class members. Constructors, destructors and assignment 
 # operators of the base classes will not be shown.
 
 INLINE_INHERITED_MEMB  = NO
 
-# If the FULL_PATH_NAMES tag is set to YES then Doxygen will prepend the full 
-# path before files name in the file list and in the header files. If set 
+# If the FULL_PATH_NAMES tag is std::set to YES then Doxygen will prepend the full 
+# path before files name in the file std::list and in the header files. If std::set 
 # to NO the shortest path that makes the file name unique will be used.
 
 FULL_PATH_NAMES        = YES
 
-# If the FULL_PATH_NAMES tag is set to YES then the STRIP_FROM_PATH tag 
+# If the FULL_PATH_NAMES tag is std::set to YES then the STRIP_FROM_PATH tag 
 # can be used to strip a user-defined part of the path. Stripping is 
 # only done if one of the specified strings matches the left-hand part of 
-# the path. The tag can be used to show relative paths in the file list. 
+# the path. The tag can be used to show relative paths in the file std::list. 
 # If left blank the directory from which doxygen is run is used as the 
 # path to strip.
 
@@ -116,21 +116,21 @@ STRIP_FROM_PATH        =
 
 STRIP_FROM_INC_PATH    = 
 
-# If the SHORT_NAMES tag is set to YES, doxygen will generate much shorter 
+# If the SHORT_NAMES tag is std::set to YES, doxygen will generate much shorter 
 # (but less readable) file names. This can be useful is your file systems 
 # doesn't support long names like on DOS, Mac, or CD-ROM.
 
 SHORT_NAMES            = NO
 
-# If the JAVADOC_AUTOBRIEF tag is set to YES then Doxygen 
+# If the JAVADOC_AUTOBRIEF tag is std::set to YES then Doxygen 
 # will interpret the first line (until the first dot) of a JavaDoc-style 
-# comment as the brief description. If set to NO, the JavaDoc 
+# comment as the brief description. If std::set to NO, the JavaDoc 
 # comments will behave just like the Qt-style comments (thus requiring an 
 # explicit @brief command for a brief description.
 
 JAVADOC_AUTOBRIEF      = NO
 
-# The MULTILINE_CPP_IS_BRIEF tag can be set to YES to make Doxygen 
+# The MULTILINE_CPP_IS_BRIEF tag can be std::set to YES to make Doxygen 
 # treat a multi-line C++ special comment block (i.e. a block of //! or /// 
 # comments) as a brief description. This used to be the default behaviour. 
 # The new default is to treat a multi-line C++ comment block as a detailed 
@@ -138,19 +138,19 @@ JAVADOC_AUTOBRIEF      = NO
 
 MULTILINE_CPP_IS_BRIEF = NO
 
-# If the INHERIT_DOCS tag is set to YES (the default) then an undocumented 
+# If the INHERIT_DOCS tag is std::set to YES (the default) then an undocumented 
 # member inherits the documentation from any documented member that it 
 # re-implements.
 
 INHERIT_DOCS           = YES
 
-# If the SEPARATE_MEMBER_PAGES tag is set to YES, then doxygen will produce 
-# a new page for each member. If set to NO, the documentation of a member will 
+# If the SEPARATE_MEMBER_PAGES tag is std::set to YES, then doxygen will produce 
+# a new page for each member. If std::set to NO, the documentation of a member will 
 # be part of the file/class/namespace that contains it.
 
 SEPARATE_MEMBER_PAGES  = NO
 
-# The TAB_SIZE tag can be used to set the number of spaces in a tab. 
+# The TAB_SIZE tag can be used to std::set the number of spaces in a tab. 
 # Doxygen uses this value to replace tabs by spaces in code fragments.
 
 TAB_SIZE               = 8
@@ -166,7 +166,7 @@ ALIASES                =
 
 # Set the OPTIMIZE_OUTPUT_FOR_C tag to YES if your project consists of C 
 # sources only. Doxygen will then generate output that is more tailored for C. 
-# For instance, some of the names that are used will be different. The list 
+# For instance, some of the names that are used will be different. The std::list 
 # of all members will be omitted, etc.
 
 OPTIMIZE_OUTPUT_FOR_C  = NO
@@ -180,7 +180,7 @@ OPTIMIZE_OUTPUT_JAVA   = NO
 
 # If you use STL classes (i.e. std::string, std::vector, etc.) but do not want to 
 # include (a tag file for) the STL sources as input, then you should 
-# set this tag to YES in order to let doxygen match functions declarations and 
+# std::set this tag to YES in order to let doxygen match functions declarations and 
 # definitions whose arguments contain STL classes (e.g. func(std::string); v.s. 
 # func(std::string) {}). This also make the inheritance and collaboration 
 # diagrams that involve STL classes more complete and accurate.
@@ -188,7 +188,7 @@ OPTIMIZE_OUTPUT_JAVA   = NO
 BUILTIN_STL_SUPPORT    = YES
 
 # If member grouping is used in the documentation and the DISTRIBUTE_GROUP_DOC 
-# tag is set to YES, then doxygen will reuse the documentation of the first 
+# tag is std::set to YES, then doxygen will reuse the documentation of the first 
 # member in the group (if any) for the other members of the group. By default 
 # all members of a group must be documented explicitly.
 
@@ -206,141 +206,141 @@ SUBGROUPING            = YES
 # Build related configuration options
 #---------------------------------------------------------------------------
 
-# If the EXTRACT_ALL tag is set to YES doxygen will assume all entities in 
+# If the EXTRACT_ALL tag is std::set to YES doxygen will assume all entities in 
 # documentation are documented, even if no documentation was available. 
 # Private class members and static file members will be hidden unless 
-# the EXTRACT_PRIVATE and EXTRACT_STATIC tags are set to YES
+# the EXTRACT_PRIVATE and EXTRACT_STATIC tags are std::set to YES
 
 EXTRACT_ALL            = NO
 
-# If the EXTRACT_PRIVATE tag is set to YES all private members of a class 
+# If the EXTRACT_PRIVATE tag is std::set to YES all private members of a class 
 # will be included in the documentation.
 
 EXTRACT_PRIVATE        = YES
 
-# If the EXTRACT_STATIC tag is set to YES all static members of a file 
+# If the EXTRACT_STATIC tag is std::set to YES all static members of a file 
 # will be included in the documentation.
 
 EXTRACT_STATIC         = YES
 
-# If the EXTRACT_LOCAL_CLASSES tag is set to YES classes (and structs) 
+# If the EXTRACT_LOCAL_CLASSES tag is std::set to YES classes (and structs) 
 # defined locally in source files will be included in the documentation. 
-# If set to NO only classes defined in header files are included.
+# If std::set to NO only classes defined in header files are included.
 
 EXTRACT_LOCAL_CLASSES  = YES
 
-# This flag is only useful for Objective-C code. When set to YES local 
+# This flag is only useful for Objective-C code. When std::set to YES local 
 # methods, which are defined in the implementation section but not in 
 # the interface are included in the documentation. 
-# If set to NO (the default) only methods in the interface are included.
+# If std::set to NO (the default) only methods in the interface are included.
 
 EXTRACT_LOCAL_METHODS  = NO
 
-# If the HIDE_UNDOC_MEMBERS tag is set to YES, Doxygen will hide all 
+# If the HIDE_UNDOC_MEMBERS tag is std::set to YES, Doxygen will hide all 
 # undocumented members of documented classes, files or namespaces. 
-# If set to NO (the default) these members will be included in the 
+# If std::set to NO (the default) these members will be included in the 
 # various overviews, but no documentation section is generated. 
 # This option has no effect if EXTRACT_ALL is enabled.
 
 HIDE_UNDOC_MEMBERS     = NO
 
-# If the HIDE_UNDOC_CLASSES tag is set to YES, Doxygen will hide all 
+# If the HIDE_UNDOC_CLASSES tag is std::set to YES, Doxygen will hide all 
 # undocumented classes that are normally visible in the class hierarchy. 
-# If set to NO (the default) these classes will be included in the various 
+# If std::set to NO (the default) these classes will be included in the various 
 # overviews. This option has no effect if EXTRACT_ALL is enabled.
 
 HIDE_UNDOC_CLASSES     = NO
 
-# If the HIDE_FRIEND_COMPOUNDS tag is set to YES, Doxygen will hide all 
+# If the HIDE_FRIEND_COMPOUNDS tag is std::set to YES, Doxygen will hide all 
 # friend (class|struct|union) declarations. 
-# If set to NO (the default) these declarations will be included in the 
+# If std::set to NO (the default) these declarations will be included in the 
 # documentation.
 
 HIDE_FRIEND_COMPOUNDS  = NO
 
-# If the HIDE_IN_BODY_DOCS tag is set to YES, Doxygen will hide any 
+# If the HIDE_IN_BODY_DOCS tag is std::set to YES, Doxygen will hide any 
 # documentation blocks found inside the body of a function. 
-# If set to NO (the default) these blocks will be appended to the 
+# If std::set to NO (the default) these blocks will be appended to the 
 # function's detailed documentation block.
 
 HIDE_IN_BODY_DOCS      = NO
 
 # The INTERNAL_DOCS tag determines if documentation 
-# that is typed after a \internal command is included. If the tag is set 
+# that is typed after a \internal command is included. If the tag is std::set 
 # to NO (the default) then the documentation will be excluded. 
 # Set it to YES to include the internal documentation.
 
 INTERNAL_DOCS          = NO
 
-# If the CASE_SENSE_NAMES tag is set to NO then Doxygen will only generate 
-# file names in lower-case letters. If set to YES upper-case letters are also 
+# If the CASE_SENSE_NAMES tag is std::set to NO then Doxygen will only generate 
+# file names in lower-case letters. If std::set to YES upper-case letters are also 
 # allowed. This is useful if you have classes or files whose names only differ 
 # in case and if your file system supports case sensitive file names. Windows 
-# and Mac users are advised to set this option to NO.
+# and Mac users are advised to std::set this option to NO.
 
 CASE_SENSE_NAMES       = YES
 
-# If the HIDE_SCOPE_NAMES tag is set to NO (the default) then Doxygen 
+# If the HIDE_SCOPE_NAMES tag is std::set to NO (the default) then Doxygen 
 # will show members with their full class and namespace scopes in the 
-# documentation. If set to YES the scope will be hidden.
+# documentation. If std::set to YES the scope will be hidden.
 
 HIDE_SCOPE_NAMES       = NO
 
-# If the SHOW_INCLUDE_FILES tag is set to YES (the default) then Doxygen 
-# will put a list of the files that are included by a file in the documentation 
+# If the SHOW_INCLUDE_FILES tag is std::set to YES (the default) then Doxygen 
+# will put a std::list of the files that are included by a file in the documentation 
 # of that file.
 
 SHOW_INCLUDE_FILES     = YES
 
-# If the INLINE_INFO tag is set to YES (the default) then a tag [inline] 
+# If the INLINE_INFO tag is std::set to YES (the default) then a tag [inline] 
 # is inserted in the documentation for inline members.
 
 INLINE_INFO            = YES
 
-# If the SORT_MEMBER_DOCS tag is set to YES (the default) then doxygen 
+# If the SORT_MEMBER_DOCS tag is std::set to YES (the default) then doxygen 
 # will sort the (detailed) documentation of file and class members 
-# alphabetically by member name. If set to NO the members will appear in 
+# alphabetically by member name. If std::set to NO the members will appear in 
 # declaration order.
 
 SORT_MEMBER_DOCS       = YES
 
-# If the SORT_BRIEF_DOCS tag is set to YES then doxygen will sort the 
+# If the SORT_BRIEF_DOCS tag is std::set to YES then doxygen will sort the 
 # brief documentation of file, namespace and class members alphabetically 
-# by member name. If set to NO (the default) the members will appear in 
+# by member name. If std::set to NO (the default) the members will appear in 
 # declaration order.
 
 SORT_BRIEF_DOCS        = NO
 
-# If the SORT_BY_SCOPE_NAME tag is set to YES, the class list will be 
-# sorted by fully-qualified names, including namespaces. If set to 
-# NO (the default), the class list will be sorted only by class name, 
+# If the SORT_BY_SCOPE_NAME tag is std::set to YES, the class std::list will be 
+# sorted by fully-qualified names, including namespaces. If std::set to 
+# NO (the default), the class std::list will be sorted only by class name, 
 # not including the namespace part. 
-# Note: This option is not very useful if HIDE_SCOPE_NAMES is set to YES.
-# Note: This option applies only to the class list, not to the 
-# alphabetical list.
+# Note: This option is not very useful if HIDE_SCOPE_NAMES is std::set to YES.
+# Note: This option applies only to the class std::list, not to the 
+# alphabetical std::list.
 
 SORT_BY_SCOPE_NAME     = NO
 
 # The GENERATE_TODOLIST tag can be used to enable (YES) or 
-# disable (NO) the todo list. This list is created by putting \todo 
+# disable (NO) the todo std::list. This std::list is created by putting \todo 
 # commands in the documentation.
 
 GENERATE_TODOLIST      = YES
 
 # The GENERATE_TESTLIST tag can be used to enable (YES) or 
-# disable (NO) the test list. This list is created by putting \test 
+# disable (NO) the test std::list. This std::list is created by putting \test 
 # commands in the documentation.
 
 GENERATE_TESTLIST      = YES
 
 # The GENERATE_BUGLIST tag can be used to enable (YES) or 
-# disable (NO) the bug list. This list is created by putting \bug 
+# disable (NO) the bug std::list. This std::list is created by putting \bug 
 # commands in the documentation.
 
 GENERATE_BUGLIST       = YES
 
 # The GENERATE_DEPRECATEDLIST tag can be used to enable (YES) or 
-# disable (NO) the deprecated list. This list is created by putting 
+# disable (NO) the deprecated std::list. This std::list is created by putting 
 # \deprecated commands in the documentation.
 
 GENERATE_DEPRECATEDLIST= YES
@@ -360,9 +360,9 @@ ENABLED_SECTIONS       =
 
 MAX_INITIALIZER_LINES  = 30
 
-# Set the SHOW_USED_FILES tag to NO to disable the list of files generated 
-# at the bottom of the documentation of classes and structs. If set to YES the 
-# list will mention the files that were used to generate the documentation.
+# Set the SHOW_USED_FILES tag to NO to disable the std::list of files generated 
+# at the bottom of the documentation of classes and structs. If std::set to YES the 
+# std::list will mention the files that were used to generate the documentation.
 
 SHOW_USED_FILES        = YES
 
@@ -391,13 +391,13 @@ QUIET                  = NO
 
 WARNINGS               = YES
 
-# If WARN_IF_UNDOCUMENTED is set to YES, then doxygen will generate warnings 
-# for undocumented members. If EXTRACT_ALL is set to YES then this flag will 
+# If WARN_IF_UNDOCUMENTED is std::set to YES, then doxygen will generate warnings 
+# for undocumented members. If EXTRACT_ALL is std::set to YES then this flag will 
 # automatically be disabled.
 
 WARN_IF_UNDOCUMENTED   = YES
 
-# If WARN_IF_DOC_ERROR is set to YES, doxygen will generate warnings for 
+# If WARN_IF_DOC_ERROR is std::set to YES, doxygen will generate warnings for 
 # potential errors in the documentation, such as not documenting some 
 # parameters in a documented function, or documenting parameters that 
 # don't exist or using markup commands wrongly.
@@ -406,14 +406,14 @@ WARN_IF_DOC_ERROR      = YES
 
 # This WARN_NO_PARAMDOC option can be abled to get warnings for 
 # functions that are documented, but have no documentation for their parameters 
-# or return value. If set to NO (the default) doxygen will only warn about 
+# or return value. If std::set to NO (the default) doxygen will only warn about 
 # wrong or incomplete parameter documentation, but not about the absence of 
 # documentation.
 
 WARN_NO_PARAMDOC       = NO
 
 # The WARN_FORMAT tag determines the format of the warning messages that 
-# doxygen can produce. The string should contain the $file, $line, and $text 
+# doxygen can produce. The std::string should contain the $file, $line, and $text 
 # tags, which will be replaced by the file and line number from which the 
 # warning originated and the warning text. Optionally the format may contain 
 # $version, which will be replaced by the version of the file (if it could 
@@ -486,7 +486,7 @@ EXAMPLE_PATH           =
 
 EXAMPLE_PATTERNS       = 
 
-# If the EXAMPLE_RECURSIVE tag is set to YES then subdirectories will be 
+# If the EXAMPLE_RECURSIVE tag is std::set to YES then subdirectories will be 
 # searched for input files to be used with the \include or \dontinclude 
 # commands irrespective of the value of the RECURSIVE tag. 
 # Possible values are YES and NO. If left blank NO is used.
@@ -511,16 +511,16 @@ INPUT_FILTER           =
 
 # The FILTER_PATTERNS tag can be used to specify filters on a per file pattern 
 # basis.  Doxygen will compare the file name with each pattern and apply the 
-# filter if there is a match.  The filters are a list of the form: 
+# filter if there is a match.  The filters are a std::list of the form: 
 # pattern=filter (like *.cpp=my_cpp_filter). See INPUT_FILTER for further 
 # info on how filters are used. If FILTER_PATTERNS is empty, INPUT_FILTER 
 # is applied to all files.
 
 FILTER_PATTERNS        = 
 
-# If the FILTER_SOURCE_FILES tag is set to YES, the input filter (if set using 
+# If the FILTER_SOURCE_FILES tag is std::set to YES, the input filter (if std::set using 
 # INPUT_FILTER) will be used to filter the input files when producing source 
-# files to browse (i.e. when SOURCE_BROWSER is set to YES).
+# files to browse (i.e. when SOURCE_BROWSER is std::set to YES).
 
 FILTER_SOURCE_FILES    = NO
 
@@ -528,10 +528,10 @@ FILTER_SOURCE_FILES    = NO
 # configuration options related to source browsing
 #---------------------------------------------------------------------------
 
-# If the SOURCE_BROWSER tag is set to YES then a list of source files will 
+# If the SOURCE_BROWSER tag is std::set to YES then a std::list of source files will 
 # be generated. Documented entities will be cross-referenced with these sources. 
 # Note: To get rid of all source code in the generated output, make sure also 
-# VERBATIM_HEADERS is set to NO.
+# VERBATIM_HEADERS is std::set to NO.
 
 SOURCE_BROWSER         = NO
 
@@ -546,26 +546,26 @@ INLINE_SOURCES         = NO
 
 STRIP_CODE_COMMENTS    = YES
 
-# If the REFERENCED_BY_RELATION tag is set to YES (the default) 
+# If the REFERENCED_BY_RELATION tag is std::set to YES (the default) 
 # then for each documented function all documented 
 # functions referencing it will be listed.
 
 REFERENCED_BY_RELATION = YES
 
-# If the REFERENCES_RELATION tag is set to YES (the default) 
+# If the REFERENCES_RELATION tag is std::set to YES (the default) 
 # then for each documented function all documented entities 
 # called/used by that function will be listed.
 
 REFERENCES_RELATION    = YES
 
-# If the REFERENCES_LINK_SOURCE tag is set to YES (the default)
-# and SOURCE_BROWSER tag is set to YES, then the hyperlinks from
+# If the REFERENCES_LINK_SOURCE tag is std::set to YES (the default)
+# and SOURCE_BROWSER tag is std::set to YES, then the hyperlinks from
 # functions in REFERENCES_RELATION and REFERENCED_BY_RELATION lists will
 # link to the source code.  Otherwise they will link to the documentstion.
 
 REFERENCES_LINK_SOURCE = YES
 
-# If the USE_HTAGS tag is set to YES then the references to source code 
+# If the USE_HTAGS tag is std::set to YES then the references to source code 
 # will point to the HTML generated by the htags(1) tool instead of doxygen 
 # built-in source browser. The htags tool is part of GNU's global source 
 # tagging system (see http://www.gnu.org/software/global/global.html). You 
@@ -573,7 +573,7 @@ REFERENCES_LINK_SOURCE = YES
 
 USE_HTAGS              = NO
 
-# If the VERBATIM_HEADERS tag is set to YES (the default) then Doxygen 
+# If the VERBATIM_HEADERS tag is std::set to YES (the default) then Doxygen 
 # will generate a verbatim copy of the header file for each class for 
 # which an include is specified. Set to NO to disable this.
 
@@ -583,7 +583,7 @@ VERBATIM_HEADERS       = NO
 # configuration options related to the alphabetical class index
 #---------------------------------------------------------------------------
 
-# If the ALPHABETICAL_INDEX tag is set to YES, an alphabetical index 
+# If the ALPHABETICAL_INDEX tag is std::set to YES, an alphabetical index 
 # of all compounds will be generated. Enable this if the project 
 # contains a lot of classes, structs, unions or interfaces.
 
@@ -591,7 +591,7 @@ ALPHABETICAL_INDEX     = NO
 
 # If the alphabetical index is enabled (see ALPHABETICAL_INDEX) then 
 # the COLS_IN_ALPHA_INDEX tag can be used to specify the number of columns 
-# in which this list will be split (can be a number in the range [1..20])
+# in which this std::list will be split (can be a number in the range [1..20])
 
 COLS_IN_ALPHA_INDEX    = 5
 
@@ -606,7 +606,7 @@ IGNORE_PREFIX          =
 # configuration options related to the HTML output
 #---------------------------------------------------------------------------
 
-# If the GENERATE_HTML tag is set to YES (the default) Doxygen will 
+# If the GENERATE_HTML tag is std::set to YES (the default) Doxygen will 
 # generate HTML output.
 
 GENERATE_HTML          = YES
@@ -644,40 +644,40 @@ HTML_FOOTER            =
 
 HTML_STYLESHEET        = 
 
-# If the GENERATE_HTMLHELP tag is set to YES, additional index files 
+# If the GENERATE_HTMLHELP tag is std::set to YES, additional index files 
 # will be generated that can be used as input for tools like the 
 # Microsoft HTML help workshop to generate a compressed HTML help file (.chm) 
 # of the generated HTML documentation.
 
 GENERATE_HTMLHELP      = NO
 
-# If the GENERATE_HTMLHELP tag is set to YES, the CHM_FILE tag can 
+# If the GENERATE_HTMLHELP tag is std::set to YES, the CHM_FILE tag can 
 # be used to specify the file name of the resulting .chm file. You 
 # can add a path in front of the file if the result should not be 
 # written to the html output directory.
 
 CHM_FILE               = 
 
-# If the GENERATE_HTMLHELP tag is set to YES, the HHC_LOCATION tag can 
+# If the GENERATE_HTMLHELP tag is std::set to YES, the HHC_LOCATION tag can 
 # be used to specify the location (absolute path including file name) of 
 # the HTML help compiler (hhc.exe). If non-empty doxygen will try to run 
 # the HTML help compiler on the generated index.hhp.
 
 HHC_LOCATION           = 
 
-# If the GENERATE_HTMLHELP tag is set to YES, the GENERATE_CHI flag 
+# If the GENERATE_HTMLHELP tag is std::set to YES, the GENERATE_CHI flag 
 # controls if a separate .chi index file is generated (YES) or that 
 # it should be included in the master .chm file (NO).
 
 GENERATE_CHI           = NO
 
-# If the GENERATE_HTMLHELP tag is set to YES, the BINARY_TOC flag 
+# If the GENERATE_HTMLHELP tag is std::set to YES, the BINARY_TOC flag 
 # controls whether a binary table of contents is generated (YES) or a 
 # normal table of contents (NO) in the .chm file.
 
 BINARY_TOC             = NO
 
-# The TOC_EXPAND flag can be set to YES to add extra items for group members 
+# The TOC_EXPAND flag can be std::set to YES to add extra items for group members 
 # to the contents of the HTML help documentation and to the tree view.
 
 TOC_EXPAND             = NO
@@ -688,12 +688,12 @@ TOC_EXPAND             = NO
 
 DISABLE_INDEX          = NO
 
-# This tag can be used to set the number of enum values (range [1..20]) 
+# This tag can be used to std::set the number of enum values (range [1..20]) 
 # that doxygen will group on one line in the generated HTML documentation.
 
 ENUM_VALUES_PER_LINE   = 4
 
-# If the GENERATE_TREEVIEW tag is set to YES, a side panel will be
+# If the GENERATE_TREEVIEW tag is std::set to YES, a side panel will be
 # generated containing a tree-like index structure (just like the one that 
 # is generated for HTML Help). For this to work a browser that supports 
 # JavaScript, DHTML, CSS and frames is required (for instance Mozilla 1.0+, 
@@ -703,7 +703,7 @@ ENUM_VALUES_PER_LINE   = 4
 GENERATE_TREEVIEW      = NO
 
 # If the treeview is enabled (see GENERATE_TREEVIEW) then this tag can be 
-# used to set the initial width (in pixels) of the frame in which the tree 
+# used to std::set the initial width (in pixels) of the frame in which the tree 
 # is shown.
 
 TREEVIEW_WIDTH         = 250
@@ -712,7 +712,7 @@ TREEVIEW_WIDTH         = 250
 # configuration options related to the LaTeX output
 #---------------------------------------------------------------------------
 
-# If the GENERATE_LATEX tag is set to YES (the default) Doxygen will 
+# If the GENERATE_LATEX tag is std::set to YES (the default) Doxygen will 
 # generate Latex output.
 
 GENERATE_LATEX         = NO
@@ -734,13 +734,13 @@ LATEX_CMD_NAME         = latex
 
 MAKEINDEX_CMD_NAME     = makeindex
 
-# If the COMPACT_LATEX tag is set to YES Doxygen generates more compact 
+# If the COMPACT_LATEX tag is std::set to YES Doxygen generates more compact 
 # LaTeX documents. This may be useful for small projects and may help to 
 # save some trees in general.
 
 COMPACT_LATEX          = NO
 
-# The PAPER_TYPE tag can be used to set the paper type that is used 
+# The PAPER_TYPE tag can be used to std::set the paper type that is used 
 # by the printer. Possible values are: a4, a4wide, letter, legal and 
 # executive. If left blank a4wide will be used.
 
@@ -758,27 +758,27 @@ EXTRA_PACKAGES         =
 
 LATEX_HEADER           = 
 
-# If the PDF_HYPERLINKS tag is set to YES, the LaTeX that is generated 
+# If the PDF_HYPERLINKS tag is std::set to YES, the LaTeX that is generated 
 # is prepared for conversion to pdf (using ps2pdf). The pdf file will 
 # contain links (just like the HTML output) instead of page references 
 # This makes the output suitable for online browsing using a pdf viewer.
 
 PDF_HYPERLINKS         = NO
 
-# If the USE_PDFLATEX tag is set to YES, pdflatex will be used instead of 
+# If the USE_PDFLATEX tag is std::set to YES, pdflatex will be used instead of 
 # plain latex in the generated Makefile. Set this option to YES to get a 
 # higher quality PDF documentation.
 
 USE_PDFLATEX           = NO
 
-# If the LATEX_BATCHMODE tag is set to YES, doxygen will add the \\batchmode. 
+# If the LATEX_BATCHMODE tag is std::set to YES, doxygen will add the \\batchmode. 
 # command to the generated LaTeX files. This will instruct LaTeX to keep 
 # running if errors occur, instead of asking the user for help. 
 # This option is also used when generating formulas in HTML.
 
 LATEX_BATCHMODE        = NO
 
-# If LATEX_HIDE_INDICES is set to YES then doxygen will not 
+# If LATEX_HIDE_INDICES is std::set to YES then doxygen will not 
 # include the index chapters (such as File Index, Compound Index, etc.) 
 # in the output.
 
@@ -788,7 +788,7 @@ LATEX_HIDE_INDICES     = NO
 # configuration options related to the RTF output
 #---------------------------------------------------------------------------
 
-# If the GENERATE_RTF tag is set to YES Doxygen will generate RTF output 
+# If the GENERATE_RTF tag is std::set to YES Doxygen will generate RTF output 
 # The RTF output is optimized for Word 97 and may not look very pretty with 
 # other RTF readers or editors.
 
@@ -800,13 +800,13 @@ GENERATE_RTF           = NO
 
 RTF_OUTPUT             = rtf
 
-# If the COMPACT_RTF tag is set to YES Doxygen generates more compact 
+# If the COMPACT_RTF tag is std::set to YES Doxygen generates more compact 
 # RTF documents. This may be useful for small projects and may help to 
 # save some trees in general.
 
 COMPACT_RTF            = NO
 
-# If the RTF_HYPERLINKS tag is set to YES, the RTF that is generated 
+# If the RTF_HYPERLINKS tag is std::set to YES, the RTF that is generated 
 # will contain hyperlink fields. The RTF file will 
 # contain links (just like the HTML output) instead of page references. 
 # This makes the output suitable for online browsing using WORD or other 
@@ -817,7 +817,7 @@ RTF_HYPERLINKS         = NO
 
 # Load stylesheet definitions from file. Syntax is similar to doxygen's 
 # config file, i.e. a series of assignments. You only have to provide 
-# replacements, missing definitions are set to their default value.
+# replacements, missing definitions are std::set to their default value.
 
 RTF_STYLESHEET_FILE    = 
 
@@ -830,7 +830,7 @@ RTF_EXTENSIONS_FILE    =
 # configuration options related to the man page output
 #---------------------------------------------------------------------------
 
-# If the GENERATE_MAN tag is set to YES (the default) Doxygen will 
+# If the GENERATE_MAN tag is std::set to YES (the default) Doxygen will 
 # generate man pages
 
 GENERATE_MAN           = NO
@@ -846,7 +846,7 @@ MAN_OUTPUT             = man
 
 MAN_EXTENSION          = .3
 
-# If the MAN_LINKS tag is set to YES and Doxygen generates man output, 
+# If the MAN_LINKS tag is std::set to YES and Doxygen generates man output, 
 # then it will generate one additional man file for each entity 
 # documented in the real man page(s). These additional files 
 # only source the real man page, but without them the man command 
@@ -858,7 +858,7 @@ MAN_LINKS              = NO
 # configuration options related to the XML output
 #---------------------------------------------------------------------------
 
-# If the GENERATE_XML tag is set to YES Doxygen will 
+# If the GENERATE_XML tag is std::set to YES Doxygen will 
 # generate an XML file that captures the structure of 
 # the code including all documentation.
 
@@ -882,7 +882,7 @@ XML_SCHEMA             =
 
 XML_DTD                = 
 
-# If the XML_PROGRAMLISTING tag is set to YES Doxygen will 
+# If the XML_PROGRAMLISTING tag is std::set to YES Doxygen will 
 # dump the program listings (including syntax highlighting 
 # and cross-referencing information) to the XML output. Note that 
 # enabling this will significantly increase the size of the XML output.
@@ -893,7 +893,7 @@ XML_PROGRAMLISTING     = YES
 # configuration options for the AutoGen Definitions output
 #---------------------------------------------------------------------------
 
-# If the GENERATE_AUTOGEN_DEF tag is set to YES Doxygen will 
+# If the GENERATE_AUTOGEN_DEF tag is std::set to YES Doxygen will 
 # generate an AutoGen Definitions (see autogen.sf.net) file 
 # that captures the structure of the code including all 
 # documentation. Note that this feature is still experimental 
@@ -905,7 +905,7 @@ GENERATE_AUTOGEN_DEF   = NO
 # configuration options related to the Perl module output
 #---------------------------------------------------------------------------
 
-# If the GENERATE_PERLMOD tag is set to YES Doxygen will 
+# If the GENERATE_PERLMOD tag is std::set to YES Doxygen will 
 # generate a Perl module file that captures the structure of 
 # the code including all documentation. Note that this 
 # feature is still experimental and incomplete at the 
@@ -913,22 +913,22 @@ GENERATE_AUTOGEN_DEF   = NO
 
 GENERATE_PERLMOD       = NO
 
-# If the PERLMOD_LATEX tag is set to YES Doxygen will generate 
+# If the PERLMOD_LATEX tag is std::set to YES Doxygen will generate 
 # the necessary Makefile rules, Perl scripts and LaTeX code to be able 
 # to generate PDF and DVI output from the Perl module output.
 
 PERLMOD_LATEX          = NO
 
-# If the PERLMOD_PRETTY tag is set to YES the Perl module output will be 
+# If the PERLMOD_PRETTY tag is std::set to YES the Perl module output will be 
 # nicely formatted so it can be parsed by a human reader.  This is useful 
 # if you want to understand what is going on.  On the other hand, if this 
-# tag is set to NO the size of the Perl module output will be much smaller 
+# tag is std::set to NO the size of the Perl module output will be much smaller 
 # and Perl will parse it just the same.
 
 PERLMOD_PRETTY         = YES
 
 # The names of the make variables in the generated doxyrules.make file 
-# are prefixed with the string contained in PERLMOD_MAKEVAR_PREFIX. 
+# are prefixed with the std::string contained in PERLMOD_MAKEVAR_PREFIX. 
 # This is useful so different doxyrules.make files included by the same 
 # Makefile don't overwrite each other's variables.
 
@@ -938,26 +938,26 @@ PERLMOD_MAKEVAR_PREFIX =
 # Configuration options related to the preprocessor   
 #---------------------------------------------------------------------------
 
-# If the ENABLE_PREPROCESSING tag is set to YES (the default) Doxygen will 
+# If the ENABLE_PREPROCESSING tag is std::set to YES (the default) Doxygen will 
 # evaluate all C-preprocessor directives found in the sources and include 
 # files.
 
 ENABLE_PREPROCESSING   = YES
 
-# If the MACRO_EXPANSION tag is set to YES Doxygen will expand all macro 
-# names in the source code. If set to NO (the default) only conditional 
+# If the MACRO_EXPANSION tag is std::set to YES Doxygen will expand all macro 
+# names in the source code. If std::set to NO (the default) only conditional 
 # compilation will be performed. Macro expansion can be done in a controlled 
 # way by setting EXPAND_ONLY_PREDEF to YES.
 
 MACRO_EXPANSION        = NO
 
-# If the EXPAND_ONLY_PREDEF and MACRO_EXPANSION tags are both set to YES 
+# If the EXPAND_ONLY_PREDEF and MACRO_EXPANSION tags are both std::set to YES 
 # then the macro expansion is limited to the macros specified with the 
 # PREDEFINED and EXPAND_AS_DEFINED tags.
 
 EXPAND_ONLY_PREDEF     = NO
 
-# If the SEARCH_INCLUDES tag is set to YES (the default) the includes files 
+# If the SEARCH_INCLUDES tag is std::set to YES (the default) the includes files 
 # in the INCLUDE_PATH (see below) will be search if a #include is found.
 
 SEARCH_INCLUDES        = YES
@@ -977,7 +977,7 @@ INCLUDE_FILE_PATTERNS  =
 
 # The PREDEFINED tag can be used to specify one or more macro names that 
 # are defined before the preprocessor is started (similar to the -D option of 
-# gcc). The argument of the tag is a list of macros of the form: name 
+# gcc). The argument of the tag is a std::list of macros of the form: name 
 # or name=definition (no spaces). If the definition and the = are 
 # omitted =1 is assumed. To prevent a macro definition from being 
 # undefined via #undef or recursively expanded use the := operator 
@@ -985,14 +985,14 @@ INCLUDE_FILE_PATTERNS  =
 
 PREDEFINED             = 
 
-# If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then 
-# this tag can be used to specify a list of macro names that should be expanded. 
+# If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are std::set to YES then 
+# this tag can be used to specify a std::list of macro names that should be expanded. 
 # The macro definition that is found in the sources will be used. 
 # Use the PREDEFINED tag if you want to use a different macro definition.
 
 EXPAND_AS_DEFINED      = 
 
-# If the SKIP_FUNCTION_MACROS tag is set to YES (the default) then 
+# If the SKIP_FUNCTION_MACROS tag is std::set to YES (the default) then 
 # doxygen's preprocessor will remove all function-like macros that are alone 
 # on a line, have an all uppercase name, and do not end with a semicolon. Such 
 # function macros are typically used for boiler-plate code, and will confuse 
@@ -1026,14 +1026,14 @@ TAGFILES               =
 
 GENERATE_TAGFILE       = 
 
-# If the ALLEXTERNALS tag is set to YES all external classes will be listed 
-# in the class index. If set to NO only the inherited external classes 
+# If the ALLEXTERNALS tag is std::set to YES all external classes will be listed 
+# in the class index. If std::set to NO only the inherited external classes 
 # will be listed.
 
 ALLEXTERNALS           = NO
 
-# If the EXTERNAL_GROUPS tag is set to YES all external groups will be listed 
-# in the modules index. If set to NO, only the current project's groups will 
+# If the EXTERNAL_GROUPS tag is std::set to YES all external groups will be listed 
+# in the modules index. If std::set to NO, only the current project's groups will 
 # be listed.
 
 EXTERNAL_GROUPS        = YES
@@ -1047,7 +1047,7 @@ PERL_PATH              = /usr/bin/perl
 # Configuration options related to the dot tool   
 #---------------------------------------------------------------------------
 
-# If the CLASS_DIAGRAMS tag is set to YES (the default) Doxygen will 
+# If the CLASS_DIAGRAMS tag is std::set to YES (the default) Doxygen will 
 # generate a inheritance diagram (in HTML, RTF and LaTeX) for classes with base 
 # or super classes. Setting the tag to NO turns the diagrams off. Note that 
 # this option is superseded by the HAVE_DOT option below. This is only a 
@@ -1056,64 +1056,64 @@ PERL_PATH              = /usr/bin/perl
 
 CLASS_DIAGRAMS         = YES
 
-# If set to YES, the inheritance and collaboration graphs will hide 
+# If std::set to YES, the inheritance and collaboration graphs will hide 
 # inheritance and usage relations if the target is undocumented 
 # or is not a class.
 
 HIDE_UNDOC_RELATIONS   = YES
 
-# If you set the HAVE_DOT tag to YES then doxygen will assume the dot tool is 
+# If you std::set the HAVE_DOT tag to YES then doxygen will assume the dot tool is 
 # available from the path. This tool is part of Graphviz, a graph visualization 
 # toolkit from AT&T and Lucent Bell Labs. The other options in this section 
-# have no effect if this option is set to NO (the default)
+# have no effect if this option is std::set to NO (the default)
 
 HAVE_DOT               = NO
 
-# If the CLASS_GRAPH and HAVE_DOT tags are set to YES then doxygen 
+# If the CLASS_GRAPH and HAVE_DOT tags are std::set to YES then doxygen 
 # will generate a graph for each documented class showing the direct and 
 # indirect inheritance relations. Setting this tag to YES will force the 
 # the CLASS_DIAGRAMS tag to NO.
 
 CLASS_GRAPH            = YES
 
-# If the COLLABORATION_GRAPH and HAVE_DOT tags are set to YES then doxygen 
+# If the COLLABORATION_GRAPH and HAVE_DOT tags are std::set to YES then doxygen 
 # will generate a graph for each documented class showing the direct and 
 # indirect implementation dependencies (inheritance, containment, and 
 # class references variables) of the class with other documented classes.
 
 COLLABORATION_GRAPH    = YES
 
-# If the GROUP_GRAPHS and HAVE_DOT tags are set to YES then doxygen 
+# If the GROUP_GRAPHS and HAVE_DOT tags are std::set to YES then doxygen 
 # will generate a graph for groups, showing the direct groups dependencies
 
 GROUP_GRAPHS           = YES
 
-# If the UML_LOOK tag is set to YES doxygen will generate inheritance and 
+# If the UML_LOOK tag is std::set to YES doxygen will generate inheritance and 
 # collaboration diagrams in a style similar to the OMG's Unified Modeling 
 # Language.
 
 UML_LOOK               = NO
 
-# If set to YES, the inheritance and collaboration graphs will show the 
+# If std::set to YES, the inheritance and collaboration graphs will show the 
 # relations between templates and their instances.
 
 TEMPLATE_RELATIONS     = NO
 
 # If the ENABLE_PREPROCESSING, SEARCH_INCLUDES, INCLUDE_GRAPH, and HAVE_DOT 
-# tags are set to YES then doxygen will generate a graph for each documented 
+# tags are std::set to YES then doxygen will generate a graph for each documented 
 # file showing the direct and indirect include dependencies of the file with 
 # other documented files.
 
 INCLUDE_GRAPH          = YES
 
 # If the ENABLE_PREPROCESSING, SEARCH_INCLUDES, INCLUDED_BY_GRAPH, and 
-# HAVE_DOT tags are set to YES then doxygen will generate a graph for each 
+# HAVE_DOT tags are std::set to YES then doxygen will generate a graph for each 
 # documented header file showing the documented files that directly or 
 # indirectly include this file.
 
 INCLUDED_BY_GRAPH      = YES
 
-# If the CALL_GRAPH and HAVE_DOT tags are set to YES then doxygen will 
+# If the CALL_GRAPH and HAVE_DOT tags are std::set to YES then doxygen will 
 # generate a call dependency graph for every global function or class method. 
 # Note that enabling this option will significantly increase the time of a run. 
 # So in most cases it will be better to enable call graphs for selected 
@@ -1121,7 +1121,7 @@ INCLUDED_BY_GRAPH      = YES
 
 CALL_GRAPH             = NO
 
-# If the CALLER_GRAPH and HAVE_DOT tags are set to YES then doxygen will 
+# If the CALLER_GRAPH and HAVE_DOT tags are std::set to YES then doxygen will 
 # generate a caller dependency graph for every global function or class method. 
 # Note that enabling this option will significantly increase the time of a run. 
 # So in most cases it will be better to enable caller graphs for selected 
@@ -1129,19 +1129,19 @@ CALL_GRAPH             = NO
 
 CALLER_GRAPH           = NO
 
-# If the GRAPHICAL_HIERARCHY and HAVE_DOT tags are set to YES then doxygen 
+# If the GRAPHICAL_HIERARCHY and HAVE_DOT tags are std::set to YES then doxygen 
 # will graphical hierarchy of all classes instead of a textual one.
 
 GRAPHICAL_HIERARCHY    = YES
 
-# If the DIRECTORY_GRAPH, SHOW_DIRECTORIES and HAVE_DOT tags are set to YES 
+# If the DIRECTORY_GRAPH, SHOW_DIRECTORIES and HAVE_DOT tags are std::set to YES 
 # then doxygen will show the dependencies a directory has on other directories 
 # in a graphical way. The dependency relations are determined by the #include
 # relations between the files in the directories.
 
 DIRECTORY_GRAPH        = YES
 
-# The DOT_IMAGE_FORMAT tag can be used to set the image format of the images 
+# The DOT_IMAGE_FORMAT tag can be used to std::set the image format of the images 
 # generated by dot. Possible values are png, jpg, or gif
 # If left blank png will be used.
 
@@ -1158,7 +1158,7 @@ DOT_PATH               =
 
 DOTFILE_DIRS           = 
 
-# The MAX_DOT_GRAPH_DEPTH tag can be used to set the maximum depth of the 
+# The MAX_DOT_GRAPH_DEPTH tag can be used to std::set the maximum depth of the 
 # graphs generated by dot. A depth value of 3 means that only nodes reachable 
 # from the root by following a path via at most 3 edges will be shown. Nodes 
 # that lay further from the root node will be omitted. Note that setting this 
@@ -1185,13 +1185,13 @@ DOT_TRANSPARENT        = NO
 
 DOT_MULTI_TARGETS      = NO
 
-# If the GENERATE_LEGEND tag is set to YES (the default) Doxygen will 
+# If the GENERATE_LEGEND tag is std::set to YES (the default) Doxygen will 
 # generate a legend page explaining the meaning of the various boxes and 
 # arrows in the dot generated graphs.
 
 GENERATE_LEGEND        = YES
 
-# If the DOT_CLEANUP tag is set to YES (the default) Doxygen will 
+# If the DOT_CLEANUP tag is std::set to YES (the default) Doxygen will 
 # remove the intermediate dot files that are used to generate 
 # the various graphs.
 
@@ -1202,6 +1202,6 @@ DOT_CLEANUP            = YES
 #---------------------------------------------------------------------------
 
 # The SEARCHENGINE tag specifies whether or not a search engine should be 
-# used. If set to NO the values of all tags below this one will be ignored.
+# used. If std::set to NO the values of all tags below this one will be ignored.
 
 SEARCHENGINE           = NO

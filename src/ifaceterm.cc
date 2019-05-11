@@ -16,7 +16,7 @@
 #include "ifaceterm.hh"
 namespace GhidraDec {
 
-IfaceTerm::IfaceTerm(const string &prmpt,istream &is,ostream &os)
+IfaceTerm::IfaceTerm(const std::string &prmpt,istream &is,std::ostream &os)
   : IfaceStatus(prmpt,is,os)
 {
 #ifdef __TERMINAL__
@@ -44,7 +44,7 @@ IfaceTerm::IfaceTerm(const string &prmpt,istream &is,ostream &os)
   ittypass.c_cc[VTIME] = 0;   // Do not time out 
 
   if (0>tcsetattr(ifd,TCSANOW,&ittypass))
-    throw IfaceError("Unable to set terminal attributes");
+    throw IfaceError("Unable to std::set terminal attributes");
 #endif
 }
 
@@ -58,20 +58,20 @@ IfaceTerm::~IfaceTerm(void)
 #endif
 }
 
-int4 IfaceTerm::doCompletion(string &line,int4 cursor)
+int4 IfaceTerm::doCompletion(std::string &line,int4 cursor)
 
 {				// Try to complete the current command
-  vector<string> fullcommand;
-  istringstream s(line);
-  string tok;
-  vector<IfaceCommand *>::const_iterator first,last;
+  vectorstd::string fullcommand;
+  std::istringstream s(line);
+  std::string tok;
+  std::vector<IfaceCommand *>::const_iterator first,last;
   int4 oldsize,match;
 
   first = comlist.begin();
   last = comlist.end();
   match = expandCom(fullcommand,s,first,last); // Try to expand the command
   if (match == 0) {
-    *optr << endl << "Invalid command" << endl;
+    *optr << std::endl << "Invalid command" << std::endl;
     return cursor;		// No change to command line
   }
 
@@ -95,19 +95,19 @@ int4 IfaceTerm::doCompletion(string &line,int4 cursor)
     return line.size();		// Just display expansion
   
   if (match > 1) {		// If more than one possible command
-    string complete;		// Display all possible completions
-    *optr << endl;
+    std::string complete;		// Display all possible completions
+    *optr << std::endl;
     for(;first!=last;++first) {
       (*first)->commandString(complete); // Get possible completion
-      *optr << complete << endl;
+      *optr << complete << std::endl;
     }
   }
   else				// Command is unique and expanded
-    *optr << endl << "Command is complete" << endl;
+    *optr << std::endl << "Command is complete" << std::endl;
   return line.size();
 }
   
-void IfaceTerm::readLine(string &line)
+void IfaceTerm::readLine(std::string &line)
 
 {
   char val;
@@ -115,7 +115,7 @@ void IfaceTerm::readLine(string &line)
   int4 cursor,lastlen,i;
   bool onecharecho;
   int4 hist;
-  string saveline;
+  std::string saveline;
 
   line.erase();
   cursor = 0;

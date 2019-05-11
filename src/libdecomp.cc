@@ -26,7 +26,7 @@ void startDecompilerLibrary(const char *sleighhome)
     SleighArchitecture::scanForSleighDirectories(sleighhome);
 }
 
-void startDecompilerLibrary(const vector<string> &extrapaths)
+void startDecompilerLibrary(const vectorstd::string &extrapaths)
 
 {
   CapabilityPoint::initializeAll();
@@ -36,7 +36,7 @@ void startDecompilerLibrary(const vector<string> &extrapaths)
     SleighArchitecture::specpaths.addDir2Path(extrapaths[i]);
 }
 
-void startDecompilerLibrary(const char *sleighhome,const vector<string> &extrapaths)
+void startDecompilerLibrary(const char *sleighhome,const vectorstd::string &extrapaths)
 
 {
   CapabilityPoint::initializeAll();

@@ -21,7 +21,7 @@ namespace GhidraDec {
 /// \param scope is Symbol scope associated with the function
 /// \param addr is the entry address for the function
 /// \param sz is the number of bytes (of code) in the function body
-Funcdata::Funcdata(const string &nm,Scope *scope,const Address &addr,int4 sz)
+Funcdata::Funcdata(const std::string &nm,Scope *scope,const Address &addr,int4 sz)
   : baseaddr(addr),
     funcp(),
     vbank(scope->getArch(),
@@ -91,12 +91,12 @@ void Funcdata::clear(void)
 /// The comment is added to the global database, indexed via its placement address and
 /// the entry address of the function. The emitter will attempt to place the comment
 /// before the source expression that maps most closely to the address.
-/// \param txt is the string body of the comment
+/// \param txt is the std::string body of the comment
 /// \param ad is the placement address
-void Funcdata::warning(const string &txt,const Address &ad) const
+void Funcdata::warning(const std::string &txt,const Address &ad) const
 
 {
-  string msg;
+  std::string msg;
   if ((flags & jumptablerecovery_on)!=0)
     msg = "WARNING (jumptable): ";
   else
@@ -108,11 +108,11 @@ void Funcdata::warning(const string &txt,const Address &ad) const
 /// The warning will be emitted as part of the block comment printed right before the
 /// prototype. The comment is stored in the global comment database, indexed via the function's
 /// entry address.
-/// \param txt is the string body of the comment
-void Funcdata::warningHeader(const string &txt) const
+/// \param txt is the std::string body of the comment
+void Funcdata::warningHeader(const std::string &txt) const
 
 {
-  string msg;
+  std::string msg;
   if ((flags & jumptablerecovery_on)!=0)
     msg = "WARNING (jumptable): ";
   else
@@ -121,7 +121,7 @@ void Funcdata::warningHeader(const string &txt) const
   glb->commentdb->addCommentNoDuplicate(Comment::warningheader,baseaddr,baseaddr,msg);
 }
 
-/// This routine does basic set-up for analyzing the function. In particular, it
+/// This routine does basic std::set-up for analyzing the function. In particular, it
 /// generates the raw p-code, builds basic blocks, and generates the call specification
 /// objects.
 void Funcdata::startProcessing(void)
@@ -178,7 +178,7 @@ Funcdata::~Funcdata(void)
 /// of branch destinations is also printed.  This is suitable for a console mode or
 /// debug view of the state of the function at any given point in its analysis.
 /// \param s is the output stream
-void Funcdata::printRaw(ostream &s) const
+void Funcdata::printRaw(std::ostream &s) const
 
 {
   if (bblocks.getSize()==0) {
@@ -189,7 +189,7 @@ void Funcdata::printRaw(ostream &s) const
     for(iter=obank.beginAll();iter!=obank.endAll();++iter) {
       s << (*iter).second->getSeqNum() << ":\t";
       (*iter).second->printRaw(s);
-      s << endl;
+      s << std::endl;
     }
   }
   else
@@ -231,7 +231,7 @@ void Funcdata::spacebase(void)
 	}
 	else {
 	  vn->setFlags(Varnode::spacebase); // Mark all base registers (not just input)
-	  if (vn->isInput())	// Only set type on the input spacebase register
+	  if (vn->isInput())	// Only std::set type on the input spacebase register
 	    vn->updateType(ptr,true,true);
 	}
       }
@@ -352,7 +352,7 @@ void Funcdata::clearCallSpecs(void)
   for(i=0;i<qlst.size();++i)
     delete qlst[i];		// Delete each func_callspec
 
-  qlst.clear();			// Delete list of pointers
+  qlst.clear();			// Delete std::list of pointers
 }
 
 FuncCallSpecs *Funcdata::getCallSpecs(const PcodeOp *op) const
@@ -421,7 +421,7 @@ void Funcdata::sortCallSpecs(void)
 void Funcdata::deleteCallSpecs(PcodeOp *op)
 
 {
-  vector<FuncCallSpecs *>::iterator iter;
+  std::vector<FuncCallSpecs *>::iterator iter;
 
   for(iter=qlst.begin();iter!=qlst.end();++iter) {
     FuncCallSpecs *fc = *iter;
@@ -434,7 +434,7 @@ void Funcdata::deleteCallSpecs(PcodeOp *op)
 }
 
 /// If \e extrapop is unknown, recover it from what we know about this function
-/// and set the value permanently for \b this Funcdata object.
+/// and std::set the value permanently for \b this Funcdata object.
 /// If there is no function body it may be impossible to know the value, in which case
 /// this returns the reserved value indicating \e extrapop is unknown.
 ///
@@ -448,7 +448,7 @@ int4 Funcdata::fillinExtrapop(void)
   if (funcp.getExtraPop() != ProtoModel::extrapop_unknown)
     return funcp.getExtraPop();	// If we already know it, just return it
 
-  list<PcodeOp *>::const_iterator iter = beginOp(CPUI_RETURN);
+  std::list<PcodeOp *>::const_iterator iter = beginOp(CPUI_RETURN);
   if (iter == endOp(CPUI_RETURN)) return 0; // If no return statements, answer is irrelevant
   
   PcodeOp *retop = *iter;
@@ -473,7 +473,7 @@ int4 Funcdata::fillinExtrapop(void)
 /// function is printed to the output stream.  This is suitable as part of a console mode
 /// or debug view of the function at any point during its analysis
 /// \param s is the output stream
-void Funcdata::printVarnodeTree(ostream &s) const
+void Funcdata::printVarnodeTree(std::ostream &s) const
 
 {
   VarnodeDefSet::const_iterator iter,enditer;
@@ -487,11 +487,11 @@ void Funcdata::printVarnodeTree(ostream &s) const
   }
 }
 
-/// Each scope has a set of memory ranges associated with it, encompassing
+/// Each scope has a std::set of memory ranges associated with it, encompassing
 /// storage locations of variables that are \e assumed to be in the scope.
 /// Each range for each local scope is printed.
 /// \param s is the output stream
-void Funcdata::printLocalRange(ostream &s) const
+void Funcdata::printLocalRange(std::ostream &s) const
 
 {
   localmap->printBounds(s);
@@ -510,9 +510,9 @@ void Funcdata::printLocalRange(ostream &s) const
 void Funcdata::restoreXmlJumpTable(const Element *el)
 
 {
-  const List &list( el->getChildren() );
+  const List &std::list( el->getChildren() );
   List::const_iterator iter;
-  for(iter=list.begin();iter!=list.end();++iter) {
+  for(iter=std::list.begin();iter!=std::list.end();++iter) {
     JumpTable *jt = new JumpTable(glb);
     jt->restoreXml(*iter);
     jumpvec.push_back(jt);
@@ -522,11 +522,11 @@ void Funcdata::restoreXmlJumpTable(const Element *el)
 /// A \<jumptablelist> tag is written with \<jumptable> sub-tags describing
 /// each jump-table associated with the control-flow of \b this function.
 /// \param s is the output stream
-void Funcdata::saveXmlJumpTable(ostream &s) const
+void Funcdata::saveXmlJumpTable(std::ostream &s) const
 
 {
   if (jumpvec.empty()) return;
-  vector<JumpTable *>::const_iterator iter;
+  std::vector<JumpTable *>::const_iterator iter;
 
   s << "<jumptablelist>\n";
   for(iter=jumpvec.begin();iter!=jumpvec.end();++iter)
@@ -534,15 +534,15 @@ void Funcdata::saveXmlJumpTable(ostream &s) const
   s << "</jumptablelist>\n";
 }
 
-/// \brief Save XML descriptions for a set of Varnodes to stream
+/// \brief Save XML descriptions for a std::set of Varnodes to stream
 ///
 /// This is an internal function for the function's save to XML system.
-/// Individual XML tags are written in sequence for Varnodes in a given set.
-/// The set is bounded by iterators using the 'loc' ordering.
+/// Individual XML tags are written in sequence for Varnodes in a given std::set.
+/// The std::set is bounded by iterators using the 'loc' ordering.
 /// \param s is the output stream
-/// \param iter is the beginning of the set
-/// \param enditer is the end of the set
-void Funcdata::saveVarnodeXml(ostream &s,VarnodeLocSet::const_iterator iter,VarnodeLocSet::const_iterator enditer)
+/// \param iter is the beginning of the std::set
+/// \param enditer is the end of the std::set
+void Funcdata::saveVarnodeXml(std::ostream &s,VarnodeLocSet::const_iterator iter,VarnodeLocSet::const_iterator enditer)
 
 {
   Varnode *vn;
@@ -556,7 +556,7 @@ void Funcdata::saveVarnodeXml(ostream &s,VarnodeLocSet::const_iterator iter,Varn
 /// This produces a single \<highlist> tag, with a \<high> sub-tag for each
 /// high-level variable (HighVariable) currently associated with \b this function.
 /// \param s is the output stream
-void Funcdata::saveXmlHigh(ostream &s) const
+void Funcdata::saveXmlHigh(std::ostream &s) const
 
 {
   int4 j;
@@ -577,17 +577,17 @@ void Funcdata::saveXmlHigh(ostream &s) const
     //    a_v(s,"name",high->getName());
     a_v_u(s,"repref",vn->getCreateIndex());
     if (high->isSpacebase()||high->isImplied()) // This is a special variable
-      a_v(s,"class",string("other"));
+      a_v(s,"class",std::string("other"));
     else if (high->isPersist()&&high->isAddrTied()) {
 	  // Global variable
-      a_v(s,"class",string("global"));
+      a_v(s,"class",std::string("global"));
 	}
     else if (high->isConstant())
-      a_v(s,"class",string("constant"));
+      a_v(s,"class",std::string("constant"));
     else if (!high->isPersist())
-      a_v(s,"class",string("local"));
+      a_v(s,"class",std::string("local"));
     else
-      a_v(s,"class",string("other"));
+      a_v(s,"class",std::string("other"));
     if (high->isTypeLock())
       a_v_b(s,"typelock",true);
     if (high->getSymbol() != (Symbol *)0)
@@ -613,7 +613,7 @@ void Funcdata::saveXmlHigh(ostream &s) const
 /// A single \<ast> tag is produced with children describing Varnodes, PcodeOps, and
 /// basic blocks making up \b this function's current syntax tree.
 /// \param s is the output stream
-void Funcdata::saveXmlTree(ostream &s) const
+void Funcdata::saveXmlTree(std::ostream &s) const
 
 {
   s << "<ast>\n";
@@ -627,7 +627,7 @@ void Funcdata::saveXmlTree(ostream &s) const
   }
   s << "</varnodes>\n";
   
-  list<PcodeOp *>::iterator oiter,endoiter;
+  std::list<PcodeOp *>::iterator oiter,endoiter;
   PcodeOp *op;
   BlockBasic *bs;
   for(int4 i=0;i<bblocks.getSize();++i) {
@@ -663,7 +663,7 @@ void Funcdata::saveXmlTree(ostream &s) const
 /// tree is also emitted.
 /// \param s is the output stream
 /// \param savetree is \b true if the p-code tree should be emitted
-void Funcdata::saveXml(ostream &s,bool savetree) const
+void Funcdata::saveXml(std::ostream &s,bool savetree) const
 
 {
   s << "<function";
@@ -703,8 +703,8 @@ void Funcdata::restoreXml(const Element *el)
     if (el->getAttributeName(i) == "name")
       name = el->getAttributeValue(i);
     else if (el->getAttributeName(i) == "size") {
-      istringstream s( el->getAttributeValue(i));
-      s.unsetf(ios::dec | ios::hex | ios::oct);
+      std::istringstream s( el->getAttributeValue(i));
+      s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
       s >> size;
     }
     else if (el->getAttributeName(i) == "nocode") {
@@ -716,11 +716,11 @@ void Funcdata::restoreXml(const Element *el)
     throw LowlevelError("Missing function name");
   if (size == -1)
     throw LowlevelError("Missing function size");
-  const List &list( el->getChildren() );
-  List::const_iterator iter = list.begin();
+  const List &std::list( el->getChildren() );
+  List::const_iterator iter = std::list.begin();
   baseaddr = Address::restoreXml( *iter, glb );
   ++iter;
-  for(;iter!=list.end();++iter) {
+  for(;iter!=std::list.end();++iter) {
     if ((*iter)->getName() == "localdb") {
       if (localmap != (ScopeLocal *)0)
 	throw LowlevelError("Pre-existing local scope when restoring: "+name);
@@ -769,7 +769,7 @@ void Funcdata::restoreXml(const Element *el)
 /// \param addr is the address at the point of injection
 /// \param bl is the given basic block holding the new ops
 /// \param iter indicates the point of insertion
-void Funcdata::doLiveInject(InjectPayload *payload,const Address &addr,BlockBasic *bl,list<PcodeOp *>::iterator iter)
+void Funcdata::doLiveInject(InjectPayload *payload,const Address &addr,BlockBasic *bl,std::list<PcodeOp *>::iterator iter)
 
 {
   PcodeEmitFd emitter;
@@ -780,7 +780,7 @@ void Funcdata::doLiveInject(InjectPayload *payload,const Address &addr,BlockBasi
   context.baseaddr = addr;		// Shouldn't be using inst_next and inst_start here
   context.nextaddr = addr;
 
-  list<PcodeOp *>::const_iterator deaditer = obank.endDead();
+  std::list<PcodeOp *>::const_iterator deaditer = obank.endDead();
   bool deadempty = (obank.beginDead() == deaditer);
   if (!deadempty)
     --deaditer;
@@ -842,7 +842,7 @@ void Funcdata::debugModCheck(PcodeOp *op)
   if (op->isModified()) return;
   if (!debugCheckRange(op)) return;
   op->setAdditionalFlag(PcodeOp::modified);
-  ostringstream before;
+  std::ostringstream before;
   op->printDebug(before);
   modify_list.push_back(op);
   modify_before.push_back( before.str() );
@@ -859,23 +859,23 @@ void Funcdata::debugModClear(void)
 }
 
 /// \param actionname is the name of the Action being debugged
-void Funcdata::debugModPrint(const string &actionname)
+void Funcdata::debugModPrint(const std::string &actionname)
 
 {
   if (!opactdbg_active) return;
   opactdbg_active = false;
   if (modify_list.empty()) return;
   PcodeOp *op;
-  ostringstream s;
+  std::ostringstream s;
   opactdbg_breakon |= (opactdbg_count == opactdbg_breakcount);
 
-  s << "DEBUG " << dec << opactdbg_count++ << ": " << actionname << endl;
+  s << "DEBUG " << std::dec << opactdbg_count++ << ": " << actionname << std::endl;
   for(int4 i=0;i<modify_list.size();++i) {
     op = modify_list[i];
-    s << modify_before[i] << endl;
+    s << modify_before[i] << std::endl;
     s << "   ";
     op->printDebug(s);
-    s << endl;
+    s << std::endl;
     op->clearAdditionalFlag(PcodeOp::modified);
   }
   modify_list.clear();
@@ -927,7 +927,7 @@ bool Funcdata::debugCheckRange(PcodeOp *op)
 void Funcdata::debugPrintRange(int4 i) const
 
 {
-  ostringstream s;
+  std::ostringstream s;
   if (!opactdbg_pclow[i].isInvalid()) {
     s << "PC = (";
     opactdbg_pclow[i].printRaw(s);
@@ -938,7 +938,7 @@ void Funcdata::debugPrintRange(int4 i) const
   else
     s << "entire function ";
   if (opactdbg_uqlow[i] != ~((uintm)0)) {
-    s << "unique = (" << hex << opactdbg_uqlow[i] << ',';
+    s << "unique = (" << std::dec << opactdbg_uqlow[i] << ',';
     s << opactdbg_uqhigh[i] << ')';
   }
   glb->printDebug(s.str());

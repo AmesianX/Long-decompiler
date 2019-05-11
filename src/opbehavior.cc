@@ -17,10 +17,10 @@
 #include "translate.hh"
 
 namespace GhidraDec {
-/// This routine generates a vector of OpBehavior objects indexed by opcode
-/// \param inst is the vector of behaviors to be filled
+/// This routine generates a std::vector of OpBehavior objects indexed by opcode
+/// \param inst is the std::vector of behaviors to be filled
 /// \param trans is the translator object needed by the floating point behaviors
-void OpBehavior::registerInstructions(vector<OpBehavior *> &inst,const Translate *trans)
+void OpBehavior::registerInstructions(std::vector<OpBehavior *> &inst,const Translate *trans)
 
 {
   inst.insert(inst.end(),CPUI_MAX,(OpBehavior *)0);
@@ -109,7 +109,7 @@ void OpBehavior::registerInstructions(vector<OpBehavior *> &inst,const Translate
 uintb OpBehavior::evaluateUnary(int4 sizeout,int4 sizein,uintb in1) const
 
 {
-  string name(get_opname(opcode));
+  std::string name(get_opname(opcode));
   throw LowlevelError("Unary emulation unimplemented for "+name);
 }
 
@@ -121,7 +121,7 @@ uintb OpBehavior::evaluateUnary(int4 sizeout,int4 sizein,uintb in1) const
 uintb OpBehavior::evaluateBinary(int4 sizeout,int4 sizein,uintb in1,uintb in2) const
 
 {
-  string name(get_opname(opcode));
+  std::string name(get_opname(opcode));
   throw LowlevelError("Binary emulation unimplemented for "+name);
 }
   

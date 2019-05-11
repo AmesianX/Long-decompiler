@@ -145,7 +145,7 @@
   instruction at a specific address.  The control flow
   through these p-code operations is followed to determine
   if control falls through, or if there are jumps or calls.
-  A work list of new instruction addresses is kept and is
+  A work std::list of new instruction addresses is kept and is
   continually revisited until there are no new instructions.
   After the control flow is traced, additional changes may
   be made to the p-code.
@@ -157,7 +157,7 @@
     -# Functions which are marked as inlined are filled in
        at this point, before basic blocks are generated.
        P-code for the inlined function is generated
-       separately and control flow is carefully set up to
+       separately and control flow is carefully std::set up to
        link it in properly.
 
    \subsection step2 Generate Basic Blocks and the CFG
@@ -181,7 +181,7 @@
          parameter information can be filled in and the
          indirect call can be changed to a direct call.
       -# Any call for which no prototype is found has a
-         default prototype set for it.
+         default prototype std::set for it.
       -# Any global or default prototype recovered at this
          point can be overridden locally.
 
@@ -261,7 +261,7 @@
      particular point in the code.  Dead code elimination is
      complicated by the fact that its not always clear what
      variables are temporary, locals, or globals.  Also,
-     compilers frequently map smaller (1-byte or 2-byte)
+     compilers frequently std::map smaller (1-byte or 2-byte)
      variables into bigger (4-byte) registers, and
      manipulation of these registers may still carry around
      left over information in the upper bytes.  The
@@ -287,14 +287,14 @@
 
      The bulk of the interesting simplifications happen in
      this section.  Following Formal Methods style term
-     rewriting, a long list of rules are applied to the
+     rewriting, a long std::list of rules are applied to the
      syntax tree. Each rule matches some potential
      configuration in a portion of the syntax tree, and
      after the rule matches, it specifies a sequence of edit
      operations on the syntax tree to transform it.  Each
      rule can be applied repeatedly and in different parts
-     of the tree if necessary.  So even a small set of rules
-     can cause a large transformation. The set of rules in
+     of the tree if necessary.  So even a small std::set of rules
+     can cause a large transformation. The std::set of rules in
      the decompiler is extensive and is tailored to specific
      reverse engineering needs and compiler constructs.  The
      goal of these transformations is not to optimize as a

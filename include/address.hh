@@ -28,6 +28,8 @@
 
 #include "space.hh"
 
+#include <set>
+
 namespace GhidraDec {
 
 class AddrSpaceManager;
@@ -63,8 +65,8 @@ public:
   bool isInvalid(void) const;  ///< Is the address invalid?
   int4 getAddrSize(void) const; ///< Get the number of bytes in the address
   bool isBigEndian(void) const;	///< Is data at this address big endian encoded
-  void printRaw(ostream &s) const; ///< Write a raw version of the address to a stream
-  int4 read(const string &s); ///< Read in the address from a string
+  void printRaw(std::ostream &s) const; ///< Write a raw version of the address to a stream
+  int4 read(const std::string &s); ///< Read in the address from a std::string
   AddrSpace *getSpace(void) const; ///< Get the address space
   uintb getOffset(void) const;  ///< Get the address offset
   void toPhysical(void);       ///< Convert this to a physical address
@@ -76,14 +78,14 @@ public:
   bool operator<=(const Address &op2) const; ///< Compare two addresses via their natural ordering
   Address operator+(int4 off) const; ///< Increment address by a number of bytes
   Address operator-(int4 off) const; ///< Decrement address by a number of bytes
-  friend ostream &operator<<(ostream &s,const Address &addr);  ///< Write out an address to stream
+  friend std::ostream &operator<<(std::ostream &s,const Address &addr);  ///< Write out an address to stream
   int4 justifiedContain(int4 sz,const Address &op2,int4 sz2,bool forceleft) const; ///< Determine if \e op2 is the least significant part of \e this.
   int4 overlap(int4 skip,const Address &op,int4 size) const; ///< Determine how two address ranges overlap
   bool isContiguous(int4 sz,const Address &loaddr,int4 losz) const; ///< Does \e this form a contigous range with \e loaddr
   bool isConstant(void) const; ///< Is this a \e constant \e value
   bool isJoin(void) const;	///< Is this a \e join \e value
-  void saveXml(ostream &s) const; ///< Save this to a stream as an XML tag
-  void saveXml(ostream &s,int4 size) const; ///< Save this and a size to a stream as an XML tag
+  void saveXml(std::ostream &s) const; ///< Save this to a stream as an XML tag
+  void saveXml(std::ostream &s,int4 size) const; ///< Save this and a size to a stream as an XML tag
 
   /// Restore an address from parsed XML
   static Address restoreXml(const Element *el,const AddrSpaceManager *manage);
@@ -101,7 +103,7 @@ public:
 /// can only be labelled with a single Address. But PcodeOps
 /// must be distinguishable and compared for execution order.
 /// A SeqNum extends the address for a PcodeOp to include:
-///   - A fixed \e time field, which is set at the time the PcodeOp
+///   - A fixed \e time field, which is std::set at the time the PcodeOp
 ///     is created. The \e time field guarantees a unique SeqNum
 ///     for the life of the PcodeOp. 
 ///   - An \e order field, which is guaranteed to be comparable
@@ -148,13 +150,13 @@ public:
   }
 
   /// Save a SeqNum to a stream as an XML tag
-  void saveXml(ostream &s) const;
+  void saveXml(std::ostream &s) const;
 
   /// Restore a SeqNum from parsed XML
   static SeqNum restoreXml(const Element *el,const AddrSpaceManager *manage);
 
   /// Write out a SeqNum to a stream
-  friend ostream &operator<<(ostream &s,const SeqNum &sq);
+  friend std::ostream &operator<<(std::ostream &s,const SeqNum &sq);
 };
 
 /// \brief A contiguous range of bytes in some address space
@@ -190,25 +192,25 @@ public:
     if (spc->getIndex() != op2.spc->getIndex())
       return (spc->getIndex() < op2.spc->getIndex());
     return (first < op2.first); }
-  void printBounds(ostream &s) const;			///< Print \b this Range to a stream
-  void saveXml(ostream &s) const;			///< Save \b this Range to an XML stream
+  void printBounds(std::ostream &s) const;			///< Print \b this Range to a stream
+  void saveXml(std::ostream &s) const;			///< Save \b this Range to an XML stream
   void restoreXml(const Element *el,const AddrSpaceManager *manage);	///< Restore \b this from XML stream
 };
 
-/// \brief A disjoint set of Ranges, possibly across multiple address spaces
+/// \brief A disjoint std::set of Ranges, possibly across multiple address spaces
 ///
-/// This is a container for addresses. It maintains a disjoint list of Ranges
+/// This is a container for addresses. It maintains a disjoint std::list of Ranges
 /// that cover all the addresses in the container.  Ranges can be inserted
 /// and removed, but overlapping/adjacent ranges will get merged.
 class RangeList {
-  set<Range> tree;			///< The sorted list of Range objects
+  std::set<Range> tree;			///< The sorted std::list of Range objects
 public:
   RangeList(const RangeList &op2) { tree = op2.tree; }		///< Copy constructor
   RangeList(void) {}						///< Construct an empty container
   void clear(void) { tree.clear(); }				///< Clear \b this container to empty
   bool empty(void) const { return tree.empty(); }		///< Return \b true if \b this is empty
-  set<Range>::const_iterator begin(void) const { return tree.begin(); }	///< Get iterator to beginning Range
-  set<Range>::const_iterator end(void) const { return tree.end(); }	///< Get iterator to ending Range
+  std::set<Range>::const_iterator begin(void) const { return tree.begin(); }	///< Get iterator to beginning Range
+  std::set<Range>::const_iterator end(void) const { return tree.end(); }	///< Get iterator to ending Range
   int4 numRanges(void) const { return tree.size(); }		///< Return the number of Range objects in container
   const Range *getFirstRange(void) const;			///< Get the first Range
   const Range *getLastRange(void) const;			///< Get the last Range
@@ -219,8 +221,8 @@ public:
   void merge(const RangeList &op2);				///< Merge another RangeList into \b this
   bool inRange(const Address &addr,int4 size) const;		///< Check containment an address range
   uintb longestFit(const Address &addr,uintb maxsize) const;	///< Find size of biggest Range containing given address
-  void printBounds(ostream &s) const;				///< Print a description of \b this RangeList to stream
-  void saveXml(ostream &s) const;				///< Write \b this RangeList to an XML stream
+  void printBounds(std::ostream &s) const;				///< Print a description of \b this RangeList to stream
+  void saveXml(std::ostream &s) const;				///< Write \b this RangeList to an XML stream
   void restoreXml(const Element *el,const AddrSpaceManager *manage);	///< Restore \b this RangeList from an XML stream
 };
 
@@ -273,7 +275,7 @@ inline bool Address::isBigEndian(void) const {
 /// Write a short-hand or debug version of this address to a
 /// stream.
 /// \param s is the stream being written
-inline void Address::printRaw(ostream &s) const {
+inline void Address::printRaw(std::ostream &s) const {
   if (base == (AddrSpace *)0) {
     s << "invalid_addr";
     return;
@@ -281,11 +283,11 @@ inline void Address::printRaw(ostream &s) const {
   base->printRaw(s,offset);
 }
 
-/// Convert a string into an address. The string format can be
+/// Convert a std::string into an address. The std::string format can be
 /// tailored for the particular address space.
-/// \param s is the string to parse
-/// \return any size associated with the parsed string
-inline int4 Address::read(const string &s) {
+/// \param s is the std::string to parse
+/// \return any size associated with the parsed std::string
+inline int4 Address::read(const std::string &s) {
   int4 sz; offset=base->read(s,sz); return sz;
 }
 
@@ -413,7 +415,7 @@ inline bool Address::isConstant(void) const {
   return (base->getType() == IPTR_CONSTANT);
 }
 
-/// Determine if this address represents a set of joined memory locations.
+/// Determine if this address represents a std::set of joined memory locations.
 /// \return \b true if this address represents a join
 inline bool Address::isJoin(void) const {
   return (base->getType() == IPTR_JOIN);
@@ -423,7 +425,7 @@ inline bool Address::isJoin(void) const {
 /// stream.  The exact format is determined by the address space,
 /// but this generally has a \e space and an \e offset attribute.
 /// \param s is the stream being written to
-inline void Address::saveXml(ostream &s) const {
+inline void Address::saveXml(std::ostream &s) const {
   s << "<addr";
   if (base!=(AddrSpace *)0)
     base->saveXmlAttributes(s,offset);
@@ -435,7 +437,7 @@ inline void Address::saveXml(ostream &s) const {
 /// so that it can describe an entire memory range.
 /// \param s is the stream being written to
 /// \param size is the number of bytes in the range
-inline void Address::saveXml(ostream &s,int4 size) const {
+inline void Address::saveXml(std::ostream &s,int4 size) const {
   s << "<addr";
   if (base!=(AddrSpace *)0)
     base->saveXmlAttributes(s,offset,size);
@@ -484,7 +486,7 @@ inline uintb pcode_left(uintb val,int4 sa) {
   return val << sa;
 }
 
-extern bool signbit_negative(uintb val,int4 size);	///< Return true if the sign-big is set
+extern bool signbit_negative(uintb val,int4 size);	///< Return true if the sign-big is std::set
 extern uintb calc_mask(int4 size);			///< Calculate a mask for a given byte size
 extern uintb uintb_negate(uintb in,int4 size);		///< Negate the \e sized value
 extern uintb sign_extend(uintb in,int4 sizein,int4 sizeout);	///< Sign-extend a value between two byte sizes
@@ -494,8 +496,8 @@ extern void zero_extend(intb &val,int4 bit);		///< Clear all bits above given bi
 extern void byte_swap(intb &val,int4 size);		///< Swap bytes in the given value
 
 extern uintb byte_swap(uintb val,int4 size);		///< Return the given value with bytes swapped
-extern int4 leastsigbit_set(uintb val);			///< Return index of least significant bit set in given value
-extern int4 mostsigbit_set(uintb val);			///< Return index of most significant bit set in given val
+extern int4 leastsigbit_set(uintb val);			///< Return index of least significant bit std::set in given value
+extern int4 mostsigbit_set(uintb val);			///< Return index of most significant bit std::set in given val
 
 extern uintb coveringmask(uintb val);			///< Return a mask that \e covers the given value
 extern int4 bit_transitions(uintb val,int4 sz);		///< Calculate the number of bit transitions in the sized value

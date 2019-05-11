@@ -33,7 +33,7 @@ void Funcdata::setVarnodeProperties(Varnode *vn) const
       if (entry->getSymbol()->isTypeLocked())
 	vn->mapentry = entry;
     }
-    vn->setFlags(vflags & ~Varnode::typelock); // typelock set by updateType
+    vn->setFlags(vflags & ~Varnode::typelock); // typelock std::set by updateType
   }
 
   if (vn->cover == (Cover *)0) {
@@ -114,7 +114,7 @@ Varnode *Funcdata::newVarnodeOut(int4 s,const Address &m,PcodeOp *op)
     if (entry->getSymbol()->isTypeLocked())
       vn->mapentry = entry;
   }
-  vn->setFlags(vflags & ~Varnode::typelock); // Typelock set by updateType
+  vn->setFlags(vflags & ~Varnode::typelock); // Typelock std::set by updateType
 
   return vn;
 }
@@ -159,7 +159,7 @@ Varnode *Funcdata::newVarnode(int4 s,const Address &m,Datatype *ct)
     if (entry->getSymbol()->isTypeLocked())
       vn->mapentry = entry;
   }
-  vn->setFlags(vflags & ~Varnode::typelock); // Typelock set by updateType
+  vn->setFlags(vflags & ~Varnode::typelock); // Typelock std::set by updateType
 
   return vn;
 }
@@ -268,7 +268,7 @@ Varnode *Funcdata::cloneVarnode(const Varnode *vn)
 void Funcdata::destroyVarnode(Varnode *vn)
 
 {
-  list<PcodeOp *>::const_iterator iter;
+  std::list<PcodeOp *>::const_iterator iter;
 
   for(iter=vn->beginDescend();iter!=vn->endDescend();++iter) {
     PcodeOp *op = *iter;
@@ -292,10 +292,10 @@ void Funcdata::destroyVarnode(Varnode *vn)
 /// part of the value of the Symbol, NULL is returned.
 /// \param name is the name to search for
 /// \return the matching HighVariable or NULL
-HighVariable *Funcdata::findHigh(const string &name) const
+HighVariable *Funcdata::findHigh(const std::string &name) const
 
 {
-  vector<Symbol *> symList;
+  std::vector<Symbol *> symList;
   localmap->queryByName(name,symList);
   if (symList.empty()) return (HighVariable *)0;
   Symbol *sym = symList[0];
@@ -371,7 +371,7 @@ void Funcdata::adjustInputVarnodes(const Address &addr,int4 size)
 
 {
   Address endaddr = addr + (size-1);
-  vector<Varnode *> inlist;
+  std::vector<Varnode *> inlist;
   VarnodeDefSet::const_iterator iter,enditer;
   iter = vbank.beginDef(Varnode::input,addr);
   enditer = vbank.endDef(Varnode::input,endaddr);
@@ -422,7 +422,7 @@ bool Funcdata::descend2Undef(Varnode *vn)
   PcodeOp *op,*copyop;
   BlockBasic *inbl;
   Varnode *badconst;
-  list<PcodeOp *>::const_iterator iter;
+  std::list<PcodeOp *>::const_iterator iter;
   int4 i,size;
   bool res;
 
@@ -430,7 +430,7 @@ bool Funcdata::descend2Undef(Varnode *vn)
   size = vn->getSize();
   iter = vn->beginDescend();
   while(iter != vn->endDescend()) {
-    op = *iter++;		// Move to next in list before deletion
+    op = *iter++;		// Move to next in std::list before deletion
     if (op->getParent()->isDead()) continue;
     if (op->getParent()->sizeIn()!=0) res = true;
     i = op->getSlot(vn);
@@ -523,7 +523,7 @@ bool Funcdata::fillinReadOnly(Varnode *vn)
       defop->setFlag(PcodeOp::warning);	// Not a true write, ignore it
     else if (!defop->isWarning()) { // No warning generated before
       defop->setFlag(PcodeOp::warning);
-      ostringstream s;
+      std::ostringstream s;
       if ((!vn->isAddrForce())||(!vn->hasNoDescend())) {
 	s << "Read-only address (";
 	s << vn->getSpace()->getName();
@@ -561,7 +561,7 @@ bool Funcdata::fillinReadOnly(Varnode *vn)
   }
 				// Replace all references to vn
   bool changemade = false;
-  list<PcodeOp *>::const_iterator iter;
+  std::list<PcodeOp *>::const_iterator iter;
   PcodeOp *op;
   int4 i;
   Datatype *locktype = vn->isTypeLock() ? vn->getType() : (Datatype *)0;
@@ -644,14 +644,14 @@ bool Funcdata::replaceVolatile(Varnode *vn)
 bool Funcdata::checkIndirectUse(Varnode *vn)
 
 {
-  vector<Varnode *> vlist;
+  std::vector<Varnode *> vlist;
   int4 i = 0;
   vlist.push_back(vn);
   vn->setMark();
   bool result = true;
   while((i<vlist.size())&&result) {
     vn = vlist[i++];
-    list<PcodeOp *>::const_iterator iter;
+    std::list<PcodeOp *>::const_iterator iter;
     for(iter=vn->beginDescend();iter!=vn->endDescend();++iter) {
       PcodeOp *op = *iter;
       OpCode opc = op->code();
@@ -723,9 +723,9 @@ void Funcdata::clearDeadVarnodes(void)
 void Funcdata::calcNZMask(void)
 
 {
-  vector<PcodeOp *> opstack;
-  vector<int4> slotstack;
-  list<PcodeOp *>::const_iterator oiter;
+  std::vector<PcodeOp *> opstack;
+  std::vector<int4> slotstack;
+  std::list<PcodeOp *>::const_iterator oiter;
 
   for(oiter=beginOpAlive();oiter!=endOpAlive();++oiter) {
     PcodeOp *op = *oiter;
@@ -798,7 +798,7 @@ void Funcdata::calcNZMask(void)
 /// \brief Update Varnode boolean properties based on (new) Symbol information
 ///
 /// Boolean properties \b addrtied, \b addrforce, \b auto_live, and \b nolocalalias
-/// for Varnodes are updated based on new Symbol information they map to.
+/// for Varnodes are updated based on new Symbol information they std::map to.
 /// The caller can elect to update data-type information as well.
 /// \param lm is the Symbol scope within which to search for mapped Varnodes
 /// \param typesyes is \b true if the caller wants to update data-types
@@ -857,12 +857,12 @@ bool Funcdata::updateFlags(const ScopeLocal *lm,bool typesyes)
   return updateoccurred;
 }
 
-/// \brief Update boolean properties (and the data-type) for a set of Varnodes
+/// \brief Update boolean properties (and the data-type) for a std::set of Varnodes
 ///
-/// The set of Varnodes with the same size and address all have their boolean properties
-/// updated to the given values. The set is specified by providing an iterator reference
-/// to the first Varnode in the set assuming a 'loc' ordering. This iterator is updated
-/// to point to the first Varnode after the affected set.
+/// The std::set of Varnodes with the same size and address all have their boolean properties
+/// updated to the given values. The std::set is specified by providing an iterator reference
+/// to the first Varnode in the std::set assuming a 'loc' ordering. This iterator is updated
+/// to point to the first Varnode after the affected std::set.
 ///
 /// The only properties that can be effectively changed with this
 /// routine are \b mapped, \b addrtied, \b addrforce, \b auto_live, and \b nolocalalias.
@@ -870,9 +870,9 @@ bool Funcdata::updateFlags(const ScopeLocal *lm,bool typesyes)
 ///
 /// If the given data-type is non-null, an attempt is made to update all the Varnodes
 /// to this data-type. The \b typelock and \b namelock properties cannot be changed here.
-/// \param iter points to the first Varnode in the set
-/// \param flags holds the new set of boolean properties
-/// \param ct is the given data-type to set (or NULL)
+/// \param iter points to the first Varnode in the std::set
+/// \param flags holds the new std::set of boolean properties
+/// \param ct is the given data-type to std::set (or NULL)
 /// \return \b true if at least one Varnode was modified
 bool Funcdata::updateFlags(VarnodeLocSet::const_iterator &iter,uint4 flags,Datatype *ct)
 
@@ -884,13 +884,13 @@ bool Funcdata::updateFlags(VarnodeLocSet::const_iterator &iter,uint4 flags,Datat
 				// These are the flags we are going to try to update
   uint4 mask = Varnode::mapped;
 				// We take special care with the addrtied flag
-				// as we cannot set it here if it is clear
+				// as we cannot std::set it here if it is clear
 				// We can CLEAR but not SET the addrtied flag
 				// If addrtied is cleared, so should addrforce and auto_live
   if ((flags&Varnode::addrtied)==0) // Is the addrtied flags cleared
     mask |= Varnode::addrtied | Varnode::addrforce | Varnode::auto_live;
-  // We can set the nolocalalias flag, but not clear it
-  // If nolocalalias is set, then addrforce should be cleared
+  // We can std::set the nolocalalias flag, but not clear it
+  // If nolocalalias is std::set, then addrforce should be cleared
   if ((flags&Varnode::nolocalalias)!=0)
     mask |= Varnode::nolocalalias | Varnode::addrforce | Varnode::auto_live;
   flags &= mask;
@@ -914,7 +914,7 @@ bool Funcdata::updateFlags(VarnodeLocSet::const_iterator &iter,uint4 flags,Datat
 }
 
 /// The Symbol is really attached to the Varnode's HighVariable (which must exist).
-/// The only reason a Symbol doesn't get set is if, the HighVariable
+/// The only reason a Symbol doesn't get std::set is if, the HighVariable
 /// is global and there is no pre-existing Symbol.  (see mapGlobals())
 /// \param is the given Varnode
 /// \return the associated Symbol or NULL
@@ -1025,7 +1025,7 @@ bool Funcdata::attemptDynamicMapping(SymbolEntry *entry,DynamicHash &dhash)
 void Funcdata::totalReplace(Varnode *vn,Varnode *newvn)
 
 {
-  list<PcodeOp *>::const_iterator iter;
+  std::list<PcodeOp *>::const_iterator iter;
   PcodeOp *op;
   int4 i;
 
@@ -1040,14 +1040,14 @@ void Funcdata::totalReplace(Varnode *vn,Varnode *newvn)
 /// \brief Replace every read reference of the given Varnode with a constant value
 ///
 /// A new constant Varnode is created for each read site. If there are any marker ops
-/// (MULTIEQUAL) a single COPY op is inserted and the marker input is set to be the
+/// (MULTIEQUAL) a single COPY op is inserted and the marker input is std::set to be the
 /// output of the COPY.
 /// \param vn is the given Varnode
 /// \param val is the constant value to replace it with
 void Funcdata::totalReplaceConstant(Varnode *vn,uintb val)
 
 {
-  list<PcodeOp *>::const_iterator iter;
+  std::list<PcodeOp *>::const_iterator iter;
   PcodeOp *op;
   PcodeOp *copyop = (PcodeOp *)0;
   Varnode *newrep;
@@ -1094,7 +1094,7 @@ void Funcdata::splitUses(Varnode *vn)
   PcodeOp *op = vn->getDef();
   Varnode *newvn;
   PcodeOp *newop,*useop;
-  list<PcodeOp *>::iterator iter;
+  std::list<PcodeOp *>::iterator iter;
   int4 slot;
 
   iter = vn->descend.begin();
@@ -1165,7 +1165,7 @@ void Funcdata::mapGlobals(void)
       if (discover == (Scope *)0)
 	throw LowlevelError("Could not discover scope");
       int4 index = 0;
-      string symbolname = discover->buildVariableName(addr,usepoint,ct,index,
+      std::string symbolname = discover->buildVariableName(addr,usepoint,ct,index,
 						      Varnode::addrtied|Varnode::persist);
       discover->addSymbol(symbolname,ct,addr,usepoint);
     }
@@ -1231,8 +1231,8 @@ bool Funcdata::checkCallDoubleUse(const PcodeOp *opmatch,const PcodeOp *op,const
 bool Funcdata::onlyOpUse(const Varnode *invn,const PcodeOp *opmatch,const ParamTrial &trial) const
 
 {
-  vector<const Varnode *> varlist;
-  list<PcodeOp *>::const_iterator iter;
+  std::vector<const Varnode *> varlist;
+  std::list<PcodeOp *>::const_iterator iter;
   const Varnode *vn,*subvn;
   const PcodeOp *op;
   int4 i;
@@ -1349,7 +1349,7 @@ bool Funcdata::ancestorOpUse(int4 maxlevel,const Varnode *invn,
   case CPUI_SUBPIECE:
     // This is a rather kludgy way to get around where a DIV (or other similar) instruction
     // causes a register that looks like the high precision piece of the function return
-    // to be set with the remainder as a side effect
+    // to be std::set with the remainder as a side effect
     if (def->getIn(1)->getOffset()==0) {
       const Varnode *vn = def->getIn(0);
       if (vn->isWritten()) {

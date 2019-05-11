@@ -22,13 +22,13 @@ ConstantPoolGhidra::ConstantPoolGhidra(ArchitectureGhidra *g)
   ghidra = g;
 }
 
-CPoolRecord *ConstantPoolGhidra::createRecord(const vector<uintb> &refs)
+CPoolRecord *ConstantPoolGhidra::createRecord(const std::vector<uintb> &refs)
 
 {
   throw LowlevelError("Cannot access constant pool with this method");
 }
 
-const CPoolRecord *ConstantPoolGhidra::getRecord(const vector<uintb> &refs) const
+const CPoolRecord *ConstantPoolGhidra::getRecord(const std::vector<uintb> &refs) const
 
 {
   const CPoolRecord *rec = cache.getRecord(refs);
@@ -44,7 +44,7 @@ const CPoolRecord *ConstantPoolGhidra::getRecord(const vector<uintb> &refs) cons
       throw LowlevelError("Error in constant pool record xml: "+err.explain);
     }
     if (doc == (Document *)0) {
-      ostringstream s;
+      std::ostringstream s;
       s << "Could not retrieve constant pool record for reference: 0x" << refs[0];
       throw LowlevelError(s.str());
     }
@@ -54,7 +54,7 @@ const CPoolRecord *ConstantPoolGhidra::getRecord(const vector<uintb> &refs) cons
   return rec;
 }
 
-void ConstantPoolGhidra::saveXml(ostream &s) const
+void ConstantPoolGhidra::saveXml(std::ostream &s) const
 
 {
   throw LowlevelError("Cannot access constant pool with this method");

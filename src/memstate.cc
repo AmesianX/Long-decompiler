@@ -169,7 +169,7 @@ void MemoryBank::setPage(uintb addr,const uint1 *val,int4 skip,int4 size)
   } while(startalign != endalign);
 }
 
-/// This routine is used to set a single value in the memory bank at an arbitrary address
+/// This routine is used to std::set a single value in the memory bank at an arbitrary address
 /// It takes into account the endianness of the associated address space when encoding the
 /// value as bytes in the bank.  The value is broken up into aligned pieces of \e wordsize and
 /// the actual \b write is performed with the insert routine.  If only parts of aligned words
@@ -419,7 +419,7 @@ void MemoryPageOverlay::insert(uintb addr,uintb val)
 
 {
   uintb pageaddr = addr & ~((uintb)(getPageSize()-1));
-  map<uintb,uint1 *>::iterator iter;
+  std::map<uintb,uint1 *>::iterator iter;
 
   uint1 *pageptr;
 
@@ -450,7 +450,7 @@ uintb MemoryPageOverlay::find(uintb addr) const
 
 {
   uintb pageaddr = addr & ~((uintb)(getPageSize()-1));
-  map<uintb,uint1 *>::const_iterator iter;
+  std::map<uintb,uint1 *>::const_iterator iter;
 
   iter = page.find(pageaddr);
   if (iter == page.end()) {
@@ -475,7 +475,7 @@ uintb MemoryPageOverlay::find(uintb addr) const
 void MemoryPageOverlay::getPage(uintb addr,uint1 *res,int4 skip,int4 size) const
 
 {
-  map<uintb,uint1 *>::const_iterator iter;
+  std::map<uintb,uint1 *>::const_iterator iter;
 
   iter = page.find(addr);
   if (iter == page.end()) {
@@ -501,7 +501,7 @@ void MemoryPageOverlay::getPage(uintb addr,uint1 *res,int4 skip,int4 size) const
 void MemoryPageOverlay::setPage(uintb addr,const uint1 *val,int4 skip,int4 size)
 
 {
-  map<uintb,uint1 *>::iterator iter;
+  std::map<uintb,uint1 *>::iterator iter;
   uint1 *pageptr;
 
   iter = page.find(addr);
@@ -538,7 +538,7 @@ MemoryPageOverlay::MemoryPageOverlay(AddrSpace *spc,int4 ws,int4 ps,MemoryBank *
 MemoryPageOverlay::~MemoryPageOverlay(void)
 
 {
-  map<uintb,uint1 *>::iterator iter;
+  std::map<uintb,uint1 *>::iterator iter;
 
   for(iter=page.begin();iter!=page.end();++iter)
     delete [] (*iter).second;
@@ -680,7 +680,7 @@ uintb MemoryState::getValue(AddrSpace *spc,uintb off,int4 size) const
 /// passed to the main setValue routine.
 /// \param nm is the name of the register
 /// \param cval is the value to write to the register
-void MemoryState::setValue(const string &nm,uintb cval)
+void MemoryState::setValue(const std::string &nm,uintb cval)
 
 { // Set a "register" value
   const VarnodeData &vdata( trans->getRegister(nm) );
@@ -693,7 +693,7 @@ void MemoryState::setValue(const string &nm,uintb cval)
 /// passed to the main getValue routine.
 /// \param nm is the name of the register
 /// \return the value associated with that register
-uintb MemoryState::getValue(const string &nm) const
+uintb MemoryState::getValue(const std::string &nm) const
 
 { // Get a "register" value
   const VarnodeData &vdata( trans->getRegister(nm) );

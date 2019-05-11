@@ -26,8 +26,8 @@ class XmlArchitectureCapability : public ArchitectureCapability {
   XmlArchitectureCapability(const XmlArchitectureCapability &op2);	///< Not implemented
   XmlArchitectureCapability &operator=(const XmlArchitectureCapability &op2);	///< Not implemented
 public:
-  virtual Architecture *buildArchitecture(const string &filename,const string &target,ostream *estream);
-  virtual bool isFileMatch(const string &filename) const;
+  virtual Architecture *buildArchitecture(const std::string &filename,const std::string &target,std::ostream *estream);
+  virtual bool isFileMatch(const std::string &filename) const;
   virtual bool isXmlMatch(Document *doc) const;
 };
 
@@ -38,9 +38,9 @@ class XmlArchitecture : public SleighArchitecture {
   // virtual void resolveArchitecture(void);   		///< Inherit SleighArchitecture's version
   virtual void postSpecFile(void);
 public:
-  virtual void saveXml(ostream &s) const;
+  virtual void saveXml(std::ostream &s) const;
   virtual void restoreXml(DocumentStorage &store);
-  XmlArchitecture(const string &fname,const string &targ,ostream *estream);	///< Constructor
+  XmlArchitecture(const std::string &fname,const std::string &targ,std::ostream *estream);	///< Constructor
   virtual ~XmlArchitecture(void) {}
 };
 }

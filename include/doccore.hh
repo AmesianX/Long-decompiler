@@ -27,8 +27,8 @@
   implement these models provides the quickest inroad into 
   obtaining an overall understanding of the code.
 
-  We list all these fundemental classes here, loosely grouped
-  as follows.  There is one set of classes that describe the
+  We std::list all these fundemental classes here, loosely grouped
+  as follows.  There is one std::set of classes that describe the
   \e Syntax \e Trees, which are built up from the original p-code,
   and transformed during the decompiler's simplification process.
   The \e Translation classes do the actual building of the syntax
@@ -52,7 +52,7 @@
 	   Address of the byte at that offset.
          .
     - Varnode
-         - A contiguous set of bytes, given by an Address and a size,
+         - A contiguous std::set of bytes, given by an Address and a size,
 	   encoding a single value in the model.  In terms of SSA
 	   syntax tree, a Varnode is also a node in the tree.
          .
@@ -161,7 +161,7 @@
   and local scope.
 
   \code
-    string &       getName();           // get name of function
+    std::string &       getName();           // get name of function
     Address &      getAddress();        // get Address of function's entry point
     int4           numCalls();          // number of subfunctions called by this function
     FuncCallSpecs *getCallSpecs(int4 i); // get specs for one of the subfunctions
@@ -186,7 +186,7 @@
 
   \code
     int4  oneInstruction(PcodeEmit &,Address &) const;   // produce pcode for one instruction
-    void printAssembly(ostream &,int4,Address &) const;  // print the assembly for one instruction
+    void printAssembly(std::ostream &,int4,Address &) const;  // print the assembly for one instruction
   \endcode
 
   \section classdatatype Datatype
@@ -199,7 +199,7 @@
     type_metatype getMetatype();     // categorize type as VOID, UNKNOWN,
                                      // INT, UINT, BOOL, CODE, FLOAT,
                                      // PTR, ARRAY, STRUCT
-    string &      getName();         // get name of the type
+    std::string &      getName();         // get name of the type
     int4          getSize();         // get number of bytes encoding this type
   \endcode
 
@@ -237,7 +237,7 @@
   This is a container for Datatypes.
 
   \code
-    Datatype *findByName(string &);                 // find a Datatype by name
+    Datatype *findByName(std::string &);                 // find a Datatype by name
     Datatype *getTypeVoid();                        // retrieve common types
     Datatype *getTypeChar();
     Datatype *getBase(int4 size,type_metatype);
@@ -274,7 +274,7 @@
   lives in a scope, has a name, and has a Datatype.
 
   \code
-    string &      getName();        // get the name of the symbol
+    std::string &      getName();        // get the name of the symbol
     Datatype *    getType();        // get the Datatype of the symbol
     Scope *       getScope();       // get the scope containing the symbol
     SymbolEntry * getFirstWholeMap(); // get the (first) SymbolEntry associated
@@ -303,12 +303,12 @@
   SymbolEntry *findAddr(Address &,Address &);          // find a Symbol by address
   SymbolEntry *findContainer(Address &,int4,Address &); // find containing symbol
   Funcdata *   findFunction(Address &);                // find a function by entry address
-  Symbol *     findByName(string &);                   // find a Symbol by name
+  Symbol *     findByName(std::string &);                   // find a Symbol by name
   SymbolEntry *queryByAddr(Address &,Address &);       // search for symbols across multiple scopes
   SymbolEntry *queryContainer(Address &,int4,Address &);
   Funcdata *   queryFunction(Address &);
   Scope *      discoverScope(Address &,int4,Address &); // discover scope of an address
-  string &     getName();                              // get name of scope
+  std::string &     getName();                              // get name of scope
   Scope *      getParent();                            // get parent scope
   \endcode
 
@@ -318,7 +318,7 @@
 
   \code
     Scope *getGlobalScope();                // get the root/global scope
-    Scope *resolveScope(string &,Scope *);  // resolve a scope by name
+    Scope *resolveScope(std::string &,Scope *);  // resolve a scope by name
   \endcode
 
   \section classarchitecture Architecture

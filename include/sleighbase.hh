@@ -28,31 +28,31 @@ namespace GhidraDec {
 ///   - Reading the various SLEIGH specification files
 ///   - Building and writing out SLEIGH specification files
 class SleighBase : public Translate {
-  vector<string> userop;		///< Names of user-define p-code ops for \b this Translate object
-  map<VarnodeData,string> varnode_xref;	///< A map from Varnodes in the \e register space to register names
+  vectorstd::string userop;		///< Names of user-define p-code ops for \b this Translate object
+  std::map<VarnodeData,std::string> varnode_xref;	///< A std::map from Varnodes in the \e register space to register names
 protected:
   SubtableSymbol *root;		///< The root SLEIGH decoding symbol
   SymbolTable symtab;		///< The SLEIGH symbol table
   uint4 maxdelayslotbytes;	///< Maximum number of bytes in a delay-slot directive
   uint4 unique_allocatemask;	///< Bits that are guaranteed to be zero in the unique allocation scheme
   uint4 numSections;		///< Number of \e named sections
-  void buildXrefs(void);	///< Build register map. Collect user-ops and context-fields.
+  void buildXrefs(void);	///< Build register std::map. Collect user-ops and context-fields.
   void reregisterContext(void);	///< Reregister context fields for a new executable
   void restoreXml(const Element *el);	///< Read a SLEIGH specification from XML
 public:
   SleighBase(void);		///< Construct an uninitialized translator
   bool isInitialized(void) const { return (root != (SubtableSymbol *)0); }	///< Return \b true if \b this is initialized
   virtual ~SleighBase(void) {}	///< Destructor
-  virtual void addRegister(const string &nm,AddrSpace *base,uintb offset,int4 size);
-  virtual const VarnodeData &getRegister(const string &nm) const;
-  virtual string getRegisterName(AddrSpace *base,uintb off,int4 size) const;
-  virtual void getAllRegisters(map<VarnodeData,string> &reglist) const;
-  virtual void getUserOpNames(vector<string> &res) const;
+  virtual void addRegister(const std::string &nm,AddrSpace *base,uintb offset,int4 size);
+  virtual const VarnodeData &getRegister(const std::string &nm) const;
+  virtual std::string getRegisterName(AddrSpace *base,uintb off,int4 size) const;
+  virtual void getAllRegisters(std::map<VarnodeData,std::string> &reglist) const;
+  virtual void getUserOpNames(vectorstd::string &res) const;
 
-  SleighSymbol *findSymbol(const string &nm) const { return symtab.findSymbol(nm); }	///< Find a specific SLEIGH symbol by name in the current scope
+  SleighSymbol *findSymbol(const std::string &nm) const { return symtab.findSymbol(nm); }	///< Find a specific SLEIGH symbol by name in the current scope
   SleighSymbol *findSymbol(uintm id) const { return symtab.findSymbol(id); }	///< Find a specific SLEIGH symbol by id
-  SleighSymbol *findGlobalSymbol(const string &nm) const { return symtab.findGlobalSymbol(nm); }	///< Find a specific global SLEIGH symbol by name
-  void saveXml(ostream &s) const;	///< Write out the SLEIGH specification as an XML \<sleigh> tag.
+  SleighSymbol *findGlobalSymbol(const std::string &nm) const { return symtab.findGlobalSymbol(nm); }	///< Find a specific global SLEIGH symbol by name
+  void saveXml(std::ostream &s) const;	///< Write out the SLEIGH specification as an XML \<sleigh> tag.
 };
 
 }

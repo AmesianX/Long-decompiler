@@ -22,7 +22,7 @@ int4 TokenPattern::resolveTokens(const TokenPattern &tok1,const TokenPattern &to
 {				// Use the token lists to decide how the two patterns
 				// should be aligned relative to each other
 				// return how much -tok2- needs to be shifted
-				// and set the resulting tokenlist and ellipses
+				// and std::set the resulting tokenlist and ellipses
   bool reversedirection = false;
   leftellipsis = false;
   rightellipsis = false;
@@ -338,7 +338,7 @@ TokenPattern TokenPattern::doCat(const TokenPattern &tokpat) const
   }
   else {
     sa = 0;
-    vector<Token *>::const_iterator iter;
+    std::vector<Token *>::const_iterator iter;
 
     for(iter=toklist.begin();iter!=toklist.end();++iter)
       sa += (*iter)->getSize();
@@ -427,7 +427,7 @@ PatternExpression *PatternExpression::restoreExpression(const Element *el,Transl
 
 {
   PatternExpression *res;
-  const string &nm(el->getName());
+  const std::string &nm(el->getName());
 
   if (nm == "tokenfield")
     res = new TokenField();
@@ -558,7 +558,7 @@ TokenPattern TokenField::genPattern(intb val) const
   return TokenPattern(tok,val,bitstart,bitend);
 }
 
-void TokenField::saveXml(ostream &s) const
+void TokenField::saveXml(std::ostream &s) const
 
 {
   s << "<tokenfield";
@@ -572,7 +572,7 @@ void TokenField::saveXml(ostream &s) const
     s << "true\"";
   else
     s << "false\"";
-  s << " bitstart=\"" << dec << bitstart << "\"";
+  s << " bitstart=\"" << std::dec << bitstart << "\"";
   s << " bitend=\"" << bitend << "\"";
   s << " bytestart=\"" << bytestart << "\"";
   s << " byteend=\"" << byteend << "\"";
@@ -586,28 +586,28 @@ void TokenField::restoreXml(const Element *el,Translate *trans)
   bigendian = xml_readbool(el->getAttributeValue("bigendian"));
   signbit = xml_readbool(el->getAttributeValue("signbit"));
   {
-    istringstream s(el->getAttributeValue("bitstart"));
-    s.unsetf(ios::dec | ios::hex | ios::oct);
+    std::istringstream s(el->getAttributeValue("bitstart"));
+    s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
     s >> bitstart;
   }
   {
-    istringstream s(el->getAttributeValue("bitend"));
-    s.unsetf(ios::dec | ios::hex | ios::oct);
+    std::istringstream s(el->getAttributeValue("bitend"));
+    s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
     s >> bitend;
   }
   {
-    istringstream s(el->getAttributeValue("bytestart"));
-    s.unsetf(ios::dec | ios::hex | ios::oct);
+    std::istringstream s(el->getAttributeValue("bytestart"));
+    s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
     s >> bytestart;
   }
   {
-    istringstream s(el->getAttributeValue("byteend"));
-    s.unsetf(ios::dec | ios::hex | ios::oct);
+    std::istringstream s(el->getAttributeValue("byteend"));
+    s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
     s >> byteend;
   }
   {
-    istringstream s(el->getAttributeValue("shift"));
-    s.unsetf(ios::dec | ios::hex | ios::oct);
+    std::istringstream s(el->getAttributeValue("shift"));
+    s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
     s >> shift;
   }
 }
@@ -641,7 +641,7 @@ TokenPattern ContextField::genPattern(intb val) const
   return TokenPattern(val,startbit,endbit);
 }
 
-void ContextField::saveXml(ostream &s) const
+void ContextField::saveXml(std::ostream &s) const
 
 {
   s << "<contextfield";
@@ -650,7 +650,7 @@ void ContextField::saveXml(ostream &s) const
     s << "true\"";
   else
     s << "false\"";
-  s << " startbit=\"" << dec << startbit << "\"";
+  s << " startbit=\"" << std::dec << startbit << "\"";
   s << " endbit=\"" << endbit << "\"";
   s << " startbyte=\"" << startbyte << "\"";
   s << " endbyte=\"" << endbyte << "\"";
@@ -662,43 +662,43 @@ void ContextField::restoreXml(const Element *el,Translate *trans)
 {
   signbit = xml_readbool(el->getAttributeValue("signbit"));
   {
-    istringstream s(el->getAttributeValue("startbit"));
-    s.unsetf(ios::dec | ios::hex | ios::oct);
+    std::istringstream s(el->getAttributeValue("startbit"));
+    s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
     s >> startbit;
   }
   {
-    istringstream s(el->getAttributeValue("endbit"));
-    s.unsetf(ios::dec | ios::hex | ios::oct);
+    std::istringstream s(el->getAttributeValue("endbit"));
+    s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
     s >> endbit;
   }
   {
-    istringstream s(el->getAttributeValue("startbyte"));
-    s.unsetf(ios::dec | ios::hex | ios::oct);
+    std::istringstream s(el->getAttributeValue("startbyte"));
+    s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
     s >> startbyte;
   }
   {
-    istringstream s(el->getAttributeValue("endbyte"));
-    s.unsetf(ios::dec | ios::hex | ios::oct);
+    std::istringstream s(el->getAttributeValue("endbyte"));
+    s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
     s >> endbyte;
   }
   {
-    istringstream s(el->getAttributeValue("shift"));
-    s.unsetf(ios::dec | ios::hex | ios::oct);
+    std::istringstream s(el->getAttributeValue("shift"));
+    s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
     s >> shift;
   }
 }
 
-void ConstantValue::saveXml(ostream &s) const
+void ConstantValue::saveXml(std::ostream &s) const
 
 {
-  s << "<intb val=\"" << dec << val << "\"/>\n";
+  s << "<intb val=\"" << std::dec << val << "\"/>\n";
 }
 
 void ConstantValue::restoreXml(const Element *el,Translate *trans)
 
 {
-  istringstream s(el->getAttributeValue("val"));
-  s.unsetf(ios::dec | ios::hex | ios::oct);
+  std::istringstream s(el->getAttributeValue("val"));
+  s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
   s >> val;
 }
 
@@ -749,7 +749,7 @@ intb OperandValue::getValue(ParserWalker &walker) const
   return res;
 }
 
-intb OperandValue::getSubValue(const vector<intb> &replace,int4 &listpos) const
+intb OperandValue::getSubValue(const std::vector<intb> &replace,int4 &listpos) const
 
 {
   OperandSymbol *sym = ct->getOperand(index);
@@ -763,19 +763,19 @@ bool OperandValue::isConstructorRelative(void) const
   return (sym->getOffsetBase()==-1);
 }
 
-const string &OperandValue::getName(void) const
+const std::string &OperandValue::getName(void) const
 
 {
   OperandSymbol *sym = ct->getOperand(index);
   return sym->getName();
 }
 
-void OperandValue::saveXml(ostream &s) const
+void OperandValue::saveXml(std::ostream &s) const
 
 {
   s << "<operand_exp";
-  s << " index=\"" << dec << index << "\"";
-  s << " table=\"0x" << hex << ct->getParent()->getId() << "\"";
+  s << " index=\"" << std::dec << index << "\"";
+  s << " table=\"0x" << std::dec << ct->getParent()->getId() << "\"";
   s << " ct=\"0x" << ct->getId() << "\"/>\n"; // Save id of our constructor
 }
 
@@ -784,18 +784,18 @@ void OperandValue::restoreXml(const Element *el,Translate *trans)
 {
   uintm ctid,tabid;
   {
-    istringstream s(el->getAttributeValue("index"));
-    s.unsetf(ios::dec | ios::hex | ios::oct);
+    std::istringstream s(el->getAttributeValue("index"));
+    s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
     s >> index;
   }
   {
-    istringstream s(el->getAttributeValue("table"));
-    s.unsetf(ios::dec | ios::hex | ios::oct);
+    std::istringstream s(el->getAttributeValue("table"));
+    s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
     s >> tabid;
   }
   {
-    istringstream s(el->getAttributeValue("ct"));
-    s.unsetf(ios::dec | ios::hex | ios::oct);
+    std::istringstream s(el->getAttributeValue("ct"));
+    s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
     s >> ctid;
   }
   SleighBase *sleigh = (SleighBase *)trans;
@@ -819,7 +819,7 @@ BinaryExpression::~BinaryExpression(void)
     PatternExpression::release(right);
 }
 
-void BinaryExpression::saveXml(ostream &s) const
+void BinaryExpression::saveXml(std::ostream &s) const
 
 {				// Outer tag is generated by derived classes
   left->saveXml(s);
@@ -829,9 +829,9 @@ void BinaryExpression::saveXml(ostream &s) const
 void BinaryExpression::restoreXml(const Element *el,Translate *trans)
 
 {
-  const List &list(el->getChildren());
+  const List &std::list(el->getChildren());
   List::const_iterator iter;
-  iter = list.begin();
+  iter = std::list.begin();
   left = PatternExpression::restoreExpression(*iter,trans);
   ++iter;
   right = PatternExpression::restoreExpression(*iter,trans);
@@ -852,7 +852,7 @@ UnaryExpression::~UnaryExpression(void)
     PatternExpression::release(unary);
 }
 
-void UnaryExpression::saveXml(ostream &s) const
+void UnaryExpression::saveXml(std::ostream &s) const
 
 {				// Outer tag is generated by derived classes
   unary->saveXml(s);
@@ -861,9 +861,9 @@ void UnaryExpression::saveXml(ostream &s) const
 void UnaryExpression::restoreXml(const Element *el,Translate *trans)
 
 {
-  const List &list(el->getChildren());
+  const List &std::list(el->getChildren());
   List::const_iterator iter;
-  iter = list.begin();
+  iter = std::list.begin();
   unary = PatternExpression::restoreExpression(*iter,trans);
   unary->layClaim();
 }
@@ -876,7 +876,7 @@ intb PlusExpression::getValue(ParserWalker &walker) const
   return leftval + rightval;
 }
 
-intb PlusExpression::getSubValue(const vector<intb> &replace,int4 &listpos) const
+intb PlusExpression::getSubValue(const std::vector<intb> &replace,int4 &listpos) const
 
 {
   intb leftval = getLeft()->getSubValue(replace,listpos); // Must be left first
@@ -884,7 +884,7 @@ intb PlusExpression::getSubValue(const vector<intb> &replace,int4 &listpos) cons
   return leftval + rightval;
 }
 
-void PlusExpression::saveXml(ostream &s) const
+void PlusExpression::saveXml(std::ostream &s) const
 
 {
   s << "<plus_exp>\n";
@@ -900,7 +900,7 @@ intb SubExpression::getValue(ParserWalker &walker) const
   return leftval - rightval;
 }
 
-intb SubExpression::getSubValue(const vector<intb> &replace,int4 &listpos) const
+intb SubExpression::getSubValue(const std::vector<intb> &replace,int4 &listpos) const
 
 {
   intb leftval = getLeft()->getSubValue(replace,listpos); // Must be left first
@@ -908,7 +908,7 @@ intb SubExpression::getSubValue(const vector<intb> &replace,int4 &listpos) const
   return leftval - rightval;
 }
 
-void SubExpression::saveXml(ostream &s) const
+void SubExpression::saveXml(std::ostream &s) const
 
 {
   s << "<sub_exp>\n";
@@ -924,7 +924,7 @@ intb MultExpression::getValue(ParserWalker &walker) const
   return leftval * rightval;
 }
 
-intb MultExpression::getSubValue(const vector<intb> &replace,int4 &listpos) const
+intb MultExpression::getSubValue(const std::vector<intb> &replace,int4 &listpos) const
 
 {
   intb leftval = getLeft()->getSubValue(replace,listpos); // Must be left first
@@ -932,7 +932,7 @@ intb MultExpression::getSubValue(const vector<intb> &replace,int4 &listpos) cons
   return leftval * rightval;
 }
 
-void MultExpression::saveXml(ostream &s) const
+void MultExpression::saveXml(std::ostream &s) const
 
 {
   s << "<mult_exp>\n";
@@ -948,7 +948,7 @@ intb LeftShiftExpression::getValue(ParserWalker &walker) const
   return leftval << rightval;
 }
 
-intb LeftShiftExpression::getSubValue(const vector<intb> &replace,int4 &listpos) const
+intb LeftShiftExpression::getSubValue(const std::vector<intb> &replace,int4 &listpos) const
 
 {
   intb leftval = getLeft()->getSubValue(replace,listpos); // Must be left first
@@ -956,7 +956,7 @@ intb LeftShiftExpression::getSubValue(const vector<intb> &replace,int4 &listpos)
   return leftval << rightval;
 }
 
-void LeftShiftExpression::saveXml(ostream &s) const
+void LeftShiftExpression::saveXml(std::ostream &s) const
 
 {
   s << "<lshift_exp>\n";
@@ -972,7 +972,7 @@ intb RightShiftExpression::getValue(ParserWalker &walker) const
   return leftval >> rightval;
 }
 
-intb RightShiftExpression::getSubValue(const vector<intb> &replace,int4 &listpos) const
+intb RightShiftExpression::getSubValue(const std::vector<intb> &replace,int4 &listpos) const
 
 {
   intb leftval = getLeft()->getSubValue(replace,listpos); // Must be left first
@@ -980,7 +980,7 @@ intb RightShiftExpression::getSubValue(const vector<intb> &replace,int4 &listpos
   return leftval >> rightval;
 }
 
-void RightShiftExpression::saveXml(ostream &s) const
+void RightShiftExpression::saveXml(std::ostream &s) const
 
 {
   s << "<rshift_exp>\n";
@@ -996,7 +996,7 @@ intb AndExpression::getValue(ParserWalker &walker) const
   return leftval & rightval;
 }
 
-intb AndExpression::getSubValue(const vector<intb> &replace,int4 &listpos) const
+intb AndExpression::getSubValue(const std::vector<intb> &replace,int4 &listpos) const
 
 {
   intb leftval = getLeft()->getSubValue(replace,listpos); // Must be left first
@@ -1004,7 +1004,7 @@ intb AndExpression::getSubValue(const vector<intb> &replace,int4 &listpos) const
   return leftval & rightval;
 }
 
-void AndExpression::saveXml(ostream &s) const
+void AndExpression::saveXml(std::ostream &s) const
 
 {
   s << "<and_exp>\n";
@@ -1020,7 +1020,7 @@ intb OrExpression::getValue(ParserWalker &walker) const
   return leftval | rightval;
 }
 
-intb OrExpression::getSubValue(const vector<intb> &replace,int4 &listpos) const
+intb OrExpression::getSubValue(const std::vector<intb> &replace,int4 &listpos) const
 
 {
   intb leftval = getLeft()->getSubValue(replace,listpos); // Must be left first
@@ -1028,7 +1028,7 @@ intb OrExpression::getSubValue(const vector<intb> &replace,int4 &listpos) const
   return leftval | rightval;
 }
 
-void OrExpression::saveXml(ostream &s) const
+void OrExpression::saveXml(std::ostream &s) const
 
 {
   s << "<or_exp>\n";
@@ -1044,7 +1044,7 @@ intb XorExpression::getValue(ParserWalker &walker) const
   return leftval ^ rightval;
 }
 
-intb XorExpression::getSubValue(const vector<intb> &replace,int4 &listpos) const
+intb XorExpression::getSubValue(const std::vector<intb> &replace,int4 &listpos) const
 
 {
   intb leftval = getLeft()->getSubValue(replace,listpos); // Must be left first
@@ -1052,7 +1052,7 @@ intb XorExpression::getSubValue(const vector<intb> &replace,int4 &listpos) const
   return leftval ^ rightval;
 }
 
-void XorExpression::saveXml(ostream &s) const
+void XorExpression::saveXml(std::ostream &s) const
 
 {
   s << "<xor_exp>\n";
@@ -1068,7 +1068,7 @@ intb DivExpression::getValue(ParserWalker &walker) const
   return leftval / rightval;
 }
 
-intb DivExpression::getSubValue(const vector<intb> &replace,int4 &listpos) const
+intb DivExpression::getSubValue(const std::vector<intb> &replace,int4 &listpos) const
 
 {
   intb leftval = getLeft()->getSubValue(replace,listpos); // Must be left first
@@ -1076,7 +1076,7 @@ intb DivExpression::getSubValue(const vector<intb> &replace,int4 &listpos) const
   return leftval / rightval;
 }
 
-void DivExpression::saveXml(ostream &s) const
+void DivExpression::saveXml(std::ostream &s) const
 
 {
   s << "<div_exp>\n";
@@ -1091,14 +1091,14 @@ intb MinusExpression::getValue(ParserWalker &walker) const
   return -val;
 }
 
-intb MinusExpression::getSubValue(const vector<intb> &replace,int4 &listpos) const
+intb MinusExpression::getSubValue(const std::vector<intb> &replace,int4 &listpos) const
 
 {
   intb val = getUnary()->getSubValue(replace,listpos);
   return -val;
 }
 
-void MinusExpression::saveXml(ostream &s) const
+void MinusExpression::saveXml(std::ostream &s) const
 
 {
   s << "<minus_exp>\n";
@@ -1113,14 +1113,14 @@ intb NotExpression::getValue(ParserWalker &walker) const
   return ~val;
 }
 
-intb NotExpression::getSubValue(const vector<intb> &replace,int4 &listpos) const
+intb NotExpression::getSubValue(const std::vector<intb> &replace,int4 &listpos) const
 
 {
   intb val = getUnary()->getSubValue(replace,listpos);
   return ~val;
 }
 
-void NotExpression::saveXml(ostream &s) const
+void NotExpression::saveXml(std::ostream &s) const
 
 {
   s << "<not_exp>\n";
@@ -1128,7 +1128,7 @@ void NotExpression::saveXml(ostream &s) const
   s << "</not_exp>\n";
 }
 
-static bool advance_combo(vector<intb> &val,const vector<intb> &min,vector<intb> &max)
+static bool advance_combo(std::vector<intb> &val,const std::vector<intb> &min,std::vector<intb> &max)
 
 {
   int4 i;
@@ -1144,8 +1144,8 @@ static bool advance_combo(vector<intb> &val,const vector<intb> &min,vector<intb>
   return false;
 }
 
-static TokenPattern buildPattern(PatternValue *lhs,intb lhsval,vector<const PatternValue *> &semval,
-				 vector<intb> &val)
+static TokenPattern buildPattern(PatternValue *lhs,intb lhsval,std::vector<const PatternValue *> &semval,
+				 std::vector<intb> &val)
 
 {
   TokenPattern respattern = lhs->genPattern(lhsval);
@@ -1163,7 +1163,7 @@ void PatternEquation::release(PatternEquation *pateq)
     delete pateq;
 }
 
-void OperandEquation::genPattern(const vector<TokenPattern> &ops) const
+void OperandEquation::genPattern(const std::vector<TokenPattern> &ops) const
 
 {
   resultpattern = ops[index];
@@ -1187,7 +1187,7 @@ bool OperandEquation::resolveOperandLeft(OperandResolve &state) const
   return true;
 }
 
-void OperandEquation::operandOrder(Constructor *ct,vector<OperandSymbol *> &order) const
+void OperandEquation::operandOrder(Constructor *ct,std::vector<OperandSymbol *> &order) const
 
 {
   OperandSymbol *sym = ct->getOperand(index);
@@ -1209,7 +1209,7 @@ UnconstrainedEquation::~UnconstrainedEquation(void)
   PatternExpression::release(patex);
 }
 
-void UnconstrainedEquation::genPattern(const vector<TokenPattern> &ops) const
+void UnconstrainedEquation::genPattern(const std::vector<TokenPattern> &ops) const
 
 {
   resultpattern = patex->genMinPattern(ops);
@@ -1251,15 +1251,15 @@ bool ValExpressEquation::resolveOperandLeft(OperandResolve &state) const
   return true;
 }
 
-void EqualEquation::genPattern(const vector<TokenPattern> &ops) const
+void EqualEquation::genPattern(const std::vector<TokenPattern> &ops) const
 
 {
   intb lhsmin = lhs->minValue();
   intb lhsmax = lhs->maxValue();
-  vector<const PatternValue *> semval;
-  vector<intb> min;
-  vector<intb> max;
-  vector<intb> cur;
+  std::vector<const PatternValue *> semval;
+  std::vector<intb> min;
+  std::vector<intb> max;
+  std::vector<intb> cur;
   int4 count=0;
 
   rhs->listValues(semval);
@@ -1280,15 +1280,15 @@ void EqualEquation::genPattern(const vector<TokenPattern> &ops) const
     throw SleighError("Equal constraint is impossible to match");
 }
 
-void NotEqualEquation::genPattern(const vector<TokenPattern> &ops) const
+void NotEqualEquation::genPattern(const std::vector<TokenPattern> &ops) const
 
 {
   intb lhsmin = lhs->minValue();
   intb lhsmax = lhs->maxValue();
-  vector<const PatternValue *> semval;
-  vector<intb> min;
-  vector<intb> max;
-  vector<intb> cur;
+  std::vector<const PatternValue *> semval;
+  std::vector<intb> min;
+  std::vector<intb> max;
+  std::vector<intb> cur;
   int4 count=0;
 
   rhs->listValues(semval);
@@ -1311,15 +1311,15 @@ void NotEqualEquation::genPattern(const vector<TokenPattern> &ops) const
     throw SleighError("Notequal constraint is impossible to match");
 }
 
-void LessEquation::genPattern(const vector<TokenPattern> &ops) const
+void LessEquation::genPattern(const std::vector<TokenPattern> &ops) const
 
 {
   intb lhsmin = lhs->minValue();
   intb lhsmax = lhs->maxValue();
-  vector<const PatternValue *> semval;
-  vector<intb> min;
-  vector<intb> max;
-  vector<intb> cur;
+  std::vector<const PatternValue *> semval;
+  std::vector<intb> min;
+  std::vector<intb> max;
+  std::vector<intb> cur;
   int4 count=0;
 
   rhs->listValues(semval);
@@ -1342,15 +1342,15 @@ void LessEquation::genPattern(const vector<TokenPattern> &ops) const
     throw SleighError("Less than constraint is impossible to match");
 }
 
-void LessEqualEquation::genPattern(const vector<TokenPattern> &ops) const
+void LessEqualEquation::genPattern(const std::vector<TokenPattern> &ops) const
 
 {
   intb lhsmin = lhs->minValue();
   intb lhsmax = lhs->maxValue();
-  vector<const PatternValue *> semval;
-  vector<intb> min;
-  vector<intb> max;
-  vector<intb> cur;
+  std::vector<const PatternValue *> semval;
+  std::vector<intb> min;
+  std::vector<intb> max;
+  std::vector<intb> cur;
   int4 count=0;
 
   rhs->listValues(semval);
@@ -1373,15 +1373,15 @@ void LessEqualEquation::genPattern(const vector<TokenPattern> &ops) const
     throw SleighError("Less than or equal constraint is impossible to match");
 }
 
-void GreaterEquation::genPattern(const vector<TokenPattern> &ops) const
+void GreaterEquation::genPattern(const std::vector<TokenPattern> &ops) const
 
 {
   intb lhsmin = lhs->minValue();
   intb lhsmax = lhs->maxValue();
-  vector<const PatternValue *> semval;
-  vector<intb> min;
-  vector<intb> max;
-  vector<intb> cur;
+  std::vector<const PatternValue *> semval;
+  std::vector<intb> min;
+  std::vector<intb> max;
+  std::vector<intb> cur;
   int4 count=0;
 
   rhs->listValues(semval);
@@ -1404,15 +1404,15 @@ void GreaterEquation::genPattern(const vector<TokenPattern> &ops) const
     throw SleighError("Greater than constraint is impossible to match");
 }
 
-void GreaterEqualEquation::genPattern(const vector<TokenPattern> &ops) const
+void GreaterEqualEquation::genPattern(const std::vector<TokenPattern> &ops) const
 
 {
   intb lhsmin = lhs->minValue();
   intb lhsmax = lhs->maxValue();
-  vector<const PatternValue *> semval;
-  vector<intb> min;
-  vector<intb> max;
-  vector<intb> cur;
+  std::vector<const PatternValue *> semval;
+  std::vector<intb> min;
+  std::vector<intb> max;
+  std::vector<intb> cur;
   int4 count=0;
 
   rhs->listValues(semval);
@@ -1449,7 +1449,7 @@ EquationAnd::~EquationAnd(void)
   PatternEquation::release(right);
 }
 
-void EquationAnd::genPattern(const vector<TokenPattern> &ops) const
+void EquationAnd::genPattern(const std::vector<TokenPattern> &ops) const
 
 {
   left->genPattern(ops);
@@ -1477,7 +1477,7 @@ bool EquationAnd::resolveOperandLeft(OperandResolve &state) const
   return true;
 }
 
-void EquationAnd::operandOrder(Constructor *ct,vector<OperandSymbol *> &order) const
+void EquationAnd::operandOrder(Constructor *ct,std::vector<OperandSymbol *> &order) const
 
 {
   left->operandOrder(ct,order);	// List operands left
@@ -1498,7 +1498,7 @@ EquationOr::~EquationOr(void)
   PatternEquation::release(right);
 }
 
-void EquationOr::genPattern(const vector<TokenPattern> &ops) const
+void EquationOr::genPattern(const std::vector<TokenPattern> &ops) const
 
 {
   left->genPattern(ops);
@@ -1526,7 +1526,7 @@ bool EquationOr::resolveOperandLeft(OperandResolve &state) const
   return true;
 }
 
-void EquationOr::operandOrder(Constructor *ct,vector<OperandSymbol *> &order) const
+void EquationOr::operandOrder(Constructor *ct,std::vector<OperandSymbol *> &order) const
 
 {
   left->operandOrder(ct,order);	// List operands left
@@ -1547,7 +1547,7 @@ EquationCat::~EquationCat(void)
   PatternEquation::release(right);
 }
 
-void EquationCat::genPattern(const vector<TokenPattern> &ops) const
+void EquationCat::genPattern(const std::vector<TokenPattern> &ops) const
 
 {
   left->genPattern(ops);
@@ -1591,14 +1591,14 @@ bool EquationCat::resolveOperandLeft(OperandResolve &state) const
   return true;
 }
 
-void EquationCat::operandOrder(Constructor *ct,vector<OperandSymbol *> &order) const
+void EquationCat::operandOrder(Constructor *ct,std::vector<OperandSymbol *> &order) const
 
 {
   left->operandOrder(ct,order);	// List operands left
   right->operandOrder(ct,order); //  to right
 }
 
-void EquationLeftEllipsis::genPattern(const vector<TokenPattern> &ops) const
+void EquationLeftEllipsis::genPattern(const std::vector<TokenPattern> &ops) const
 
 {
   eq->genPattern(ops);
@@ -1618,13 +1618,13 @@ bool EquationLeftEllipsis::resolveOperandLeft(OperandResolve &state) const
   return true;
 }
 
-void EquationLeftEllipsis::operandOrder(Constructor *ct,vector<OperandSymbol *> &order) const
+void EquationLeftEllipsis::operandOrder(Constructor *ct,std::vector<OperandSymbol *> &order) const
 
 {
   eq->operandOrder(ct,order);	// List operands
 }
 
-void EquationRightEllipsis::genPattern(const vector<TokenPattern> &ops) const
+void EquationRightEllipsis::genPattern(const std::vector<TokenPattern> &ops) const
 
 {
   eq->genPattern(ops);
@@ -1641,7 +1641,7 @@ bool EquationRightEllipsis::resolveOperandLeft(OperandResolve &state) const
   return true;
 }
 
-void EquationRightEllipsis::operandOrder(Constructor *ct,vector<OperandSymbol *> &order) const
+void EquationRightEllipsis::operandOrder(Constructor *ct,std::vector<OperandSymbol *> &order) const
 
 {
   eq->operandOrder(ct,order);	// List operands

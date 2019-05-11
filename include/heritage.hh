@@ -28,7 +28,7 @@ namespace GhidraDec {
 
 /// Container holding the stack system for the renaming algorithm.  Every disjoint address
 /// range (indexed by its initial address) maps to its own Varnode stack.
-typedef map<Address,vector<Varnode *> > VariableStack;
+typedef std::map<Address,std::vector<Varnode *> > VariableStack;
 
 /// \brief Label for describing extent of address range that has been heritaged
 struct SizePass {
@@ -41,32 +41,32 @@ struct SizePass {
 /// We keep track of a fairly fine grained description of when each address range
 /// was entered in SSA form, refered to as \b heritaged or, for Varnode objects,
 /// no longer \b free.  An address range is added using the add() method, which includes
-/// the particular pass when it was entered.  The map can be queried using findPass()
+/// the particular pass when it was entered.  The std::map can be queried using findPass()
 /// that informs the caller whether the address has been heritaged and if so in which pass.
 class LocationMap {
 public:
-  /// Iterator into the main map
-  typedef map<Address,SizePass>::iterator iterator;
+  /// Iterator into the main std::map
+  typedef std::map<Address,SizePass>::iterator iterator;
 private:
-  map<Address,SizePass> themap;	///< Heritaged addresses mapped to range size and pass number
+  std::map<Address,SizePass> themap;	///< Heritaged addresses mapped to range size and pass number
 public:
   iterator add(Address addr,int4 size,int4 pass,int4 &intersect); ///< Mark new address as \b heritaged
   iterator find(Address addr);			      ///< Look up if/how given address was heritaged
   int4 findPass(Address addr) const;		      ///< Look up if/how given address was heritaged
-  void erase(iterator iter) { themap.erase(iter); }   ///< Remove a particular entry from the map
+  void erase(iterator iter) { themap.erase(iter); }   ///< Remove a particular entry from the std::map
   iterator begin(void) { return themap.begin(); }     ///< Get starting iterator over heritaged ranges
   iterator end(void) { return themap.end(); }	      ///< Get ending iterator over heritaged ranges
-  void clear(void) { themap.clear(); }		      ///< Clear the map of heritaged ranges
+  void clear(void) { themap.clear(); }		      ///< Clear the std::map of heritaged ranges
 };
 
 /// \brief Priority queue for the phi-node (MULTIEQUAL) placement algorithm
 ///
-/// A \e work-list for basic blocks used during phi-node placement.  Implemented as
-/// a set of stacks with an associated priority.  Blocks are placed in the \e queue
+/// A \e work-std::list for basic blocks used during phi-node placement.  Implemented as
+/// a std::set of stacks with an associated priority.  Blocks are placed in the \e queue
 /// with an associated \e priority (or depth) using the insert() method.  The current
 /// highest priority block is retrieved with the extract() method.
 class PriorityQueue {
-  vector<vector<FlowBlock *> > queue; ///< An array of \e stacks, indexed by priority
+  std::vector<std::vector<FlowBlock *> > queue; ///< An array of \e stacks, indexed by priority
   int4 curdepth;		      ///< The current highest priority index with active blocks
 public:
   PriorityQueue(void) { curdepth = -2; } ///< Constructor
@@ -141,16 +141,16 @@ class Heritage {
   Funcdata *fd;		        ///< The function \b this is controlling SSA construction 
   LocationMap globaldisjoint;	///< Disjoint cover of every heritaged memory location
   LocationMap disjoint;		///< Disjoint cover of memory locations currently being heritaged
-  vector<vector<FlowBlock *> > domchild; ///< Parent->child edges in dominator tree
-  vector<vector<FlowBlock *> > augment; ///< Augmented edges
-  vector<uint4> flags;		///< Block properties for phi-node placement algorithm
-  vector<int4> depth;		///< Dominator depth of individual blocks
+  std::vector<std::vector<FlowBlock *> > domchild; ///< Parent->child edges in dominator tree
+  std::vector<std::vector<FlowBlock *> > augment; ///< Augmented edges
+  std::vector<uint4> flags;		///< Block properties for phi-node placement algorithm
+  std::vector<int4> depth;		///< Dominator depth of individual blocks
   int4 maxdepth;		///< Maximum depth of the dominator tree
   int4 pass;			///< Current pass being executed
 
   PriorityQueue pq;		///< Priority queue for phi-node placement
-  vector<FlowBlock *> merge;	///< Calculate merge points (blocks containing phi-nodes)
-  vector<HeritageInfo> infolist; ///< Heritage status for individual address spaces
+  std::vector<FlowBlock *> merge;	///< Calculate merge points (blocks containing phi-nodes)
+  std::vector<HeritageInfo> infolist; ///< Heritage status for individual address spaces
   void clearInfoList(void);	 ///< Reset heritage status for all address spaces
 
   /// \brief Get the heritage status for the given address space
@@ -159,34 +159,34 @@ class Heritage {
   /// \brief Get the heriage status for the given address space
   const HeritageInfo *getInfo(AddrSpace *spc) const { return &(infolist[spc->getIndex()]); }
 
-  void splitJoinLevel(vector<Varnode *> &lastcombo,vector<Varnode *> &nextlev,JoinRecord *joinrec);
+  void splitJoinLevel(std::vector<Varnode *> &lastcombo,std::vector<Varnode *> &nextlev,JoinRecord *joinrec);
   void splitJoinRead(Varnode *vn,JoinRecord *joinrec);
   void splitJoinWrite(Varnode *vn,JoinRecord *joinrec);
   void floatExtensionRead(Varnode *vn,JoinRecord *joinrec);
   void floatExtensionWrite(Varnode *vn,JoinRecord *joinrec);
   void processJoins(void);
   void buildADT(void);		///< Build the augmented dominator tree
-  int4 collect(Address addr,int4 size,vector<Varnode *> &read,vector<Varnode *> &write,vector<Varnode *> &input) const;
+  int4 collect(Address addr,int4 size,std::vector<Varnode *> &read,std::vector<Varnode *> &write,std::vector<Varnode *> &input) const;
   bool callOpIndirectEffect(const Address &addr,int4 size,PcodeOp *op) const;
   Varnode *normalizeReadSize(Varnode *vn,const Address &addr,int4 size);
   Varnode *normalizeWriteSize(Varnode *vn,const Address &addr,int4 size);
-  Varnode *concatPieces(const vector<Varnode *> &vnlist,PcodeOp *insertop,Varnode *finalvn);
-  void splitPieces(const vector<Varnode *> &vnlist,PcodeOp *insertop,const Address &addr,int4 size,Varnode *startvn);
-  void guard(const Address &addr,int4 size,vector<Varnode *> &read,vector<Varnode *> &write,vector<Varnode *> &inputvars);
-  void guardInput(const Address &addr,int4 size,vector<Varnode *> &input);
-  void guardCalls(uint4 flags,const Address &addr,int4 size,vector<Varnode *> &write);
-  void guardStores(const Address &addr,int4 size,vector<Varnode *> &write);
-  void guardReturns(uint4 flags,const Address &addr,int4 size,vector<Varnode *> &write);
-  //  void guardLoads(uint4 flags,const Address &addr,int4 size,vector<Varnode *> &write);
-  static void buildRefinement(vector<int4> &refine,const Address &addr,int4 size,const vector<Varnode *> &vnlist);
-  void splitByRefinement(Varnode *vn,const Address &addr,const vector<int4> &refine,vector<Varnode *> &split);
-  void refineRead(Varnode *vn,const Address &addr,const vector<int4> &refine,vector<Varnode *> &newvn);
-  void refineWrite(Varnode *vn,const Address &addr,const vector<int4> &refine,vector<Varnode *> &newvn);
-  void refineInput(Varnode *vn,const Address &addr,const vector<int4> &refine,vector<Varnode *> &newvn);
-  void remove13Refinement(vector<int4> &refine);
-  bool refinement(const Address &addr,int4 size,const vector<Varnode *> &readvars,const vector<Varnode *> &writevars,const vector<Varnode *> &inputvars);
+  Varnode *concatPieces(const std::vector<Varnode *> &vnlist,PcodeOp *insertop,Varnode *finalvn);
+  void splitPieces(const std::vector<Varnode *> &vnlist,PcodeOp *insertop,const Address &addr,int4 size,Varnode *startvn);
+  void guard(const Address &addr,int4 size,std::vector<Varnode *> &read,std::vector<Varnode *> &write,std::vector<Varnode *> &inputvars);
+  void guardInput(const Address &addr,int4 size,std::vector<Varnode *> &input);
+  void guardCalls(uint4 flags,const Address &addr,int4 size,std::vector<Varnode *> &write);
+  void guardStores(const Address &addr,int4 size,std::vector<Varnode *> &write);
+  void guardReturns(uint4 flags,const Address &addr,int4 size,std::vector<Varnode *> &write);
+  //  void guardLoads(uint4 flags,const Address &addr,int4 size,std::vector<Varnode *> &write);
+  static void buildRefinement(std::vector<int4> &refine,const Address &addr,int4 size,const std::vector<Varnode *> &vnlist);
+  void splitByRefinement(Varnode *vn,const Address &addr,const std::vector<int4> &refine,std::vector<Varnode *> &split);
+  void refineRead(Varnode *vn,const Address &addr,const std::vector<int4> &refine,std::vector<Varnode *> &newvn);
+  void refineWrite(Varnode *vn,const Address &addr,const std::vector<int4> &refine,std::vector<Varnode *> &newvn);
+  void refineInput(Varnode *vn,const Address &addr,const std::vector<int4> &refine,std::vector<Varnode *> &newvn);
+  void remove13Refinement(std::vector<int4> &refine);
+  bool refinement(const Address &addr,int4 size,const std::vector<Varnode *> &readvars,const std::vector<Varnode *> &writevars,const std::vector<Varnode *> &inputvars);
   void visitIncr(FlowBlock *qnode,FlowBlock *vnode);
-  void calcMultiequals(const vector<Varnode *> &write);
+  void calcMultiequals(const std::vector<Varnode *> &write);
   void renameRecurse(BlockBasic *bl,VariableStack &varstack);
   void bumpDeadcodeDelay(Varnode *vn);
 public:

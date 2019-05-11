@@ -44,32 +44,32 @@ public:
   Architecture *conf;
   CallGraph *cgraph;
 
-  map<Funcdata*,PrototypePieces> prototypePieces;
+  std::map<Funcdata*,PrototypePieces> prototypePieces;
   void storePrototypePieces( Funcdata *fd_in, PrototypePieces pp_in ) { prototypePieces.insert(pair<Funcdata*,PrototypePieces>(fd_in,pp_in)); }
   PrototypePieces findPrototypePieces( Funcdata *fd_in ) { return (*prototypePieces.find(fd_in)).second; }
 
 #ifdef CPUI_RULECOMPILE
-  string experimental_file;	// File containing experimental rules
+  std::string experimental_file;	// File containing experimental rules
 #endif
 #ifdef OPACTION_DEBUG
   bool jumptabledebug;
 #endif
   IfaceDecompData(void);
   virtual ~IfaceDecompData(void);
-  void abortFunction(ostream &s);
+  void abortFunction(std::ostream &s);
   void clearArchitecture(void);
 };
 
 class IfaceAssemblyEmit : public AssemblyEmit {
   int4 mnemonicpad;		// How much to pad the mnemonic
-  ostream *s;
+  std::ostream *s;
 public:
-  IfaceAssemblyEmit(ostream *val,int4 mp) { s = val; mnemonicpad=mp; }
-  virtual void dump(const Address &addr,const string &mnem,const string &body) {
+  IfaceAssemblyEmit(std::ostream *val,int4 mp) { s = val; mnemonicpad=mp; }
+  virtual void dump(const Address &addr,const std::string &mnem,const std::string &body) {
     addr.printRaw(*s);
     *s << ": " << mnem;
     for(int4 i=mnem.size();i<mnemonicpad;++i) *s << ' ';
-    *s << body << endl;
+    *s << body << std::endl;
   }
 };
 
@@ -84,7 +84,7 @@ protected:
   void iterateFunctionsAddrOrder(Scope *scope);
 public:
   virtual void setData(IfaceStatus *root,IfaceData *data) { status = root; dcp = (IfaceDecompData *)data; }
-  virtual string getModule(void) const { return "decompile"; }
+  virtual std::string getModule(void) const { return "decompile"; }
   virtual IfaceData *createData(void) { return new IfaceDecompData(); }
   virtual void iterationCallback(Funcdata *fd) {}
   void iterateFunctionsAddrOrder(void);

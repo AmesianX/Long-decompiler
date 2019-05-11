@@ -1,0 +1,17 @@
+s/[[:<:]]string[[:>:]]/std::string/g
+s/[[:<:]]ostream[[:>:]]/std::iostream/g
+s/[[:<:]]vector[[:>:]]/std::vector/g
+s/[[:<:]]map[[:>:]]/std::map/g
+s/[[:<:]]set[[:>:]]/std::set/g
+s/[[:<:]]endl[[:>:]]/std::endl/g
+s/[[:<:]]dec[[:>:]]/std::dec/g
+s/[[:<:]]hex[[:>:]]/std::dec/g
+s/[[:<:]]ios[[:>:]]/std::ios/g
+s/[[:<:]]list[[:>:]]/std::list/g
+s/[[:<:]]istringstream[[:>:]]/std::istringstream/g
+s/[[:<:]]ostringstream[[:>:]]/std::ostringstream/g
+s/::std::dec/dec/g
+s/::std::hex/hex/g
+s/std::std/std/g
+s/include <::/include </g
+s/include <std::/include </g

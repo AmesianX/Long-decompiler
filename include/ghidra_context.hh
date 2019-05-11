@@ -26,19 +26,19 @@ namespace GhidraDec {
 /// \brief An implementation of a ContextDatabase obtaining context information via a Ghidra client
 ///
 /// This only implements the tracked register parts of the interface. In fact, this only implements
-/// the single method getTrackedSet(). Other methods that get or set the low-level (disassembly)
+/// the single method getTrackedSet(). Other methods that get or std::set the low-level (disassembly)
 /// context variables will throw an exception. The low-level context is only needed by the
 /// Sleigh disassembly engine, which is being provided by the Ghidra client in this use case.
 class ContextGhidra : public ContextDatabase {
   ArchitectureGhidra *glb;			///< Architecture and connection to the Ghidra client
   mutable TrackedSet cache;			///< A cache of previously fetched tracked registers.
-  virtual ContextBitRange &getVariable(const string &nm) {
+  virtual ContextBitRange &getVariable(const std::string &nm) {
     throw LowlevelError("getVariable should not be called for GHIDRA"); }
-  virtual const ContextBitRange &getVariable(const string &nm) const {
+  virtual const ContextBitRange &getVariable(const std::string &nm) const {
     throw LowlevelError("getVariable should not be called for GHIDRA"); }
-  virtual void getRegionForSet(vector<uintm *> &res,const Address &addr1,const Address &addr2,int4 num,uintm mask) {
+  virtual void getRegionForSet(std::vector<uintm *> &res,const Address &addr1,const Address &addr2,int4 num,uintm mask) {
     throw LowlevelError("getRegionForSet should not be called for GHIDRA"); }
-  virtual void getRegionToChangePoint(vector<uintm *> &res,const Address &addr,int4 num,uintm mask) {
+  virtual void getRegionToChangePoint(std::vector<uintm *> &res,const Address &addr,int4 num,uintm mask) {
     throw LowlevelError("getRegionToChangePoint should not be called for GHIDRA"); }
   virtual const uintm *getDefaultValue(void) const {
     throw LowlevelError("getDefaultValue should not be called for GHIDRA"); }
@@ -62,9 +62,9 @@ public:
     throw LowlevelError("getContext should not be called for GHIDRA"); }
   virtual const uintm *getContext(const Address &addr,uintb &first,uintb &last) const {
     throw LowlevelError("getContext should not be called for GHIDRA"); }
-  virtual void registerVariable(const string &nm,int4 sbit,int4 ebit) {
+  virtual void registerVariable(const std::string &nm,int4 sbit,int4 ebit) {
     throw LowlevelError("registerVariable should not be called for GHIDRA"); }
-  virtual void saveXml(ostream &s) const {
+  virtual void saveXml(std::ostream &s) const {
     throw LowlevelError("context::saveXml should not be called for GHIDRA"); }
 
   virtual TrackedSet &createSet(const Address &addr1,const Address &addr2) {

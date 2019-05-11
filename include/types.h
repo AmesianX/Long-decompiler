@@ -193,7 +193,7 @@ typedef uint8 uintp;
 #pragma warning (disable:4244)
 
 /*
- The windows standard template library list implementation seems to have a philosophical difference with
+ The windows standard template library std::list implementation seems to have a philosophical difference with
  the standard regarding the validity of iterators pointing to objects that are moved between containers
  (via the splice method) These defines turn off the validity checks
  (These have been moved to the VC project spec)

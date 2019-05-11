@@ -467,7 +467,7 @@ bool PreferSplitManager::testTemporary(SplitInstance *inst)
   default:
     return false;
   }
-  list<PcodeOp *>::const_iterator iter,enditer;
+  std::list<PcodeOp *>::const_iterator iter,enditer;
   iter = inst->vn->beginDescend();
   enditer = inst->vn->endDescend();
   while(iter != enditer) {
@@ -525,7 +525,7 @@ void PreferSplitManager::splitTemporary(SplitInstance *inst)
   data->opDestroy(op);
 }
 
-void PreferSplitManager::init(Funcdata *fd,const vector<PreferSplitRecord> *rec)
+void PreferSplitManager::init(Funcdata *fd,const std::vector<PreferSplitRecord> *rec)
 
 {
   data = fd;
@@ -539,7 +539,7 @@ const PreferSplitRecord *PreferSplitManager::findRecord(Varnode *vn) const
   templ.storage.space = vn->getSpace();
   templ.storage.size = vn->getSize();
   templ.storage.offset = vn->getOffset();
-  vector<PreferSplitRecord>::const_iterator iter;
+  std::vector<PreferSplitRecord>::const_iterator iter;
   iter = lower_bound(records->begin(),records->end(),templ);
   if (iter == records->end())
     return (PreferSplitRecord *)0;
@@ -548,7 +548,7 @@ const PreferSplitRecord *PreferSplitManager::findRecord(Varnode *vn) const
   return &(*iter);
 }
 
-void PreferSplitManager::initialize(vector<PreferSplitRecord> &records)
+void PreferSplitManager::initialize(std::vector<PreferSplitRecord> &records)
 
 {
   sort(records.begin(),records.end());
@@ -564,7 +564,7 @@ void PreferSplitManager::split(void)
 void PreferSplitManager::splitAdditional(void)
 
 {
-  vector<PcodeOp *> defops;
+  std::vector<PcodeOp *> defops;
   for(int4 i=0;i<tempsplits.size();++i) {
     PcodeOp *op = tempsplits[i]; // Look at everything connected to COPYs in -tempsplits-
     if (op->isDead()) continue;
@@ -577,7 +577,7 @@ void PreferSplitManager::splitAdditional(void)
 	  defops.push_back(defop);
       }
     }
-    list<PcodeOp *>::const_iterator iter,enditer;
+    std::list<PcodeOp *>::const_iterator iter,enditer;
     iter = op->getOut()->beginDescend();
     enditer = op->getOut()->endDescend();
     while(iter != enditer) {

@@ -33,13 +33,13 @@ BfdArchitectureCapability::~BfdArchitectureCapability(void)
   SleighArchitecture::shutdown();
 }
 
-Architecture *BfdArchitectureCapability::buildArchitecture(const string &filename,const string &target,ostream *estream)
+Architecture *BfdArchitectureCapability::buildArchitecture(const std::string &filename,const std::string &target,std::ostream *estream)
 
 {
   return new BfdArchitecture(filename,target,estream);
 }
 
-bool BfdArchitectureCapability::isFileMatch(const string &filename) const
+bool BfdArchitectureCapability::isFileMatch(const std::string &filename) const
 
 {
   ifstream s(filename.c_str());
@@ -84,24 +84,24 @@ void BfdArchitecture::resolveArchitecture(void)
 
 {
   archid = getTarget();
-  if (archid.find(':')==string::npos) {
+  if (archid.find(':')==std::string::npos) {
     archid = loader->getArchType();
     // kludge to distinguish windows binaries from linux/gcc
-    if (archid.find("efi-app-ia32") != string::npos)
+    if (archid.find("efi-app-ia32") != std::string::npos)
       archid = "x86:LE:32:default:windows";
-    else if (archid.find("pe-i386") != string::npos)
+    else if (archid.find("pe-i386") != std::string::npos)
       archid = "x86:LE:32:default:windows";
-    else if (archid.find("pei-i386") != string::npos)
+    else if (archid.find("pei-i386") != std::string::npos)
       archid = "x86:LE:32:default:windows";
-    else if (archid.find("pei-x86-64") != string::npos)
+    else if (archid.find("pei-x86-64") != std::string::npos)
       archid = "x86:LE:64:default:windows";
-    else if (archid.find("sparc") != string::npos)
+    else if (archid.find("sparc") != std::string::npos)
       archid = "sparc:BE:32:default:default";
-    else if (archid.find("elf64") != string::npos)
+    else if (archid.find("elf64") != std::string::npos)
       archid = "x86:LE:64:default:gcc";
-    else if (archid.find("elf") != string::npos)
+    else if (archid.find("elf") != std::string::npos)
       archid = "x86:LE:32:default:gcc";
-    else if (archid.find("mach-o") != string::npos)
+    else if (archid.find("mach-o") != std::string::npos)
       archid = "PowerPC:BE:32:default:macosx";
     else
       throw LowlevelError("Cannot convert bfd target to sleigh target: "+archid);
@@ -119,14 +119,14 @@ void BfdArchitecture::postSpecFile(void)
 /// \param fname is the path to the executable file
 /// \param targ is the (optional) language id to use for the file
 /// \param estream is the stream to use for the error console
-BfdArchitecture::BfdArchitecture(const string &fname,const string &targ,ostream *estream)
+BfdArchitecture::BfdArchitecture(const std::string &fname,const std::string &targ,std::ostream *estream)
   : SleighArchitecture(fname,targ,estream)
 
-{				// Select architecture from string
+{				// Select architecture from std::string
   adjustvma = 0;
 }
 
-void BfdArchitecture::saveXml(ostream &s) const
+void BfdArchitecture::saveXml(std::ostream &s) const
 
 {				// prepend extra stuff to specify binary file and spec
   s << "<bfd_savefile";
@@ -147,16 +147,16 @@ void BfdArchitecture::restoreXml(DocumentStorage &store)
 
   restoreXmlHeader(el);
   {
-    istringstream s( el->getAttributeValue("adjustvma"));
-    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+    std::istringstream s( el->getAttributeValue("adjustvma"));
+    s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
     s >> adjustvma;
   }
-  const List &list(el->getChildren());
+  const List &std::list(el->getChildren());
   List::const_iterator iter;
 
-  iter = list.begin();
+  iter = std::list.begin();
 
-  if (iter != list.end()) {
+  if (iter != std::list.end()) {
     if ((*iter)->getName() == "coretypes") {
       store.registerTag(*iter);
       ++iter;
@@ -164,7 +164,7 @@ void BfdArchitecture::restoreXml(DocumentStorage &store)
   }
   init(store); // Load the image and configure
 
-  if (iter != list.end()) {
+  if (iter != std::list.end()) {
     store.registerTag(*iter);
     SleighArchitecture::restoreXml(store);
   }

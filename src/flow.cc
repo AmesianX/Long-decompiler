@@ -22,7 +22,7 @@ namespace GhidraDec {
 /// \param o is the internal p-code container for the function
 /// \param b is the internal basic block container
 /// \param q is the internal container of call sites
-FlowInfo::FlowInfo(Funcdata &d,PcodeOpBank &o,BlockGraph &b,vector<FuncCallSpecs *> &q) :
+FlowInfo::FlowInfo(Funcdata &d,PcodeOpBank &o,BlockGraph &b,std::vector<FuncCallSpecs *> &q) :
   data(d), obank(o), bblocks(b), qlst(q),
   baddr(d.getAddress().getSpace(),0),
   eaddr(d.getAddress().getSpace(),~((uintb)0)),
@@ -34,7 +34,7 @@ FlowInfo::FlowInfo(Funcdata &d,PcodeOpBank &o,BlockGraph &b,vector<FuncCallSpecs
   flags = 0;
   emitter.setFuncdata(&d);
   inline_head = (Funcdata *)0;
-  inline_recursion = (set<Address> *)0;
+  inline_recursion = (std::set<Address> *)0;
   insn_count = 0;
   insn_max = ~((uint4)0);
   flowoverride_present = data.getOverride().hasFlowOverride();
@@ -48,7 +48,7 @@ FlowInfo::FlowInfo(Funcdata &d,PcodeOpBank &o,BlockGraph &b,vector<FuncCallSpecs
 /// \param b is the internal basic block container
 /// \param q is the internal container of call sites
 /// \param op2 is the existing flow
-FlowInfo::FlowInfo(Funcdata &d,PcodeOpBank &o,BlockGraph &b,vector<FuncCallSpecs *> &q,const FlowInfo *op2) :
+FlowInfo::FlowInfo(Funcdata &d,PcodeOpBank &o,BlockGraph &b,std::vector<FuncCallSpecs *> &q,const FlowInfo *op2) :
   data(d), obank(o), bblocks(b), qlst(q),
   baddr(op2->baddr),
   eaddr(op2->eaddr),
@@ -68,7 +68,7 @@ FlowInfo::FlowInfo(Funcdata &d,PcodeOpBank &o,BlockGraph &b,vector<FuncCallSpecs
     inline_recursion = &inline_base;
   }
   else
-    inline_recursion = (set<Address> *)0;
+    inline_recursion = (std::set<Address> *)0;
   insn_count = op2->insn_count;
   insn_max = op2->insn_max;
   flowoverride_present = data.getOverride().hasFlowOverride();
@@ -88,7 +88,7 @@ PcodeOp *FlowInfo::fallthruOp(PcodeOp *op) const
 
 {
   PcodeOp *retop;
-  list<PcodeOp *>::const_iterator iter = op->getInsertIter();
+  std::list<PcodeOp *>::const_iterator iter = op->getInsertIter();
   ++iter;
   if (iter != obank.endDead()) {
     retop = *iter;
@@ -96,7 +96,7 @@ PcodeOp *FlowInfo::fallthruOp(PcodeOp *op) const
       return retop;		// Then this is the fall thru
   }
   // Find address of instruction containing this op
-  map<Address,VisitStat>::const_iterator miter;
+  std::map<Address,VisitStat>::const_iterator miter;
   miter = visited.upper_bound(op->getAddr());
   if (miter == visited.begin()) return (PcodeOp *)0;
   --miter;
@@ -114,7 +114,7 @@ PcodeOp *FlowInfo::fallthruOp(PcodeOp *op) const
 PcodeOp *FlowInfo::target(const Address &addr) const
 
 {
-  map<Address,VisitStat>::const_iterator iter;
+  std::map<Address,VisitStat>::const_iterator iter;
 
   iter = visited.find(addr);
   while(iter != visited.end()) {
@@ -128,7 +128,7 @@ PcodeOp *FlowInfo::target(const Address &addr) const
     // Visit fall thru address in case of no-op
     iter = visited.find( (*iter).first + (*iter).second.size );
   }
-  ostringstream errmsg;
+  std::ostringstream errmsg;
   errmsg << "Could not find op at target address: (";
   errmsg << addr.getSpace()->getName() << ',';
   addr.printRaw(errmsg);
@@ -160,7 +160,7 @@ PcodeOp *FlowInfo::findRelTarget(PcodeOp *op,Address &res) const
   retop = obank.findOp(seqnum1); // We go back one sequence number
   if (retop != (PcodeOp *)0) {
     // If the PcodeOp exists here then branch was indeed to next instruction
-    map<Address,VisitStat>::const_iterator miter;
+    std::map<Address,VisitStat>::const_iterator miter;
     miter = visited.upper_bound(retop->getAddr());
     if (miter != visited.begin()) {
       --miter;
@@ -169,7 +169,7 @@ PcodeOp *FlowInfo::findRelTarget(PcodeOp *op,Address &res) const
 	return (PcodeOp *)0;	// Indicate that res has the fallthru address
     }
   }
-  ostringstream errmsg;
+  std::ostringstream errmsg;
   errmsg << "Bad relative branch at instruction : (";
   errmsg << op->getAddr().getSpace()->getName() << ',';
   op->getAddr().printRaw(errmsg);
@@ -198,7 +198,7 @@ PcodeOp *FlowInfo::branchTarget(PcodeOp *op) const
 }
 
 /// Check to see if the new target has been seen before. Otherwise
-/// add it to the list of addresses that need to be processed.
+/// add it to the std::list of addresses that need to be processed.
 /// Also check range bounds and update basic block information.
 /// \param from is the PcodeOp issuing the branch
 /// \param to is the target address of the branch
@@ -222,8 +222,8 @@ void FlowInfo::newAddress(PcodeOp *from,const Address &to)
 /// \brief Delete any remaining ops at the end of the instruction
 ///
 /// (because they have been predetermined to be dead)
-/// \param oiter is the point within the raw p-code list where deletion should start
-void FlowInfo::deleteRemainingOps(list<PcodeOp *>::const_iterator oiter)
+/// \param oiter is the point within the raw p-code std::list where deletion should start
+void FlowInfo::deleteRemainingOps(std::list<PcodeOp *>::const_iterator oiter)
 
 {
   while(oiter != obank.endDead()) {
@@ -235,19 +235,19 @@ void FlowInfo::deleteRemainingOps(list<PcodeOp *>::const_iterator oiter)
 
 /// \brief Analyze control-flow within p-code for a single instruction
 ///
-/// Walk through the raw p-code (from the given iterator to the end of the list)
+/// Walk through the raw p-code (from the given iterator to the end of the std::list)
 /// looking for control flow operations (BRANCH,CBRANCH,BRANCHIND,CALL,CALLIND,RETURN)
 /// and add appropriate annotations (startbasic, callspecs, new addresses).
 /// As it iterates through the p-code, the method maintains a reference to a boolean
 /// indicating whether the current op is the start of a basic block. This value
 /// persists across calls. The method also passes back a boolean value indicating whether
 /// the instruction as a whole has fall-thru flow.
-/// \param oiter is the given iterator starting the list of p-code ops
+/// \param oiter is the given iterator starting the std::list of p-code ops
 /// \param startbasic is the reference holding whether the current op starts a basic block
 /// \param isfallthru passes back if the instruction has fall-thru flow
 /// \param fc if the p-code is generated from an \e injection, this holds the reference to the injecting sub-function
 /// \return the last processed PcodeOp (or NULL if there were no ops in the instruction)
-PcodeOp *FlowInfo::xrefControlFlow(list<PcodeOp *>::const_iterator oiter,bool &startbasic,bool &isfallthru,FuncCallSpecs *fc)
+PcodeOp *FlowInfo::xrefControlFlow(std::list<PcodeOp *>::const_iterator oiter,bool &startbasic,bool &isfallthru,FuncCallSpecs *fc)
 
 {
   PcodeOp *op = (PcodeOp *)0;
@@ -360,9 +360,9 @@ PcodeOp *FlowInfo::xrefControlFlow(list<PcodeOp *>::const_iterator oiter,bool &s
 
 /// \brief Generate p-code for a single machine instruction and process discovered flow information
 ///
-/// P-code is generated (to the raw \e dead list in PcodeOpBank). Errors for unimplemented
+/// P-code is generated (to the raw \e dead std::list in PcodeOpBank). Errors for unimplemented
 /// instructions or inaccessible data are handled.  The p-code is examined for control-flow,
-/// and annotations are made.  The set of visited instructions and the set of
+/// and annotations are made.  The std::set of visited instructions and the std::set of
 /// addresses still needing to be processed are updated.
 /// \param curaddr is the address of the instruction to process
 /// \param startbasic indicates of the instruction starts a basic block and passes back whether the next instruction does
@@ -373,7 +373,7 @@ bool FlowInfo::processInstruction(const Address &curaddr,bool &startbasic)
   bool emptyflag;
   bool isfallthru = true;
   //  JumpTable *jt;
-  list<PcodeOp *>::const_iterator oiter;
+  std::list<PcodeOp *>::const_iterator oiter;
   int4 step;
   uint4 flowoverride;
 
@@ -476,7 +476,7 @@ bool FlowInfo::processInstruction(const Address &curaddr,bool &startbasic)
 bool FlowInfo::setFallthruBound(Address &bound)
 
 {
-  map<Address,VisitStat>::const_iterator iter;
+  std::map<Address,VisitStat>::const_iterator iter;
   const Address &addr( addrlist.back() );
 
   iter = visited.upper_bound(addr); // First range greater than addr
@@ -507,7 +507,7 @@ void FlowInfo::handleOutOfBounds(const Address &fromaddr,const Address &toaddr)
 
 {
   if ((flags&ignore_outofbounds)==0) { // Should we throw an error for out of bounds
-    ostringstream errmsg;
+    std::ostringstream errmsg;
     errmsg << "Function flow out of bounds: ";
     errmsg << fromaddr.getShortcut();
     fromaddr.printRaw(errmsg);
@@ -587,25 +587,25 @@ PcodeOp *FlowInfo::artificialHalt(const Address &addr,uint4 flag)
   return haltop;
 }
 
-/// A set of bytes is \b reinterpreted if there are at least two
+/// A std::set of bytes is \b reinterpreted if there are at least two
 /// different interpretations of the bytes as instructions.
 /// \param addr is the address of a byte previously interpreted as (the interior of) an instruction
 void FlowInfo::reinterpreted(const Address &addr)
 
 {
-  map<Address,VisitStat>::const_iterator iter;
+  std::map<Address,VisitStat>::const_iterator iter;
 
   iter = visited.upper_bound(addr);
   if (iter==visited.begin()) return; // Should never happen
   --iter;
   const Address &addr2( (*iter).first );
-  ostringstream s;
+  std::ostringstream s;
 
   s << "Instruction at (" << addr.getSpace()->getName() << ',';
   addr.printRaw(s);
   s << ") overlaps instruction at (" << addr2.getSpace()->getName() << ',';
   addr2.printRaw(s);
-  s << ')' << endl;
+  s << ')' << std::endl;
   if ((flags & error_reinterpreted)!=0)
     throw LowlevelError(s.str());
 
@@ -738,7 +738,7 @@ void FlowInfo::truncateIndirectJump(PcodeOp *op,int4 failuremode)
 /// \param array is the array of p-code ops to search
 /// \param op is the given p-code op to search for
 /// \return \b true if the op is a member of the array
-bool FlowInfo::isInArray(vector<PcodeOp *> &array,PcodeOp *op)
+bool FlowInfo::isInArray(std::vector<PcodeOp *> &array,PcodeOp *op)
 
 {
   for(int4 i=0;i<array.size();++i) {
@@ -750,7 +750,7 @@ bool FlowInfo::isInArray(vector<PcodeOp *> &array,PcodeOp *op)
 void FlowInfo::generateOps(void)
 
 {
-  vector<PcodeOp *> notreached;	// indirect ops that are not reachable
+  std::vector<PcodeOp *> notreached;	// indirect ops that are not reachable
   int4 notreachcnt = 0;
   clearProperties();
   addrlist.push_back(data.getAddress());
@@ -818,13 +818,13 @@ void FlowInfo::generateBlocks(void)
     data.removeUnreachableBlocks(false,true);
 }
 
-/// In the case where additional flow is truncated, run through the list of
+/// In the case where additional flow is truncated, run through the std::list of
 /// pending addresses, and if they don't have a p-code generated for them,
 /// add the Address to the \b unprocessed array.
 void FlowInfo::findUnprocessed(void)
 
 {
-  vector<Address>::iterator iter;
+  std::vector<Address>::iterator iter;
 
   for(iter=addrlist.begin();iter!=addrlist.end();++iter) {
     if (seenInstruction(*iter)) {
@@ -836,13 +836,13 @@ void FlowInfo::findUnprocessed(void)
   }
 }
 
-/// The list is also sorted
+/// The std::list is also sorted
 void FlowInfo::dedupUnprocessed(void)
 
 {
   if (unprocessed.empty()) return;
   sort(unprocessed.begin(),unprocessed.end());
-  vector<Address>::iterator iter1,iter2;
+  std::vector<Address>::iterator iter1,iter2;
 
   iter1 = unprocessed.begin();
   Address lastaddr = *iter1++;
@@ -859,11 +859,11 @@ void FlowInfo::dedupUnprocessed(void)
 }
 
 /// A special form of RETURN instruction is generated for every address in
-/// the \b unprocessed list.
+/// the \b unprocessed std::list.
 void FlowInfo::fillinBranchStubs(void)
 
 {
-  vector<Address>::iterator iter;
+  std::vector<Address>::iterator iter;
 
   findUnprocessed();
   dedupUnprocessed();
@@ -879,7 +879,7 @@ void FlowInfo::fillinBranchStubs(void)
 void FlowInfo::collectEdges(void)
 
 {
-  list<PcodeOp *>::const_iterator iter,iterend,iter1,iter2;
+  std::list<PcodeOp *>::const_iterator iter,iterend,iter1,iter2;
   PcodeOp *op,*targ_op;
   JumpTable *jt;
   bool nextstart;
@@ -949,7 +949,7 @@ void FlowInfo::collectEdges(void)
   }
 }
 
-/// PcodeOp objects are moved out of the PcodeOpBank \e dead list into their
+/// PcodeOp objects are moved out of the PcodeOpBank \e dead std::list into their
 /// assigned PcodeBlockBasic.  Initial address ranges of instructions are recorded in the block.
 /// PcodeBlockBasic objects are created based on p-code ops that have been
 /// previously marked as \e start of basic block.
@@ -958,7 +958,7 @@ void FlowInfo::splitBasic(void)
 {
   PcodeOp *op;
   BlockBasic *cur;
-  list<PcodeOp *>::const_iterator iter,iterend;
+  std::list<PcodeOp *>::const_iterator iter,iterend;
 
   iter = obank.beginDead();
   iterend = obank.endDead();
@@ -996,7 +996,7 @@ void FlowInfo::connectBasic(void)
 {
   PcodeOp *op,*targ_op;
   BlockBasic *bs,*targ_bs;
-  list<PcodeOp *>::const_iterator iter,iter2;
+  std::list<PcodeOp *>::const_iterator iter,iter2;
 
   iter = block_edge1.begin();
   iter2 = block_edge2.begin();
@@ -1047,7 +1047,7 @@ void FlowInfo::xrefInlinedBranch(PcodeOp *op)
 void FlowInfo::inlineClone(const FlowInfo &inlineflow,const Address &retaddr)
 
 {
-  list<PcodeOp *>::const_iterator iter;
+  std::list<PcodeOp *>::const_iterator iter;
   for(iter=inlineflow.data.beginOpDead();iter!=inlineflow.data.endOpDead();++iter) {
     PcodeOp *op = *iter;
     PcodeOp *cloneop;
@@ -1081,7 +1081,7 @@ void FlowInfo::inlineClone(const FlowInfo &inlineflow,const Address &retaddr)
 void FlowInfo::inlineEZClone(const FlowInfo &inlineflow,const Address &calladdr)
 
 {
-  list<PcodeOp *>::const_iterator iter;
+  std::list<PcodeOp *>::const_iterator iter;
   for(iter=inlineflow.data.beginOpDead();iter!=inlineflow.data.endOpDead();++iter) {
     PcodeOp *op = *iter;
     if (op->code() == CPUI_RETURN) break;
@@ -1113,7 +1113,7 @@ bool FlowInfo::testHardInlineRestrictions(Funcdata *inlinefd,PcodeOp *op,Address
   }
   
   if (!inlinefd->getFuncProto().isNoReturn()) {
-    list<PcodeOp *>::iterator iter = op->getInsertIter();
+    std::list<PcodeOp *>::iterator iter = op->getInsertIter();
     ++iter;
     if (iter == obank.endDead()) {
       inline_head->warning("No fallthrough prevents inlining here",op->getAddr());
@@ -1138,7 +1138,7 @@ bool FlowInfo::testHardInlineRestrictions(Funcdata *inlinefd,PcodeOp *op,Address
 bool FlowInfo::checkEZModel(void) const
 
 {
-  list<PcodeOp *>::const_iterator iter = obank.beginDead();
+  std::list<PcodeOp *>::const_iterator iter = obank.beginDead();
   while(iter != obank.endDead()) {
     PcodeOp *op = *iter;
     if (op->isCallOrBranch()) return false;
@@ -1159,7 +1159,7 @@ void FlowInfo::doInjection(InjectPayload *payload,InjectContext &icontext,PcodeO
 
 {
   // Create marker at current end of the deadlist
-  list<PcodeOp *>::const_iterator iter = obank.endDead();
+  std::list<PcodeOp *>::const_iterator iter = obank.endDead();
   --iter;			// There must be at least one op
 
   payload->inject(icontext,emitter);		// Do the injection
@@ -1179,7 +1179,7 @@ void FlowInfo::doInjection(InjectPayload *payload,InjectContext &icontext,PcodeO
 
   obank.moveSequenceDead(firstop,lastop,op); // Move the injection to right after the call
 
-  map<Address,VisitStat>::iterator viter = visited.find(op->getAddr());
+  std::map<Address,VisitStat>::iterator viter = visited.find(op->getAddr());
   if (viter != visited.end()) {				// Check if -op- is a possible branch target
     if ((*viter).second.seqnum == op->getSeqNum())	// (if injection op is the first op for its address)
       (*viter).second.seqnum = firstop->getSeqNum();	//    change the seqnum to the first injected op
@@ -1256,7 +1256,7 @@ bool FlowInfo::injectSubFunction(FuncCallSpecs *fc)
   InjectPayload *payload = glb->pcodeinjectlib->getPayload(fc->getInjectId());
   doInjection(payload,icontext,op,fc);
   // If the injection fills in the -paramshift- field of the context
-  // pass this information on to the callspec of the injected call, which must be last in the list
+  // pass this information on to the callspec of the injected call, which must be last in the std::list
   if (payload->getParamShift() != 0)
     qlst.back()->setParamshift(payload->getParamShift());
 
@@ -1333,7 +1333,7 @@ void FlowInfo::injectPcode(void)
 void FlowInfo::checkContainedCall(void)
 
 {
-  vector<FuncCallSpecs *>::iterator iter;
+  std::vector<FuncCallSpecs *>::iterator iter;
   for(iter=qlst.begin();iter!=qlst.end();++iter) {
     FuncCallSpecs *fc = *iter;
     Funcdata *fd = fc->getFuncdata();
@@ -1342,14 +1342,14 @@ void FlowInfo::checkContainedCall(void)
     if (op->code() != CPUI_CALL) continue;
 
     const Address &addr( fc->getEntryAddress() );
-    map<Address,VisitStat>::const_iterator miter;
+    std::map<Address,VisitStat>::const_iterator miter;
     miter = visited.upper_bound(addr);
     if (miter == visited.begin()) continue;
     --miter;
     if ((*miter).first + (*miter).second.size <= addr)
       continue;
     if ((*miter).first == addr) {
-      ostringstream s;
+      std::ostringstream s;
       s << "Possible PIC construction at ";
       op->getAddr().printRaw(s);
       s << ": Changing call to branch";
@@ -1359,7 +1359,7 @@ void FlowInfo::checkContainedCall(void)
       PcodeOp *targ = target(addr);
       data.opSetFlag(targ,PcodeOp::startbasic);
       // Make sure the following op starts a basic block
-      list<PcodeOp *>::const_iterator oiter = op->getInsertIter();
+      std::list<PcodeOp *>::const_iterator oiter = op->getInsertIter();
       ++oiter;
       if (oiter != obank.endDead())
 	data.opSetFlag(*oiter,PcodeOp::startbasic);

@@ -47,7 +47,7 @@ public:
   /// \brief Set \b this value within a given context blob
   ///
   /// \param vec is the given context blob to alter (as an array of uintm words)
-  /// \param val is the integer value to set
+  /// \param val is the integer value to std::set
   void setValue(uintm *vec,uintm val) const {
     uintm newval = vec[word];
     newval &= ~(mask<<shift);
@@ -75,11 +75,11 @@ struct TrackedContext {
   void restoreXml(const Element *el,const AddrSpaceManager *manage);	///< Restore \b this from an XML stream
   void saveXml(std::ostream &s) const;					///< Save \b this to an XML stream
 };
-typedef std::vector<TrackedContext> TrackedSet;		///< A set of tracked registers and their values (at one code point)
+typedef std::vector<TrackedContext> TrackedSet;		///< A std::set of tracked registers and their values (at one code point)
 
 /// \brief An interface to a database of disassembly/decompiler \b context information
 ///
-/// \b Context \b information is a set of named variables that hold concrete values at specific
+/// \b Context \b information is a std::set of named variables that hold concrete values at specific
 /// addresses in the target executable being analyzed. A variable can hold different values at
 /// different addresses, but a specific value at a specific address never changes. Analysis recovers
 /// these values over time, populating this database, and querying this database lets analysis
@@ -97,18 +97,18 @@ typedef std::vector<TrackedContext> TrackedSet;		///< A set of tracked registers
 ///      code. These are normally registers that are being tracked by the compiler outside the
 ///      domain of normal local and global variables. They have a specific value established by
 ///      the compiler coming into a function but are not supposed to be interpreted as a high-level
-///      variable. Typical examples are the direction flag (for \e string instructions) and segment
+///      variable. Typical examples are the direction flag (for \e std::string instructions) and segment
 ///      registers. All tracked variables are interpreted as a constant value at the start of a
 ///      function, although the memory location can be recycled for other calculations later in the
 ///      function.
 ///
-/// Low-level context variables can be queried and set by name -- getVariable(), setVariable(),
+/// Low-level context variables can be queried and std::set by name -- getVariable(), setVariable(),
 /// setVariableRegion() -- but the disassembler accesses all the variables at an address as a group
 /// via getContext(), setContextChangePoint(), setContextRegion().  In this setting, all the values
 /// are packed together in an array of words, a context \e blob (See ContextBitRange).
 ///
 /// Tracked variables are also queried as a group via getTrackedSet() and createSet().  These return
-/// a list of TrackedContext objects.
+/// a std::list of TrackedContext objects.
 class ContextDatabase {
 protected:
   static void saveTracked(std::ostream &s,const Address &addr,const TrackedSet &vec);
@@ -119,27 +119,27 @@ protected:
   /// If the variable doesn't exist an exception is thrown.
   /// \param nm is the name of the context value
   /// \return the ContextBitRange object matching the name
-  virtual ContextBitRange &getVariable(const string &nm)=0;
+  virtual ContextBitRange &getVariable(const std::string &nm)=0;
 
   /// \brief Retrieve the context variable description object by name
   ///
   /// If the variable doesn't exist an exception is thrown.
   /// \param nm is the name of the context value
   /// \return the ContextBitRange object matching the name
-  virtual const ContextBitRange &getVariable(const string &nm) const=0;
+  virtual const ContextBitRange &getVariable(const std::string &nm) const=0;
 
-  /// \brief Grab the context blob(s) for the given address range, marking bits that will be set
+  /// \brief Grab the context blob(s) for the given address range, marking bits that will be std::set
   ///
   /// This is an internal routine for obtaining the actual memory regions holding context values
-  /// for the address range.  This also informs the system which bits are getting set. A split is forced
+  /// for the address range.  This also informs the system which bits are getting std::set. A split is forced
   /// at the first address, and at least one memory region is passed back. The second address can be
   /// invalid in which case the memory region passed back is valid from the first address to whatever
   /// the next split point is.
   /// \param res will hold pointers to memory regions for the given range
   /// \param addr1 is the starting address of the range
   /// \param addr2 is (1 past) the last address of the range or is invalid
-  /// \param num is the word index for the context value that will be set
-  /// \param mask is a mask of the value being set (within its word)
+  /// \param num is the word index for the context value that will be std::set
+  /// \param mask is a mask of the value being std::set (within its word)
   virtual void getRegionForSet(std::vector<uintm *> &res,const Address &addr1,
 			       const Address &addr2,int4 num,uintm mask)=0;
 
@@ -150,8 +150,8 @@ protected:
   /// are returned up to the first address where that particular context value changes.
   /// \param res will hold pointers to memory regions being passed back
   /// \param addr is the starting address of the regions to fetch
-  /// \param num is the word index for the specific context value being set
-  /// \param mask is a mask of the context value being set (within its word)
+  /// \param num is the word index for the specific context value being std::set
+  /// \param mask is a mask of the context value being std::set (within its word)
   virtual void getRegionToChangePoint(std::vector<uintm *> &res,const Address &addr,int4 num,uintm mask)=0;
 
   /// \brief Retrieve the memory region holding all default context values
@@ -180,11 +180,11 @@ public:
   /// A new variable is registered by providing a name and the range of bits the value will occupy
   /// within the context blob.  The full blob size is automatically increased if necessary.  The variable
   /// must be contained within a single word, and all variables must be registered before any values can
-  /// be set.
+  /// be std::set.
   /// \param nm is the name of the new variable
   /// \param sbit is the position of the variable's most significant bit within the blob
   /// \param ebit is the position of the variable's least significant bit within the blob
-  virtual void registerVariable(const string &nm,int4 sbit,int4 ebit)=0;
+  virtual void registerVariable(const std::string &nm,int4 sbit,int4 ebit)=0;
 
   /// \brief Get the context blob of values associated with a given address
   ///
@@ -202,24 +202,24 @@ public:
   /// \return the memory region holding the context values for the address
   virtual const uintm *getContext(const Address &addr,uintb &first,uintb &last) const=0;
 
-  /// \brief Get the set of default values for all tracked registers
+  /// \brief Get the std::set of default values for all tracked registers
   ///
-  /// \return the list of TrackedContext objects
+  /// \return the std::list of TrackedContext objects
   virtual TrackedSet &getTrackedDefault(void)=0;
 
-  /// \brief Get the set of tracked register values associated with the given address
+  /// \brief Get the std::set of tracked register values associated with the given address
   ///
   /// \param addr is the given address
-  /// \return the list of TrackedContext objects
+  /// \return the std::list of TrackedContext objects
   virtual const TrackedSet &getTrackedSet(const Address &addr) const=0;
 
-  /// \brief Create a tracked register set that is valid over the given range
+  /// \brief Create a tracked register std::set that is valid over the given range
   ///
-  /// This really should be an internal routine.  The created set is empty, old values are blown
+  /// This really should be an internal routine.  The created std::set is empty, old values are blown
   /// away.  If old/default values are to be preserved, they must be copied back in.
   /// \param addr1 is the starting address of the given range
   /// \param addr2 is (1 past) the ending address of the given range
-  /// \return the empty set of tracked register values
+  /// \return the empty std::set of tracked register values
   virtual TrackedSet &createSet(const Address &addr1,const Address &addr2)=0;
 
   /// \brief Serialize the entire database to an XML stream
@@ -241,32 +241,32 @@ public:
   /// \param manage is used to resolve address space references
   virtual void restoreFromSpec(const Element *el,const AddrSpaceManager *manage)=0;
 
-  void setVariableDefault(const string &nm,uintm val);	///< Provide a default value for a context variable
-  uintm getDefaultValue(const string &nm) const;	///< Retrieve the default value for a context variable
-  void setVariable(const string &nm,const Address &addr,uintm value);	///< Set a context value at the given address
-  uintm getVariable(const string &nm,const Address &addr) const;	///< Retrieve a context value at the given address
+  void setVariableDefault(const std::string &nm,uintm val);	///< Provide a default value for a context variable
+  uintm getDefaultValue(const std::string &nm) const;	///< Retrieve the default value for a context variable
+  void setVariable(const std::string &nm,const Address &addr,uintm value);	///< Set a context value at the given address
+  uintm getVariable(const std::string &nm,const Address &addr) const;	///< Retrieve a context value at the given address
   void setContextChangePoint(const Address &addr,int4 num,uintm mask,uintm value);
   void setContextRegion(const Address &addr1,const Address &addr2,int4 num,uintm mask,uintm value);
-  void setVariableRegion(const string &nm,const Address &begad,
+  void setVariableRegion(const std::string &nm,const Address &begad,
 			 const Address &endad,uintm value);
   uintb getTrackedValue(const VarnodeData &mem,const Address &point) const;
 };
 
 /// \brief An in-memory implementation of the ContextDatabase interface
 ///
-/// Context blobs are held in a partition map on addresses.  Any address within the map
+/// Context blobs are held in a partition std::map on addresses.  Any address within the std::map
 /// indicates a \e split point, where the value of a context variable was explicitly changed.
-/// Sets of tracked registers are held in a separate partition map.
+/// Sets of tracked registers are held in a separate partition std::map.
 class ContextInternal : public ContextDatabase {
 
   /// \brief A context blob, holding context values across some range of code addresses
   ///
   /// This is an internal object that allocates the actual "array of words" for a context blob.
-  /// An associated mask array holds 1-bits for context variables that were explicitly set for the
+  /// An associated mask array holds 1-bits for context variables that were explicitly std::set for the
   /// specific split point.
   struct FreeArray {
     uintm *array;		///< The "array of words" holding context variable values
-    uintm *mask;		///< The mask array indicating which variables are explicitly set
+    uintm *mask;		///< The mask array indicating which variables are explicitly std::set
     int4 size;			///< The number of words in the array
     FreeArray(void) { size=0; array = (uintm *)0; mask = (uintm *)0; }	///< Construct an empty context blob
     ~FreeArray(void) { if (size!=0) { delete [] array; delete [] mask; } }	///< Destructor
@@ -275,13 +275,13 @@ class ContextInternal : public ContextDatabase {
   };
 
   int4 size;			///< Number of words in a context blob (for this architecture)
-  map<string,ContextBitRange> variables;		///< Map from context variable name to description object
-  partmap<Address,FreeArray> database;			///< Partition map of context blobs (FreeArray)
-  partmap<Address,TrackedSet> trackbase;		///< Partition map of tracked register sets
+  std::map<std::string,ContextBitRange> variables;		///< std::map from context variable name to description object
+  partmap<Address,FreeArray> database;			///< Partition std::map of context blobs (FreeArray)
+  partmap<Address,TrackedSet> trackbase;		///< Partition std::map of tracked register sets
   void saveContext(std::ostream &s,const Address &addr,const uintm *vec) const;
   void restoreContext(const Element *el,const Address &addr1,const Address &addr2);
-  virtual ContextBitRange &getVariable(const string &nm);
-  virtual const ContextBitRange &getVariable(const string &nm) const;
+  virtual ContextBitRange &getVariable(const std::string &nm);
+  virtual const ContextBitRange &getVariable(const std::string &nm) const;
   virtual void getRegionForSet(std::vector<uintm *> &res,const Address &addr1,
 			       const Address &addr2,int4 num,uintm mask);
   virtual void getRegionToChangePoint(std::vector<uintm *> &res,const Address &addr,int4 num,uintm mask);
@@ -291,7 +291,7 @@ public:
   ContextInternal(void) { size = 0; }
   virtual ~ContextInternal(void) {}
   virtual int4 getContextSize(void) const { return size; }
-  virtual void registerVariable(const string &nm,int4 sbit,int4 ebit);
+  virtual void registerVariable(const std::string &nm,int4 sbit,int4 ebit);
 
   virtual const uintm *getContext(const Address &addr) const { return database.getValue(addr).array; }
   virtual const uintm *getContext(const Address &addr,uintb &first,uintb &last) const;
@@ -312,7 +312,7 @@ public:
 /// exposes a minimal interface (getContext() and setContext()).
 class ContextCache {
   ContextDatabase *database;		///< The encapsulated context database
-  bool allowset;			///< If set to \b false, and setContext() call is dropped
+  bool allowset;			///< If std::set to \b false, and setContext() call is dropped
   mutable AddrSpace *curspace;		///< Address space of the current valid range
   mutable uintb first;			///< Starting offset of the current valid range
   mutable uintb last;			///< Ending offset of the current valid range

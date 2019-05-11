@@ -305,7 +305,7 @@ void ConstTpl::printHandleSelector(std::ostream &s,v_field val)
   }
 }
 
-ConstTpl::v_field ConstTpl::readHandleSelector(const string &name)
+ConstTpl::v_field ConstTpl::readHandleSelector(const std::string &name)
 
 {
   if (name == "space")
@@ -332,15 +332,15 @@ void ConstTpl::saveXml(std::ostream &s) const
   s << "<const_tpl type=\"";
   switch(type) {
   case real:
-    s << "real\" val=\"0x" << hex << value_real << "\"/>";
+    s << "real\" val=\"0x" << std::dec << value_real << "\"/>";
     break;
   case handle:
-    s << "handle\" val=\"" << dec << value.handle_index << "\" ";
+    s << "handle\" val=\"" << std::dec << value.handle_index << "\" ";
     s << "s=\"";
     printHandleSelector(s,select);
     s << "\"";
     if (select == v_offset_plus)
-      s << " plus=\"0x" << hex << value_real << "\"";
+      s << " plus=\"0x" << std::dec << value_real << "\"";
     s << "/>";
     break;
   case j_start:
@@ -359,7 +359,7 @@ void ConstTpl::saveXml(std::ostream &s) const
     s << "spaceid\" name=\"" << value.spaceid->getName() << "\"/>";
     break;
   case j_relative:
-    s << "relative\" val=\"0x" << hex << value_real << "\"/>";
+    s << "relative\" val=\"0x" << std::dec << value_real << "\"/>";
     break;
   case j_flowref:
     s << "flowref\"/>";
@@ -379,22 +379,22 @@ void ConstTpl::saveXml(std::ostream &s) const
 void ConstTpl::restoreXml(const Element *el,const AddrSpaceManager *manage)
 
 {
-  const string &typestring(el->getAttributeValue("type"));
+  const std::string &typestring(el->getAttributeValue("type"));
   if (typestring == "real") {
     type = real;
     std::istringstream s(el->getAttributeValue("val"));
-    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+    s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
     s >> value_real;
   }
   else if (typestring=="handle") {
     type = handle;
     std::istringstream s(el->getAttributeValue("val"));
-    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+    s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
     s >> value.handle_index;
     select = readHandleSelector(el->getAttributeValue("s"));
     if (select == v_offset_plus) {
       std::istringstream s2(el->getAttributeValue("plus"));
-      s2.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+      s2.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
       s2 >> value_real;
     }
   }
@@ -417,7 +417,7 @@ void ConstTpl::restoreXml(const Element *el,const AddrSpaceManager *manage)
   else if (typestring=="relative") {
     type = j_relative;
     std::istringstream s(el->getAttributeValue("val"));
-    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+    s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
     s >> value_real;
   }
   else if (typestring == "flowref") {
@@ -439,7 +439,7 @@ void ConstTpl::restoreXml(const Element *el,const AddrSpaceManager *manage)
 VarnodeTpl::VarnodeTpl(int4 hand,bool zerosize) :
   space(ConstTpl::handle,hand,ConstTpl::v_space), offset(ConstTpl::handle,hand,ConstTpl::v_offset), size(ConstTpl::handle,hand,ConstTpl::v_size)
 {				// Varnode built from a handle
-				// if zerosize is true, set the size constant to zero
+				// if zerosize is true, std::set the size constant to zero
   if (zerosize)
     size = ConstTpl(ConstTpl::real,0);
   unnamed_flag = false;
@@ -547,9 +547,9 @@ void VarnodeTpl::saveXml(std::ostream &s) const
 void VarnodeTpl::restoreXml(const Element *el,const AddrSpaceManager *manage)
 
 {
-  const List &list(el->getChildren());
+  const List &std::list(el->getChildren());
   List::const_iterator iter;
-  iter = list.begin();
+  iter = std::list.begin();
   space.restoreXml(*iter,manage);
   ++iter;
   offset.restoreXml(*iter,manage);
@@ -640,9 +640,9 @@ void HandleTpl::saveXml(std::ostream &s) const
 void HandleTpl::restoreXml(const Element *el,const AddrSpaceManager *manage)
 
 {
-  const List &list(el->getChildren());
+  const List &std::list(el->getChildren());
   List::const_iterator iter;
-  iter = list.begin();
+  iter = std::list.begin();
   space.restoreXml(*iter,manage);
   ++iter;
   size.restoreXml(*iter,manage);
@@ -717,9 +717,9 @@ void OpTpl::restoreXml(const Element *el,const AddrSpaceManager *manage)
 
 {
   opc = get_opcode(el->getAttributeValue("code"));
-  const List &list(el->getChildren());
+  const List &std::list(el->getChildren());
   List::const_iterator iter;
-  iter = list.begin();
+  iter = std::list.begin();
   if ((*iter)->getName() == "null")
     output = (VarnodeTpl *)0;
   else {
@@ -727,7 +727,7 @@ void OpTpl::restoreXml(const Element *el,const AddrSpaceManager *manage)
     output->restoreXml(*iter,manage);
   }
   ++iter;
-  while(iter != list.end()) {
+  while(iter != std::list.end()) {
     VarnodeTpl *vn = new VarnodeTpl();
     vn->restoreXml(*iter,manage);
     input.push_back(vn);
@@ -820,7 +820,7 @@ void ConstructTpl::changeHandleIndex(const std::vector<int4> &handmap)
 
 void ConstructTpl::setInput(VarnodeTpl *vn,int4 index,int4 slot)
 
-{ // set the VarnodeTpl input for a particular op
+{ // std::set the VarnodeTpl input for a particular op
   // for use with optimization routines
   OpTpl *op = vec[index];
   VarnodeTpl *oldvn = op->getIn(slot);
@@ -831,7 +831,7 @@ void ConstructTpl::setInput(VarnodeTpl *vn,int4 index,int4 slot)
 
 void ConstructTpl::setOutput(VarnodeTpl *vn,int4 index)
 
-{ // set the VarnodeTpl output for a particular op
+{ // std::set the VarnodeTpl output for a particular op
   // for use with optimization routines
   OpTpl *op = vec[index];
   VarnodeTpl *oldvn = op->getOut();
@@ -842,7 +842,7 @@ void ConstructTpl::setOutput(VarnodeTpl *vn,int4 index)
 
 void ConstructTpl::deleteOps(const std::vector<int4> &indices)
 
-{ // delete a particular set of ops
+{ // delete a particular std::set of ops
   for(uint4 i=0;i<indices.size();++i) {
     delete vec[indices[i]];
     vec[indices[i]] = (OpTpl *)0;
@@ -864,11 +864,11 @@ void ConstructTpl::saveXml(std::ostream &s,int4 sectionid) const
 {
   s << "<construct_tpl";
   if (sectionid >=0 )
-    s << " section=\"" << dec << sectionid << "\"";
+    s << " section=\"" << std::dec << sectionid << "\"";
   if (delayslot != 0)
-    s << " delay=\"" << dec << delayslot << "\"";
+    s << " delay=\"" << std::dec << delayslot << "\"";
   if (numlabels != 0)
-    s << " labels=\"" << dec << numlabels << "\"";
+    s << " labels=\"" << std::dec << numlabels << "\"";
   s << ">\n";
   if (result != (HandleTpl *)0)
     result->saveXml(s);
@@ -886,23 +886,23 @@ int4 ConstructTpl::restoreXml(const Element *el,const AddrSpaceManager *manage)
   for(int4 i=0;i<el->getNumAttributes();++i) {
     if (el->getAttributeName(i)=="delay") {
       std::istringstream s(el->getAttributeValue(i));
-      s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+      s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
       s >> delayslot;
     }
     else if (el->getAttributeName(i)=="labels") {
       std::istringstream s(el->getAttributeValue(i));
-      s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+      s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
       s >> numlabels;
     }
     else if (el->getAttributeName(i)=="section") {
       std::istringstream s(el->getAttributeValue(i));
-      s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+      s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
       s >> sectionid;
     }
   }
-  const List &list(el->getChildren());
+  const List &std::list(el->getChildren());
   List::const_iterator iter;
-  iter = list.begin();
+  iter = std::list.begin();
   if ((*iter)->getName() == "null")
     result = (HandleTpl *)0;
   else {
@@ -910,7 +910,7 @@ int4 ConstructTpl::restoreXml(const Element *el,const AddrSpaceManager *manage)
     result->restoreXml(*iter,manage);
   }
   ++iter;
-  while(iter != list.end()) {
+  while(iter != std::list.end()) {
     OpTpl *op = new OpTpl();
     op->restoreXml(*iter,manage);
     vec.push_back(op);

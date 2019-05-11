@@ -31,13 +31,13 @@ RawBinaryArchitectureCapability::~RawBinaryArchitectureCapability(void)
   SleighArchitecture::shutdown();
 }
 
-Architecture *RawBinaryArchitectureCapability::buildArchitecture(const string &filename,const string &target,ostream *estream)
+Architecture *RawBinaryArchitectureCapability::buildArchitecture(const std::string &filename,const std::string &target,std::ostream *estream)
 
 {
   return new RawBinaryArchitecture(filename,target,estream);
 }
 
-bool RawBinaryArchitectureCapability::isFileMatch(const string &filename) const
+bool RawBinaryArchitectureCapability::isFileMatch(const std::string &filename) const
 
 {
   return true;			// File can always be opened as raw binary
@@ -75,13 +75,13 @@ void RawBinaryArchitecture::postSpecFile(void)
   ((RawLoadImage *)loader)->attachToSpace(getDefaultSpace());	 // Attach default space to loader
 }
 
-RawBinaryArchitecture::RawBinaryArchitecture(const string &fname,const string &targ,ostream *estream)
+RawBinaryArchitecture::RawBinaryArchitecture(const std::string &fname,const std::string &targ,std::ostream *estream)
   : SleighArchitecture(fname,targ,estream)
 {
   adjustvma = 0;
 }
 
-void RawBinaryArchitecture::saveXml(ostream &s) const
+void RawBinaryArchitecture::saveXml(std::ostream &s) const
 
 {
   s << "<raw_savefile";
@@ -102,15 +102,15 @@ void RawBinaryArchitecture::restoreXml(DocumentStorage &store)
 
   restoreXmlHeader(el);
   {
-    istringstream s( el->getAttributeValue("adjustvma"));
-    s.unsetf(ios::dec | ios::hex | ios::oct);
+    std::istringstream s( el->getAttributeValue("adjustvma"));
+    s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
     s >> adjustvma;
   }
-  const List &list(el->getChildren());
+  const List &std::list(el->getChildren());
   List::const_iterator iter;
 
-  iter = list.begin();
-  if (iter != list.end()) {
+  iter = std::list.begin();
+  if (iter != std::list.end()) {
     if ((*iter)->getName() == "coretypes") {
       store.registerTag(*iter);
       ++iter;
@@ -118,7 +118,7 @@ void RawBinaryArchitecture::restoreXml(DocumentStorage &store)
   }
   init(store);			// Load the image and configure
 
-  if (iter != list.end()) {
+  if (iter != std::list.end()) {
     store.registerTag(*iter);
     SleighArchitecture::restoreXml(store);
   }

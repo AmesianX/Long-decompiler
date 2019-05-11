@@ -72,7 +72,7 @@ class MyLoadImage : public LoadImage {
 public:
   MyLoadImage(uintb ad,uint1 *ptr,int4 sz) : LoadImage("nofile") { baseaddr = ad; data = ptr; length = sz; }
   virtual void loadFill(uint1 *ptr,int4 size,const Address &addr);
-  virtual string getArchType(void) const { return "myload"; }
+  virtual std::string getArchType(void) const { return "myload"; }
   virtual void adjustVma(long adjust) { }
 };
 
@@ -102,9 +102,9 @@ void MyLoadImage::loadFill(uint1 *ptr,int4 size,const Address &addr)
 // to standard out.
 class AssemblyRaw : public AssemblyEmit {
 public:
-  virtual void dump(const Address &addr,const string &mnem,const string &body) {
+  virtual void dump(const Address &addr,const std::string &mnem,const std::string &body) {
     addr.printRaw(cout);
-    cout << ": " << mnem << ' ' << body << endl;
+    cout << ": " << mnem << ' ' << body << std::endl;
   }
 };
 
@@ -127,19 +127,19 @@ static void dumpAssembly(Translate &trans)
 //
 // These are the classes/routines relevant to printing a pcode translation
 
-// Here is a simple class for emitting pcode. We simply dump an appropriate string representation
+// Here is a simple class for emitting pcode. We simply dump an appropriate std::string representation
 // straight to standard out.
 class PcodeRawOut : public PcodeEmit {
 public:
   virtual void dump(const Address &addr,OpCode opc,VarnodeData *outvar,VarnodeData *vars,int4 isize);
 };
 
-static void print_vardata(ostream &s,VarnodeData &data)
+static void print_vardata(std::ostream &s,VarnodeData &data)
 
 {
   s << '(' << data.space->getName() << ',';
   data.space->printOffset(s,data.offset);
-  s << ',' << dec << data.size << ')';
+  s << ',' << std::dec << data.size << ')';
 }
 
 void PcodeRawOut::dump(const Address &addr,OpCode opc,VarnodeData *outvar,VarnodeData *vars,int4 isize)
@@ -155,7 +155,7 @@ void PcodeRawOut::dump(const Address &addr,OpCode opc,VarnodeData *outvar,Varnod
     cout << ' ';
     print_vardata(cout,vars[i]);
   }
-  cout << endl;
+  cout << std::endl;
 }
 
 static void dumpPcode(Translate &trans)
@@ -181,7 +181,7 @@ static void dumpPcode(Translate &trans)
 // These are the classes/routines relevant for emulating the executable
 
 // A simple class for emulating the system "puts" call.
-// It justs looks up the string data and dumps it to standard out.
+// It justs looks up the std::string data and dumps it to standard out.
 class PutsCallBack : public BreakCallBack {
 public:
   virtual bool addressCallback(const Address &addr);
@@ -198,7 +198,7 @@ bool PutsCallBack::addressCallback(const Address &addr)
   uint4 param1 = mem->getValue(ram,esp+4,4);
   mem->getChunk(buffer,ram,param1,255);
 
-  cout << (char *)&buffer << endl;
+  cout << (char *)&buffer << std::endl;
 
   uint4 returnaddr = mem->getValue(ram,esp,4);
   mem->setValue("ESP",esp+8);
@@ -209,7 +209,7 @@ bool PutsCallBack::addressCallback(const Address &addr)
 
 // A simple class for emulating the system "printf" call.
 // We don't really emulate all of it.  The only printf call in the example
-// has an initial string of "%d\n". So we grab the second parameter from the
+// has an initial std::string of "%d\n". So we grab the second parameter from the
 // memory state and print it as an integer
 class PrintfCallBack : public BreakCallBack {
 public:
@@ -225,7 +225,7 @@ bool PrintfCallBack::addressCallback(const Address &addr)
 
   uint4 esp = mem->getValue("ESP");
   uint4 param2 = mem->getValue(ram,esp+8,4);
-  cout << (int4)param2 << endl;
+  cout << (int4)param2 << std::endl;
 
   uint4 returnaddr = mem->getValue(ram,esp,4);
   mem->setValue("ESP",esp+12);
@@ -288,12 +288,12 @@ int main(int argc,char **argv)
 
 {
   if (argc != 2) {
-    cerr << "USAGE:  " << argv[0] << " disassemble" << endl;
-    cerr << "        " << argv[0] << " pcode" << endl;
-    cerr << "        " << argv[0] << " emulate" << endl;
+    cerr << "USAGE:  " << argv[0] << " disassemble" << std::endl;
+    cerr << "        " << argv[0] << " pcode" << std::endl;
+    cerr << "        " << argv[0] << " emulate" << std::endl;
     return 2;
   }
-  string action(argv[1]);
+  std::string action(argv[1]);
 
   // Set up the loadimage
   MyLoadImage loader(0x80483b4,myprog,408);
@@ -304,7 +304,7 @@ int main(int argc,char **argv)
   ContextInternal context;
 
   // Set up the assembler/pcode-translator
-  string sleighfilename = "specfiles/x86.sla";
+  std::string sleighfilename = "specfiles/x86.sla";
   Sleigh trans(&loader,&context);
 
   // Read sleigh file into DOM
@@ -314,7 +314,7 @@ int main(int argc,char **argv)
   trans.initialize(docstorage); // Initialize the translator
 
   // Now that context symbol names are loaded by the translator
-  // we can set the default context
+  // we can std::set the default context
 
   context.setVariableDefault("addrsize",1); // Address size is 32-bit
   context.setVariableDefault("opsize",1); // Operand size is 32-bit
@@ -326,7 +326,7 @@ int main(int argc,char **argv)
   else if (action == "emulate")
     doEmulation(trans,loader);
   else
-    cerr << "Unknown action: "+action << endl;
+    cerr << "Unknown action: "+action << std::endl;
 }
 
 /*
@@ -383,7 +383,7 @@ int main(int argc,char **argv)
 -a-
 -a- The "sleighexample" application expects a the x86 specification
 -a- file, named "x86.sla", to be in the "specfiles" directory.
--a- Or, you can easily change the hard coded string in main.
+-a- Or, you can easily change the hard coded std::string in main.
 -a-
 -a- The "sleighexample" application contains a tiny example of how to derive
 -a- a tailored LoadImage class in order to get executable bytes to the SLEIGH

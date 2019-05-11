@@ -125,7 +125,7 @@ void DynamicHash::buildVnUp(const Varnode *vn)
 void DynamicHash::buildVnDown(const Varnode *vn)
   
 {
-  list<PcodeOp *>::const_iterator iter;
+  std::list<PcodeOp *>::const_iterator iter;
   uint4 insize = opedge.size();
   
   for(iter=vn->beginDescend();iter!=vn->endDescend();++iter) {
@@ -315,9 +315,9 @@ void DynamicHash::calcHash(const Varnode *root,uint4 method)
   addrresult = op->getSeqNum().getAddr();
 }
 
-/// Collect the set of Varnodes at the same address as the given Varnode.
+/// Collect the std::set of Varnodes at the same address as the given Varnode.
 /// Starting with method 0, increment the method and calculate hashes
-/// of the Varnodes until the given Varnode has a unique hash within the set.
+/// of the Varnodes until the given Varnode has a unique hash within the std::set.
 /// The resulting hash and address can be obtained after calling this method
 /// through getHash() and getAddress().
 ///
@@ -325,7 +325,7 @@ void DynamicHash::calcHash(const Varnode *root,uint4 method)
 /// the hash encodes:
 ///   - the smallest number of hash collisions
 ///   - the method that produced the smallest number of hash collisions
-///   - the position of the root within the collision list
+///   - the position of the root within the collision std::list
 ///
 /// For most cases, this will still uniquely identify the root Varnode.
 /// \param root is the given root Varnode
@@ -333,9 +333,9 @@ void DynamicHash::calcHash(const Varnode *root,uint4 method)
 void DynamicHash::uniqueHash(const Varnode *root,Funcdata *fd)
 
 {
-  vector<Varnode *> vnlist;
-  vector<Varnode *> vnlist2;
-  vector<Varnode *> champion;
+  std::vector<Varnode *> vnlist;
+  std::vector<Varnode *> vnlist2;
+  std::vector<Varnode *> champion;
   uint4 method;
   uint8 tmphash;
   Address tmpaddr;
@@ -380,7 +380,7 @@ void DynamicHash::uniqueHash(const Varnode *root,Funcdata *fd)
     addrresult = Address();
     return;
   }
-  hash = tmphash | ((uint8)pos << 49); // Store three bits for position with list of duplicate hashes
+  hash = tmphash | ((uint8)pos << 49); // Store three bits for position with std::list of duplicate hashes
   hash |= ((uint8)total << 52);	// Store three bits for total number of duplicate hashes
   addrresult = tmpaddr;
 }
@@ -403,8 +403,8 @@ Varnode *DynamicHash::findVarnode(Funcdata *fd,const Address &addr,uint8 h)
   uint4 total = getTotalFromHash(h);
   uint4 pos = getPositionFromHash(h);
   clearTotalPosition(h);
-  vector<Varnode *> vnlist;
-  vector<Varnode *> vnlist2;
+  std::vector<Varnode *> vnlist;
+  std::vector<Varnode *> vnlist2;
   gatherFirstLevelVars(vnlist,fd,addr,h);
   for(uint4 i=0;i<vnlist.size();++i) {
     Varnode *tmpvn = vnlist[i];
@@ -421,12 +421,12 @@ Varnode *DynamicHash::findVarnode(Funcdata *fd,const Address &addr,uint8 h)
 ///
 /// Varnodes can be either inputs or outputs to the PcodeOps. The op-code, slot, and
 /// attachment boolean encoded in the hash are used to further filter the
-/// PcodeOp and Varnode objects. Varnodes are passed back in sequence with a list container.
+/// PcodeOp and Varnode objects. Varnodes are passed back in sequence with a std::list container.
 /// \param varlist is the container that will hold the matching Varnodes
 /// \param fd is the function holding the data-flow
 /// \param addr is the given address
 /// \param h is the given hash
-void DynamicHash::gatherFirstLevelVars(vector<Varnode *> &varlist,Funcdata *fd,const Address &addr,uint8 h)
+void DynamicHash::gatherFirstLevelVars(std::vector<Varnode *> &varlist,Funcdata *fd,const Address &addr,uint8 h)
 
 {
   OpCode opc = getOpCodeFromHash(h);
@@ -496,7 +496,7 @@ OpCode DynamicHash::getOpCodeFromHash(uint8 h)
   return (OpCode)((h>>37)&0x7f);
 }
 
-/// The hash encodes the position of the root Varnode within the list of hash collisions
+/// The hash encodes the position of the root Varnode within the std::list of hash collisions
 /// \param h is the hash value
 /// \return the position of the root
 uint4 DynamicHash::getPositionFromHash(uint8 h)
@@ -523,7 +523,7 @@ bool DynamicHash::getIsNotAttached(uint8 h)
   return (((h>>48)&1)!=0);
 }
 
-/// The position and total collisions fields are set by the uniqueness and
+/// The position and total collisions fields are std::set by the uniqueness and
 /// need to be cleared when comparing raw hashes.
 /// \param h is a reference to the hash to modify
 void DynamicHash::clearTotalPosition(uint8 &h)

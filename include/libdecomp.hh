@@ -26,10 +26,10 @@
 
 // Initialize all decompiler capabilities and register any sleigh specifications
 // If you have an entire ghidra distribution, you can specify its root with the -sleighhome- input,
-// otherwise you can provide a list of directories that contain '.lspec' files.
+// otherwise you can provide a std::list of directories that contain '.lspec' files.
 extern void startDecompilerLibrary(const char *sleighhome);
-extern void startDecompilerLibrary(const vector<string> &extrapaths);
-extern void startDecompilerLibrary(const char *sleighhome,const vector<string> &extrapaths);
+extern void startDecompilerLibrary(const vectorstd::string &extrapaths);
+extern void startDecompilerLibrary(const char *sleighhome,const vectorstd::string &extrapaths);
 
 extern void shutdownDecompilerLibrary(void);
 

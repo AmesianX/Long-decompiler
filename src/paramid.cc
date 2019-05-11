@@ -37,7 +37,7 @@ void ParamMeasure::walkforward( WalkState &state, PcodeOp *ignoreop, Varnode *vn
     state.depth -= 1;
     return;
   }
-  list<PcodeOp *>::const_iterator iter = vn->beginDescend();
+  std::list<PcodeOp *>::const_iterator iter = vn->beginDescend();
   while( rank != state.terminalrank && iter != vn->endDescend() ) {
     PcodeOp *op = *iter;
     if( op != ignoreop ) {
@@ -153,7 +153,7 @@ void ParamMeasure::calculateRank(bool best,Varnode *basevn,PcodeOp *ignoreop)
     walkbackward(state, ignoreop, basevn);
 }
 
-void ParamMeasure::saveXml( ostream &s,string tag,bool moredetail ) const
+void ParamMeasure::saveXml( std::ostream &s,std::string tag,bool moredetail ) const
 
 {
   s << "<" + tag +">\n<addr";
@@ -168,7 +168,7 @@ void ParamMeasure::saveXml( ostream &s,string tag,bool moredetail ) const
   s << "</" + tag + ">\n";
 }
 
-void ParamMeasure::savePretty( ostream &s,bool moredetail ) const
+void ParamMeasure::savePretty( std::ostream &s,bool moredetail ) const
 
 {
   s << "  Space: " << vndata.space->getName() << "\n";
@@ -197,7 +197,7 @@ ParamIDAnalysis::ParamIDAnalysis( Funcdata *fd_in, bool justproto )
     if (!outparam->getAddress().isInvalid()) { // If we don't have a void type
       OutputParamMeasures.push_back( ParamMeasure( outparam->getAddress(),outparam->getSize(),
 						   outparam->getType(),ParamMeasure::OUTPUT) );
-      list<PcodeOp *>::const_iterator rtn_iter = fd->beginOp( CPUI_RETURN );
+      std::list<PcodeOp *>::const_iterator rtn_iter = fd->beginOp( CPUI_RETURN );
       while( rtn_iter != fd->endOp( CPUI_RETURN ) ) {
 	PcodeOp *rtn_op = *rtn_iter;
 	// For RETURN op, input0 is address location of indirect return, input1,
@@ -214,7 +214,7 @@ ParamIDAnalysis::ParamIDAnalysis( Funcdata *fd_in, bool justproto )
     }
   }
   else {
-    // Need to list input varnodes that are outside of the model
+    // Need to std::list input varnodes that are outside of the model
     VarnodeDefSet::const_iterator iter,enditer;
     iter = fd->beginDef(Varnode::input);
     enditer = fd->endDef(Varnode::input);
@@ -228,7 +228,7 @@ ParamIDAnalysis::ParamIDAnalysis( Funcdata *fd_in, bool justproto )
   }
 }
 
-void ParamIDAnalysis::saveXml( ostream &s,bool moredetail ) const
+void ParamIDAnalysis::saveXml( std::ostream &s,bool moredetail ) const
 
 {
   s << "<parammeasures";
@@ -244,7 +244,7 @@ void ParamIDAnalysis::saveXml( ostream &s,bool moredetail ) const
   else
     a_v_i(s,"extrapop",extrapop);
   s << "/>\n";
-  list<ParamMeasure>::const_iterator pm_iter;
+  std::list<ParamMeasure>::const_iterator pm_iter;
   for( pm_iter = InputParamMeasures.begin(); pm_iter != InputParamMeasures.end(); ++pm_iter) {
     const ParamMeasure &pm( *pm_iter );
     s << "  ";
@@ -259,13 +259,13 @@ void ParamIDAnalysis::saveXml( ostream &s,bool moredetail ) const
   s << "\n";
 }
 
-void ParamIDAnalysis::savePretty( ostream &s,bool moredetail ) const
+void ParamIDAnalysis::savePretty( std::ostream &s,bool moredetail ) const
 
 {
-  s << "Param Measures\nFunction: " << fd->getName() << "\nAddress: 0x" << hex << fd->getAddress().getOffset() << "\n";
+  s << "Param Measures\nFunction: " << fd->getName() << "\nAddress: 0x" << std::dec << fd->getAddress().getOffset() << "\n";
   s << "Model: " << fd->getFuncProto().getModelName() << "\nExtrapop: " << fd->getFuncProto().getExtraPop() << "\n";
   s << "Num Params: " << InputParamMeasures.size() << "\n";
-  list<ParamMeasure>::const_iterator pm_iter = InputParamMeasures.begin();
+  std::list<ParamMeasure>::const_iterator pm_iter = InputParamMeasures.begin();
   for( pm_iter = InputParamMeasures.begin(); pm_iter != InputParamMeasures.end() ; ++pm_iter ) {
     const ParamMeasure &pm( *pm_iter );
     pm.savePretty( s, moredetail );

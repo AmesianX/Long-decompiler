@@ -35,8 +35,8 @@ void turn_on_debugging(Funcdata *fd)
 {
   if (ghidra_dcp == (IfaceStatus *)0) {
     ghidra_dcp = new IfaceStatus("[ghidradbg]> ",cin,cout);
-    ghidra_dcp->optr = (ostream *)0;
-    ghidra_dcp->fileoptr = (ostream *)0;
+    ghidra_dcp->optr = (std::ostream *)0;
+    ghidra_dcp->fileoptr = (std::ostream *)0;
     IfaceCapability::registerAllCommands(ghidra_dcp);
   }
   // Check if debug script exists
@@ -58,9 +58,9 @@ void turn_on_debugging(Funcdata *fd)
 void turn_off_debugging(Funcdata *fd)
 
 {
-  if (ghidra_dcp->optr != (ostream *)0) {
+  if (ghidra_dcp->optr != (std::ostream *)0) {
     delete ghidra_dcp->optr;
-    ghidra_dcp->optr = (ostream *)0;
+    ghidra_dcp->optr = (std::ostream *)0;
   }
 }
 
@@ -74,7 +74,7 @@ std::map<std::string,GhidraCommand *> GhidraCapability::commandmap; // List of c
 GhidraDecompCapability GhidraDecompCapability::ghidraDecompCapability;
 
 /// This method reads an id selecting the Architecture to act on, but it can be overloaded
-/// to read any set of data from the Ghidra client to configure how the command is executed.
+/// to read any std::set of data from the Ghidra client to configure how the command is executed.
 /// Individual parameters are read using the method protocol.
 void GhidraCommand::loadParameters(void)
 
@@ -83,7 +83,7 @@ void GhidraCommand::loadParameters(void)
   int4 type = ArchitectureGhidra::readToAnyBurst(sin);
   if (type != 14)
     throw JavaError("alignment","Expecting arch id start");
-  sin >> dec >> id;
+  sin >> std::dec >> id;
   type = ArchitectureGhidra::readToAnyBurst(sin);
   if (type != 15)
     throw JavaError("alignment","Expecting arch id end");
@@ -193,7 +193,7 @@ void RegisterProgram::sendResult(void)
 
 {
   sout.write("\000\000\001\016",4);
-  sout << dec << archid;
+  sout << std::dec << archid;
   sout.write("\000\000\001\017",4);
   GhidraCommand::sendResult();
 }
@@ -205,7 +205,7 @@ void DeregisterProgram::loadParameters(void)
   int4 type = ArchitectureGhidra::readToAnyBurst(sin);
   if (type!=14)
     throw JavaError("alignment","Expecting deregister id start");
-  sin >> dec >> inid;
+  sin >> std::dec >> inid;
   type = ArchitectureGhidra::readToAnyBurst(sin);
   if (type!=15)
     throw JavaError("alignment","Expecting deregister id end");
@@ -239,7 +239,7 @@ void DeregisterProgram::sendResult(void)
 
 {
   sout.write("\000\000\001\016",4);
-  sout << dec << res;
+  sout << std::dec << res;
   sout.write("\000\000\001\017",4);
   GhidraCommand::sendResult();
 }
@@ -260,7 +260,7 @@ void FlushNative::sendResult(void)
 
 {
   sout.write("\000\000\001\016",4);
-  sout << dec << res;
+  sout << std::dec << res;
   sout.write("\000\000\001\017",4);
   GhidraCommand::sendResult();
 }
@@ -282,7 +282,7 @@ void DecompileAt::rawAction(void)
 {
   Funcdata *fd = ghidra->symboltab->getGlobalScope()->queryFunction(addr);
   if (fd == (Funcdata *)0) {
-    ostringstream s;
+    std::ostringstream s;
     s << "Bad decompile address: " << addr.getShortcut();
     addr.printRaw(s);
     s << "\n";
@@ -462,7 +462,7 @@ void SetOptions::sendResult(void)
 /// \param sin is the input stream from the client
 /// \param out is the output stream to the client
 /// \return the result code of the command
-int4 GhidraCapability::readCommand(istream &sin,ostream &out)
+int4 GhidraCapability::readCommand(istream &sin,std::ostream &out)
 
 {
   std::string function;

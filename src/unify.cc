@@ -102,29 +102,29 @@ void UnifyDatatype::setConstant(uintb val)
   *storespot.cn = val;
 }
 
-void UnifyDatatype::printVarDecl(ostream &s,int4 id,const UnifyCPrinter &cprinter) const
+void UnifyDatatype::printVarDecl(std::ostream &s,int4 id,const UnifyCPrinter &cprinter) const
 
 {
   cprinter.printIndent(s);
   switch(type) {
   case op_type:
-    s << "PcodeOp *" << cprinter.getName(id) << ';' << endl;
+    s << "PcodeOp *" << cprinter.getName(id) << ';' << std::endl;
     break;
   case var_type:
-    s << "Varnode *" << cprinter.getName(id) << ';' << endl;
+    s << "Varnode *" << cprinter.getName(id) << ';' << std::endl;
     break;
   case block_type:
-    s << "BlockBasic *" << cprinter.getName(id) << ';' << endl;
+    s << "BlockBasic *" << cprinter.getName(id) << ';' << std::endl;
     break;
   case const_type:
-    s << "uintb " << cprinter.getName(id) << ';' << endl;
+    s << "uintb " << cprinter.getName(id) << ';' << std::endl;
     break;
   default:
     throw LowlevelError("Bad unify datatype");
   }
 }
 
-string UnifyDatatype::getBaseName(void) const
+std::string UnifyDatatype::getBaseName(void) const
 
 {
   switch(type) {
@@ -147,7 +147,7 @@ uintb ConstantNamed::getConstant(UnifyState &state) const
   return state.data(constindex).getConstant();
 }
 
-void ConstantNamed::writeExpression(ostream &s,UnifyCPrinter &printstate) const
+void ConstantNamed::writeExpression(std::ostream &s,UnifyCPrinter &printstate) const
 
 {
   s << printstate.getName(constindex);
@@ -159,10 +159,10 @@ uintb ConstantAbsolute::getConstant(UnifyState &state) const
   return val;
 }
 
-void ConstantAbsolute::writeExpression(ostream &s,UnifyCPrinter &printstate) const
+void ConstantAbsolute::writeExpression(std::ostream &s,UnifyCPrinter &printstate) const
 
 {
-  s << "(uintb)0x" << hex << val;
+  s << "(uintb)0x" << std::dec << val;
 }
 
 uintb ConstantNZMask::getConstant(UnifyState &state) const
@@ -172,7 +172,7 @@ uintb ConstantNZMask::getConstant(UnifyState &state) const
   return vn->getNZMask();
 }
 
-void ConstantNZMask::writeExpression(ostream &s,UnifyCPrinter &printstate) const
+void ConstantNZMask::writeExpression(std::ostream &s,UnifyCPrinter &printstate) const
 
 {
   s << printstate.getName(varindex) << "->getNZMask()";
@@ -185,7 +185,7 @@ uintb ConstantConsumed::getConstant(UnifyState &state) const
   return vn->getConsume();
 }
 
-void ConstantConsumed::writeExpression(ostream &s,UnifyCPrinter &printstate) const
+void ConstantConsumed::writeExpression(std::ostream &s,UnifyCPrinter &printstate) const
 
 {
   s << printstate.getName(varindex) << "->getConsume()";
@@ -198,7 +198,7 @@ uintb ConstantOffset::getConstant(UnifyState &state) const
   return vn->getOffset();
 }
 
-void ConstantOffset::writeExpression(ostream &s,UnifyCPrinter &printstate) const
+void ConstantOffset::writeExpression(std::ostream &s,UnifyCPrinter &printstate) const
 
 {
   s << printstate.getName(varindex) << "->getOffset()";
@@ -211,7 +211,7 @@ uintb ConstantIsConstant::getConstant(UnifyState &state) const
   return vn->isConstant() ? (uintb)1 : (uintb)0;
 }
 
-void ConstantIsConstant::writeExpression(ostream &s,UnifyCPrinter &printstate) const
+void ConstantIsConstant::writeExpression(std::ostream &s,UnifyCPrinter &printstate) const
 
 {
   s << "(uintb)" << printstate.getName(varindex) << "->isConstant()";
@@ -224,7 +224,7 @@ uintb ConstantHeritageKnown::getConstant(UnifyState &state) const
   return (uintb)(vn->isHeritageKnown() ? 1 : 0);
 }
 
-void ConstantHeritageKnown::writeExpression(ostream &s,UnifyCPrinter &printstate) const
+void ConstantHeritageKnown::writeExpression(std::ostream &s,UnifyCPrinter &printstate) const
 
 {
   s << "(uintb)" << printstate.getName(varindex) << "->isHeritageKnown()";
@@ -237,7 +237,7 @@ uintb ConstantVarnodeSize::getConstant(UnifyState &state) const
   return (uintb)vn->getSize();	// The size is the actual value
 }
 
-void ConstantVarnodeSize::writeExpression(ostream &s,UnifyCPrinter &printstate) const
+void ConstantVarnodeSize::writeExpression(std::ostream &s,UnifyCPrinter &printstate) const
 
 {
   s << "(uintb)" << printstate.getName(varindex) << "->getSize()";
@@ -280,11 +280,11 @@ uintb ConstantExpression::getConstant(UnifyState &state) const
   return res;
 }
 
-void ConstantExpression::writeExpression(ostream &s,UnifyCPrinter &printstate) const
+void ConstantExpression::writeExpression(std::ostream &s,UnifyCPrinter &printstate) const
 
 {
   int4 type;			// 0=binary 1=unarypre 2=unarypost 3=func
-  string name;			// name of operator
+  std::string name;			// name of operator
   switch(opc) {
   case CPUI_INT_ADD:
     type=0;
@@ -400,7 +400,7 @@ bool ConstraintBoolean::step(UnifyState &state)
   return (ourconst == 0);
 }
 
-void ConstraintBoolean::print(ostream &s,UnifyCPrinter &printstate) const
+void ConstraintBoolean::print(std::ostream &s,UnifyCPrinter &printstate) const
 
 {
   printstate.printIndent(s);
@@ -410,7 +410,7 @@ void ConstraintBoolean::print(ostream &s,UnifyCPrinter &printstate) const
     s << "== 0)";		// If false abort
   else
     s << "!= 0)";		// If true abort
-  s << endl;
+  s << std::endl;
   printstate.printAbort(s);
 }
 
@@ -451,13 +451,13 @@ bool ConstraintVarConst::step(UnifyState &state)
   return true;
 }
 
-void ConstraintVarConst::collectTypes(vector<UnifyDatatype> &typelist) const
+void ConstraintVarConst::collectTypes(std::vector<UnifyDatatype> &typelist) const
 
 {
   typelist[varindex] = UnifyDatatype(UnifyDatatype::var_type);
 }
 
-void ConstraintVarConst::print(ostream &s,UnifyCPrinter &printstate) const
+void ConstraintVarConst::print(std::ostream &s,UnifyCPrinter &printstate) const
 
 {
   printstate.printIndent(s);
@@ -465,12 +465,12 @@ void ConstraintVarConst::print(ostream &s,UnifyCPrinter &printstate) const
   if (exprsz != (RHSConstant *)0)
     exprsz->writeExpression(s,printstate);
   else
-    s << dec << (int4)sizeof(uintb);
+    s << std::dec << (int4)sizeof(uintb);
   s << ',';
   expr->writeExpression(s,printstate);
   s << " & calc_mask(";
   exprsz->writeExpression(s,printstate);
-  s << "));" << endl;
+  s << "));" << std::endl;
 }
 
 bool ConstraintNamedExpression::step(UnifyState &state)
@@ -483,19 +483,19 @@ bool ConstraintNamedExpression::step(UnifyState &state)
   return true;
 }
 
-void ConstraintNamedExpression::collectTypes(vector<UnifyDatatype> &typelist) const
+void ConstraintNamedExpression::collectTypes(std::vector<UnifyDatatype> &typelist) const
 
 {
   typelist[constindex] = UnifyDatatype(UnifyDatatype::const_type);
 }
 
-void ConstraintNamedExpression::print(ostream &s,UnifyCPrinter &printstate) const
+void ConstraintNamedExpression::print(std::ostream &s,UnifyCPrinter &printstate) const
 
 {
   printstate.printIndent(s);
   s << printstate.getName(constindex) << " = ";
   expr->writeExpression(s,printstate);
-  s << ';' << endl;
+  s << ';' << std::endl;
 }
 
 bool ConstraintOpCopy::step(UnifyState &state)
@@ -508,18 +508,18 @@ bool ConstraintOpCopy::step(UnifyState &state)
   return true;
 }
 
-void ConstraintOpCopy::collectTypes(vector<UnifyDatatype> &typelist) const
+void ConstraintOpCopy::collectTypes(std::vector<UnifyDatatype> &typelist) const
 
 {
   typelist[oldopindex] = UnifyDatatype(UnifyDatatype::op_type);
   typelist[newopindex] = UnifyDatatype(UnifyDatatype::op_type);
 }
 
-void ConstraintOpCopy::print(ostream &s,UnifyCPrinter &printstate) const
+void ConstraintOpCopy::print(std::ostream &s,UnifyCPrinter &printstate) const
 
 {
   printstate.printIndent(s);
-  s << printstate.getName(newopindex) << " = " << printstate.getName(oldopindex) << ';' << endl;
+  s << printstate.getName(newopindex) << " = " << printstate.getName(oldopindex) << ';' << std::endl;
 }
 
 bool ConstraintOpcode::step(UnifyState &state)
@@ -533,13 +533,13 @@ bool ConstraintOpcode::step(UnifyState &state)
   return false;
 }
 
-void ConstraintOpcode::collectTypes(vector<UnifyDatatype> &typelist) const
+void ConstraintOpcode::collectTypes(std::vector<UnifyDatatype> &typelist) const
 
 {
   typelist[opindex] = UnifyDatatype(UnifyDatatype::op_type);
 }
 
-void ConstraintOpcode::print(ostream &s,UnifyCPrinter &printstate) const
+void ConstraintOpcode::print(std::ostream &s,UnifyCPrinter &printstate) const
 
 {
   printstate.printIndent(s);
@@ -554,7 +554,7 @@ void ConstraintOpcode::print(ostream &s,UnifyCPrinter &printstate) const
       s << '(' << printstate.getName(opindex) << "->code() != CPUI_" << get_opname(opcodes[i]) << ')';
     }
   }
-  s << ')' << endl;
+  s << ')' << std::endl;
   printstate.printAbort(s);
 }
 
@@ -568,14 +568,14 @@ bool ConstraintOpCompare::step(UnifyState &state)
   return ((op1==op2) == istrue);
 }
 
-void ConstraintOpCompare::collectTypes(vector<UnifyDatatype> &typelist) const
+void ConstraintOpCompare::collectTypes(std::vector<UnifyDatatype> &typelist) const
 
 {
   typelist[op1index] = UnifyDatatype(UnifyDatatype::op_type);
   typelist[op2index] = UnifyDatatype(UnifyDatatype::op_type);
 }
 
-void ConstraintOpCompare::print(ostream &s,UnifyCPrinter &printstate) const
+void ConstraintOpCompare::print(std::ostream &s,UnifyCPrinter &printstate) const
 
 {
   printstate.printIndent(s);
@@ -584,7 +584,7 @@ void ConstraintOpCompare::print(ostream &s,UnifyCPrinter &printstate) const
     s << " != ";
   else
     s << " == ";
-  s << printstate.getName(op2index) << ')' << endl;
+  s << printstate.getName(op2index) << ')' << std::endl;
   printstate.printAbort(s);
 }
 
@@ -599,19 +599,19 @@ bool ConstraintOpInput::step(UnifyState &state)
   return true;
 }
 
-void ConstraintOpInput::collectTypes(vector<UnifyDatatype> &typelist) const
+void ConstraintOpInput::collectTypes(std::vector<UnifyDatatype> &typelist) const
 
 {
   typelist[opindex] = UnifyDatatype(UnifyDatatype::op_type);
   typelist[varnodeindex] = UnifyDatatype(UnifyDatatype::var_type);
 }
 
-void ConstraintOpInput::print(ostream &s,UnifyCPrinter &printstate) const
+void ConstraintOpInput::print(std::ostream &s,UnifyCPrinter &printstate) const
 
 {
   printstate.printIndent(s);
   s << printstate.getName(varnodeindex) << " = " << printstate.getName(opindex);
-  s << "->getIn(" << dec << slot << ");" << endl;
+  s << "->getIn(" << std::dec << slot << ");" << std::endl;
 }
 
 void ConstraintOpInputAny::initialize(UnifyState &state)
@@ -633,23 +633,23 @@ bool ConstraintOpInputAny::step(UnifyState &state)
   return true;
 }
 
-void ConstraintOpInputAny::collectTypes(vector<UnifyDatatype> &typelist) const
+void ConstraintOpInputAny::collectTypes(std::vector<UnifyDatatype> &typelist) const
 
 {
   typelist[opindex] = UnifyDatatype(UnifyDatatype::op_type);
   typelist[varnodeindex] = UnifyDatatype(UnifyDatatype::var_type);
 }
 
-void ConstraintOpInputAny::print(ostream &s,UnifyCPrinter &printstate) const
+void ConstraintOpInputAny::print(std::ostream &s,UnifyCPrinter &printstate) const
 
 {
   printstate.printIndent(s);
-  s << "for(int4 i" << dec << printstate.getDepth() << "=0;i"<<printstate.getDepth()<< '<';
-  s << printstate.getName(opindex) << "->numInput();++i" << printstate.getDepth() << ") {" << endl;
+  s << "for(int4 i" << std::dec << printstate.getDepth() << "=0;i"<<printstate.getDepth()<< '<';
+  s << printstate.getName(opindex) << "->numInput();++i" << printstate.getDepth() << ") {" << std::endl;
   printstate.incDepth();	// A permanent increase in depth
   printstate.printIndent(s);
   s << printstate.getName(varnodeindex) << " = " << printstate.getName(opindex) << "->getIn(i";
-  s << (printstate.getDepth()-1) << ");" << endl;
+  s << (printstate.getDepth()-1) << ");" << std::endl;
 }
 
 bool ConstraintOpOutput::step(UnifyState &state)
@@ -663,18 +663,18 @@ bool ConstraintOpOutput::step(UnifyState &state)
   return true;
 }
 
-void ConstraintOpOutput::collectTypes(vector<UnifyDatatype> &typelist) const
+void ConstraintOpOutput::collectTypes(std::vector<UnifyDatatype> &typelist) const
 
 {
   typelist[opindex] = UnifyDatatype(UnifyDatatype::op_type);
   typelist[varnodeindex] = UnifyDatatype(UnifyDatatype::var_type);
 }
 
-void ConstraintOpOutput::print(ostream &s,UnifyCPrinter &printstate) const
+void ConstraintOpOutput::print(std::ostream &s,UnifyCPrinter &printstate) const
 
 {
   printstate.printIndent(s);
-  s << printstate.getName(varnodeindex) << " = " << printstate.getName(opindex) << "->getOut();" << endl;
+  s << printstate.getName(varnodeindex) << " = " << printstate.getName(opindex) << "->getOut();" << std::endl;
 }
 
 bool ConstraintParamConstVal::step(UnifyState &state)
@@ -689,22 +689,22 @@ bool ConstraintParamConstVal::step(UnifyState &state)
   return true;
 }
 
-void ConstraintParamConstVal::collectTypes(vector<UnifyDatatype> &typelist) const
+void ConstraintParamConstVal::collectTypes(std::vector<UnifyDatatype> &typelist) const
 
 {
   typelist[opindex] = UnifyDatatype(UnifyDatatype::op_type);
 }
 
-void ConstraintParamConstVal::print(ostream &s,UnifyCPrinter &printstate) const
+void ConstraintParamConstVal::print(std::ostream &s,UnifyCPrinter &printstate) const
 
 {
   printstate.printIndent(s);
-  s << "if (!" << printstate.getName(opindex) << "->getIn(" << dec << slot << ")->isConstant())" << endl;
+  s << "if (!" << printstate.getName(opindex) << "->getIn(" << std::dec << slot << ")->isConstant())" << std::endl;
   printstate.printAbort(s);
   printstate.printIndent(s);
-  s << "if (" << printstate.getName(opindex) << "->getIn(" << dec << slot << ")->getOffset() != 0x";
-  s << hex << val << " & calc_mask(" << printstate.getName(opindex) << "->getIn(" << dec;
-  s << slot << ")->getSize()))" << endl;
+  s << "if (" << printstate.getName(opindex) << "->getIn(" << std::dec << slot << ")->getOffset() != 0x";
+  s << std::dec << val << " & calc_mask(" << printstate.getName(opindex) << "->getIn(" << std::dec;
+  s << slot << ")->getSize()))" << std::endl;
   printstate.printAbort(s);
 }
 
@@ -720,22 +720,22 @@ bool ConstraintParamConst::step(UnifyState &state)
   return true;
 }
 
-void ConstraintParamConst::collectTypes(vector<UnifyDatatype> &typelist) const
+void ConstraintParamConst::collectTypes(std::vector<UnifyDatatype> &typelist) const
 
 {
   typelist[opindex] = UnifyDatatype(UnifyDatatype::op_type);
   typelist[constindex] = UnifyDatatype(UnifyDatatype::const_type);
 }
 
-void ConstraintParamConst::print(ostream &s,UnifyCPrinter &printstate) const
+void ConstraintParamConst::print(std::ostream &s,UnifyCPrinter &printstate) const
 
 {
   printstate.printIndent(s);
-  s << "if (!" << printstate.getName(opindex) << "->getIn(" << dec << slot << ")->isConstant())" << endl;
+  s << "if (!" << printstate.getName(opindex) << "->getIn(" << std::dec << slot << ")->isConstant())" << std::endl;
   printstate.printAbort(s);
   printstate.printIndent(s);
   s << printstate.getName(constindex) << " = ";
-  s << printstate.getName(opindex) << "->getIn(" << dec << slot << ")->getOffset();" << endl;
+  s << printstate.getName(opindex) << "->getIn(" << std::dec << slot << ")->getOffset();" << std::endl;
 }
 
 bool ConstraintVarnodeCopy::step(UnifyState &state)
@@ -748,18 +748,18 @@ bool ConstraintVarnodeCopy::step(UnifyState &state)
   return true;
 }
 
-void ConstraintVarnodeCopy::collectTypes(vector<UnifyDatatype> &typelist) const
+void ConstraintVarnodeCopy::collectTypes(std::vector<UnifyDatatype> &typelist) const
 
 {
   typelist[oldvarindex] = UnifyDatatype(UnifyDatatype::var_type);
   typelist[newvarindex] = UnifyDatatype(UnifyDatatype::var_type);
 }
 
-void ConstraintVarnodeCopy::print(ostream &s,UnifyCPrinter &printstate) const
+void ConstraintVarnodeCopy::print(std::ostream &s,UnifyCPrinter &printstate) const
 
 {
   printstate.printIndent(s);
-  s << printstate.getName(newvarindex) << " = " << printstate.getName(oldvarindex) << ';' << endl;
+  s << printstate.getName(newvarindex) << " = " << printstate.getName(oldvarindex) << ';' << std::endl;
 }
 
 bool ConstraintVarCompare::step(UnifyState &state)
@@ -772,14 +772,14 @@ bool ConstraintVarCompare::step(UnifyState &state)
   return ((vn1 == vn2)==istrue);
 }
 
-void ConstraintVarCompare::collectTypes(vector<UnifyDatatype> &typelist) const
+void ConstraintVarCompare::collectTypes(std::vector<UnifyDatatype> &typelist) const
 
 {
   typelist[var1index] = UnifyDatatype(UnifyDatatype::var_type);
   typelist[var2index] = UnifyDatatype(UnifyDatatype::var_type);
 }
 
-void ConstraintVarCompare::print(ostream &s,UnifyCPrinter &printstate) const
+void ConstraintVarCompare::print(std::ostream &s,UnifyCPrinter &printstate) const
 
 {
   printstate.printIndent(s);
@@ -788,7 +788,7 @@ void ConstraintVarCompare::print(ostream &s,UnifyCPrinter &printstate) const
     s << " != ";
   else
     s << " == ";
-  s << printstate.getName(var2index) << ')' << endl;
+  s << printstate.getName(var2index) << ')' << std::endl;
   printstate.printAbort(s);
 }
 
@@ -804,21 +804,21 @@ bool ConstraintDef::step(UnifyState &state)
   return true;
 }
 
-void ConstraintDef::collectTypes(vector<UnifyDatatype> &typelist) const
+void ConstraintDef::collectTypes(std::vector<UnifyDatatype> &typelist) const
 
 {
   typelist[opindex] = UnifyDatatype(UnifyDatatype::op_type);
   typelist[varindex] = UnifyDatatype(UnifyDatatype::var_type);
 }
 
-void ConstraintDef::print(ostream &s,UnifyCPrinter &printstate) const
+void ConstraintDef::print(std::ostream &s,UnifyCPrinter &printstate) const
 
 {
   printstate.printIndent(s);
-  s << "if (!" << printstate.getName(varindex) << "->isWritten())" << endl;
+  s << "if (!" << printstate.getName(varindex) << "->isWritten())" << std::endl;
   printstate.printAbort(s);
   printstate.printIndent(s);
-  s << printstate.getName(opindex) << " = " << printstate.getName(varindex) << "->getDef();" << endl;
+  s << printstate.getName(opindex) << " = " << printstate.getName(varindex) << "->getDef();" << std::endl;
 }
 
 void ConstraintDescend::buildTraverseState(UnifyState &state)
@@ -848,29 +848,29 @@ bool ConstraintDescend::step(UnifyState &state)
   return true;
 }
 
-void ConstraintDescend::collectTypes(vector<UnifyDatatype> &typelist) const
+void ConstraintDescend::collectTypes(std::vector<UnifyDatatype> &typelist) const
 
 {
   typelist[opindex] = UnifyDatatype(UnifyDatatype::op_type);
   typelist[varindex] = UnifyDatatype(UnifyDatatype::var_type);
 }
 
-void ConstraintDescend::print(ostream &s,UnifyCPrinter &printstate) const
+void ConstraintDescend::print(std::ostream &s,UnifyCPrinter &printstate) const
 
 {
   printstate.printIndent(s);
-  s << "list<PcodeOp *>::const_iterator iter" << dec << printstate.getDepth() << ",enditer" << printstate.getDepth() << ';' << endl;
+  s << "std::list<PcodeOp *>::const_iterator iter" << std::dec << printstate.getDepth() << ",enditer" << printstate.getDepth() << ';' << std::endl;
   printstate.printIndent(s);
-  s << "iter" << printstate.getDepth() << " = " << printstate.getName(varindex) << "->beginDescend();" << endl;
+  s << "iter" << printstate.getDepth() << " = " << printstate.getName(varindex) << "->beginDescend();" << std::endl;
   printstate.printIndent(s);
-  s << "enditer" << printstate.getDepth() << " = " << printstate.getName(varindex) << "->endDescend();" << endl;
+  s << "enditer" << printstate.getDepth() << " = " << printstate.getName(varindex) << "->endDescend();" << std::endl;
   printstate.printIndent(s);
-  s << "while(iter" << printstate.getDepth() << " != enditer" << printstate.getDepth() << ") {" << endl;
+  s << "while(iter" << printstate.getDepth() << " != enditer" << printstate.getDepth() << ") {" << std::endl;
   printstate.incDepth();	// permanent increase in depth
   printstate.printIndent(s);
-  s << printstate.getName(opindex) << " = *iter" << (printstate.getDepth()-1) << ';' << endl;
+  s << printstate.getName(opindex) << " = *iter" << (printstate.getDepth()-1) << ';' << std::endl;
   printstate.printIndent(s);
-  s << "++iter" << (printstate.getDepth()-1) << endl;
+  s << "++iter" << (printstate.getDepth()-1) << std::endl;
 }
 
 bool ConstraintLoneDescend::step(UnifyState &state)
@@ -885,20 +885,20 @@ bool ConstraintLoneDescend::step(UnifyState &state)
   return true;
 }
 
-void ConstraintLoneDescend::collectTypes(vector<UnifyDatatype> &typelist) const
+void ConstraintLoneDescend::collectTypes(std::vector<UnifyDatatype> &typelist) const
 
 {
   typelist[opindex] = UnifyDatatype(UnifyDatatype::op_type);
   typelist[varindex] = UnifyDatatype(UnifyDatatype::var_type);
 }
 
-void ConstraintLoneDescend::print(ostream &s,UnifyCPrinter &printstate) const
+void ConstraintLoneDescend::print(std::ostream &s,UnifyCPrinter &printstate) const
 
 {
   printstate.printIndent(s);
-  s << printstate.getName(opindex) << " = " << printstate.getName(varindex) << "->loneDescend();" << endl;
+  s << printstate.getName(opindex) << " = " << printstate.getName(varindex) << "->loneDescend();" << std::endl;
   printstate.printIndent(s);
-  s << "if (" << printstate.getName(opindex) << " == (PcodeOp *)0)" << endl;
+  s << "if (" << printstate.getName(opindex) << " == (PcodeOp *)0)" << std::endl;
   printstate.printAbort(s);
 }
 
@@ -914,7 +914,7 @@ bool ConstraintOtherInput::step(UnifyState &state)
   return true;
 }
 
-void ConstraintOtherInput::collectTypes(vector<UnifyDatatype> &typelist) const
+void ConstraintOtherInput::collectTypes(std::vector<UnifyDatatype> &typelist) const
 
 {
   typelist[opindex] = UnifyDatatype(UnifyDatatype::op_type);
@@ -922,12 +922,12 @@ void ConstraintOtherInput::collectTypes(vector<UnifyDatatype> &typelist) const
   typelist[varindex_out] = UnifyDatatype(UnifyDatatype::var_type);
 }
 
-void ConstraintOtherInput::print(ostream &s,UnifyCPrinter &printstate) const
+void ConstraintOtherInput::print(std::ostream &s,UnifyCPrinter &printstate) const
 
 {
   printstate.printIndent(s);
   s << printstate.getName(varindex_out) << " = " << printstate.getName(opindex) << "->getIn(1 - ";
-  s << printstate.getName(opindex) << "->getSlot(" << printstate.getName(varindex_in) << "));" << endl;
+  s << printstate.getName(opindex) << "->getSlot(" << printstate.getName(varindex_in) << "));" << std::endl;
 }
 
 bool ConstraintConstCompare::step(UnifyState &state)
@@ -943,14 +943,14 @@ bool ConstraintConstCompare::step(UnifyState &state)
   return (res != 0);
 }
 
-void ConstraintConstCompare::collectTypes(vector<UnifyDatatype> &typelist) const
+void ConstraintConstCompare::collectTypes(std::vector<UnifyDatatype> &typelist) const
 
 {
   typelist[const1index] = UnifyDatatype(UnifyDatatype::const_type);
   typelist[const2index] = UnifyDatatype(UnifyDatatype::const_type);
 }
 
-void ConstraintConstCompare::print(ostream &s,UnifyCPrinter &printstate) const
+void ConstraintConstCompare::print(std::ostream &s,UnifyCPrinter &printstate) const
 
 {
   printstate.printIndent(s);
@@ -966,7 +966,7 @@ void ConstraintConstCompare::print(ostream &s,UnifyCPrinter &printstate) const
     s << "/* unimplemented constant operation */" ;
     break;
   }
-  s << ')' << endl;
+  s << ')' << std::endl;
   printstate.printAbort(s);
 }
 
@@ -996,7 +996,7 @@ void ConstraintGroup::addConstraint(UnifyConstraint *c)
 void ConstraintGroup::deleteConstraint(int4 slot)
 
 {
-  vector<UnifyConstraint *>::iterator iter = constraintlist.begin();
+  std::vector<UnifyConstraint *>::iterator iter = constraintlist.begin();
   iter = iter + slot;
   UnifyConstraint *mydel = *iter;
   constraintlist.erase(iter);
@@ -1081,7 +1081,7 @@ bool ConstraintGroup::step(UnifyState &state)
   return true;
 }
 
-void ConstraintGroup::collectTypes(vector<UnifyDatatype> &typelist) const
+void ConstraintGroup::collectTypes(std::vector<UnifyDatatype> &typelist) const
 
 {
   for(int4 i=0;i<constraintlist.size();++i)
@@ -1112,7 +1112,7 @@ void ConstraintGroup::setId(int4 &id)
     constraintlist[i]->setId(id);
 }
 
-void ConstraintGroup::print(ostream &s,UnifyCPrinter &printstate) const
+void ConstraintGroup::print(std::ostream &s,UnifyCPrinter &printstate) const
 
 {
   for(int4 i=0;i<constraintlist.size();++i)
@@ -1122,7 +1122,7 @@ void ConstraintGroup::print(ostream &s,UnifyCPrinter &printstate) const
 void ConstraintGroup::removeDummy(void)
 
 { // Remove any dummy constraints within us
-  vector<UnifyConstraint *> newlist;
+  std::vector<UnifyConstraint *> newlist;
 
   for(int4 i=0;i<constraintlist.size();++i) {
     UnifyConstraint *cur = constraintlist[i];
@@ -1194,20 +1194,20 @@ void ConstraintOr::buildTraverseState(UnifyState &state)
   }
 }
 
-void ConstraintOr::print(ostream &s,UnifyCPrinter &printstate) const
+void ConstraintOr::print(std::ostream &s,UnifyCPrinter &printstate) const
 
 {
   printstate.printIndent(s);
-  s << "for(i" << dec << printstate.getDepth() << "=0;i" << printstate.getDepth() << '<';
-  s << (int4)constraintlist.size() << ";++i" << printstate.getDepth() << ") {" << endl;
+  s << "for(i" << std::dec << printstate.getDepth() << "=0;i" << printstate.getDepth() << '<';
+  s << (int4)constraintlist.size() << ";++i" << printstate.getDepth() << ") {" << std::endl;
   printstate.incDepth();	// permanent increase in depth
   for(int4 i=0;i<constraintlist.size();++i) {
     printstate.printIndent(s);
     if (i != 0)
       s << "else ";
     if (i != constraintlist.size()-1)
-      s << "if (i" << printstate.getDepth()-1 << " == " << dec << i << ") ";
-    s << '{' << endl;
+      s << "if (i" << printstate.getDepth()-1 << " == " << std::dec << i << ") ";
+    s << '{' << std::endl;
     int4 olddepth = printstate.getDepth();
     printstate.incDepth();
     constraintlist[i]->print(s,printstate);
@@ -1242,27 +1242,27 @@ bool ConstraintNewOp::step(UnifyState &state)
   return true;
 }
 
-void ConstraintNewOp::collectTypes(vector<UnifyDatatype> &typelist) const
+void ConstraintNewOp::collectTypes(std::vector<UnifyDatatype> &typelist) const
 
 {
   typelist[newopindex] = UnifyDatatype(UnifyDatatype::op_type);
   typelist[oldopindex] = UnifyDatatype(UnifyDatatype::op_type);
 }
 
-void ConstraintNewOp::print(ostream &s,UnifyCPrinter &printstate) const
+void ConstraintNewOp::print(std::ostream &s,UnifyCPrinter &printstate) const
 
 {
   printstate.printIndent(s);
-  s << printstate.getName(newopindex) << " = data.newOp(" << dec << numparams;
-  s << ',' << printstate.getName(oldopindex) << "->getAddr());" << endl;
+  s << printstate.getName(newopindex) << " = data.newOp(" << std::dec << numparams;
+  s << ',' << printstate.getName(oldopindex) << "->getAddr());" << std::endl;
   printstate.printIndent(s);
-  s << "data.opSetOpcode(" << printstate.getName(newopindex) << ",CPUI_" << get_opname(opc) << ");" << endl;
+  s << "data.opSetOpcode(" << printstate.getName(newopindex) << ",CPUI_" << get_opname(opc) << ");" << std::endl;
   s << "data.opInsert";
   if (insertafter)
     s << "After(";
   else
     s << "Before(";
-  s << printstate.getName(newopindex) << ',' << printstate.getName(oldopindex) << ");" << endl;
+  s << printstate.getName(newopindex) << ',' << printstate.getName(oldopindex) << ");" << std::endl;
 }
 
 ConstraintNewUniqueOut::ConstraintNewUniqueOut(int4 oind,int4 newvarind,int4 sizeind)
@@ -1295,7 +1295,7 @@ bool ConstraintNewUniqueOut::step(UnifyState &state)
   return true;
 }
 
-void ConstraintNewUniqueOut::collectTypes(vector<UnifyDatatype> &typelist) const
+void ConstraintNewUniqueOut::collectTypes(std::vector<UnifyDatatype> &typelist) const
 
 {
   typelist[opindex] = UnifyDatatype(UnifyDatatype::op_type);
@@ -1304,16 +1304,16 @@ void ConstraintNewUniqueOut::collectTypes(vector<UnifyDatatype> &typelist) const
     typelist[sizevarindex] = UnifyDatatype(UnifyDatatype::var_type);
 }
 
-void ConstraintNewUniqueOut::print(ostream &s,UnifyCPrinter &printstate) const
+void ConstraintNewUniqueOut::print(std::ostream &s,UnifyCPrinter &printstate) const
 
 {
   printstate.printIndent(s);
   s << printstate.getName(newvarindex) << " = data.newUniqueOut(";
   if (sizevarindex < 0)
-    s << dec << -sizevarindex;
+    s << std::dec << -sizevarindex;
   else
     s << printstate.getName(sizevarindex) << "->getSize()";
-  s << ',' << printstate.getName(opindex) << ");" << endl;
+  s << ',' << printstate.getName(opindex) << ");" << std::endl;
 }
 
 bool ConstraintSetInput::step(UnifyState &state)
@@ -1329,21 +1329,21 @@ bool ConstraintSetInput::step(UnifyState &state)
   return true;
 }
 
-void ConstraintSetInput::collectTypes(vector<UnifyDatatype> &typelist) const
+void ConstraintSetInput::collectTypes(std::vector<UnifyDatatype> &typelist) const
 
 {
   typelist[opindex] = UnifyDatatype(UnifyDatatype::op_type);
   typelist[varindex] = UnifyDatatype(UnifyDatatype::var_type);
 }
 
-void ConstraintSetInput::print(ostream &s,UnifyCPrinter &printstate) const
+void ConstraintSetInput::print(std::ostream &s,UnifyCPrinter &printstate) const
 
 {
   printstate.printIndent(s);
   s << "data.opSetInput(" << printstate.getName(opindex) << ',' << printstate.getName(varindex);
   s << ',';
   slot->writeExpression(s,printstate);
-  s << ");" << endl;
+  s << ");" << std::endl;
 }
 
 ConstraintSetInputConstVal::~ConstraintSetInputConstVal(void)
@@ -1384,14 +1384,14 @@ bool ConstraintSetInputConstVal::step(UnifyState &state)
   return true;
 }
 
-void ConstraintSetInputConstVal::collectTypes(vector<UnifyDatatype> &typelist) const
+void ConstraintSetInputConstVal::collectTypes(std::vector<UnifyDatatype> &typelist) const
 
 {
   typelist[opindex] = UnifyDatatype(UnifyDatatype::op_type);
   //  typelist[varindex] = UnifyDatatype(UnifyDatatype::var_type);
 }
 
-void ConstraintSetInputConstVal::print(ostream &s,UnifyCPrinter &printstate) const
+void ConstraintSetInputConstVal::print(std::ostream &s,UnifyCPrinter &printstate) const
 
 {
   printstate.printIndent(s);
@@ -1399,17 +1399,17 @@ void ConstraintSetInputConstVal::print(ostream &s,UnifyCPrinter &printstate) con
   if (exprsz != (RHSConstant *)0)
     exprsz->writeExpression(s,printstate);
   else
-    s << dec << (int4)sizeof(uintb);
+    s << std::dec << (int4)sizeof(uintb);
   s << ",calc_mask(";
   if (exprsz != (RHSConstant *)0)
     exprsz->writeExpression(s,printstate);
   else
-    s << dec << (int4)sizeof(uintb);
+    s << std::dec << (int4)sizeof(uintb);
   s << ")&";
   val->writeExpression(s,printstate);
   s << "),";
   slot->writeExpression(s,printstate);
-  s << ");" << endl;
+  s << ");" << std::endl;
 }
 
 bool ConstraintRemoveInput::step(UnifyState &state)
@@ -1424,19 +1424,19 @@ bool ConstraintRemoveInput::step(UnifyState &state)
   return true;
 }
 
-void ConstraintRemoveInput::collectTypes(vector<UnifyDatatype> &typelist) const
+void ConstraintRemoveInput::collectTypes(std::vector<UnifyDatatype> &typelist) const
 
 {
   typelist[opindex] = UnifyDatatype(UnifyDatatype::op_type);
 }
 
-void ConstraintRemoveInput::print(ostream &s,UnifyCPrinter &printstate) const
+void ConstraintRemoveInput::print(std::ostream &s,UnifyCPrinter &printstate) const
 
 {
   printstate.printIndent(s);
   s << "data.opRemoveInput(" << printstate.getName(opindex) << ',';
   slot->writeExpression(s,printstate);
-  s << ");" << endl;
+  s << ");" << std::endl;
 }
 
 bool ConstraintSetOpcode::step(UnifyState &state)
@@ -1450,17 +1450,17 @@ bool ConstraintSetOpcode::step(UnifyState &state)
   return true;
 }
 
-void ConstraintSetOpcode::collectTypes(vector<UnifyDatatype> &typelist) const
+void ConstraintSetOpcode::collectTypes(std::vector<UnifyDatatype> &typelist) const
 
 {
   typelist[opindex] = UnifyDatatype(UnifyDatatype::op_type);
 }
 
-void ConstraintSetOpcode::print(ostream &s,UnifyCPrinter &printstate) const
+void ConstraintSetOpcode::print(std::ostream &s,UnifyCPrinter &printstate) const
 
 {
   printstate.printIndent(s);
-  s << "data.opSetOpcode(" << printstate.getName(opindex) << ",CPUI_" << get_opname(opc) << ");" << endl;
+  s << "data.opSetOpcode(" << printstate.getName(opindex) << ",CPUI_" << get_opname(opc) << ");" << std::endl;
 }
 
 UnifyState::UnifyState(ConstraintGroup *uni)
@@ -1513,34 +1513,34 @@ void UnifyCPrinter::initializeBase(ConstraintGroup *g)
   g->collectTypes(storemap);
 
   for(int4 i=0;i<=maxop;++i) {
-    ostringstream s;
-    s << storemap[i].getBaseName() << dec << i;
+    std::ostringstream s;
+    s << storemap[i].getBaseName() << std::dec << i;
     namemap.push_back(s.str());
   }
 }
 
-void UnifyCPrinter::printGetOpList(ostream &s)
+void UnifyCPrinter::printGetOpList(std::ostream &s)
 
 { // Print the getOpList method of the new rule
-  s << "void " << classname << "::getOpList(vector<uint4> &oplist) const" << endl;
-  s << endl;
-  s << '{' << endl;
+  s << "void " << classname << "::getOpList(std::vector<uint4> &oplist) const" << std::endl;
+  s << std::endl;
+  s << '{' << std::endl;
   for(int4 i=0;i<opcodelist.size();++i) {
-    s << "  oplist.push_back(CPUI_" << get_opname(opcodelist[i]) << ");" << endl;
+    s << "  oplist.push_back(CPUI_" << get_opname(opcodelist[i]) << ");" << std::endl;
   }
-  s << '}' << endl;
-  s << endl;
+  s << '}' << std::endl;
+  s << std::endl;
 }
 
-void UnifyCPrinter::printRuleHeader(ostream &s)
+void UnifyCPrinter::printRuleHeader(std::ostream &s)
 
 { // print the header for the applyOp method of the rule
-  s << "int " << classname << "::applyOp(PcodeOp *" << namemap[opparam] << ",Funcdata &data)" << endl;
-  s << endl;
-  s << '{' << endl;
+  s << "int " << classname << "::applyOp(PcodeOp *" << namemap[opparam] << ",Funcdata &data)" << std::endl;
+  s << std::endl;
+  s << '{' << std::endl;
 }
 
-void UnifyCPrinter::printAbort(ostream &s)
+void UnifyCPrinter::printAbort(std::ostream &s)
 
 {
   depth += 1;
@@ -1554,20 +1554,20 @@ void UnifyCPrinter::printAbort(ostream &s)
       s << "return false;";
   }
   depth -= 1;
-  s << endl;
+  s << std::endl;
 }
 
-void UnifyCPrinter::popDepth(ostream &s,int4 newdepth)
+void UnifyCPrinter::popDepth(std::ostream &s,int4 newdepth)
 
 {
   while(depth != newdepth) {
     depth -= 1;
     printIndent(s);
-    s << '}' << endl;
+    s << '}' << std::endl;
   }
 }
 
-void UnifyCPrinter::printVarDecls(ostream &s) const
+void UnifyCPrinter::printVarDecls(std::ostream &s) const
 
 { // Print the variables declarations
   for(int4 i=0;i<namemap.size();++i) {
@@ -1575,10 +1575,10 @@ void UnifyCPrinter::printVarDecls(ostream &s) const
     storemap[i].printVarDecl(s,i,*this);
   }
   if (namemap.size() != 0)
-    s << endl;			// Extra blank line
+    s << std::endl;			// Extra blank line
 }
 
-void UnifyCPrinter::initializeRuleAction(ConstraintGroup *g,int4 opp,const vector<OpCode> &oplist)
+void UnifyCPrinter::initializeRuleAction(ConstraintGroup *g,int4 opp,const std::vector<OpCode> &oplist)
 
 {
   initializeBase(g);
@@ -1597,10 +1597,10 @@ void UnifyCPrinter::initializeBasic(ConstraintGroup *g)
   opparam = -1;
 }
 
-void UnifyCPrinter::addNames(const map<string,int4> &nmmap)
+void UnifyCPrinter::addNames(const std::map<std::string,int4> &nmmap)
 
 {
-  map<string,int4>::const_iterator iter;
+  std::map<std::string,int4>::const_iterator iter;
 
   for(iter=nmmap.begin();iter!=nmmap.end();++iter) {
     int4 slot = (*iter).second;
@@ -1610,35 +1610,35 @@ void UnifyCPrinter::addNames(const map<string,int4> &nmmap)
   }
 }
 
-void UnifyCPrinter::print(ostream &s)
+void UnifyCPrinter::print(std::ostream &s)
 
 {
   if (printingtype == 0) {
     printGetOpList(s);
-    s << endl;
+    s << std::endl;
     printRuleHeader(s);
     printVarDecls(s);
     grp->print(s,*this);
     printIndent(s);
-    s << "return 1;" << endl;	// Found a complete match
+    s << "return 1;" << std::endl;	// Found a complete match
     if (depth != 0) {
       popDepth(s,0);
       printIndent(s);
-      s << "return 0;" << endl;	// Could never find a complete match
+      s << "return 0;" << std::endl;	// Could never find a complete match
     }
-    s << '}' << endl;
+    s << '}' << std::endl;
   }
   else if (printingtype == 1) {
     printVarDecls(s);
     grp->print(s,*this);
     printIndent(s);
-    s << "return true;" << endl;
+    s << "return true;" << std::endl;
     if (depth != 0) {
       popDepth(s,0);
       printIndent(s);
-      s << "return false;" << endl;
+      s << "return false;" << std::endl;
     }
-    s << '}' << endl;
+    s << '}' << std::endl;
   }
 }
 

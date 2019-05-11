@@ -75,7 +75,7 @@ FloatFormat::FloatFormat(int4 sz)
   maxexponent = (1<<exp_size)-1;
 }
 
-/// \param sign is set to \b true if the value should be negative
+/// \param sign is std::set to \b true if the value should be negative
 /// \param signif is the fractional part
 /// \param exp is the exponent
 /// \return the constructed floating-point value
@@ -153,8 +153,8 @@ int4 FloatFormat::extractExponentCode(uintb x) const
   return (int4)(x & mask);
 }
 
-/// \param x is an encoded value (with fraction part set to zero)
-/// \param code is the new fractional value to set
+/// \param x is an encoded value (with fraction part std::set to zero)
+/// \param code is the new fractional value to std::set
 /// \return the encoded value with the fractional filled in
 uintb FloatFormat::setFractionalCode(uintb x,uintb code) const
 
@@ -167,9 +167,9 @@ uintb FloatFormat::setFractionalCode(uintb x,uintb code) const
   return x;
 }
 
-/// \param x is an encoded value (with sign set to zero)
-/// \param sign is the sign bit to set
-/// \return the encoded value with the sign bit set
+/// \param x is an encoded value (with sign std::set to zero)
+/// \param sign is the sign bit to std::set
+/// \return the encoded value with the sign bit std::set
 uintb FloatFormat::setSign(uintb x,bool sign) const
 
 {
@@ -180,8 +180,8 @@ uintb FloatFormat::setSign(uintb x,bool sign) const
   return x;
 }
 
-/// \param x is an encoded value (with exponent set to zero)
-/// \param code is the exponent to set
+/// \param x is an encoded value (with exponent std::set to zero)
+/// \param code is the exponent to std::set
 /// \return the encoded value with the new exponent
 uintb FloatFormat::setExponentCode(uintb x,uintb code) const
 
@@ -191,7 +191,7 @@ uintb FloatFormat::setExponentCode(uintb x,uintb code) const
   return x;
 }
 
-/// \param sgn is set to \b true for negative zero, \b false for positive
+/// \param sgn is std::set to \b true for negative zero, \b false for positive
 /// \return the encoded zero
 uintb FloatFormat::getZeroEncoding(bool sgn) const
 
@@ -203,7 +203,7 @@ uintb FloatFormat::getZeroEncoding(bool sgn) const
   return setSign(res,sgn);
 }
 
-/// \param sgn is set to \b true for negative infinity, \b false for positive
+/// \param sgn is std::set to \b true for negative infinity, \b false for positive
 /// \return the encoded infinity
 uintb FloatFormat::getInfinityEncoding(bool sgn) const
 
@@ -215,7 +215,7 @@ uintb FloatFormat::getInfinityEncoding(bool sgn) const
   return setSign(res,sgn);
 }
 
-/// \param sgn is set to \b true for negative NaN, \b false for positive
+/// \param sgn is std::set to \b true for negative NaN, \b false for positive
 /// \return the encoded NaN
 uintb FloatFormat::getNaNEncoding(bool sgn) const
 
@@ -580,37 +580,37 @@ void FloatFormat::restoreXml(const Element *el)
 {
   {
 	std::istringstream s(el->getAttributeValue("size"));
-    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+    s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
     s >> size;
   }
   {
-    istringstream s(el->getAttributeValue("signpos"));
-    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+    std::istringstream s(el->getAttributeValue("signpos"));
+    s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
     s >> signbit_pos;
   }
   {
-    istringstream s(el->getAttributeValue("fracpos"));
-    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+    std::istringstream s(el->getAttributeValue("fracpos"));
+    s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
     s >> frac_pos;
   }
   {
-    istringstream s(el->getAttributeValue("fracsize"));
-    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+    std::istringstream s(el->getAttributeValue("fracsize"));
+    s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
     s >> frac_size;
   }
   {
-    istringstream s(el->getAttributeValue("exppos"));
-    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+    std::istringstream s(el->getAttributeValue("exppos"));
+    s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
     s >> exp_pos;
   }
   {
-    istringstream s(el->getAttributeValue("expsize"));
-    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+    std::istringstream s(el->getAttributeValue("expsize"));
+    s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
     s >> exp_size;
   }
   {
-    istringstream s(el->getAttributeValue("bias"));
-    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+    std::istringstream s(el->getAttributeValue("bias"));
+    s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
     s >> bias;
   }
   jbitimplied = xml_readbool(el->getAttributeValue("jbitimplied"));

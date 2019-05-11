@@ -16,7 +16,7 @@
 #include "inject_ghidra.hh"
 namespace GhidraDec {
 
-void InjectContextGhidra::saveXml(ostream &s) const
+void InjectContextGhidra::saveXml(std::ostream &s) const
 
 {
   s << "<context>\n";
@@ -63,20 +63,20 @@ void InjectPayloadGhidra::inject(InjectContext &con,PcodeEmit &emit) const
     throw LowlevelError("Could not retrieve pcode snippet: "+name);
   }
   const Element *el = doc->getRoot();
-  const List &list(el->getChildren());
+  const List &std::list(el->getChildren());
   List::const_iterator iter;
-  for(iter=list.begin();iter!=list.end();++iter)
+  for(iter=std::list.begin();iter!=std::list.end();++iter)
     emit.restoreXmlOp(*iter,ghidra->translate);
   delete doc;
 }
 
-void InjectPayloadGhidra::printTemplate(ostream &s) const
+void InjectPayloadGhidra::printTemplate(std::ostream &s) const
 
 {
   throw LowlevelError("Printing not supported");
 }
 
-InjectCallfixupGhidra::InjectCallfixupGhidra(const string &src,const string &nm)
+InjectCallfixupGhidra::InjectCallfixupGhidra(const std::string &src,const std::string &nm)
   : InjectPayloadGhidra(src,nm,InjectPayload::CALLFIXUP_TYPE)
 {
 }
@@ -87,7 +87,7 @@ void InjectCallfixupGhidra::restoreXml(const Element *el)
   name = el->getAttributeValue("name");
 }
 
-InjectCallotherGhidra::InjectCallotherGhidra(const string &src,const string &nm)
+InjectCallotherGhidra::InjectCallotherGhidra(const std::string &src,const std::string &nm)
   : InjectPayloadGhidra(src,nm,InjectPayload::CALLOTHERFIXUP_TYPE)
 {
 }
@@ -95,16 +95,16 @@ InjectCallotherGhidra::InjectCallotherGhidra(const string &src,const string &nm)
 void InjectCallotherGhidra::restoreXml(const Element *el)
 
 {
-  const List &list(el->getChildren());
+  const List &std::list(el->getChildren());
   List::const_iterator iter;
   name = el->getAttributeValue("targetop");
-  iter = list.begin();
-  if ((iter == list.end()) || ((*iter)->getName() != "pcode"))
+  iter = std::list.begin();
+  if ((iter == std::list.end()) || ((*iter)->getName() != "pcode"))
     throw LowlevelError("<callotherfixup> does not contain a <pcode> tag");
   InjectPayload::restoreXml(*iter);
 }
 
-ExecutablePcodeGhidra::ExecutablePcodeGhidra(Architecture *g,const string &src,const string &nm)
+ExecutablePcodeGhidra::ExecutablePcodeGhidra(Architecture *g,const std::string &src,const std::string &nm)
   : ExecutablePcode(g,src,nm)
 {
 }
@@ -127,9 +127,9 @@ void ExecutablePcodeGhidra::inject(InjectContext &con,PcodeEmit &emit) const
     throw LowlevelError("Could not retrieve pcode snippet: "+name);
   }
   const Element *el = doc->getRoot();
-  const List &list(el->getChildren());
+  const List &std::list(el->getChildren());
   List::const_iterator iter;
-  for(iter=list.begin();iter!=list.end();++iter)
+  for(iter=std::list.begin();iter!=std::list.end();++iter)
     emit.restoreXmlOp(*iter,ghidra->translate);
   delete doc;
 }
@@ -141,13 +141,13 @@ void ExecutablePcodeGhidra::restoreXml(const Element *el)
   // But ignore rest of body
 }
 
-void ExecutablePcodeGhidra::printTemplate(ostream &s) const
+void ExecutablePcodeGhidra::printTemplate(std::ostream &s) const
 
 {
   throw LowlevelError("Printing not supported");
 }
 
-int4 PcodeInjectLibraryGhidra::allocateInject(const string &sourceName,const string &name,int4 type)
+int4 PcodeInjectLibraryGhidra::allocateInject(const std::string &sourceName,const std::string &name,int4 type)
 
 {
   int4 injectid = injection.size();
@@ -200,7 +200,7 @@ PcodeInjectLibraryGhidra::PcodeInjectLibraryGhidra(ArchitectureGhidra *ghi)
   contextCache.glb = ghi;
 }
 
-const vector<OpBehavior *> &PcodeInjectLibraryGhidra::getBehaviors(void)
+const std::vector<OpBehavior *> &PcodeInjectLibraryGhidra::getBehaviors(void)
 
 {
   if (inst.empty())
@@ -208,14 +208,14 @@ const vector<OpBehavior *> &PcodeInjectLibraryGhidra::getBehaviors(void)
   return inst;
 }
 
-int4 PcodeInjectLibraryGhidra::manualCallFixup(const string &name,const string &snippet)
+int4 PcodeInjectLibraryGhidra::manualCallFixup(const std::string &name,const std::string &snippet)
 
 {
   return 0;	 // We don't have to do anything, because ghidra is keeping track of the snippets
 }
 
-int4 PcodeInjectLibraryGhidra::manualCallOtherFixup(const string &name,const string &outname,
-						    const vector<string> &inname,const string &snippet)
+int4 PcodeInjectLibraryGhidra::manualCallOtherFixup(const std::string &name,const std::string &outname,
+						    const vectorstd::string &inname,const std::string &snippet)
 {
   return 0;	 // We don't have to do anything
 }

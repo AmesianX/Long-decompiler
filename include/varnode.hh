@@ -40,13 +40,13 @@ struct VarnodeCompareDefLoc {
   bool operator()(const Varnode *a,const Varnode *b) const;	///< Functional comparison operator
 };
 
-/// A set of Varnodes sorted by location (then by definition)
-typedef set<Varnode *,VarnodeCompareLocDef> VarnodeLocSet;
+/// A std::set of Varnodes sorted by location (then by definition)
+typedef std::set<Varnode *,VarnodeCompareLocDef> VarnodeLocSet;
 
-/// A set of Varnodes sorted by definition (then location)
-typedef set<Varnode *,VarnodeCompareDefLoc> VarnodeDefSet;
+/// A std::set of Varnodes sorted by definition (then location)
+typedef std::set<Varnode *,VarnodeCompareDefLoc> VarnodeDefSet;
 
-/// \brief A low-level variable or contiguous set of bytes described by an Address and a size
+/// \brief A low-level variable or contiguous std::set of bytes described by an Address and a size
 ///
 /// A Varnode is the fundemental \e variable in the p-code language model.  A Varnode
 /// represents anything that holds data, including registers, stack locations,
@@ -66,7 +66,7 @@ class Varnode {
 public:
   /// There are a large number of boolean attributes that can be placed on a Varnode.
   /// Some are calculated and maintained by the friend classes Funcdata and VarnodeBank, 
-  /// and others can be set and cleared publically by separate subsystems.
+  /// and others can be std::set and cleared publically by separate subsystems.
   enum varnode_flags {
     mark = 0x01,	///< Prevents infinite loops
     constant = 0x02,	///< The varnode is constant
@@ -133,7 +133,7 @@ private:
   Datatype *type;		///< Datatype associated with this varnode
   VarnodeLocSet::iterator lociter;	///< Iterator into VarnodeBank sorted by location
   VarnodeDefSet::iterator defiter;	///< Iterator into VarnodeBank sorted by definition
-  list<PcodeOp *> descend;		///< List of every op using this varnode as input
+  std::list<PcodeOp *> descend;		///< List of every op using this varnode as input
   mutable Cover *cover;		///< Addresses covered by the def->use of this Varnode
   mutable Datatype *temptype;	///< For type propagate algorithm
   uintb consumed;		///< What parts of this varnode are used
@@ -150,8 +150,8 @@ private:
   // These functions should be only private things used by VarnodeBank
   void setInput(void) { setFlags(Varnode::input|Varnode::coverdirty); }	///< Mark Varnode as \e input
   void setDef(PcodeOp *op);	///< Set the defining PcodeOp of this Varnode
-  void addDescend(PcodeOp *op);	///< Add a descendant (reading) PcodeOp to this Varnode's list
-  void eraseDescend(PcodeOp *op); ///< Erase a descendant (reading) PcodeOp from this Varnode's list
+  void addDescend(PcodeOp *op);	///< Add a descendant (reading) PcodeOp to this Varnode's std::list
+  void eraseDescend(PcodeOp *op); ///< Erase a descendant (reading) PcodeOp from this Varnode's std::list
   void destroyDescend(void);	///< Clear all descendant (reading) PcodeOps
 public:
   // only to be used by HighVariable
@@ -172,8 +172,8 @@ public:
   Datatype *getTempType(void) const { return temptype; } ///< Get the temporary Datatype (used during type propagation)
   uint4 getCreateIndex(void) const { return create_index; } ///< Get the creation index
   Cover *getCover(void) const { updateCover(); return cover; } ///< Get Varnode coverage information
-  list<PcodeOp *>::const_iterator beginDescend(void) const { return descend.begin(); } ///< Get iterator to list of syntax tree descendants (reads)
-  list<PcodeOp *>::const_iterator endDescend(void) const { return descend.end(); } ///< Get the end iterator to list of descendants
+  std::list<PcodeOp *>::const_iterator beginDescend(void) const { return descend.begin(); } ///< Get iterator to std::list of syntax tree descendants (reads)
+  std::list<PcodeOp *>::const_iterator endDescend(void) const { return descend.end(); } ///< Get the end iterator to std::list of descendants
   uintb getConsume(void) const { return consumed; } ///< Get mask of consumed bits
   void setConsume(uintb val) { consumed = val; } ///< Set the mask of consumed bits (used by dead-code algorithm)
   bool isConsumeList(void) const { return ((addlflags&Varnode::lisconsume)!=0); } ///< Get marker used by dead-code algorithm
@@ -184,10 +184,10 @@ public:
   void clearConsumeVacuous(void) { addlflags &= ~Varnode::vacconsume; } ///< Clear marker used by dead-code algorithm
   PcodeOp *loneDescend(void) const; ///< Return unique reading PcodeOp, or \b null if there are zero or more than 1
   Address getUsePoint(const Funcdata &fd) const; ///< Get Address when this Varnode first comes into scope
-  int4 printRawNoMarkup(ostream &s) const; ///< Print a simple identifier for the Varnode
-  void printRaw(ostream &s) const; ///< Print a simple identifier plus additional info identifying Varnode with SSA form
-  void printCover(ostream &s) const; ///< Print raw coverage info about the Varnode
-  void printInfo(ostream &s) const; ///< Print raw attribute info about the Varnode
+  int4 printRawNoMarkup(std::ostream &s) const; ///< Print a simple identifier for the Varnode
+  void printRaw(std::ostream &s) const; ///< Print a simple identifier plus additional info identifying Varnode with SSA form
+  void printCover(std::ostream &s) const; ///< Print raw coverage info about the Varnode
+  void printInfo(std::ostream &s) const; ///< Print raw attribute info about the Varnode
   Varnode(int4 s,const Address &m,Datatype *dt);	///< Construct a \e free Varnode
   bool operator<(const Varnode &op2) const; ///< Comparison operator on Varnode
   bool operator==(const Varnode &op2) const; ///< Equality operator
@@ -201,7 +201,7 @@ public:
   int4 overlap(const Address &op2loc,int4 op2size) const;	///< Return relative point of overlap with Address range
   uintb getNZMask(void) const { return nzm; } ///< Get the mask of bits within \b this that are known to be zero
   int4 termOrder(const Varnode *op) const; ///< Compare two Varnodes based on their term order
-  void printRawHeritage(ostream &s,int4 depth) const; ///< Print a simple SSA subtree rooted at \b this
+  void printRawHeritage(std::ostream &s,int4 depth) const; ///< Print a simple SSA subtree rooted at \b this
   bool isAnnotation(void) const { return ((flags&Varnode::annotation)!=0); } ///< Is \b this an annotation?
   bool isImplied(void) const { return ((flags&Varnode::implied)!=0); } ///< Is \b this an implied variable?
   bool isExplicit(void) const { return ((flags&Varnode::explict)!=0); }	///< Is \b this an explicitly printed variable?
@@ -290,13 +290,13 @@ public:
   void setWriteMask(void) { addlflags |= Varnode::writemask; } ///< Mark \b this as not a true \e write when computing SSA form
   void clearWriteMask(void) { addlflags &= ~Varnode::writemask; } ///< Clear the mark indicating \b this is not a true write
   void setUnsignedPrint(void) { addlflags |= Varnode::unsignedprint; } ///< Force \b this to be printed as unsigned
-  bool updateType(Datatype *ct,bool lock,bool override); ///< (Possibly) set the Datatype given various restrictions
+  bool updateType(Datatype *ct,bool lock,bool override); ///< (Possibly) std::set the Datatype given various restrictions
   void setStackStore(void) { addlflags |= Varnode::stack_store; } ///< Mark as produced by explicit CPUI_STORE
   void copySymbol(const Varnode *vn); ///< Copy symbol info from \b vn
   void copySymbolIfValid(const Varnode *vn);	///< Copy symbol info from \b vn if constant value matches
   Datatype *getLocalType(void) const; ///< Calculate type of Varnode based on local information
   bool copyShadow(const Varnode *op2) const; ///< Are \b this and \b op2 copied from the same source?
-  void saveXml(ostream &s) const; ///< Save a description of \b this as an XML tag
+  void saveXml(std::ostream &s) const; ///< Save a description of \b this as an XML tag
   static bool comparePointers(const Varnode *a,const Varnode *b) { return (*a < *b); }	///< Compare Varnodes as pointers
   //  static Varnode *restoreXml(const Element *el,Funcdata &fd,bool coderef);
 };
@@ -340,8 +340,8 @@ public:
   Varnode *findCoveredInput(int4 s,const Address &loc) const;	///< Find an input Varnode contained within this range
   Varnode *findCoveringInput(int4 s,const Address &loc) const;	///< Find an input Varnode covering a range
   uint4 getCreateIndex(void) const { return create_index; }	///< Get the next creation index to be assigned
-  VarnodeLocSet::const_iterator beginLoc(void) const { return loc_tree.begin(); }	///< Beginning of location list
-  VarnodeLocSet::const_iterator endLoc(void) const { return loc_tree.end(); }		///< End of location list
+  VarnodeLocSet::const_iterator beginLoc(void) const { return loc_tree.begin(); }	///< Beginning of location std::list
+  VarnodeLocSet::const_iterator endLoc(void) const { return loc_tree.end(); }		///< End of location std::list
   VarnodeLocSet::const_iterator beginLoc(AddrSpace *spaceid) const;
   VarnodeLocSet::const_iterator endLoc(AddrSpace *spaceid) const;
   VarnodeLocSet::const_iterator beginLoc(const Address &addr) const;

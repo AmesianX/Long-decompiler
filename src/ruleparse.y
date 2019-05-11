@@ -30,11 +30,11 @@ extern int ruleparseerror(const char *str);
 
 %union {
   char ch;
-  string *str;
+  std::string *str;
   int8 *big;
   int4 id;
   OpCode opcode;
-  vector<OpCode> *opcodelist;
+  std::vector<OpCode> *opcodelist;
   ConstraintGroup *group;
   RHSConstant *rhsconst;
 }
@@ -243,7 +243,7 @@ op_any: OP_BOOL_OR             { $$ = CPUI_BOOL_OR; }
   | OP_COPY                { $$ = CPUI_COPY; }
 ;
 
-op_list: op_any { $$ = new vector<OpCode>; $$->push_back($1); }
+op_list: op_any { $$ = new std::vector<OpCode>; $$->push_back($1); }
 | op_list op_any { $$ = $1; $$->push_back($2); }
 ;
 

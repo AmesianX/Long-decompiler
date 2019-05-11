@@ -110,8 +110,8 @@ void RawLoadImage::loadFill(uint1 *ptr,int4 size,const Address &addr)
     curaddr += readsize;
   }
   if (size > 0) {
-    ostringstream errmsg;
-    errmsg << "Unable to load " << dec << size << " bytes at " << addr.getShortcut();
+    std::ostringstream errmsg;
+    errmsg << "Unable to load " << std::dec << size << " bytes at " << addr.getShortcut();
     addr.printRaw(errmsg);
     throw DataUnavailError(errmsg.str());
   }

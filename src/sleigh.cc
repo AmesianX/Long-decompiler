@@ -63,7 +63,7 @@ VarnodeData *PcodeCacher::expandPool(uint4 size)
       issued[i].invar = invar;
     }
   }
-  list<RelativeRecord>::iterator iter;
+  std::list<RelativeRecord>::iterator iter;
   for(iter=label_refs.begin();iter!=label_refs.end();++iter) {
     VarnodeData *ref = (*iter).dataptr;
     (*iter).dataptr = newpool + (ref - poolstart);
@@ -107,7 +107,7 @@ void PcodeCacher::resolveRelatives(void)
 { // Assuming all the PcodeData has been generated for an
   // instruction, go resolve any relative offsets and back
   // patch their value(s) into the PcodeData
-  list<RelativeRecord>::const_iterator iter;
+  std::list<RelativeRecord>::const_iterator iter;
   for(iter=label_refs.begin();iter!=label_refs.end();++iter) {
     VarnodeData *ptr = (*iter).dataptr;
     uint4 id = ptr->offset;
@@ -123,7 +123,7 @@ void PcodeCacher::resolveRelatives(void)
 void PcodeCacher::emit(const Address &addr,PcodeEmit *emt) const
 
 { // Emit any cached pcode
-  vector<PcodeData>::const_iterator iter;
+  std::vector<PcodeData>::const_iterator iter;
 
   for(iter=issued.begin();iter!=issued.end();++iter)
     emt->dump(addr,(*iter).opc,(*iter).outvar,(*iter).invar,(*iter).isize);
@@ -361,15 +361,15 @@ void DisassemblyCache::initialize(int4 min,int4 hashsize)
   uintb masktest = coveringmask((uintb)mask);
   if (masktest != (uintb)mask)	// -hashsize- must be a power of 2
     throw LowlevelError("Bad windowsize for disassembly cache");
-  list = new ParserContext *[minimumreuse];
+  std::list = new ParserContext *[minimumreuse];
   nextfree = 0;
   hashtable = new ParserContext *[hashsize];
   for(int4 i=0;i<minimumreuse;++i) {
     ParserContext *pos = new ParserContext(contextcache);
     pos->initialize(75,20,constspace);
-    list[i] = pos;
+    std::list[i] = pos;
   }
-  ParserContext *pos = list[0];
+  ParserContext *pos = std::list[0];
   for(int4 i=0;i<hashsize;++i)
     hashtable[i] = pos;		// Make sure all hashtable positions point to a real ParserContext
 }
@@ -378,8 +378,8 @@ void DisassemblyCache::free(void)
 
 {
   for(int4 i=0;i<minimumreuse;++i)
-    delete list[i];
-  delete [] list;
+    delete std::list[i];
+  delete [] std::list;
   delete [] hashtable;
 }
 
@@ -402,7 +402,7 @@ ParserContext *DisassemblyCache::getParserContext(const Address &addr)
   ParserContext *res = hashtable[ hashindex ];
   if (res->getAddr() == addr)
     return res;
-  res = list[ nextfree ];
+  res = std::list[ nextfree ];
   nextfree += 1;		// Advance the circular index
   if (nextfree >= minimumreuse)
     nextfree = 0;
@@ -607,9 +607,9 @@ int4 Sleigh::printAssembly(AssemblyEmit &emit,const Address &baseaddr) const
   walker.baseState();
   
   Constructor *ct = walker.getConstructor();
-  ostringstream mons;
+  std::ostringstream mons;
   ct->printMnemonic(mons,walker);
-  ostringstream body;
+  std::ostringstream body;
   ct->printBody(body,walker);
   emit.dump(baseaddr,mons.str(),body.str());
   sz = pos->getLength();
@@ -622,7 +622,7 @@ int4 Sleigh::oneInstruction(PcodeEmit &emit,const Address &baseaddr) const
   int4 fallOffset;
   if (alignment != 1) {
     if ((baseaddr.getOffset() % alignment)!=0) {
-      ostringstream s;
+      std::ostringstream s;
       s << "Instruction address not aligned: " << baseaddr;
       throw UnimplError(s.str(),0);
     }
@@ -653,7 +653,7 @@ int4 Sleigh::oneInstruction(PcodeEmit &emit,const Address &baseaddr) const
     pcode_cache.resolveRelatives();
     pcode_cache.emit(baseaddr,&emit);
   } catch(UnimplError &err) {
-    ostringstream s;
+    std::ostringstream s;
     s << "Instruction not implemented in pcode:\n ";
     ParserWalker *cur = builder.getCurrentWalker();
     cur->baseState();
@@ -670,13 +670,13 @@ int4 Sleigh::oneInstruction(PcodeEmit &emit,const Address &baseaddr) const
   return fallOffset;
 }
 
-void Sleigh::registerContext(const string &name,int4 sbit,int4 ebit)
+void Sleigh::registerContext(const std::string &name,int4 sbit,int4 ebit)
 
 {  // Inform translator of existence of context variable
   context_db->registerVariable(name,sbit,ebit);
 }
 
-void Sleigh::setContextDefault(const string &name,uintm val)
+void Sleigh::setContextDefault(const std::string &name,uintm val)
 
 {
   context_db->setVariableDefault(name,val);

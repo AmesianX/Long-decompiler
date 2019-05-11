@@ -20,7 +20,7 @@ namespace GhidraDec {
 void Override::clear(void)
 
 {
-  map<Address,FuncProto *>::iterator iter;
+  std::map<Address,FuncProto *>::iterator iter;
 
   for(iter=protoover.begin();iter!=protoover.end();++iter)
     delete (*iter).second;
@@ -39,11 +39,11 @@ void Override::clear(void)
 /// \param index is the index of the address space
 /// \param glb is the Architecture object
 /// \return the generated message
-string Override::generateDeadcodeDelayMessage(int4 index,Architecture *glb)
+std::string Override::generateDeadcodeDelayMessage(int4 index,Architecture *glb)
 
 {
   AddrSpace *spc = glb->getSpace(index);
-  string res = "Restarted to delay deadcode elimination for space: " + spc->getName();
+  std::string res = "Restarted to delay deadcode elimination for space: " + spc->getName();
   return res;
 }
 
@@ -112,7 +112,7 @@ void Override::insertIndirectOverride(const Address &callpoint,const Address &di
 void Override::insertProtoOverride(const Address &callpoint,FuncProto *p)
 
 {
-  map<Address,FuncProto *>::iterator iter;
+  std::map<Address,FuncProto *>::iterator iter;
 
   iter = protoover.find(callpoint);
   if (iter != protoover.end())	// Check for pre-existing override
@@ -151,7 +151,7 @@ void Override::applyPrototype(Funcdata &data,FuncCallSpecs &fspecs) const
 
 {
   if (!protoover.empty()) {
-    map<Address,FuncProto *>::const_iterator iter = protoover.find(fspecs.getOp()->getAddr());
+    std::map<Address,FuncProto *>::const_iterator iter = protoover.find(fspecs.getOp()->getAddr());
     if (iter != protoover.end()) {
       fspecs.copy(*(*iter).second);
     }
@@ -168,7 +168,7 @@ void Override::applyIndirect(Funcdata &data,FuncCallSpecs &fspecs) const
 
 {
   if (!indirectover.empty()) {
-    map<Address,Address>::const_iterator iter = indirectover.find(fspecs.getOp()->getAddr());
+    std::map<Address,Address>::const_iterator iter = indirectover.find(fspecs.getOp()->getAddr());
     if (iter != indirectover.end())
       fspecs.setAddress( (*iter).second );
   }
@@ -194,7 +194,7 @@ bool Override::queryMultistageJumptable(const Address &addr) const
 void Override::applyForceGoto(Funcdata &data) const
 
 {
-  map<Address,Address>::const_iterator iter;
+  std::map<Address,Address>::const_iterator iter;
 
   for(iter=forcegoto.begin();iter!=forcegoto.end();++iter)
     data.forceGoto((*iter).first,(*iter).second);
@@ -223,7 +223,7 @@ void Override::applyDeadCodeDelay(Funcdata &data) const
 uint4 Override::getFlowOverride(const Address &addr) const
 
 {
-  map<Address,uint4>::const_iterator iter;
+  std::map<Address,uint4>::const_iterator iter;
   iter = flowoverride.find(addr);
   if (iter == flowoverride.end())
     return Override::NONE;
@@ -235,38 +235,38 @@ uint4 Override::getFlowOverride(const Address &addr) const
 /// Give a description of each override, one per line, that is suitable for debug
 /// \param s is the output stream
 /// \param glb is the Architecture
-void Override::printRaw(ostream &s,Architecture *glb) const
+void Override::printRaw(std::ostream &s,Architecture *glb) const
 
 {
-  map<Address,Address>::const_iterator iter;
+  std::map<Address,Address>::const_iterator iter;
 
   for(iter=forcegoto.begin();iter!=forcegoto.end();++iter)
-    s << "force goto at " << (*iter).first << " jumping to " << (*iter).second << endl;
+    s << "force goto at " << (*iter).first << " jumping to " << (*iter).second << std::endl;
 
   for(int4 i=0;i<deadcodedelay.size();++i) {
     if (deadcodedelay[i] < 0) continue;
     AddrSpace *spc = glb->getSpace(i);
-    s << "dead code delay on " << spc->getName() << " set to " << dec << deadcodedelay[i] << endl;
+    s << "dead code delay on " << spc->getName() << " std::set to " << std::dec << deadcodedelay[i] << std::endl;
   }
 
   for(iter=forcegoto.begin();iter!=forcegoto.end();++iter)
-    s << "override indirect at " << (*iter).first << " to call directly to " << (*iter).second << endl;
+    s << "override indirect at " << (*iter).first << " to call directly to " << (*iter).second << std::endl;
 
-  map<Address,FuncProto *>::const_iterator fiter;
+  std::map<Address,FuncProto *>::const_iterator fiter;
 
   for(fiter=protoover.begin();fiter!=protoover.end();++fiter) {
     s << "override prototype at " << (*fiter).first << " to ";
     (*fiter).second->printRaw("func",s);
-    s << endl;
+    s << std::endl;
   }
 }
 
 /// \brief Create warning messages that describe current overrides
 ///
 /// Message are designed to be displayed in the function header comment
-/// \param messagelist will hold the generated list of messages
+/// \param messagelist will hold the generated std::list of messages
 /// \param glb is the Architecture
-void Override::generateOverrideMessages(vector<string> &messagelist,Architecture *glb) const
+void Override::generateOverrideMessages(vectorstd::string &messagelist,Architecture *glb) const
 
 {
   // Generate deadcode delay messages
@@ -281,7 +281,7 @@ void Override::generateOverrideMessages(vector<string> &messagelist,Architecture
 /// All the commands are written as sub-tags of a root \<override> tag.
 /// \param s is the output stream
 /// \param glb is the Architecture
-void Override::saveXml(ostream &s,Architecture *glb) const
+void Override::saveXml(std::ostream &s,Architecture *glb) const
 
 {
   if (forcegoto.empty() && deadcodedelay.empty() && indirectover.empty() && protoover.empty() &&
@@ -289,7 +289,7 @@ void Override::saveXml(ostream &s,Architecture *glb) const
     return;
   s << "<override>\n";
 
-  map<Address,Address>::const_iterator iter;
+  std::map<Address,Address>::const_iterator iter;
 
   for(iter=forcegoto.begin();iter!=forcegoto.end();++iter) {
     s << "<forcegoto>";
@@ -314,7 +314,7 @@ void Override::saveXml(ostream &s,Architecture *glb) const
     s << "</indirectoverride>\n";
   }
 
-  map<Address,FuncProto *>::const_iterator fiter;
+  std::map<Address,FuncProto *>::const_iterator fiter;
 
   for(fiter=protoover.begin();fiter!=protoover.end();++fiter) {
     s << "<protooverride>";
@@ -329,7 +329,7 @@ void Override::saveXml(ostream &s,Architecture *glb) const
     s << "</multistagejump>";
   }
 
-  map<Address,uint4>::const_iterator titer;
+  std::map<Address,uint4>::const_iterator titer;
   for(titer=flowoverride.begin();titer!=flowoverride.end();++titer) {
     s << "<flow";
     a_v(s,"type",typeToString( (*titer).second ));
@@ -349,10 +349,10 @@ void Override::saveXml(ostream &s,Architecture *glb) const
 void Override::restoreXml(const Element *el,Architecture *glb)
 
 {
-  const List &list(el->getChildren());
+  const List &std::list(el->getChildren());
   List::const_iterator iter;
 
-  for(iter=list.begin();iter!=list.end();++iter) {
+  for(iter=std::list.begin();iter!=std::list.end();++iter) {
     const Element *subel = *iter;
 
     if (subel->getName() == "indirectoverride") {
@@ -383,8 +383,8 @@ void Override::restoreXml(const Element *el,Architecture *glb)
     }
     else if (subel->getName() == "deadcodedelay") {
       int4 delay = -1;
-      istringstream s(subel->getAttributeValue("delay"));
-      s.unsetf(ios::dec | ios::hex | ios::oct);
+      std::istringstream s(subel->getAttributeValue("delay"));
+      s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
       s >> delay;
       AddrSpace *spc = glb->getSpaceByName( subel->getAttributeValue("space"));
       if ((spc == (AddrSpace *)0)||(delay < 0))
@@ -414,8 +414,8 @@ void Override::restoreXml(const Element *el,Architecture *glb)
 }
 
 /// \param tp is the override type
-/// \return the corresponding name string
-string Override::typeToString(uint4 tp)
+/// \return the corresponding name std::string
+std::string Override::typeToString(uint4 tp)
 
 {
   if (tp == Override::BRANCH)
@@ -431,7 +431,7 @@ string Override::typeToString(uint4 tp)
 
 /// \param nm is the override name
 /// \return the override enumeration type
-uint4 Override::stringToType(const string &nm)
+uint4 Override::stringToType(const std::string &nm)
 
 {
   if (nm == "branch")

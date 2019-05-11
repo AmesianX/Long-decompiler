@@ -54,7 +54,7 @@ class SubvariableFlow {
     OpCode opc;		// type of new op
     int4 numparams;
     ReplaceVarnode *output;	// varnode output
-    vector<ReplaceVarnode *> input; // varnode inputs
+    std::vector<ReplaceVarnode *> input; // varnode inputs
   };
   
   class PatchRecord {		// Operation where logical value is part of input, but output remains as is
@@ -72,11 +72,11 @@ class SubvariableFlow {
   bool aggressive;		// Do we "know" initial seed point must be a sub variable
   bool sextrestrictions;	// Check for logical variables that are always sign extended into their container
   Funcdata *fd;
-  map<Varnode *,ReplaceVarnode> varmap;
-  list<ReplaceVarnode> newvarlist;
-  list<ReplaceOp> oplist;
-  list<PatchRecord> patchlist;	// Operations getting patched (but no flow thru)
-  vector<ReplaceVarnode *> worklist;
+  std::map<Varnode *,ReplaceVarnode> varmap;
+  std::list<ReplaceVarnode> newvarlist;
+  std::list<ReplaceOp> oplist;
+  std::list<PatchRecord> patchlist;	// Operations getting patched (but no flow thru)
+  std::vector<ReplaceVarnode *> worklist;
   int4 pullcount;		// Number of instructions pulling out the logical value
   static int4 doesOrSet(PcodeOp *orop,uintb mask);
   static int4 doesAndClear(PcodeOp *andop,uintb mask);
@@ -139,9 +139,9 @@ class SplitFlow {
   int4 loSize;			// Size of logical piece in least sig part of combined
   int4 hiSize;			// Size of logical piece in most sig part of combined
   Funcdata *fd;
-  map<Varnode *,ReplaceVarnode> varmap;
-  list<ReplaceOp> oplist;
-  vector<ReplaceVarnode *> worklist;
+  std::map<Varnode *,ReplaceVarnode> varmap;
+  std::list<ReplaceOp> oplist;
+  std::vector<ReplaceVarnode *> worklist;
   void assignReplaceOp(bool isLogicalInput,PcodeOp *op,OpCode opc,int4 numParam,ReplaceVarnode *outrvn);
   void assignLogicalPieces(ReplaceVarnode *rvn);
   void buildReplaceOutputs(ReplaceOp *rop);
@@ -186,7 +186,7 @@ class SubfloatFlow {
     OpCode opc;		// type of new op
     int4 numparams;
     ReplaceVarnode *output;	// varnode output
-    vector<ReplaceVarnode *> input; // varnode inputs
+    std::vector<ReplaceVarnode *> input; // varnode inputs
   };
   
   class PulloutRecord {		// Node where logical variable is getting pulled out into a real varnode
@@ -206,12 +206,12 @@ class SubfloatFlow {
   int4 precision;		// Number of bytes of precision in the logical flow
   Funcdata *fd;
   const FloatFormat *format;
-  map<Varnode *,ReplaceVarnode> varmap;
-  list<ReplaceVarnode> newvarlist;
-  list<ReplaceOp> oplist;
-  list<PulloutRecord> pulllist;
-  list<CompareRecord> complist;
-  vector<ReplaceVarnode *> worklist;
+  std::map<Varnode *,ReplaceVarnode> varmap;
+  std::list<ReplaceVarnode> newvarlist;
+  std::list<ReplaceOp> oplist;
+  std::list<PulloutRecord> pulllist;
+  std::list<CompareRecord> complist;
+  std::vector<ReplaceVarnode *> worklist;
   ReplaceVarnode *setReplacement(Varnode *vn,bool &inworklist);
   ReplaceVarnode *setReplacementNoFlow(Varnode *vn);
   ReplaceOp *createOp(OpCode opc,int4 numparam,ReplaceVarnode *outrvn);

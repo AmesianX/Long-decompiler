@@ -26,11 +26,11 @@
 %union {
   uintb *i;
   std::string *str;
-  vector<ExprTree *> *param;
+  std::vector<ExprTree *> *param;
   StarQuality *starqual;
   VarnodeTpl *varnode;
   ExprTree *tree;
-  vector<OpTpl *> *stmt;
+  std::vector<OpTpl *> *stmt;
   ConstructTpl *sem;
 
   SpaceSymbol *spacesym;
@@ -91,7 +91,7 @@
 %destructor { delete $$; } STRING
 %destructor { for(int4 i=0;i<$$->size();++i) delete (*$$)[i]; delete $$; } paramlist
 %destructor { delete $$; } rtlmid
-%destructor { if ($$ != (vector<OpTpl *> *)0) { for(int4 i=0;i<$$->size();++i) delete (*$$)[i]; delete $$;} } statement
+%destructor { if ($$ != (std::vector<OpTpl *> *)0) { for(int4 i=0;i<$$->size();++i) delete (*$$)[i]; delete $$;} } statement
 %destructor { delete $$; } expr
 %destructor { if ($$ != (VarnodeTpl *)0) delete $$; } varnode integervarnode lhsvarnode jumpdest
 %destructor { delete $$; } sizedstar
@@ -109,18 +109,18 @@ statement: lhsvarnode '=' expr ';'	{ $3->setOutput($1); $$ = ExprTree::toVector(
   | STRING '=' expr ';'			{ $$ = pcode->newOutput(false,$3,$1); }
   | LOCAL_KEY STRING ':' INTEGER '=' expr ';'	{ $$ = pcode->newOutput(true,$6,$2,*$4); delete $4; }
   | STRING ':' INTEGER '=' expr ';'	{ $$ = pcode->newOutput(true,$5,$1,*$3); delete $3; }
-  | LOCAL_KEY specificsymbol '=' { $$ = (vector<OpTpl *> *)0; std::string errmsg = "Redefinition of symbol: "+$2->getName(); yyerror(errmsg.c_str()); YYERROR; }
+  | LOCAL_KEY specificsymbol '=' { $$ = (std::vector<OpTpl *> *)0; std::string errmsg = "Redefinition of symbol: "+$2->getName(); yyerror(errmsg.c_str()); YYERROR; }
   | sizedstar expr '=' expr ';'		{ $$ = pcode->createStore($1,$2,$4); }
   | USEROPSYM '(' paramlist ')' ';'	{ $$ = pcode->createUserOpNoOut($1,$3); }
   | lhsvarnode '[' INTEGER ',' INTEGER ']' '=' expr ';' { $$ = pcode->assignBitRange($1,(uint4)*$3,(uint4)*$5,$8); delete $3, delete $5; }
-  | varnode ':' INTEGER '='		{ $$ = (vector<OpTpl *> *)0; delete $1; delete $3; yyerror("Illegal truncation on left-hand side of assignment"); YYERROR; }
-  | varnode '(' INTEGER ')'		{ $$ = (vector<OpTpl *> *)0; delete $1; delete $3; yyerror("Illegal subpiece on left-hand side of assignment"); YYERROR; }
+  | varnode ':' INTEGER '='		{ $$ = (std::vector<OpTpl *> *)0; delete $1; delete $3; yyerror("Illegal truncation on left-hand side of assignment"); YYERROR; }
+  | varnode '(' INTEGER ')'		{ $$ = (std::vector<OpTpl *> *)0; delete $1; delete $3; yyerror("Illegal subpiece on left-hand side of assignment"); YYERROR; }
   | GOTO_KEY jumpdest ';'		{ $$ = pcode->createOpNoOut(CPUI_BRANCH,new ExprTree($2)); }
   | IF_KEY expr GOTO_KEY jumpdest ';'	{ $$ = pcode->createOpNoOut(CPUI_CBRANCH,new ExprTree($4),$2); }
   | GOTO_KEY '[' expr ']' ';'		{ $$ = pcode->createOpNoOut(CPUI_BRANCHIND,$3); }
   | CALL_KEY jumpdest ';'		{ $$ = pcode->createOpNoOut(CPUI_CALL,new ExprTree($2)); }
   | CALL_KEY '[' expr ']' ';'		{ $$ = pcode->createOpNoOut(CPUI_CALLIND,$3); }
-  | RETURN_KEY ';'			{ $$ = (vector<OpTpl *> *)0; yyerror("Must specify an indirect parameter for return"); YYERROR; }
+  | RETURN_KEY ';'			{ $$ = (std::vector<OpTpl *> *)0; yyerror("Must specify an indirect parameter for return"); YYERROR; }
   | RETURN_KEY '[' expr ']' ';'		{ $$ = pcode->createOpNoOut(CPUI_RETURN,$3); }
   | label                               { $$ = pcode->placeLabel( $1 ); }
   ;
@@ -222,14 +222,14 @@ specificsymbol: VARSYM		{ $$ = $1; }
   | STARTSYM			{ $$ = $1; }
   | ENDSYM			{ $$ = $1; }
   ;
-paramlist: /* EMPTY */		{ $$ = new vector<ExprTree *>; }
-  | expr			{ $$ = new vector<ExprTree *>; $$->push_back($1); }
+paramlist: /* EMPTY */		{ $$ = new std::vector<ExprTree *>; }
+  | expr			{ $$ = new std::vector<ExprTree *>; $$->push_back($1); }
   | paramlist ',' expr		{ $$ = $1; $$->push_back($3); }
   ;
 %%
 
 #define IDENTREC_SIZE 46
-const IdentRec PcodeLexer::idents[]= { // Sorted list of identifiers
+const IdentRec PcodeLexer::idents[]= { // Sorted std::list of identifiers
   { "!=", OP_NOTEQUAL },
   { "&&", OP_BOOL_AND },
   { "<<", OP_LEFT },
@@ -592,8 +592,8 @@ int4 PcodeLexer::getNextToken(void)
   }
   else if ((tok == hexstring)||(tok == decstring)) {
     curtoken[tokpos] = '\0';
-    istringstream s1(curtoken);
-    s1.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+    std::istringstream s1(curtoken);
+    s1.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
     s1 >> curnum;
     if (!s1)
       return BADINTEGER;

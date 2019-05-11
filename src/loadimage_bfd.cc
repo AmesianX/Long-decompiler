@@ -21,7 +21,7 @@
 namespace GhidraDec {
 int4 LoadImageBfd::bfdinit = 0;	// Global initialization variable
 
-LoadImageBfd::LoadImageBfd(const string &f,const string &t) : LoadImage(f)
+LoadImageBfd::LoadImageBfd(const std::string &f,const std::string &t) : LoadImage(f)
 
 {
   target = t;
@@ -49,11 +49,11 @@ LoadImageBfd::~LoadImageBfd(void)
   delete [] buffer;
 }
 
-string LoadImageBfd::getArchType(void) const
+std::string LoadImageBfd::getArchType(void) const
 
 {
-  string type;
-  string targ;
+  std::string type;
+  std::string targ;
   type = bfd_printable_name(thebfd);
   type += ':';
   targ = thebfd->xvec->name;
@@ -78,12 +78,12 @@ void LoadImageBfd::open(void)
   if (thebfd != (bfd *)0) throw LowlevelError("BFD library did not initialize");
   thebfd = bfd_openr(filename.c_str(),target.c_str());
   if (thebfd == (bfd *)0) {
-    string errmsg="Unable to open image file: ";
+    std::string errmsg="Unable to open image file: ";
     errmsg += filename;
     throw LowlevelError(errmsg);
   }
   if (!bfd_check_format( thebfd, bfd_object)) {
-    string errmsg="File: ";
+    std::string errmsg="File: ";
     errmsg += filename;
     errmsg += " : not in recognized object file format";
     throw LowlevelError(errmsg);
@@ -171,8 +171,8 @@ void LoadImageBfd::loadFill(uint1 *ptr,int4 size,const Address &addr)
     curaddr += readsize;
   }
   if (cursize > 0) {
-    ostringstream errmsg;
-    errmsg << "Unable to load " << dec << cursize << " bytes at " << addr.getShortcut();
+    std::ostringstream errmsg;
+    errmsg << "Unable to load " << std::dec << cursize << " bytes at " << addr.getShortcut();
     addr.printRaw(errmsg);
     throw DataUnavailError(errmsg.str());
   }
@@ -284,7 +284,7 @@ void LoadImageBfd::closeSymbols(void) const
   cursymbol = 0;
 }
 
-void LoadImageBfd::getReadonly(RangeList &list) const
+void LoadImageBfd::getReadonly(RangeList &std::list) const
 
 { // List all ranges that are read only
   uintb start,stop,secsize;
@@ -296,7 +296,7 @@ void LoadImageBfd::getReadonly(RangeList &list) const
       secsize = (p->size!=0) ? p->size : p->rawsize;
       if (secsize == 0) continue;
       stop = start + secsize - 1;
-      list.insertRange(spaceid,start,stop);
+      std::list.insertRange(spaceid,start,stop);
     }
   }
 }

@@ -43,7 +43,7 @@ int4 RuleEarlyRemoval::applyOp(PcodeOp *op,Funcdata &data)
   return 1;
 }
 
-// void RuleAddrForceRelease::getOpList(vector<uint4> &oplist) const
+// void RuleAddrForceRelease::getOpList(std::vector<uint4> &oplist) const
 
 // {
 //   oplist.push_back(CPUI_COPY);
@@ -149,7 +149,7 @@ int4 RuleCollectTerms::doDistribute(Funcdata &data,PcodeOp *op)
 
 /// \class RuleCollectTerms
 /// \brief Collect terms in a sum: `V * c + V * d   =>  V * (c + d)`
-void RuleCollectTerms::getOpList(vector<uint4> &oplist) const
+void RuleCollectTerms::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_INT_ADD);
@@ -167,7 +167,7 @@ int4 RuleCollectTerms::applyOp(PcodeOp *op,Funcdata &data)
   termorder.sortTerms();	// Sort them based on termorder
   Varnode *vn1,*vn2;
   uintb coef1,coef2;
-  const vector<PcodeOpEdge *> &order( termorder.getSort() );
+  const std::vector<PcodeOpEdge *> &order( termorder.getSort() );
   int4 i=0;
 
   if (!order[0]->getVarnode()->isConstant()) {
@@ -227,8 +227,8 @@ int4 RuleCollectTerms::applyOp(PcodeOp *op,Funcdata &data)
 }
 
 /// \class RuleSelectCse
-/// \brief Look for common sub-expressions (built out of a restricted set of ops)
-void RuleSelectCse::getOpList(vector<uint4> &oplist) const
+/// \brief Look for common sub-expressions (built out of a restricted std::set of ops)
+void RuleSelectCse::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_SUBPIECE);
@@ -239,29 +239,29 @@ int4 RuleSelectCse::applyOp(PcodeOp *op,Funcdata &data)
 
 {
   Varnode *vn = op->getIn(0);
-  list<PcodeOp *>::const_iterator iter;
+  std::list<PcodeOp *>::const_iterator iter;
   OpCode opc = op->code();
   PcodeOp *otherop;
   uintm hash;
-  vector< pair<uintm,PcodeOp *> > list;
-  vector<Varnode *> vlist;
+  std::vector< pair<uintm,PcodeOp *> > std::list;
+  std::vector<Varnode *> vlist;
   
   for(iter=vn->beginDescend();iter!=vn->endDescend();++iter) {
     otherop = *iter;
     if (otherop->code() != opc) continue;
     hash = otherop->getCseHash();
     if (hash == 0) continue;
-    list.push_back(pair<uintm,PcodeOp *>(hash,otherop));
+    std::list.push_back(pair<uintm,PcodeOp *>(hash,otherop));
   }
-  if (list.size()<=1) return 0;
-  cseEliminateList(data,list,vlist);
+  if (std::list.size()<=1) return 0;
+  cseEliminateList(data,std::list,vlist);
   if (vlist.empty()) return 0;
   return 1;
 }
 
 /// \class RulePiece2Zext
 /// \brief Concatenation with 0 becomes an extension:  `V = concat(#0,W)  =>  V = zext(W)`
-void RulePiece2Zext::getOpList(vector<uint4> &oplist) const
+void RulePiece2Zext::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_PIECE);
@@ -282,7 +282,7 @@ int4 RulePiece2Zext::applyOp(PcodeOp *op,Funcdata &data)
 
 /// \class RulePiece2Sext
 /// \brief Concatenation with sign bits becomes an extension: `concat( V s>> #0x1f , V)  => sext(V)`
-void RulePiece2Sext::getOpList(vector<uint4> &oplist) const
+void RulePiece2Sext::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_PIECE);
@@ -311,7 +311,7 @@ int4 RulePiece2Sext::applyOp(PcodeOp *op,Funcdata &data)
 
 /// \class RuleBxor2NotEqual
 /// \brief Eliminate BOOL_XOR:  `V ^^ W  =>  V != W`
-void RuleBxor2NotEqual::getOpList(vector<uint4> &oplist) const
+void RuleBxor2NotEqual::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_BOOL_XOR);
@@ -326,7 +326,7 @@ int4 RuleBxor2NotEqual::applyOp(PcodeOp *op,Funcdata &data)
 
 /// \class RuleOrMask
 /// \brief Simplify INT_OR with full mask:  `V = W | 0xffff  =>  V = W`
-void RuleOrMask::getOpList(vector<uint4> &oplist) const
+void RuleOrMask::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_INT_OR);
@@ -352,7 +352,7 @@ int4 RuleOrMask::applyOp(PcodeOp *op,Funcdata &data)
 
 /// \class RuleAndMask
 /// \brief Collapse unnecessary INT_AND
-void RuleAndMask::getOpList(vector<uint4> &oplist) const
+void RuleAndMask::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_INT_AND);
@@ -395,9 +395,9 @@ int4 RuleAndMask::applyOp(PcodeOp *op,Funcdata &data)
 /// \class RuleOrCollapse
 /// \brief Collapse unnecessary INT_OR
 ///
-/// Replace V | c with c, if any bit not set in c,
-/// is also not set in V   i.e. NZM(V) | c == c
-void RuleOrCollapse::getOpList(vector<uint4> &oplist) const
+/// Replace V | c with c, if any bit not std::set in c,
+/// is also not std::set in V   i.e. NZM(V) | c == c
+void RuleOrCollapse::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_INT_OR);
@@ -424,7 +424,7 @@ int4 RuleOrCollapse::applyOp(PcodeOp *op,Funcdata &data)
 
 /// \class RuleAndOrLump
 /// \brief Collapse constants in logical expressions:  `(V & c) & d  =>  V & (c & d)`
-void RuleAndOrLump::getOpList(vector<uint4> &oplist) const
+void RuleAndOrLump::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_INT_AND);
@@ -465,7 +465,7 @@ int4 RuleAndOrLump::applyOp(PcodeOp *op,Funcdata &data)
 
 /// \class RuleNegateIdentity
 /// \brief Apply INT_NEGATE identities:  `V & ~V  => #0,  V | ~V  ->  #-1`
-void RuleNegateIdentity::getOpList(vector<uint4> &oplist) const
+void RuleNegateIdentity::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_INT_NEGATE);
@@ -476,7 +476,7 @@ int4 RuleNegateIdentity::applyOp(PcodeOp *op,Funcdata &data)
 {
   Varnode *vn = op->getIn(0);
   Varnode *outVn = op->getOut();
-  list<PcodeOp *>::const_iterator iter;
+  std::list<PcodeOp *>::const_iterator iter;
   for(iter=outVn->beginDescend();iter!=outVn->endDescend();++iter) {
     PcodeOp *logicOp = *iter;
     OpCode opc = logicOp->code();
@@ -500,7 +500,7 @@ int4 RuleNegateIdentity::applyOp(PcodeOp *op,Funcdata &data)
 ///
 /// `( V & 0xf000 ) << 4   =>   #0 << 4`
 /// `( V + 0xf000 ) << 4   =>    V << 4`
-void RuleShiftBitops::getOpList(vector<uint4> &oplist) const
+void RuleShiftBitops::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_INT_LEFT);
@@ -588,7 +588,7 @@ int4 RuleShiftBitops::applyOp(PcodeOp *op,Funcdata &data)
 
 /// \class RuleIntLessEqual
 /// \brief Convert LESSEQUAL to LESS:  `V <= c  =>  V < (c+1)`
-void RuleIntLessEqual::getOpList(vector<uint4> &oplist) const
+void RuleIntLessEqual::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_INT_LESSEQUAL);
@@ -608,7 +608,7 @@ int4 RuleIntLessEqual::applyOp(PcodeOp *op,Funcdata &data)
 ///
 /// If both inputs to an INT_EQUAL or INT_NOTEQUAL op are functionally equivalent,
 /// the op can be collapsed to a COPY of a \b true or \b false.
-void RuleEquality::getOpList(vector<uint4> &oplist) const
+void RuleEquality::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_INT_EQUAL);
@@ -634,17 +634,17 @@ int4 RuleEquality::applyOp(PcodeOp *op,Funcdata &data)
 ///
 /// Constants always come last in particular which eliminates
 /// some of the combinatorial explosion of expression variations.
-void RuleTermOrder::getOpList(vector<uint4> &oplist) const
+void RuleTermOrder::getOpList(std::vector<uint4> &oplist) const
 
 {
 				// FIXME:  All the commutative ops
 				// Use the TypeOp::commutative function
-  uint4 list[]={ CPUI_INT_EQUAL, CPUI_INT_NOTEQUAL, CPUI_INT_ADD, CPUI_INT_CARRY,
+  uint4 std::list[]={ CPUI_INT_EQUAL, CPUI_INT_NOTEQUAL, CPUI_INT_ADD, CPUI_INT_CARRY,
 		 CPUI_INT_SCARRY, CPUI_INT_XOR, CPUI_INT_AND, CPUI_INT_OR,
 		 CPUI_INT_MULT, CPUI_BOOL_XOR, CPUI_BOOL_AND, CPUI_BOOL_OR,
 		 CPUI_FLOAT_EQUAL, CPUI_FLOAT_NOTEQUAL, CPUI_FLOAT_ADD,
 		 CPUI_FLOAT_MULT };
-  oplist.insert(oplist.end(),list,list+16);
+  oplist.insert(oplist.end(),std::list,std::list+16);
 }
 
 int4 RuleTermOrder::applyOp(PcodeOp *op,Funcdata &data)
@@ -670,7 +670,7 @@ int4 RuleTermOrder::applyOp(PcodeOp *op,Funcdata &data)
 void RulePullsubMulti::minMaxUse(Varnode *vn,int4 &maxByte,int4 &minByte)
 
 {
-  list<PcodeOp *>::const_iterator iter,enditer;
+  std::list<PcodeOp *>::const_iterator iter,enditer;
   enditer = vn->endDescend();
 
   int4 inSize = vn->getSize();
@@ -706,7 +706,7 @@ void RulePullsubMulti::minMaxUse(Varnode *vn,int4 &maxByte,int4 &minByte)
 void RulePullsubMulti::replaceDescendants(Varnode *origVn,Varnode *newVn,int4 maxByte,int4 minByte,Funcdata &data)
 
 {
-  list<PcodeOp *>::const_iterator iter,enditer;
+  std::list<PcodeOp *>::const_iterator iter,enditer;
   iter = origVn->beginDescend();
   enditer = origVn->endDescend();
   while(iter != enditer) {
@@ -834,7 +834,7 @@ Varnode *RulePullsubMulti::buildSubpiece(Varnode *basevn,uint4 outsize,uint4 shi
 Varnode *RulePullsubMulti::findSubpiece(Varnode *basevn,uint4 outsize,uint4 shift)
 
 {
-  list<PcodeOp *>::const_iterator iter;
+  std::list<PcodeOp *>::const_iterator iter;
   PcodeOp *prevop;
 
   for(iter=basevn->beginDescend();iter!=basevn->endDescend();++iter) {
@@ -856,7 +856,7 @@ Varnode *RulePullsubMulti::findSubpiece(Varnode *basevn,uint4 outsize,uint4 shif
 
 /// \class RulePullsubMulti
 /// \brief Pull SUBPIECE back through MULTIEQUAL
-void RulePullsubMulti::getOpList(vector<uint4> &oplist) const
+void RulePullsubMulti::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_SUBPIECE);
@@ -887,7 +887,7 @@ int4 RulePullsubMulti::applyOp(PcodeOp *op,Funcdata &data)
   else
     smalladdr2 = vn->getAddr()+(vn->getSize()-maxByte-1);
 
-  vector<Varnode *> params;
+  std::vector<Varnode *> params;
   int4 branches = mult->numInput();
 
   for(int4 i=0;i<branches;++i) {
@@ -913,7 +913,7 @@ int4 RulePullsubMulti::applyOp(PcodeOp *op,Funcdata &data)
 
 /// \class RulePullsubIndirect
 /// \brief Pull-back SUBPIECE through INDIRECT
-void RulePullsubIndirect::getOpList(vector<uint4> &oplist) const
+void RulePullsubIndirect::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_SUBPIECE);
@@ -986,7 +986,7 @@ int4 RulePullsubIndirect::applyOp(PcodeOp *op,Funcdata &data)
 PcodeOp *RulePushMulti::findSubstitute(Varnode *in1,Varnode *in2,BlockBasic *bb,PcodeOp *earliest)
 
 {
-  list<PcodeOp *>::const_iterator iter,enditer;
+  std::list<PcodeOp *>::const_iterator iter,enditer;
   iter = in1->beginDescend();
   enditer = in1->endDescend();
   while(iter != enditer) {
@@ -1020,7 +1020,7 @@ PcodeOp *RulePushMulti::findSubstitute(Varnode *in1,Varnode *in2,BlockBasic *bb,
 /// Look for a two-branch MULTIEQUAL where both inputs are constructed in
 /// functionally equivalent ways.  Remove (the reference to) one construction
 /// and move the other into the merge block.
-void RulePushMulti::getOpList(vector<uint4> &oplist) const
+void RulePushMulti::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_MULTIEQUAL);
@@ -1093,7 +1093,7 @@ int4 RulePushMulti::applyOp(PcodeOp *op,Funcdata &data)
 
 /// \class RuleNotDistribute
 /// \brief Distribute BOOL_NEGATE:  `!(V && W)  =>  !V || !W`
-void RuleNotDistribute::getOpList(vector<uint4> &oplist) const
+void RuleNotDistribute::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_BOOL_NEGATE);
@@ -1142,7 +1142,7 @@ int4 RuleNotDistribute::applyOp(PcodeOp *op,Funcdata &data)
 ///
 /// If V and W are aligned to a mask, then
 /// `((V + c) + W) & 0xfff0   =>   (V + (c & 0xfff0)) + W`
-void RuleHighOrderAnd::getOpList(vector<uint4> &oplist) const
+void RuleHighOrderAnd::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_INT_AND);
@@ -1206,7 +1206,7 @@ int4 RuleHighOrderAnd::applyOp(PcodeOp *op,Funcdata &data)
 
 /// \class RuleAndDistribute
 /// \brief Distribute INT_AND through INT_OR if result is simpler
-void RuleAndDistribute::getOpList(vector<uint4> &oplist) const
+void RuleAndDistribute::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_INT_AND);
@@ -1270,7 +1270,7 @@ int4 RuleAndDistribute::applyOp(PcodeOp *op,Funcdata &data)
 
 /// \class RuleLessOne
 /// \brief Transform INT_LESS of 0 or 1:  `V < 1  =>  V == 0,  V <= 0  =>  V == 0`
-void RuleLessOne::getOpList(vector<uint4> &oplist) const
+void RuleLessOne::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_INT_LESS);
@@ -1293,7 +1293,7 @@ int4 RuleLessOne::applyOp(PcodeOp *op,Funcdata &data)
   return 1;
 }
 
-void RuleRangeMeld::getOpList(vector<uint4> &oplist) const
+void RuleRangeMeld::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_BOOL_OR);
@@ -1395,7 +1395,7 @@ int4 RuleRangeMeld::applyOp(PcodeOp *op,Funcdata &data)
 /// \brief Merge range conditions of the form: `V f< c, c f< V, V f== c` etc.
 ///
 /// Convert `(V f< W)||(V f== W)   =>   V f<= W` (and similar variants)
-void RuleFloatRange::getOpList(vector<uint4> &oplist) const
+void RuleFloatRange::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_BOOL_OR);
@@ -1478,7 +1478,7 @@ int4 RuleFloatRange::applyOp(PcodeOp *op,Funcdata &data)
 /// This makes sense to do if W is constant and there is no other use of (V << W)
 /// If W is \b not constant, it only makes sense if the INT_AND is likely to cancel
 /// with a specific INT_OR or PIECE
-void RuleAndCommute::getOpList(vector<uint4> &oplist) const
+void RuleAndCommute::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_INT_AND);
@@ -1586,7 +1586,7 @@ int4 RuleAndCommute::applyOp(PcodeOp *op,Funcdata &data)
 /// Conversion to INT_ZEXT works if we know the upper part of the result is zero.
 ///
 /// Similarly if the lower part is zero:  `V & concat(W,X)  =>  V & concat(#0,X)`
-void RuleAndPiece::getOpList(vector<uint4> &oplist) const
+void RuleAndPiece::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_INT_AND);
@@ -1652,7 +1652,7 @@ int4 RuleAndPiece::applyOp(PcodeOp *op,Funcdata &data)
 /// \brief Simplify INT_ZEXT and SUBPIECE in masked comparison: `zext(V) & c == 0  =>  V & (c & mask) == 0`
 ///
 /// Similarly:  `sub(V,c) & d == 0  =>  V & (d & mask) == 0`
-void RuleAndCompare::getOpList(vector<uint4> &oplist) const
+void RuleAndCompare::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_INT_EQUAL);
@@ -1713,7 +1713,7 @@ int4 RuleAndCompare::applyOp(PcodeOp *op,Funcdata &data)
 
 /// \class RuleDoubleSub
 /// \brief Simplify chained SUBPIECE:  `sub( sub(V,c), d)  =>  sub(V, c+d)`
-void RuleDoubleSub::getOpList(vector<uint4> &oplist) const
+void RuleDoubleSub::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_SUBPIECE);
@@ -1746,7 +1746,7 @@ int4 RuleDoubleSub::applyOp(PcodeOp *op,Funcdata &data)
 ///
 ///    - `(V << c) << d  =>  V << (c+d)`
 ///    - `(V << c) >> c` =>  V & 0xff`
-void RuleDoubleShift::getOpList(vector<uint4> &oplist) const
+void RuleDoubleShift::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_INT_LEFT);
@@ -1827,7 +1827,7 @@ int4 RuleDoubleShift::applyOp(PcodeOp *op,Funcdata &data)
 /// Right shifts (signed and unsigned) can throw away the least significant part
 /// of a concatentation.  The result is a (sign or zero) extension of the most significant part.
 /// Depending on the original shift amount, the extension may still need to be shifted.
-void RuleConcatShift::getOpList(vector<uint4> &oplist) const
+void RuleConcatShift::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_INT_RIGHT);
@@ -1878,7 +1878,7 @@ int4 RuleConcatShift::applyOp(PcodeOp *op,Funcdata &data)
 /// amount must be a multiple of 8.
 ///
 /// `(V << c) s>> c  =>  sext( sub(V, #0) )`
-void RuleLeftRight::getOpList(vector<uint4> &oplist) const
+void RuleLeftRight::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_INT_RIGHT);
@@ -1924,7 +1924,7 @@ int4 RuleLeftRight::applyOp(PcodeOp *op,Funcdata &data)
 /// Similarly: `V << c == d  =>  V & mask == (d >> c)`
 ///
 /// The rule works on both INT_EQUAL and INT_NOTEQUAL.
-void RuleShiftCompare::getOpList(vector<uint4> &oplist) const
+void RuleShiftCompare::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_INT_EQUAL);
@@ -2024,7 +2024,7 @@ int4 RuleShiftCompare::applyOp(PcodeOp *op,Funcdata &data)
   return 1;
 }
 
-// void RuleShiftLess::getOpList(vector<uint4> &oplist) const
+// void RuleShiftLess::getOpList(std::vector<uint4> &oplist) const
 
 // {
 //   oplist.push_back(CPUI_INT_LESS);
@@ -2110,7 +2110,7 @@ int4 RuleShiftCompare::applyOp(PcodeOp *op,Funcdata &data)
 /// Similarly: `V < W || V != W  =>  V != W`
 ///
 /// Handle INT_SLESS variants as well.
-void RuleLessEqual::getOpList(vector<uint4> &oplist) const
+void RuleLessEqual::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_BOOL_OR);
@@ -2168,7 +2168,7 @@ int4 RuleLessEqual::applyOp(PcodeOp *op,Funcdata &data)
 /// \brief Simplify INT_LESSEQUAL && INT_NOTEQUAL:  `V <= W && V != W  =>  V < W`
 ///
 /// Handle INT_SLESSEQUAL variant.
-void RuleLessNotEqual::getOpList(vector<uint4> &oplist) const
+void RuleLessNotEqual::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_BOOL_AND);
@@ -2226,14 +2226,14 @@ int4 RuleLessNotEqual::applyOp(PcodeOp *op,Funcdata &data)
 ///   - `V ^ V   => #0`
 ///
 /// Handles other signed, boolean, and floating-point variants.
-void RuleTrivialArith::getOpList(vector<uint4> &oplist) const
+void RuleTrivialArith::getOpList(std::vector<uint4> &oplist) const
 
 {
-  uint4 list[]={ CPUI_INT_NOTEQUAL, CPUI_INT_SLESS, CPUI_INT_LESS, CPUI_BOOL_XOR, CPUI_BOOL_AND, CPUI_BOOL_OR,
+  uint4 std::list[]={ CPUI_INT_NOTEQUAL, CPUI_INT_SLESS, CPUI_INT_LESS, CPUI_BOOL_XOR, CPUI_BOOL_AND, CPUI_BOOL_OR,
 		 CPUI_INT_EQUAL, CPUI_INT_SLESSEQUAL, CPUI_INT_LESSEQUAL,
 		 CPUI_INT_XOR, CPUI_INT_AND, CPUI_INT_OR,
                  CPUI_FLOAT_EQUAL, CPUI_FLOAT_NOTEQUAL, CPUI_FLOAT_LESS, CPUI_FLOAT_LESSEQUAL };
-  oplist.insert(oplist.end(),list,list+16);
+  oplist.insert(oplist.end(),std::list,std::list+16);
 }
   
 int4 RuleTrivialArith::applyOp(PcodeOp *op,Funcdata &data)
@@ -2298,11 +2298,11 @@ int4 RuleTrivialArith::applyOp(PcodeOp *op,Funcdata &data)
 ///   - `V || true   =>  true`
 ///   - `V ^^ true   =>  !V`
 ///   - `V ^^ false  =>  V`
-void RuleTrivialBool::getOpList(vector<uint4> &oplist) const
+void RuleTrivialBool::getOpList(std::vector<uint4> &oplist) const
 
 {
-  uint4 list[] = { CPUI_BOOL_AND, CPUI_BOOL_OR, CPUI_BOOL_XOR };
-  oplist.insert(oplist.end(),list,list+3);
+  uint4 std::list[] = { CPUI_BOOL_AND, CPUI_BOOL_OR, CPUI_BOOL_XOR };
+  oplist.insert(oplist.end(),std::list,std::list+3);
 }
 
 int4 RuleTrivialBool::applyOp(PcodeOp *op,Funcdata &data)
@@ -2353,12 +2353,12 @@ int4 RuleTrivialBool::applyOp(PcodeOp *op,Funcdata &data)
 ///   - `zext(V) != c =>  V != c`
 ///   - `zext(V) < c  =>  V < c`
 ///   - `zext(V) <= c =>  V <= c`
-void RuleZextEliminate::getOpList(vector<uint4> &oplist) const
+void RuleZextEliminate::getOpList(std::vector<uint4> &oplist) const
 
 {
-  uint4 list[] = {CPUI_INT_EQUAL, CPUI_INT_NOTEQUAL,
+  uint4 std::list[] = {CPUI_INT_EQUAL, CPUI_INT_NOTEQUAL,
 		  CPUI_INT_LESS,CPUI_INT_LESSEQUAL };
-  oplist.insert(oplist.end(),list,list+4);
+  oplist.insert(oplist.end(),std::list,std::list+4);
 }
 
 int4 RuleZextEliminate::applyOp(PcodeOp *op,Funcdata &data)
@@ -2405,7 +2405,7 @@ int4 RuleZextEliminate::applyOp(PcodeOp *op,Funcdata &data)
 ///
 /// This also works converting INT_SLESSEQUAL to INT_LESSEQUAL.
 /// We use the non-zero mask to verify the sign bit is zero.
-void RuleSlessToLess::getOpList(vector<uint4> &oplist) const
+void RuleSlessToLess::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_INT_SLESS);
@@ -2429,7 +2429,7 @@ int4 RuleSlessToLess::applyOp(PcodeOp *op,Funcdata &data)
 
 /// \class RuleZextSless
 /// \brief Transform INT_ZEXT and INT_SLESS:  `zext(V) s< c  =>  V < c`
-void RuleZextSless::getOpList(vector<uint4> &oplist) const
+void RuleZextSless::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_INT_SLESS);
@@ -2479,11 +2479,11 @@ int4 RuleZextSless::applyOp(PcodeOp *op,Funcdata &data)
 ///  - `(V >> X) | (W >> X)  =>  (V | W) >> X`
 ///
 /// Works with INT_ZEXT, INT_SEXT, INT_LEFT, INT_RIGHT, and INT_SRIGHT.
-void RuleBitUndistribute::getOpList(vector<uint4> &oplist) const
+void RuleBitUndistribute::getOpList(std::vector<uint4> &oplist) const
 
 {
-  uint4 list[]= { CPUI_INT_AND, CPUI_INT_OR, CPUI_INT_XOR };
-  oplist.insert(oplist.end(),list,list+3);
+  uint4 std::list[]= { CPUI_INT_AND, CPUI_INT_OR, CPUI_INT_XOR };
+  oplist.insert(oplist.end(),std::list,std::list+3);
 }
 
 int4 RuleBitUndistribute::applyOp(PcodeOp *op,Funcdata &data)
@@ -2554,11 +2554,11 @@ int4 RuleBitUndistribute::applyOp(PcodeOp *op,Funcdata &data)
 ///
 /// Works with both INT_EQUAL and INT_NOTEQUAL.  Both sides of the comparison
 /// must be boolean values.
-void RuleBooleanNegate::getOpList(vector<uint4> &oplist) const
+void RuleBooleanNegate::getOpList(std::vector<uint4> &oplist) const
 
 {
-  uint4 list[]= { CPUI_INT_NOTEQUAL, CPUI_INT_EQUAL };
-  oplist.insert(oplist.end(),list,list+2);
+  uint4 std::list[]= { CPUI_INT_NOTEQUAL, CPUI_INT_EQUAL };
+  oplist.insert(oplist.end(),std::list,std::list+2);
 }
 
 int4 RuleBooleanNegate::applyOp(PcodeOp *op,Funcdata &data)
@@ -2604,7 +2604,7 @@ int4 RuleBooleanNegate::applyOp(PcodeOp *op,Funcdata &data)
 ///   - `(zext(V) * -1) != -1  =>  V != true`
 ///   - `(zext(V) * -1) & (zext(W) * -1)  =>  zext(V && W) * -1`
 ///   - `(zext(V) * -1) | (zext(W) * -1)  =>  zext(V || W) * -1`
-void RuleBoolZext::getOpList(vector<uint4> &oplist) const
+void RuleBoolZext::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_INT_ZEXT);
@@ -2727,11 +2727,11 @@ int4 RuleBoolZext::applyOp(PcodeOp *op,Funcdata &data)
 ///
 /// Verify that the inputs to the logical operator are booleans, then convert
 /// INT_AND to BOOL_AND, INT_OR to BOOL_OR etc.
-void RuleLogic2Bool::getOpList(vector<uint4> &oplist) const
+void RuleLogic2Bool::getOpList(std::vector<uint4> &oplist) const
 
 {			      
-  uint4 list[]= { CPUI_INT_AND, CPUI_INT_OR, CPUI_INT_XOR };
-  oplist.insert(oplist.end(),list,list+3);
+  uint4 std::list[]= { CPUI_INT_AND, CPUI_INT_OR, CPUI_INT_XOR };
+  oplist.insert(oplist.end(),std::list,std::list+3);
 }
 
 int4 RuleLogic2Bool::applyOp(PcodeOp *op,Funcdata &data)
@@ -2769,7 +2769,7 @@ int4 RuleLogic2Bool::applyOp(PcodeOp *op,Funcdata &data)
 
 /// \class RuleIndirectCollapse
 /// \brief Remove a CPUI_INDIRECT if its blocking PcodeOp is dead
-void RuleIndirectCollapse::getOpList(vector<uint4> &oplist) const
+void RuleIndirectCollapse::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_INDIRECT);
@@ -2818,7 +2818,7 @@ int4 RuleIndirectCollapse::applyOp(PcodeOp *op,Funcdata &data)
 
 /// \class RuleMultiCollapse
 /// \brief Collapse MULTIEQUAL whose inputs all trace to the same value
-void RuleMultiCollapse::getOpList(vector<uint4> &oplist) const
+void RuleMultiCollapse::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_MULTIEQUAL);
@@ -2827,7 +2827,7 @@ void RuleMultiCollapse::getOpList(vector<uint4> &oplist) const
 int4 RuleMultiCollapse::applyOp(PcodeOp *op,Funcdata &data)
 
 {
-  vector<Varnode *> skiplist,matchlist;
+  std::vector<Varnode *> skiplist,matchlist;
   Varnode *defcopyr,*copyr;
   bool func_eq,nofunc;
   PcodeOp *newop;
@@ -2881,7 +2881,7 @@ int4 RuleMultiCollapse::applyOp(PcodeOp *op,Funcdata &data)
       newop = copyr->getDef();
       skiplist.push_back(copyr); // We give the branch one last chance and
       copyr->setMark();
-      for(int4 i=0;i<newop->numInput();++i) // add its inputs to list of things to match
+      for(int4 i=0;i<newop->numInput();++i) // add its inputs to std::list of things to match
 	matchlist.push_back(newop->getIn(i));
     }
     else {			// A non-matching branch
@@ -2911,7 +2911,7 @@ int4 RuleMultiCollapse::applyOp(PcodeOp *op,Funcdata &data)
 	}
 	else {			// Otherwise, create a copy
 	  bool needsreinsert = (op->code() == CPUI_MULTIEQUAL);
-	  vector<Varnode *> parms;
+	  std::vector<Varnode *> parms;
 	  for(int4 i=0;i<newop->numInput();++i)
 	    parms.push_back(newop->getIn(i)); // Copy parameters
 	  data.opSetAllInput(op,parms);
@@ -2945,7 +2945,7 @@ int4 RuleMultiCollapse::applyOp(PcodeOp *op,Funcdata &data)
 /// - `sborrow(V,W) == (V + (W * -1) s< 0)  =>  W s<= V`
 ///
 /// Supports variations where W is constant.
-void RuleSborrow::getOpList(vector<uint4> &oplist) const
+void RuleSborrow::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_INT_SBORROW);
@@ -2956,7 +2956,7 @@ int4 RuleSborrow::applyOp(PcodeOp *op,Funcdata &data)
 {
   Varnode *svn = op->getOut();
   Varnode *cvn,*avn,*bvn;
-  list<PcodeOp *>::const_iterator iter;
+  std::list<PcodeOp *>::const_iterator iter;
   PcodeOp *compop,*signop,*addop;
   int4 zside;
 
@@ -3030,11 +3030,11 @@ int4 RuleSborrow::applyOp(PcodeOp *op,Funcdata &data)
 
 /// \class RuleTrivialShift
 /// \brief Simplify trivial shifts:  `V << 0  =>  V,  V << #64  =>  0`
-void RuleTrivialShift::getOpList(vector<uint4> &oplist) const
+void RuleTrivialShift::getOpList(std::vector<uint4> &oplist) const
 
 {
-  uint4 list[] = { CPUI_INT_LEFT, CPUI_INT_RIGHT, CPUI_INT_SRIGHT };
-  oplist.insert(oplist.end(),list,list+3);
+  uint4 std::list[] = { CPUI_INT_LEFT, CPUI_INT_RIGHT, CPUI_INT_SRIGHT };
+  oplist.insert(oplist.end(),std::list,std::list+3);
 }
 
 int4 RuleTrivialShift::applyOp(PcodeOp *op,Funcdata &data)
@@ -3065,12 +3065,12 @@ int4 RuleTrivialShift::applyOp(PcodeOp *op,Funcdata &data)
 ///   - `V || 0 =>  V`
 ///   - `V ^^ 0 =>  V`
 ///   - `V * 1  =>  V`
-void RuleIdentityEl::getOpList(vector<uint4> &oplist) const
+void RuleIdentityEl::getOpList(std::vector<uint4> &oplist) const
 
 {
-  uint4 list[]= { CPUI_INT_ADD, CPUI_INT_XOR, CPUI_INT_OR,
+  uint4 std::list[]= { CPUI_INT_ADD, CPUI_INT_XOR, CPUI_INT_OR,
 		  CPUI_BOOL_XOR, CPUI_BOOL_OR, CPUI_INT_MULT };
-  oplist.insert(oplist.end(),list,list+6);
+  oplist.insert(oplist.end(),std::list,std::list+6);
 }
 
 int4 RuleIdentityEl::applyOp(PcodeOp *op,Funcdata &data)
@@ -3105,7 +3105,7 @@ int4 RuleIdentityEl::applyOp(PcodeOp *op,Funcdata &data)
 /// \brief Convert INT_LEFT to INT_MULT:  `V << 2  =>  V * 4`
 ///
 /// This only applies if the result is involved in an arithmetic expression.
-void RuleShift2Mult::getOpList(vector<uint4> &oplist) const
+void RuleShift2Mult::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_INT_LEFT);
@@ -3115,7 +3115,7 @@ int4 RuleShift2Mult::applyOp(PcodeOp *op,Funcdata &data)
 
 {
   int4 flag;
-  list<PcodeOp *>::const_iterator desc;
+  std::list<PcodeOp *>::const_iterator desc;
   Varnode *vn,*constvn;
   PcodeOp *arithop;
   OpCode opc;
@@ -3160,7 +3160,7 @@ int4 RuleShift2Mult::applyOp(PcodeOp *op,Funcdata &data)
 ///
 ///  - `(zext(V s>> 0x1f) << 0x20) + zext(V)  =>  sext(V)`
 ///  - `(zext(W s>> 0x1f) << 0x20) + X        =>  sext(W) where W = sub(X,0)`
-void RuleShiftPiece::getOpList(vector<uint4> &oplist) const
+void RuleShiftPiece::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_INT_OR);
@@ -3286,7 +3286,7 @@ int4 RuleCollapseConstants::applyOp(PcodeOp *op,Funcdata &data)
 ///
 /// If a reference into the constant pool is a constant, convert the CPOOLREF to
 /// a COPY of the constant.  Otherwise just append the type id of the reference to the top.
-void RuleTransformCpool::getOpList(vector<uint4> &oplist) const
+void RuleTransformCpool::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_CPOOLREF);
@@ -3297,7 +3297,7 @@ int4 RuleTransformCpool::applyOp(PcodeOp *op,Funcdata &data)
 {
   if (op->isCpoolTransformed()) return 0;		// Already visited
   data.opSetFlag(op,PcodeOp::is_cpool_transformed);	// Mark our visit
-  vector<uintb> refs;
+  std::vector<uintb> refs;
   for(int4 i=1;i<op->numInput();++i)
     refs.push_back(op->getIn(i)->getOffset());
   const CPoolRecord *rec = data.getArch()->cpool->getRecord(refs);	// Recover the record
@@ -3362,7 +3362,7 @@ int4 RulePropagateCopy::applyOp(PcodeOp *op,Funcdata &data)
 
 /// \class Rule2Comp2Mult
 /// \brief Eliminate INT_2COMP:  `-V  =>  V * -1`
-void Rule2Comp2Mult::getOpList(vector<uint4> &oplist) const
+void Rule2Comp2Mult::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_INT_2COMP);
@@ -3383,7 +3383,7 @@ int4 Rule2Comp2Mult::applyOp(PcodeOp *op,Funcdata &data)
 ///
 /// There is a special case when the constant is zero:
 ///   - `carry(V,0)  => false`
-void RuleCarryElim::getOpList(vector<uint4> &oplist) const
+void RuleCarryElim::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_INT_CARRY);
@@ -3415,7 +3415,7 @@ int4 RuleCarryElim::applyOp(PcodeOp *op,Funcdata &data)
 
 /// \class RuleSub2Add
 /// \brief Eliminate INT_SUB:  `V - W  =>  V + W * -1`
-void RuleSub2Add::getOpList(vector<uint4> &oplist) const
+void RuleSub2Add::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_INT_SUB);
@@ -3444,7 +3444,7 @@ int4 RuleSub2Add::applyOp(PcodeOp *op,Funcdata &data)
 ///
 /// The comparison can be INT_EQUAL or INT_NOTEQUAL. This also supports the form:
 ///   - `(V ^ c) == d  => V == (c^d)`
-void RuleXorCollapse::getOpList(vector<uint4> &oplist) const
+void RuleXorCollapse::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_INT_EQUAL);
@@ -3485,11 +3485,11 @@ int4 RuleXorCollapse::applyOp(PcodeOp *op,Funcdata &data)
 ///  - `((V + c) + d)  =>  V + (c+d)`
 ///  - `((V * c) * d)  =>  V * (c*d)`
 ///  - `((V + (W + c)) + d)  =>  (W + (c+d)) + V`
-void RuleAddMultCollapse::getOpList(vector<uint4> &oplist) const
+void RuleAddMultCollapse::getOpList(std::vector<uint4> &oplist) const
 
 {
-  uint4 list[]= { CPUI_INT_ADD, CPUI_INT_MULT };
-  oplist.insert(oplist.end(),list,list+2);
+  uint4 std::list[]= { CPUI_INT_ADD, CPUI_INT_MULT };
+  oplist.insert(oplist.end(),std::list,std::list+2);
 }
 
 int4 RuleAddMultCollapse::applyOp(PcodeOp *op,Funcdata &data)
@@ -3662,7 +3662,7 @@ AddrSpace *RuleLoadVarnode::checkSpacebase(Architecture *glb,PcodeOp *op,uintb &
 /// The pointer can either be a constant offset into the LOAD's specified address space,
 /// or it can be a \e spacebase register plus an offset, in which case it points into
 /// the \e spacebase register's address space.
-void RuleLoadVarnode::getOpList(vector<uint4> &oplist) const
+void RuleLoadVarnode::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_LOAD);
@@ -3704,7 +3704,7 @@ int4 RuleLoadVarnode::applyOp(PcodeOp *op,Funcdata &data)
 /// The pointer can either be a constant offset into the STORE's specified address space,
 /// or it can be a \e spacebase register plus an offset, in which case it points into
 /// the \e spacebase register's address space.
-void RuleStoreVarnode::getOpList(vector<uint4> &oplist) const
+void RuleStoreVarnode::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_STORE);
@@ -3732,7 +3732,7 @@ int4 RuleStoreVarnode::applyOp(PcodeOp *op,Funcdata &data)
 }
 
 // This op is quadratic in the number of MULTIEQUALs in a block
-// void RuleShadowVar::getOpList(vector<uint4> &oplist) const
+// void RuleShadowVar::getOpList(std::vector<uint4> &oplist) const
 
 // {
 //   oplist.push_back(CPUI_MULTIEQUAL);
@@ -3751,7 +3751,7 @@ int4 RuleStoreVarnode::applyOp(PcodeOp *op,Funcdata &data)
 //     if (i != op->numInput()) continue; // All branches did not match
     
 // 				// This op "shadows" op2, so replace with COPY
-//     vector<Varnode *> plist;
+//     std::vector<Varnode *> plist;
 //     plist.push_back(op2->Output());
 //     data.op_setopcode(op,CPUI_COPY);
 //     data.opSetAllInput(op,plist);
@@ -3760,7 +3760,7 @@ int4 RuleStoreVarnode::applyOp(PcodeOp *op,Funcdata &data)
 //   return 0;
 // }
 
-// void RuleTruncShiftCancel::getOpList(vector<uint4> &oplist) const
+// void RuleTruncShiftCancel::getOpList(std::vector<uint4> &oplist) const
 
 // {
 //   oplist.push_back(CPUI_SUBPIECE);
@@ -3780,7 +3780,7 @@ int4 RuleStoreVarnode::applyOp(PcodeOp *op,Funcdata &data)
 /// The original SUBPIECE is changed into the INT_ZEXT, but the original INT_ZEXT is
 /// not changed, a new SUBPIECE is created.
 /// This rule also works with INT_SEXT.
-void RuleSubExtComm::getOpList(vector<uint4> &oplist) const
+void RuleSubExtComm::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_SUBPIECE);
@@ -3821,7 +3821,7 @@ int4 RuleSubExtComm::applyOp(PcodeOp *op,Funcdata &data)
 /// We try to push SUBPIECE earlier in the expression trees (preferring short versions
 /// of ops over long) in the hopes that the SUBPIECE will run into a
 /// constant, a INT_SEXT, or a INT_ZEXT, canceling out
-void RuleSubCommute::getOpList(vector<uint4> &oplist) const
+void RuleSubCommute::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_SUBPIECE);
@@ -3995,7 +3995,7 @@ int4 RuleSubCommute::applyOp(PcodeOp *op,Funcdata &data)
 /// This supports forms:
 ///   - `concat( V & c, W)  =>  concat(V,W) & (c<<16 | 0xffff)`
 ///   - `concat( V, W | c)  =>  concat(V,W) | c`
-void RuleConcatCommute::getOpList(vector<uint4> &oplist) const
+void RuleConcatCommute::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_PIECE);
@@ -4061,7 +4061,7 @@ int4 RuleConcatCommute::applyOp(PcodeOp *op,Funcdata &data)
   return 0;
 }
 
-// void RuleIndirectConcat::getOpList(vector<uint4> &oplist) const
+// void RuleIndirectConcat::getOpList(std::vector<uint4> &oplist) const
 
 // {
 //   oplist.push_back(CPUI_INDIRECT);
@@ -4119,7 +4119,7 @@ int4 RuleConcatCommute::applyOp(PcodeOp *op,Funcdata &data)
 
 /// \class RuleConcatZext
 /// \brief Commute PIECE with INT_ZEXT:  `concat(zext(V),W)  =>  zext(concat(V,W))`
-void RuleConcatZext::getOpList(vector<uint4> &oplist) const
+void RuleConcatZext::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_PIECE);
@@ -4157,7 +4157,7 @@ int4 RuleConcatZext::applyOp(PcodeOp *op,Funcdata &data)
 
 /// \class RuleZextCommute
 /// \brief Commute INT_ZEXT with INT_RIGHT: `zext(V) >> W  =>  zext(V >> W)`
-void RuleZextCommute::getOpList(vector<uint4> &oplist) const
+void RuleZextCommute::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_INT_RIGHT);
@@ -4190,7 +4190,7 @@ int4 RuleZextCommute::applyOp(PcodeOp *op,Funcdata &data)
 
 /// \class RuleZextShiftZext
 /// \brief Simplify multiple INT_ZEXT operations: `zext( zext(V) << c )  => zext(V) << c`
-void RuleZextShiftZext::getOpList(vector<uint4> &oplist) const
+void RuleZextShiftZext::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_INT_ZEXT);
@@ -4236,7 +4236,7 @@ int4 RuleZextShiftZext::applyOp(PcodeOp *op,Funcdata &data)
 /// \brief Eliminate any INT_AND when the bits it zeroes out are discarded by a shift
 ///
 /// This also allows for bits that aren't discarded but are already zero.
-void RuleShiftAnd::getOpList(vector<uint4> &oplist) const
+void RuleShiftAnd::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_INT_RIGHT);
@@ -4292,7 +4292,7 @@ int4 RuleShiftAnd::applyOp(PcodeOp *op,Funcdata &data)
 
 /// \class RuleConcatZero
 /// \brief Simplify concatenation with zero:  `concat(V,0)  =>  zext(V) << c`
-void RuleConcatZero::getOpList(vector<uint4> &oplist) const
+void RuleConcatZero::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_PIECE);
@@ -4319,7 +4319,7 @@ int4 RuleConcatZero::applyOp(PcodeOp *op,Funcdata &data)
 
 /// \class RuleConcatLeftShift
 /// \brief Simplify concatenation of extended value: `concat(V, zext(W) << c)  =>  concat( concat(V,W), 0)`
-void RuleConcatLeftShift::getOpList(vector<uint4> &oplist) const
+void RuleConcatLeftShift::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_PIECE);
@@ -4364,7 +4364,7 @@ int4 RuleConcatLeftShift::applyOp(PcodeOp *op,Funcdata &data)
 ///  - `zext( sub( V, 0) )        =>    V & mask`
 ///  - `zext( sub( V, c)          =>    (V >> c*8) & mask`
 ///  - `zext( sub( V, c) >> d )   =>    (V >> (c*8+d)) & mask`
-void RuleSubZext::getOpList(vector<uint4> &oplist) const
+void RuleSubZext::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_INT_ZEXT);
@@ -4441,7 +4441,7 @@ int4 RuleSubZext::applyOp(PcodeOp *op,Funcdata &data)
 ///
 /// This also supports the corner case:
 ///  - `sub(zext(V),c)  =>  0  when c is big enough`
-void RuleSubCancel::getOpList(vector<uint4> &oplist) const
+void RuleSubCancel::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_SUBPIECE);
@@ -4503,7 +4503,7 @@ int4 RuleSubCancel::applyOp(PcodeOp *op,Funcdata &data)
 
 /// \class RuleShiftSub
 /// \brief Simplify SUBPIECE applied to INT_LEFT: `sub( V << 8*c, c)  =>  sub(V,0)`
-void RuleShiftSub::getOpList(vector<uint4> &oplist) const
+void RuleShiftSub::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_SUBPIECE);
@@ -4530,7 +4530,7 @@ int4 RuleShiftSub::applyOp(PcodeOp *op,Funcdata &data)
 ///
 /// There is also the variation:
 ///  - `concat( sub(V,c), sub(V,d) )  => sub(V,d)`
-void RuleHumptyDumpty::getOpList(vector<uint4> &oplist) const
+void RuleHumptyDumpty::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_PIECE);
@@ -4583,7 +4583,7 @@ int4 RuleHumptyDumpty::applyOp(PcodeOp *op,Funcdata &data)
 ///  - `sub( concat(V,W), 0)  =>  W`
 ///  - `sub( concat(V,W), c)  =>  V`
 ///  - `sub( concat(V,W), c)  =>  sub(V,c)`
-void RuleDumptyHump::getOpList(vector<uint4> &oplist) const
+void RuleDumptyHump::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_SUBPIECE);
@@ -4637,7 +4637,7 @@ int4 RuleDumptyHump::applyOp(PcodeOp *op,Funcdata &data)
 ///
 /// This supports the more general form:
 ///  - `(V & W) | (V & X)  =>  V & (W|X)`
-void RuleHumptyOr::getOpList(vector<uint4> &oplist) const
+void RuleHumptyOr::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_INT_OR);
@@ -4720,7 +4720,7 @@ int4 RuleHumptyOr::applyOp(PcodeOp *op,Funcdata &data)
 ///
 /// There is a complementary form:
 ///  `concat(sub(V,c),W)  =>  (V & 0xff00) | zext(W)`
-void RuleEmbed::getOpList(vector<uint4> &oplist) const
+void RuleEmbed::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_PIECE);
@@ -4801,7 +4801,7 @@ int4 RuleEmbed::applyOp(PcodeOp *op,Funcdata &data)
 
 /// \class RuleSwitchSingle
 /// \brief Convert BRANCHIND with only one computed destination to a BRANCH
-void RuleSwitchSingle::getOpList(vector<uint4> &oplist) const
+void RuleSwitchSingle::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_BRANCHIND);
@@ -4838,11 +4838,11 @@ int4 RuleSwitchSingle::applyOp(PcodeOp *op,Funcdata &data)
   // otherwise this may indicate some other problem
 
   if (needwarning) {
-    ostringstream s;
+    std::ostringstream s;
     s << "Switch with 1 destination removed at ";
     op->getAddr().printRaw(s);
     if (allcasesmatch) {
-      s << " : " << dec << jt->numEntries() << " cases all go to same destination";
+      s << " : " << std::dec << jt->numEntries() << " cases all go to same destination";
     }
     data.warningHeader(s.str());
   }
@@ -4863,7 +4863,7 @@ int4 RuleSwitchSingle::applyOp(PcodeOp *op,Funcdata &data)
 /// branch directions as \b true or \b false, but this may conflict with the
 /// natural meaning of the boolean calculation feeding into a CBRANCH.
 /// This Rule introduces a BOOL_NEGATE op as necessary to get the meanings to align.
-void RuleCondNegate::getOpList(vector<uint4> &oplist) const
+void RuleCondNegate::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_CBRANCH);
@@ -4890,7 +4890,7 @@ int4 RuleCondNegate::applyOp(PcodeOp *op,Funcdata &data)
 }
 
 /// \class RuleBoolNegate
-/// \brief Apply a set of identities involving BOOL_NEGATE
+/// \brief Apply a std::set of identities involving BOOL_NEGATE
 ///
 /// The identities include:
 ///  - `!!V  =>  V`
@@ -4900,7 +4900,7 @@ int4 RuleCondNegate::applyOp(PcodeOp *op,Funcdata &data)
 ///  - `!(V != W)  =>  V == W`
 ///
 /// This supports signed and floating-point variants as well
-void RuleBoolNegate::getOpList(vector<uint4> &oplist) const
+void RuleBoolNegate::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_BOOL_NEGATE);
@@ -4918,7 +4918,7 @@ int4 RuleBoolNegate::applyOp(PcodeOp *op,Funcdata &data)
   if (!vn->isWritten()) return 0;
   flip_op = vn->getDef();
 
-  list<PcodeOp *>::const_iterator iter;
+  std::list<PcodeOp *>::const_iterator iter;
 
 				// ALL descendants must be negates
   for(iter=vn->beginDescend();iter!=vn->endDescend();++iter)
@@ -4942,7 +4942,7 @@ int4 RuleBoolNegate::applyOp(PcodeOp *op,Funcdata &data)
 ///  - `V < 0  =>  false`
 ///  - `ffff < V  =>  false`
 ///  - `V < ffff` =>  V != ffff`
-void RuleLess2Zero::getOpList(vector<uint4> &oplist) const
+void RuleLess2Zero::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_INT_LESS);
@@ -4990,7 +4990,7 @@ int4 RuleLess2Zero::applyOp(PcodeOp *op,Funcdata &data)
 ///  - `V <= 0  =>  V == 0`
 ///  - `ffff <= V  =>  ffff == V`
 ///  - `V <= ffff` =>  true`
-void RuleLessEqual2Zero::getOpList(vector<uint4> &oplist) const
+void RuleLessEqual2Zero::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_INT_LESSEQUAL);
@@ -5046,9 +5046,9 @@ Varnode *RuleSLess2Zero::getHiBit(PcodeOp *op)
   Varnode *vn1 = op->getIn(0);
   Varnode *vn2 = op->getIn(1);
   uintb mask = calc_mask(vn1->getSize());
-  mask = (mask ^ (mask>>1));	// Only high-bit is set
+  mask = (mask ^ (mask>>1));	// Only high-bit is std::set
   uintb nzmask1 = vn1->getNZMask();
-  if ((nzmask1!=mask)&&((nzmask1 & mask)!=0)) // If high-bit is set AND some other bit
+  if ((nzmask1!=mask)&&((nzmask1 & mask)!=0)) // If high-bit is std::set AND some other bit
     return (Varnode *)0;
   uintb nzmask2 = vn2->getNZMask();
   if ((nzmask2!=mask)&&((nzmask2 & mask)!=0))
@@ -5068,14 +5068,14 @@ Varnode *RuleSLess2Zero::getHiBit(PcodeOp *op)
 ///  - `0 s< V * -1  =>  V s< 0`
 ///  - `V * -1 s< 0  =>  0 s< V`
 ///
-/// There is a second set of forms where one side of the comparison is
+/// There is a second std::set of forms where one side of the comparison is
 /// built out of a high and low piece, where the high piece determines the
 /// sign bit:
 ///  - `0 s<= (hi + lo)  =>  0 s<= hi`
 ///  - `-1 s< (hi + lo)  =>  -1 s< hi`
 ///  - `(hi + lo) s< 0   =>  hi s< 0`
 ///  - `(hi + lo) s<= -1 =>  hi s<= -1`
-void RuleSLess2Zero::getOpList(vector<uint4> &oplist) const
+void RuleSLess2Zero::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_INT_SLESS);
@@ -5179,11 +5179,11 @@ int4 RuleSLess2Zero::applyOp(PcodeOp *op,Funcdata &data)
 /// \brief Simplify INT_EQUAL applied to 0: `0 == V + W * -1  =>  V == W  or  0 == V + c  =>  V == -c`
 ///
 /// The Rule also applies to INT_NOTEQUAL comparisons.
-void RuleEqual2Zero::getOpList(vector<uint4> &oplist) const
+void RuleEqual2Zero::getOpList(std::vector<uint4> &oplist) const
 
 {
-  uint4 list[] = { CPUI_INT_EQUAL, CPUI_INT_NOTEQUAL };
-  oplist.insert(oplist.end(),list,list+2);
+  uint4 std::list[] = { CPUI_INT_EQUAL, CPUI_INT_NOTEQUAL };
+  oplist.insert(oplist.end(),std::list,std::list+2);
 }
 
 int4 RuleEqual2Zero::applyOp(PcodeOp *op,Funcdata &data)
@@ -5202,7 +5202,7 @@ int4 RuleEqual2Zero::applyOp(PcodeOp *op,Funcdata &data)
     if ((!vn->isConstant())||(vn->getOffset() != 0))
       return 0;
   }
-  for(list<PcodeOp *>::const_iterator iter=addvn->beginDescend();iter!=addvn->endDescend();++iter) {
+  for(std::list<PcodeOp *>::const_iterator iter=addvn->beginDescend();iter!=addvn->endDescend();++iter) {
     // make sure the sum is only used in comparisons
     PcodeOp *boolop = *iter;
     if (!boolop->isBoolOutput()) return 0;
@@ -5249,11 +5249,11 @@ int4 RuleEqual2Zero::applyOp(PcodeOp *op,Funcdata &data)
 /// Forms include:
 ///  - `V * -1 == c  =>  V == -c`
 ///  - `V + c == d  =>  V == (d-c)`
-void RuleEqual2Constant::getOpList(vector<uint4> &oplist) const
+void RuleEqual2Constant::getOpList(std::vector<uint4> &oplist) const
 
 {
-  uint4 list[] = { CPUI_INT_EQUAL, CPUI_INT_NOTEQUAL };
-  oplist.insert(oplist.end(),list,list+2);
+  uint4 std::list[] = { CPUI_INT_EQUAL, CPUI_INT_NOTEQUAL };
+  oplist.insert(oplist.end(),std::list,std::list+2);
 }
 
 int4 RuleEqual2Constant::applyOp(PcodeOp *op,Funcdata &data)
@@ -5289,7 +5289,7 @@ int4 RuleEqual2Constant::applyOp(PcodeOp *op,Funcdata &data)
 
   // Make sure the transformed form of a is only used
   // in comparisons of similar form
-  list<PcodeOp *>::const_iterator iter;
+  std::list<PcodeOp *>::const_iterator iter;
   for(iter=lhs->beginDescend();iter!=lhs->endDescend();++iter) {
     PcodeOp *dop = *iter;
     if (dop == op) continue;
@@ -5544,11 +5544,11 @@ int4 RulePtrArith::transformPtr(PcodeOp *bottom_op,PcodeOp *ptr_op,int4 slot,Fun
 /// \brief Transform pointer arithmetic
 ///
 /// Rule for converting integer arithmetic to pointer arithmetic.
-/// A string of INT_ADDs is converted into PTRADDs and PTRSUBs.
+/// A std::string of INT_ADDs is converted into PTRADDs and PTRSUBs.
 ///
 /// Basic algorithm:
 /// Starting with a varnode of known pointer type (with known size):
-///  - Generate list of terms added to pointer
+///  - Generate std::list of terms added to pointer
 ///  - Find all terms that are multiples of pointer size
 ///  - Find all terms that are smaller than pointer size
 ///  - Find sum of constants smaller than pointer size
@@ -5559,7 +5559,7 @@ int4 RulePtrArith::transformPtr(PcodeOp *bottom_op,PcodeOp *ptr_op,int4 slot,Fun
 /// We need to be wary of most things being in the units of the
 /// space being pointed at. Type calculations are always in bytes
 /// so we need to convert between space units and bytes.
-void RulePtrArith::getOpList(vector<uint4> &oplist) const
+void RulePtrArith::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_INT_ADD);
@@ -5584,7 +5584,7 @@ int4 RulePtrArith::applyOp(PcodeOp *op,Funcdata &data)
 
   vn = op->getOut();
   ptrbase = op->getIn(i);
-  list<PcodeOp *>::const_iterator iter=vn->beginDescend();
+  std::list<PcodeOp *>::const_iterator iter=vn->beginDescend();
   OpCode opc;
   if (iter == vn->endDescend()) return 0; // Don't bother if no descendants
   lowerop = *iter++;
@@ -5615,7 +5615,7 @@ int4 RulePtrArith::applyOp(PcodeOp *op,Funcdata &data)
   ct = tp->getPtrTo();		// Type being pointed to
   int4 unitsize = AddrSpace::addressToByteInt(1,tp->getWordSize());
   if (ct->getSize() == unitsize) { // Degenerate case
-    vector<Varnode *> newparams;
+    std::vector<Varnode *> newparams;
     newparams.push_back( ptrbase );
     newparams.push_back( op->getIn(1-i) );
     newparams.push_back( data.newConstant(tp->getSize(),1));
@@ -5639,11 +5639,11 @@ int4 RulePtrArith::applyOp(PcodeOp *op,Funcdata &data)
 /// this is happening if we load or store too little data from the pointer, interpreting
 /// it as a pointer to the structure.  This Rule then applies a PTRSUB(,0) to the pointer
 /// to drill down to the first component.
-void RuleStructOffset0::getOpList(vector<uint4> &oplist) const
+void RuleStructOffset0::getOpList(std::vector<uint4> &oplist) const
 
 {
-  uint4 list[]={ CPUI_LOAD, CPUI_STORE };
-  oplist.insert(oplist.end(),list,list+2);
+  uint4 std::list[]={ CPUI_LOAD, CPUI_STORE };
+  oplist.insert(oplist.end(),std::list,std::list+2);
 }
   
 int4 RuleStructOffset0::applyOp(PcodeOp *op,Funcdata &data)
@@ -5700,7 +5700,7 @@ int4 RuleStructOffset0::applyOp(PcodeOp *op,Funcdata &data)
 ///
 /// This is part of the normalizing process for pointer expressions. The pointer should be added last
 /// onto the expression calculating the offset into its data-type.
-void RulePushPtr::getOpList(vector<uint4> &oplist) const
+void RulePushPtr::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_INT_ADD);
@@ -5760,7 +5760,7 @@ int4 RulePushPtr::applyOp(PcodeOp *op,Funcdata &data)
 /// It is possible for Varnodes to be assigned incorrect types in the
 /// middle of simplification. This leads to incorrect PTRADD conversions.
 /// Once the correct type is found, the PTRADD must be converted back to an INT_ADD.
-void RulePtraddUndo::getOpList(vector<uint4> &oplist) const
+void RulePtraddUndo::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_PTRADD);
@@ -5808,7 +5808,7 @@ int4 RulePtraddUndo::applyOp(PcodeOp *op,Funcdata &data)
 /// Incorrect data-types may be assigned to Varnodes in the middle of simplification. This causes
 /// incorrect PTRSUBs, which are discovered later. This rule converts the PTRSUB back to an INT_ADD
 /// when the mistake is discovered.
-void RulePtrsubUndo::getOpList(vector<uint4> &oplist) const
+void RulePtrsubUndo::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_PTRSUB);
@@ -5853,7 +5853,7 @@ int4 RulePtrsubUndo::applyOp(PcodeOp *op,Funcdata &data)
 
 /// \class RuleMultNegOne
 /// \brief Cleanup: Convert INT_2COMP from INT_MULT:  `V * -1  =>  -V`
-void RuleMultNegOne::getOpList(vector<uint4> &oplist) const
+void RuleMultNegOne::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_INT_MULT);
@@ -5874,7 +5874,7 @@ int4 RuleMultNegOne::applyOp(PcodeOp *op,Funcdata &data)
 
 /// \class RuleAddUnsigned
 /// \brief Cleanup:  Convert INT_ADD of constants to INT_SUB:  `V + 0xff...  =>  V - 0x00...`
-void RuleAddUnsigned::getOpList(vector<uint4> &oplist) const
+void RuleAddUnsigned::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_INT_ADD);
@@ -5911,7 +5911,7 @@ int4 RuleAddUnsigned::applyOp(PcodeOp *op,Funcdata &data)
 
 /// \class Rule2Comp2Sub
 /// \brief Cleanup: Convert INT_ADD back to INT_SUB: `V + -W  ==> V - W`
-void Rule2Comp2Sub::getOpList(vector<uint4> &oplist) const
+void Rule2Comp2Sub::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_INT_2COMP);
@@ -5936,7 +5936,7 @@ int4 Rule2Comp2Sub::applyOp(PcodeOp *op,Funcdata &data)
 ///
 /// If the lone descendant of the SUBPIECE is a INT_RIGHT or INT_SRIGHT,
 /// we lump that into the shift as well.
-void RuleSubRight::getOpList(vector<uint4> &oplist) const
+void RuleSubRight::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_SUBPIECE);
@@ -5994,7 +5994,7 @@ int4 RuleSubRight::applyOp(PcodeOp *op,Funcdata &data)
 
 /// \brief Try to push constant pointer further
 ///
-/// Given a PTRSUB has been collapsed to a constant COPY of a string address,
+/// Given a PTRSUB has been collapsed to a constant COPY of a std::string address,
 /// try to collapse descendant any PTRADD.
 /// \param data is the function being analyzed
 /// \param outtype is the data-type associated with the constant
@@ -6010,7 +6010,7 @@ bool RulePtrsubCharConstant::pushConstFurther(Funcdata &data,TypePointer *outtyp
   Varnode *vn = op->getIn(1);
   if (!vn->isConstant()) return false;			// that is adding a constant
   uintb addval = vn->getOffset();
-  if (addval > 128) return false;		// Sanity check on string size
+  if (addval > 128) return false;		// Sanity check on std::string size
   addval *= op->getIn(2)->getOffset();
   val += addval;
   Varnode *newconst = data.newConstant(vn->getSize(),val);
@@ -6023,12 +6023,12 @@ bool RulePtrsubCharConstant::pushConstFurther(Funcdata &data,TypePointer *outtyp
 }
 
 /// \class RulePtrsubCharConstant
-/// \brief Cleanup: Set-up to print string constants
+/// \brief Cleanup: Set-up to print std::string constants
 ///
 /// If a SUBPIECE refers to a global symbol, the output of the SUBPIECE is a (char *),
 /// and the address is read-only, then get rid of the SUBPIECE in favor
-/// of printing a constant string.
-void RulePtrsubCharConstant::getOpList(vector<uint4> &oplist) const
+/// of printing a constant std::string.
+void RulePtrsubCharConstant::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_PTRSUB);
@@ -6052,7 +6052,7 @@ int4 RulePtrsubCharConstant::applyOp(PcodeOp *op,Funcdata &data)
   Scope *scope = sbtype->getMap();
   if (!scope->isReadOnly(symaddr,1,op->getAddr()))
     return 0;
-  // Check if data at the address looks like a string
+  // Check if data at the address looks like a std::string
   uint1 buffer[128];
   try {
     data.getArch()->loader->loadFill(buffer,128,symaddr);
@@ -6063,7 +6063,7 @@ int4 RulePtrsubCharConstant::applyOp(PcodeOp *op,Funcdata &data)
   if (!isstring) return 0;
 
   // If we reach here, the PTRSUB should be converted to a (COPY of a) pointer constant.
-  list<PcodeOp *>::const_iterator iter,enditer;
+  std::list<PcodeOp *>::const_iterator iter,enditer;
   iter = outvn->beginDescend();
   enditer = outvn->endDescend();
   bool removeCopy = true;
@@ -6091,7 +6091,7 @@ int4 RulePtrsubCharConstant::applyOp(PcodeOp *op,Funcdata &data)
 ///
 /// The form looks like:
 ///  - `sub( V>>c ,d )  =>  sub( V, d+k/8 ) >> (c-k)  where k = (c/8)*8`
-void RuleSubNormal::getOpList(vector<uint4> &oplist) const
+void RuleSubNormal::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_SUBPIECE);
@@ -6149,7 +6149,7 @@ int4 RuleSubNormal::applyOp(PcodeOp *op,Funcdata &data)
 ///
 /// where n = d + b*8, and the left-shift signedness (if it exists)
 /// matches the extension signedness.
-void RuleDivTermAdd::getOpList(vector<uint4> &oplist) const
+void RuleDivTermAdd::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_SUBPIECE);
@@ -6195,14 +6195,14 @@ int4 RuleDivTermAdd::applyOp(PcodeOp *op,Funcdata &data)
   else {
     if (constExtType != 2) return 0; // TODO: Can't currently represent
     if (!signbit_negative(multConst,8)) return 0;
-    // Adding 2^64 to a sign-extended 64-bit value with its sign set, causes all the
-    // set extension bits to be cancelled out, converting it into a
+    // Adding 2^64 to a sign-extended 64-bit value with its sign std::set, causes all the
+    // std::set extension bits to be cancelled out, converting it into a
     // zero-extended 64-bit value.
     constExtType = 1;		// Set extension of constant to INT_ZEXT
   }
   Varnode *x = extop->getIn(0);
 
-  list<PcodeOp *>::const_iterator iter;
+  std::list<PcodeOp *>::const_iterator iter;
   for(iter=op->getOut()->beginDescend();iter!=op->getOut()->endDescend();++iter) {
     PcodeOp *addop = *iter;
     if (addop->code() != CPUI_INT_ADD) continue;
@@ -6255,7 +6255,7 @@ int4 RuleDivTermAdd::applyOp(PcodeOp *op,Funcdata &data)
 ///
 /// where n = d*8. All extensions and right-shifts must be unsigned
 /// n must be equal to the size of SUBPIECE's truncation.
-void RuleDivTermAdd2::getOpList(vector<uint4> &oplist) const
+void RuleDivTermAdd2::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_INT_RIGHT);
@@ -6306,7 +6306,7 @@ int4 RuleDivTermAdd2::applyOp(PcodeOp *op,Funcdata &data)
   if (zextop->code() != CPUI_INT_ZEXT) return 0;
   if (zextop->getIn(0) != x) return 0;
 
-  list<PcodeOp *>::const_iterator iter;
+  std::list<PcodeOp *>::const_iterator iter;
   for(iter=op->getOut()->beginDescend();iter!=op->getOut()->endDescend();++iter) {
     PcodeOp *addop = *iter;
     if (addop->code() != CPUI_INT_ADD) continue;
@@ -6430,7 +6430,7 @@ uintb RuleDivOpt::calcDivisor(uintb n,uint8 y,int4 xsize)
 /// The unsigned and signed variants are:
 ///   - `sub( (zext(V)*c)>>n, 0)   =>  V / (2^n/(c-1))`
 ///   - `sub( (sext(V)*c)s>>n, 0)  =>  V s/ (2^n/(c-1))`
-void RuleDivOpt::getOpList(vector<uint4> &oplist) const
+void RuleDivOpt::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_SUBPIECE);
@@ -6521,7 +6521,7 @@ int4 RuleDivOpt::applyOp(PcodeOp *op,Funcdata &data)
 
 /// \class RuleSignDiv2
 /// \brief Convert INT_SRIGHT form into INT_SDIV:  `(V + -1*(V s>> 31)) s>> 1  =>  V s/ 2`
-void RuleSignDiv2::getOpList(vector<uint4> &oplist) const
+void RuleSignDiv2::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_INT_SRIGHT);
@@ -6574,7 +6574,7 @@ int4 RuleSignDiv2::applyOp(PcodeOp *op,Funcdata &data)
 
 /// \class RuleSignForm
 /// \brief Normalize sign extraction:  `sub(sext(V),c)  =>  V s>> 31`
-void RuleSignForm::getOpList(vector<uint4> &oplist) const
+void RuleSignForm::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_SUBPIECE);
@@ -6605,7 +6605,7 @@ int4 RuleSignForm::applyOp(PcodeOp *op,Funcdata &data)
 
 /// \class RuleSignNearMult
 /// \brief Simplify division form: `(V + (V s>> 0x1f)>>(32-n)) & (-1<<n)  =>  (V s/ 2^n) * 2^n`
-void RuleSignNearMult::getOpList(vector<uint4> &oplist) const
+void RuleSignNearMult::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_INT_AND);
@@ -6666,7 +6666,7 @@ int4 RuleSignNearMult::applyOp(PcodeOp *op,Funcdata &data)
 
 /// \class RuleModOpt
 /// \brief Simplify expressions that optimize INT_REM and INT_SREM
-void RuleModOpt::getOpList(vector<uint4> &oplist) const
+void RuleModOpt::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_INT_DIV);
@@ -6678,7 +6678,7 @@ int4 RuleModOpt::applyOp(PcodeOp *op,Funcdata &data)
 {
   PcodeOp *multop,*addop;
   Varnode *div,*x,*outvn,*outvn2,*div2;
-  list<PcodeOp *>::const_iterator iter1,iter2;
+  std::list<PcodeOp *>::const_iterator iter1,iter2;
 
   x = op->getIn(0);
   div = op->getIn(1);
@@ -6727,7 +6727,7 @@ int4 RuleModOpt::applyOp(PcodeOp *op,Funcdata &data)
 
 /// \class RuleSegment
 /// \brief Propagate constants through a SEGMENTOP
-void RuleSegment::getOpList(vector<uint4> &oplist) const
+void RuleSegment::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_SEGMENTOP);
@@ -6744,7 +6744,7 @@ int4 RuleSegment::applyOp(PcodeOp *op,Funcdata &data)
   Varnode *vn2 = op->getIn(2);
 
   if (vn1->isConstant() && vn2->isConstant()) {
-    vector<uintb> bindlist;
+    std::vector<uintb> bindlist;
     bindlist.push_back(vn2->getOffset());
     bindlist.push_back(vn1->getOffset());
     uintb val = segdef->execute(bindlist);
@@ -6772,7 +6772,7 @@ int4 RuleSegment::applyOp(PcodeOp *op,Funcdata &data)
 
 /// \class RuleSubvarAnd
 /// \brief Perform SubVariableFlow analysis triggered by INT_AND
-void RuleSubvarAnd::getOpList(vector<uint4> &oplist) const
+void RuleSubvarAnd::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_INT_AND);
@@ -6811,7 +6811,7 @@ int4 RuleSubvarAnd::applyOp(PcodeOp *op,Funcdata &data)
 
 /// \class RuleSubvarSubpiece
 /// \brief Perform SubVariableFlow analysis triggered by SUBPIECE
-void RuleSubvarSubpiece::getOpList(vector<uint4> &oplist) const
+void RuleSubvarSubpiece::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_SUBPIECE);
@@ -6841,7 +6841,7 @@ int4 RuleSubvarSubpiece::applyOp(PcodeOp *op,Funcdata &data)
 /// Look for SUBPIECE coming from a PIECE that has come through INDIRECTs and/or MULTIEQUAL
 /// Then: check if the input to SUBPIECE can be viewed as two independent pieces
 /// If so:  split the pieces into independent data-flows
-void RuleSplitFlow::getOpList(vector<uint4> &oplist) const
+void RuleSplitFlow::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_SUBPIECE);
@@ -6896,14 +6896,14 @@ int4 RuleSplitFlow::applyOp(PcodeOp *op,Funcdata &data)
 /// This is used on architectures where the data-flow for pointer values needs to be
 /// truncated.  This marks the places where the truncation needs to happen.  Then
 /// the SubvariableFlow actions do the actual truncation.
-RulePtrFlow::RulePtrFlow(const string &g,Architecture *conf)
+RulePtrFlow::RulePtrFlow(const std::string &g,Architecture *conf)
   : Rule( g, 0, "ptrflow")
 {
   glb = conf;
   hasTruncations = glb->getDefaultSpace()->isTruncated();
 }
 
-void RulePtrFlow::getOpList(vector<uint4> &oplist) const
+void RulePtrFlow::getOpList(std::vector<uint4> &oplist) const
 
 {
   if (!hasTruncations) return;	// Only stick ourselves into pool if aggresiveness is turned on
@@ -6922,7 +6922,7 @@ void RulePtrFlow::getOpList(vector<uint4> &oplist) const
 /// Set \e ptrflow property on PcodeOp only if it is propagating
 ///
 /// \param op is the PcodeOp
-/// \return \b true if ptrflow property is newly set
+/// \return \b true if ptrflow property is newly std::set
 bool RulePtrFlow::trialSetPtrFlow(PcodeOp *op)
 
 {
@@ -6970,7 +6970,7 @@ bool RulePtrFlow::propagateFlowToDef(Varnode *vn)
 bool RulePtrFlow::propagateFlowToReads(Varnode *vn)
 
 {
-  list<PcodeOp *>::const_iterator iter;
+  std::list<PcodeOp *>::const_iterator iter;
   bool madeChange = false;
   if (!vn->isPtrFlow()) {
     vn->setPtrFlow();
@@ -7096,7 +7096,7 @@ int4 RulePtrFlow::applyOp(PcodeOp *op,Funcdata &data)
 /// check that input has only 1 bit that can possibly be non-zero
 /// and that the constant is testing this.  This then triggers
 /// the full SubvariableFlow analysis.
-void RuleSubvarCompZero::getOpList(vector<uint4> &oplist) const
+void RuleSubvarCompZero::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_INT_NOTEQUAL);
@@ -7161,7 +7161,7 @@ int4 RuleSubvarCompZero::applyOp(PcodeOp *op,Funcdata &data)
 /// If the INT_RIGHT input has only 1 bit that can possibly be non-zero
 /// and it is getting shifted into the least significant bit position,
 /// trigger the full SubvariableFlow analysis.
-void RuleSubvarShift::getOpList(vector<uint4> &oplist) const
+void RuleSubvarShift::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_INT_RIGHT);
@@ -7187,7 +7187,7 @@ int4 RuleSubvarShift::applyOp(PcodeOp *op,Funcdata &data)
 
 /// \class RuleSubvarZext
 /// \brief Perform SubvariableFlow analysis triggered by INT_ZEXT
-void RuleSubvarZext::getOpList(vector<uint4> &oplist) const
+void RuleSubvarZext::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_INT_ZEXT);
@@ -7208,7 +7208,7 @@ int4 RuleSubvarZext::applyOp(PcodeOp *op,Funcdata &data)
 
 /// \class RuleSubvarSext
 /// \brief Perform SubvariableFlow analysis triggered by INT_SEXT
-void RuleSubvarSext::getOpList(vector<uint4> &oplist) const
+void RuleSubvarSext::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_INT_SEXT);
@@ -7235,7 +7235,7 @@ void RuleSubvarSext::reset(Funcdata &data)
 
 /// \class RuleSubfloatConvert
 /// \brief Perform SubfloatFlow analysis triggered by FLOAT_FLOAT2FLOAT
-void RuleSubfloatConvert::getOpList(vector<uint4> &oplist) const
+void RuleSubfloatConvert::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_FLOAT_FLOAT2FLOAT);
@@ -7265,7 +7265,7 @@ int4 RuleSubfloatConvert::applyOp(PcodeOp *op,Funcdata &data)
 
 /// \class RuleNegateNegate
 /// \brief Simplify INT_NEGATE chains:  `~~V  =>  V`
-void RuleNegateNegate::getOpList(vector<uint4> &oplist) const
+void RuleNegateNegate::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_INT_NEGATE);
@@ -7431,7 +7431,7 @@ Varnode *RuleConditionalMove::constructNegate(Varnode *vn,PcodeOp *op,Funcdata &
 /// \endcode
 ///
 /// which gets simplified to `res = boolcond || differentcond`
-void RuleConditionalMove::getOpList(vector<uint4> &oplist) const
+void RuleConditionalMove::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_MULTIEQUAL);
@@ -7598,7 +7598,7 @@ int4 RuleConditionalMove::applyOp(PcodeOp *op,Funcdata &data)
 
 /// \class RuleFloatCast
 /// \brief Replace (casttosmall)(casttobig)V with identity or with single cast
-void RuleFloatCast::getOpList(vector<uint4> &oplist) const
+void RuleFloatCast::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_FLOAT_FLOAT2FLOAT);
@@ -7654,7 +7654,7 @@ int4 RuleFloatCast::applyOp(PcodeOp *op,Funcdata &data)
 ///
 /// This makes the assumption that all floating-point calculations
 /// give valid results (not NaN).
-void RuleIgnoreNan::getOpList(vector<uint4> &oplist) const
+void RuleIgnoreNan::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_FLOAT_NAN);
@@ -7678,7 +7678,7 @@ int4 RuleIgnoreNan::applyOp(PcodeOp *op,Funcdata &data)
 /// NOTE: The emulation philosophy is that it really isn't eliminated but,
 /// the CALLIND operator is now dealing with it.  Hence actions like ActionDeindirect
 /// that are modeling a CALLIND's behavior need to take this into account.
-void RuleFuncPtrEncoding::getOpList(vector<uint4> &oplist) const
+void RuleFuncPtrEncoding::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_CALLIND);
@@ -7791,7 +7791,7 @@ int4 RuleThreeWayCompare::testCompareEquivalence(PcodeOp *lessop,PcodeOp *lesseq
 ///
 /// The comparisons can signed, unsigned, or floating-point.
 /// \param op is the putative root INT_ADD of the calculation
-/// \param isPartial is set to \b true if a partial form is detected
+/// \param isPartial is std::set to \b true if a partial form is detected
 /// \return the less-than op or NULL if no three-way was detected
 PcodeOp *RuleThreeWayCompare::detectThreeWay(PcodeOp *op,bool &isPartial)
 
@@ -7895,7 +7895,7 @@ PcodeOp *RuleThreeWayCompare::detectThreeWay(PcodeOp *op,bool &isPartial)
 /// comparisons of the three-way, such as
 ///  - `X < 1`  which simplifies to
 ///  - `V <= W`
-void RuleThreeWayCompare::getOpList(vector<uint4> &oplist) const
+void RuleThreeWayCompare::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_INT_SLESS);

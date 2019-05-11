@@ -23,7 +23,7 @@ namespace GhidraDec {
 /// \param nm is the register name
 /// \param data is the Varnode description
 /// \return a reference to the cached VarnodeData
-const VarnodeData &GhidraTranslate::cacheRegister(const string &nm,const VarnodeData &data) const
+const VarnodeData &GhidraTranslate::cacheRegister(const std::string &nm,const VarnodeData &data) const
 
 {
   VarnodeData &res(nm2addr[nm]);
@@ -41,10 +41,10 @@ void GhidraTranslate::initialize(DocumentStorage &store)
   restoreXml(el);
 }
 
-const VarnodeData &GhidraTranslate::getRegister(const string &nm) const
+const VarnodeData &GhidraTranslate::getRegister(const std::string &nm) const
 
 {
-  map<string,VarnodeData>::const_iterator iter = nm2addr.find(nm);
+  std::map<std::string,VarnodeData>::const_iterator iter = nm2addr.find(nm);
   if (iter != nm2addr.end())
     return (*iter).second;
   Document *doc;
@@ -52,7 +52,7 @@ const VarnodeData &GhidraTranslate::getRegister(const string &nm) const
     doc = glb->getRegister(nm);		// Ask Ghidra client about the register
   }
   catch(XmlError &err) {
-    ostringstream errmsg;
+    std::ostringstream errmsg;
     errmsg << "Error parsing XML response for query of register: " << nm;
     errmsg << " -- " << err.explain;
     throw LowlevelError(errmsg.str());
@@ -70,7 +70,7 @@ const VarnodeData &GhidraTranslate::getRegister(const string &nm) const
   return cacheRegister(nm,vndata);
 }
 
-string GhidraTranslate::getRegisterName(AddrSpace *base,uintb off,int4 size) const
+std::string GhidraTranslate::getRegisterName(AddrSpace *base,uintb off,int4 size) const
 
 {
   if (base->getType() != IPTR_PROCESSOR) return "";
@@ -78,21 +78,21 @@ string GhidraTranslate::getRegisterName(AddrSpace *base,uintb off,int4 size) con
   vndata.space = base;
   vndata.offset = off;
   vndata.size = size;
-  map<VarnodeData,string>::const_iterator iter = addr2nm.find(vndata);
+  std::map<VarnodeData,std::string>::const_iterator iter = addr2nm.find(vndata);
   if (iter != addr2nm.end())
     return (*iter).second;
-  string res = glb->getRegisterName(vndata);
+  std::string res = glb->getRegisterName(vndata);
   if (res.size()!=0)		// Cause this register to be cached if not already
     getRegister(res);		// but make sure we get full register, vndata may be truncated
   return res;
 }
 
-void GhidraTranslate::getUserOpNames(vector<string> &res) const
+void GhidraTranslate::getUserOpNames(vectorstd::string &res) const
 
 {
   int4 i=0;
   for(;;) {
-    string nm = glb->getUserOpName(i);	// Ask for the next user-defined operator
+    std::string nm = glb->getUserOpName(i);	// Ask for the next user-defined operator
     if (nm.size()==0) break;
     res.push_back(nm);
     i += 1;
@@ -108,13 +108,13 @@ int4 GhidraTranslate::oneInstruction(PcodeEmit &emit,const Address &baseaddr) co
     doc = glb->getPcodePacked(baseaddr);	// Request p-code for one instruction
   }
   catch(JavaError &err) {
-    ostringstream s;
+    std::ostringstream s;
     s << "Error generating pcode at address: " << baseaddr.getShortcut();
     baseaddr.printRaw(s);
     throw LowlevelError(s.str());
   }
   if (doc == (uint1 *)0) {
-    ostringstream s;
+    std::ostringstream s;
     s << "No pcode could be generated at address: " << baseaddr.getShortcut();
     baseaddr.printRaw(s);
     throw BadDataError(s.str());
@@ -125,7 +125,7 @@ int4 GhidraTranslate::oneInstruction(PcodeEmit &emit,const Address &baseaddr) co
   offset = (int4)val;
 
   if (*doc == PcodeEmit::unimpl_tag) {
-    ostringstream s;
+    std::ostringstream s;
     s << "Instruction not implemented in pcode:\n ";
     baseaddr.printRaw(s);
     delete [] doc;
@@ -152,18 +152,18 @@ void GhidraTranslate::restoreXml(const Element *el)
 {
   setBigEndian(xml_readbool(el->getAttributeValue("bigendian")));
   {
-    istringstream s(el->getAttributeValue("uniqbase"));
-    s.unsetf(ios::dec | ios::hex | ios::oct);
+    std::istringstream s(el->getAttributeValue("uniqbase"));
+    s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
     uintm ubase;
     s >> ubase;
     setUniqueBase(ubase);
   }
-  const List &list(el->getChildren());
+  const List &std::list(el->getChildren());
   List::const_iterator iter;
-  iter = list.begin();
+  iter = std::list.begin();
   restoreXmlSpaces(*iter,this);
   ++iter;
-  while(iter != list.end()) {
+  while(iter != std::list.end()) {
     const Element *subel = *iter;
     if (subel->getName() == "truncate_space") {
       TruncationTag tag;

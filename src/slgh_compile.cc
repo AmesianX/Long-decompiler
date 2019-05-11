@@ -30,7 +30,7 @@ static VarnodeTpl *find_size(const ConstTpl &offset,const ConstructTpl *ct)
 
 {				// Find a defining instance of the local variable
 				// with given -offset-
-  const vector<OpTpl *> &ops(ct->getOpvec());
+  const std::vector<OpTpl *> &ops(ct->getOpvec());
   VarnodeTpl *vn;
   OpTpl *op;
   
@@ -87,7 +87,7 @@ void SectionVector::append(ConstructTpl *rtl,SymbolScope *scope)
   named[ nextindex ] = RtlPair(rtl,scope);
 }
 
-SpaceQuality::SpaceQuality(const string &nm)
+SpaceQuality::SpaceQuality(const std::string &nm)
 
 {				// Default space qualities
   name = nm;
@@ -97,7 +97,7 @@ SpaceQuality::SpaceQuality(const string &nm)
   isdefault = false;
 }
 
-FieldQuality::FieldQuality(string *nm,uintb *l,uintb *h)
+FieldQuality::FieldQuality(std::string *nm,uintb *l,uintb *h)
 
 {
   name = *nm;
@@ -105,20 +105,20 @@ FieldQuality::FieldQuality(string *nm,uintb *l,uintb *h)
   high = *h;
   signext = false;
   flow = true;
-  hex = true;
+  std::dec = true;
   delete nm;
   delete l;
   delete h;
 }
 
-void WithBlock::set(SubtableSymbol *s, PatternEquation *pq, vector<ContextChange *> *cvec)
+void WithBlock::std::set(SubtableSymbol *s, PatternEquation *pq, std::vector<ContextChange *> *cvec)
 
 {
   ss = s;
   pateq = pq;
   if (pateq != (PatternEquation *)0)
     pateq->layClaim();
-  if (cvec != (vector<ContextChange *> *)0) {
+  if (cvec != (std::vector<ContextChange *> *)0) {
     for(int4 i=0;i<cvec->size();++i)
       contvec.push_back((*cvec)[i]);	// Lay claim to -cvec-s pointers, we don't clone
     delete cvec;
@@ -135,10 +135,10 @@ WithBlock::~WithBlock(void)
   }
 }
 
-PatternEquation *WithBlock::collectAndPrependPattern(const list<WithBlock> &stack, PatternEquation *pateq)
+PatternEquation *WithBlock::collectAndPrependPattern(const std::list<WithBlock> &stack, PatternEquation *pateq)
 
 {
-  list<WithBlock>::const_iterator iter;
+  std::list<WithBlock>::const_iterator iter;
   for(iter=stack.begin();iter!=stack.end();++iter) {
     PatternEquation *witheq = (*iter).pateq;
     if (witheq != (PatternEquation *)0)
@@ -147,24 +147,24 @@ PatternEquation *WithBlock::collectAndPrependPattern(const list<WithBlock> &stac
   return pateq;
 }
 
-vector<ContextChange *> *WithBlock::collectAndPrependContext(const list<WithBlock> &stack, vector<ContextChange *> *contvec)
+std::vector<ContextChange *> *WithBlock::collectAndPrependContext(const std::list<WithBlock> &stack, std::vector<ContextChange *> *contvec)
 
-{ // Make new list of ContextChanges, prepending everything from stack to -contvec-, delete old contvec
-  vector<ContextChange *> *res = (vector<ContextChange *> *)0;
-  list<WithBlock>::const_iterator iter;
+{ // Make new std::list of ContextChanges, prepending everything from stack to -contvec-, delete old contvec
+  std::vector<ContextChange *> *res = (std::vector<ContextChange *> *)0;
+  std::list<WithBlock>::const_iterator iter;
   for(iter=stack.begin();iter!=stack.end();++iter) {
-    const vector<ContextChange *> &changelist( (*iter).contvec );
+    const std::vector<ContextChange *> &changelist( (*iter).contvec );
     if (changelist.size() == 0) continue;
-    if (res == (vector<ContextChange *> *)0)
-      res = new vector<ContextChange *>();
+    if (res == (std::vector<ContextChange *> *)0)
+      res = new std::vector<ContextChange *>();
     for(int4 i=0;i<changelist.size();++i) {
       res->push_back(changelist[i]->clone());
     }
   }
-  if (contvec != (vector<ContextChange *> *)0) {
+  if (contvec != (std::vector<ContextChange *> *)0) {
     if (contvec->size() != 0) {
-      if (res == (vector<ContextChange *> *)0)
-	res = new vector<ContextChange *>();
+      if (res == (std::vector<ContextChange *> *)0)
+	res = new std::vector<ContextChange *>();
       for(int4 i=0;i<contvec->size();++i)
 	res->push_back((*contvec)[i]);		// lay claim to contvecs pointer
     }
@@ -173,10 +173,10 @@ vector<ContextChange *> *WithBlock::collectAndPrependContext(const list<WithBloc
   return res;
 }
 
-SubtableSymbol *WithBlock::getCurrentSubtable(const list<WithBlock> &stack)
+SubtableSymbol *WithBlock::getCurrentSubtable(const std::list<WithBlock> &stack)
 
 {
-  list<WithBlock>::const_iterator iter;
+  std::list<WithBlock>::const_iterator iter;
   for(iter=stack.begin();iter!=stack.end();++iter) {
     if ((*iter).ss != (SubtableSymbol *)0)
       return (*iter).ss;
@@ -201,7 +201,7 @@ int4 ConsistencyChecker::recoverSize(const ConstTpl &sizeconst,Constructor *ct)
   int4 size,handindex;
   OperandSymbol *opsym;
   SubtableSymbol *tabsym;
-  map<SubtableSymbol *,int4>::const_iterator iter;
+  std::map<SubtableSymbol *,int4>::const_iterator iter;
 
   switch(sizeconst.getType()) {
   case ConstTpl::real:
@@ -234,7 +234,7 @@ void ConsistencyChecker::dealWithUnnecessaryExt(OpTpl *op,Constructor *ct)
   if (printextwarning) {
     cerr << "Unnecessary ";
     printOpName(cerr,op);
-    cerr << " in constructor starting at line " << dec << ct->getLineno() << endl;
+    cerr << " in constructor starting at line " << std::dec << ct->getLineno() << std::endl;
   }
   op->setOpcode(CPUI_COPY);	// Equivalent to copy
   unnecessarypcode += 1;
@@ -246,7 +246,7 @@ void ConsistencyChecker::dealWithUnnecessaryTrunc(OpTpl *op,Constructor *ct)
   if (printextwarning) {
     cerr << "Unnecessary ";
     printOpName(cerr,op);
-    cerr << " in constructor starting at line " << dec << ct->getLineno() << endl;
+    cerr << " in constructor starting at line " << std::dec << ct->getLineno() << std::endl;
   }
   op->setOpcode(CPUI_COPY);	// Equivalent to copy
   op->removeInput(1);
@@ -261,7 +261,7 @@ bool ConsistencyChecker::checkOpMisuse(OpTpl *op,Constructor *ct)
     {
       VarnodeTpl *vn = op->getIn(1);
       if (vn->getSpace().isConstSpace() && vn->getOffset().isZero()) {
-	cerr << "Unsigned comparison with zero is always false in constructor starting at line " << dec << ct->getLineno() << endl;
+	cerr << "Unsigned comparison with zero is always false in constructor starting at line " << std::dec << ct->getLineno() << std::endl;
       }
     }
     break;
@@ -536,7 +536,7 @@ bool ConsistencyChecker::sizeRestriction(OpTpl *op,Constructor *ct)
   return true;
 }
 
-void ConsistencyChecker::printOpName(ostream &s,OpTpl *op)
+void ConsistencyChecker::printOpName(std::ostream &s,OpTpl *op)
 
 {
   switch(op->getOpcode()) {
@@ -761,7 +761,7 @@ OperandSymbol *ConsistencyChecker::getOperandSymbol(int4 slot,OpTpl *op,Construc
   return opsym;
 }
 
-void ConsistencyChecker::printOpError(OpTpl *op,Constructor *ct,int4 err1,int4 err2,const string &msg)
+void ConsistencyChecker::printOpError(OpTpl *op,Constructor *ct,int4 err1,int4 err2,const std::string &msg)
 
 {
   SubtableSymbol *sym = ct->getParent();
@@ -772,8 +772,8 @@ void ConsistencyChecker::printOpError(OpTpl *op,Constructor *ct,int4 err1,int4 e
     op2 = getOperandSymbol(err2,op,ct);
   else
     op2 = (OperandSymbol *)0;
-  cerr << "Size restriction error in table \"" << sym->getName() << "\"" << endl;
-  cerr << "  in constructor starting at line " << dec << ct->getLineno() << endl;
+  cerr << "Size restriction error in table \"" << sym->getName() << "\"" << std::endl;
+  cerr << "  in constructor starting at line " << std::dec << ct->getLineno() << std::endl;
   if ((op1 != (OperandSymbol *)0)&&(op2 != (OperandSymbol *)0)) {
     cerr << "  Problem with \"" << op1->getName();
     cerr << "\" and \"" << op2->getName() << "\"";
@@ -786,7 +786,7 @@ void ConsistencyChecker::printOpError(OpTpl *op,Constructor *ct,int4 err1,int4 e
     cerr << "  Problem";
   cerr << " in ";
   printOpName(cerr,op);
-  cerr << " operator" << endl << "  " << msg << endl;
+  cerr << " operator" << std::endl << "  " << msg << std::endl;
 }
 
 bool ConsistencyChecker::checkConstructorSection(Constructor *ct,ConstructTpl *cttpl)
@@ -794,8 +794,8 @@ bool ConsistencyChecker::checkConstructorSection(Constructor *ct,ConstructTpl *c
 { // Check all the OpTpl s within the given section for consistency, return true if all tests pass
   if (cttpl == (ConstructTpl *)0)
     return true;		// Nothing to check
-  vector<OpTpl *>::const_iterator iter;
-  const vector<OpTpl *> &ops(cttpl->getOpvec());
+  std::vector<OpTpl *>::const_iterator iter;
+  const std::vector<OpTpl *> &ops(cttpl->getOpvec());
   bool testresult = true;
 
   for(iter=ops.begin();iter!=ops.end();++iter) {
@@ -836,8 +836,8 @@ bool ConsistencyChecker::checkSectionTruncations(Constructor *ct,ConstructTpl *c
 { // Check all the varnodes that have an offset_plus template
   //     adjust the plus if we are bigendian
   //     make sure the truncation is valid
-  vector<OpTpl *>::const_iterator iter;
-  const vector<OpTpl *> &ops(cttpl->getOpvec());
+  std::vector<OpTpl *>::const_iterator iter;
+  const std::vector<OpTpl *> &ops(cttpl->getOpvec());
   bool testresult = true;
   
   for(iter=ops.begin();iter!=ops.end();++iter) {
@@ -879,8 +879,8 @@ bool ConsistencyChecker::checkSubtable(SubtableSymbol *sym)
     HandleTpl *exportres = ct->getTempl()->getResult();
     if (exportres != (HandleTpl *)0) {
       if (seenemptyexport && (!seennonemptyexport)) {
-	cerr << "Table " << sym->getName() << " exports inconsistently" << endl;
-	cerr << "Constructor starting at line " << dec << ct->getLineno() << " is first inconsistency" << endl;
+	cerr << "Table " << sym->getName() << " exports inconsistently" << std::endl;
+	cerr << "Constructor starting at line " << std::dec << ct->getLineno() << " is first inconsistency" << std::endl;
 	testresult = false;
       }
       seennonemptyexport = true;
@@ -888,15 +888,15 @@ bool ConsistencyChecker::checkSubtable(SubtableSymbol *sym)
       if (tablesize == 0)
 	tablesize = exsize;
       if ((exsize!=0)&&(exsize != tablesize)) {
-	cerr << "Table " << sym->getName() << " has inconsistent export size." << endl;
-	cerr << "Constructor starting at line " << dec << ct->getLineno() << " is first conflict" << endl;
+	cerr << "Table " << sym->getName() << " has inconsistent export size." << std::endl;
+	cerr << "Constructor starting at line " << std::dec << ct->getLineno() << " is first conflict" << std::endl;
 	testresult = false;
       }
     }
     else {
       if (seennonemptyexport && (!seenemptyexport)) {
-	cerr << "Table " << sym->getName() << " exports inconsistently" << endl;
-	cerr << "Constructor starting at line " << dec << ct->getLineno() << " is first inconsistency" << endl;
+	cerr << "Table " << sym->getName() << " exports inconsistently" << std::endl;
+	cerr << "Constructor starting at line " << std::dec << ct->getLineno() << " is first inconsistency" << std::endl;
 	testresult = false;
       }
       seenemptyexport = true;
@@ -904,7 +904,7 @@ bool ConsistencyChecker::checkSubtable(SubtableSymbol *sym)
   }
   if (seennonemptyexport) {
     if (tablesize == 0)
-      cerr << "Warning: Table " << sym->getName() << " exports size 0" << endl;
+      cerr << "Warning: Table " << sym->getName() << " exports size 0" << std::endl;
     sizemap[sym] = tablesize;	// Remember recovered size
   }
   else
@@ -923,9 +923,9 @@ void ConsistencyChecker::setPostOrder(SubtableSymbol *root)
   // recursively fill in sizes of varnodes which are exported
   // from constructors
 
-  vector<SubtableSymbol *> path;
-  vector<int4> state;
-  vector<int4> ctstate;
+  std::vector<SubtableSymbol *> path;
+  std::vector<int4> state;
+  std::vector<int4> ctstate;
 
   sizemap[root] = -1;		// Mark root as traversed
   path.push_back(root);
@@ -953,7 +953,7 @@ void ConsistencyChecker::setPostOrder(SubtableSymbol *root)
 	OperandSymbol *opsym = ct->getOperand(oper);
 	SubtableSymbol *subsym = dynamic_cast<SubtableSymbol *>(opsym->getDefiningSymbol());
 	if (subsym != (SubtableSymbol *)0) {
-	  map<SubtableSymbol *,int4>::const_iterator iter;
+	  std::map<SubtableSymbol *,int4>::const_iterator iter;
 	  iter = sizemap.find(subsym);
 	  if (iter == sizemap.end()) { // Not traversed yet
 	    sizemap[subsym] = -1; // Mark table as traversed
@@ -1041,14 +1041,14 @@ bool ConsistencyChecker::readWriteInterference(const VarnodeTpl *vn,const OpTpl 
   return false;
 }
 
-void ConsistencyChecker::examineVn(map<uintb,OptimizeRecord> &recs,
+void ConsistencyChecker::examineVn(std::map<uintb,OptimizeRecord> &recs,
 				   const VarnodeTpl *vn,uint4 i,int4 inslot,int4 secnum)
 { // If varnode is a temporary,  count whether it is read or written
   if (vn == (const VarnodeTpl *)0) return;
   if (!vn->getSpace().isUniqueSpace()) return;
   if (vn->getOffset().getType() != ConstTpl::real) return;
 
-  map<uintb,OptimizeRecord>::iterator iter;
+  std::map<uintb,OptimizeRecord>::iterator iter;
   iter = recs.insert( pair<uint4,OptimizeRecord>(vn->getOffset().getReal(),OptimizeRecord())).first;
   if (inslot>=0) {
     (*iter).second.readop = i;
@@ -1063,7 +1063,7 @@ void ConsistencyChecker::examineVn(map<uintb,OptimizeRecord> &recs,
   }
 }
 
-void ConsistencyChecker::optimizeGather1(Constructor *ct,map<uintb,OptimizeRecord> &recs,int4 secnum) const
+void ConsistencyChecker::optimizeGather1(Constructor *ct,std::map<uintb,OptimizeRecord> &recs,int4 secnum) const
 
 { // Look for reads and writes to temporaries, count how many times each temporary is read or written
   ConstructTpl *tpl;
@@ -1073,7 +1073,7 @@ void ConsistencyChecker::optimizeGather1(Constructor *ct,map<uintb,OptimizeRecor
     tpl = ct->getNamedTempl(secnum);
   if (tpl == (ConstructTpl *)0)
     return;
-  const vector<OpTpl *> &ops( tpl->getOpvec() );
+  const std::vector<OpTpl *> &ops( tpl->getOpvec() );
   for(uint4 i=0;i<ops.size();++i) {
     const OpTpl *op = ops[i];
     for(uint4 j=0;j<op->numInput();++j) {
@@ -1085,7 +1085,7 @@ void ConsistencyChecker::optimizeGather1(Constructor *ct,map<uintb,OptimizeRecor
   }
 }
 
-void ConsistencyChecker::optimizeGather2(Constructor *ct,map<uintb,OptimizeRecord> &recs,int4 secnum) const
+void ConsistencyChecker::optimizeGather2(Constructor *ct,std::map<uintb,OptimizeRecord> &recs,int4 secnum) const
 
 { // Make sure any temp used by the export is not optimized away
   ConstructTpl *tpl;
@@ -1099,7 +1099,7 @@ void ConsistencyChecker::optimizeGather2(Constructor *ct,map<uintb,OptimizeRecor
   if (hand == (HandleTpl *)0) return;
   if (hand->getPtrSpace().isUniqueSpace()) {
     if (hand->getPtrOffset().getType() == ConstTpl::real) {
-      pair<map<uintb,OptimizeRecord>::iterator,bool> res;
+      pair<std::map<uintb,OptimizeRecord>::iterator,bool> res;
       uintb offset = hand->getPtrOffset().getReal();
       res = recs.insert( pair<uintb,OptimizeRecord>(offset,OptimizeRecord()));
       (*res.first).second.writeop = 0;
@@ -1113,7 +1113,7 @@ void ConsistencyChecker::optimizeGather2(Constructor *ct,map<uintb,OptimizeRecor
   if (hand->getSpace().isUniqueSpace()) {
     if ((hand->getPtrSpace().getType() == ConstTpl::real)&&
 	(hand->getPtrOffset().getType() == ConstTpl::real)) {
-      pair<map<uintb,OptimizeRecord>::iterator,bool> res;
+      pair<std::map<uintb,OptimizeRecord>::iterator,bool> res;
       uintb offset = hand->getPtrOffset().getReal();
       res = recs.insert( pair<uintb,OptimizeRecord>(offset,OptimizeRecord()));
       (*res.first).second.writeop = 0;
@@ -1126,10 +1126,10 @@ void ConsistencyChecker::optimizeGather2(Constructor *ct,map<uintb,OptimizeRecor
   }
 }
 
-ConsistencyChecker::OptimizeRecord *ConsistencyChecker::findValidRule(Constructor *ct,map<uintb,OptimizeRecord> &recs) const
+ConsistencyChecker::OptimizeRecord *ConsistencyChecker::findValidRule(Constructor *ct,std::map<uintb,OptimizeRecord> &recs) const
 
 {
-  map<uintb,OptimizeRecord>::iterator iter;
+  std::map<uintb,OptimizeRecord>::iterator iter;
   iter = recs.begin();
   while(iter != recs.end()) {
     OptimizeRecord &currec( (*iter).second );
@@ -1141,7 +1141,7 @@ ConsistencyChecker::OptimizeRecord *ConsistencyChecker::findValidRule(Constructo
 	tpl = ct->getTempl();
       else
 	tpl = ct->getNamedTempl(currec.readsection);
-      const vector<OpTpl *> &ops( tpl->getOpvec() );
+      const std::vector<OpTpl *> &ops( tpl->getOpvec() );
       const OpTpl *op = ops[ currec.readop ];
       if (currec.writeop >= currec.readop) // Read must come after write
 	throw SleighError("Read of temporary before write");
@@ -1180,7 +1180,7 @@ ConsistencyChecker::OptimizeRecord *ConsistencyChecker::findValidRule(Constructo
 void ConsistencyChecker::applyOptimization(Constructor *ct,const OptimizeRecord &rec)
 
 {
-  vector<int4> deleteops;
+  std::vector<int4> deleteops;
   ConstructTpl *ctempl;
   if (rec.readsection < 0)
     ctempl = ct->getTempl();
@@ -1204,20 +1204,20 @@ void ConsistencyChecker::applyOptimization(Constructor *ct,const OptimizeRecord 
   ctempl->deleteOps(deleteops);
 }
 
-void ConsistencyChecker::checkUnusedTemps(Constructor *ct,const map<uintb,OptimizeRecord> &recs)
+void ConsistencyChecker::checkUnusedTemps(Constructor *ct,const std::map<uintb,OptimizeRecord> &recs)
 
 {
-  map<uintb,OptimizeRecord>::const_iterator iter;
+  std::map<uintb,OptimizeRecord>::const_iterator iter;
   iter = recs.begin();
   while(iter != recs.end()) {
     const OptimizeRecord &currec( (*iter).second );
     if (currec.readcount == 0) {
       if (printdeadwarning)
-	cerr << "Warning: temporary is written but not read in constructor starting at line " << dec << ct->getLineno() << endl;
+	cerr << "Warning: temporary is written but not read in constructor starting at line " << std::dec << ct->getLineno() << std::endl;
       writenoread += 1;
     }
     else if (currec.writecount == 0) {
-      cerr << "Error: temporary is read but not written in constructor starting at line " << dec << ct->getLineno() << endl;
+      cerr << "Error: temporary is read but not written in constructor starting at line " << std::dec << ct->getLineno() << std::endl;
       readnowrite += 1;
     }
     ++iter;
@@ -1228,7 +1228,7 @@ void ConsistencyChecker::optimize(Constructor *ct)
 
 {
   OptimizeRecord *currec;
-  map<uintb,OptimizeRecord> recs;
+  std::map<uintb,OptimizeRecord> recs;
   int4 numsections = ct->getNumSections();
   do {
     recs.clear();
@@ -1311,7 +1311,7 @@ bool FieldContext::operator<(const FieldContext &op2) const
 void MacroBuilder::free(void)
 
 {
-  vector<HandleTpl *>::iterator iter;
+  std::vector<HandleTpl *>::iterator iter;
 
   for(iter=params.begin();iter!=params.end();++iter)
     delete *iter;
@@ -1319,7 +1319,7 @@ void MacroBuilder::free(void)
   params.clear();
 }
 
-void MacroBuilder::reportError(const string &val)
+void MacroBuilder::reportError(const std::string &val)
 
 {
   slgh->reportError(val,false);
@@ -1339,7 +1339,7 @@ void MacroBuilder::setMacroOp(OpTpl *macroop)
   }
 }
 
-bool MacroBuilder::transferOp(OpTpl *op,vector<HandleTpl *> &params)
+bool MacroBuilder::transferOp(OpTpl *op,std::vector<HandleTpl *> &params)
 
 { // Fix handle details of a macro generated OpTpl relative to its specific invocation
   // and transfer it into the output stream
@@ -1442,7 +1442,7 @@ uintb SleighPcode::allocateTemp(void)
   return compiler->getUniqueAddr();
 }
 
-void SleighPcode::reportError(const string &msg)
+void SleighPcode::reportError(const std::string &msg)
 
 {
   return compiler->reportError(msg,true);
@@ -1559,14 +1559,14 @@ void SleighCompile::buildDecisionTrees(void)
   for(int4 i=0;i<tables.size();++i)
     tables[i]->buildDecisionTree(props);
 
-  const vector<string> &ierrors( props.getIdentErrors() );
+  const vectorstd::string &ierrors( props.getIdentErrors() );
   for(int4 i=0;i<ierrors.size();++i) {
     errors += 1;
     cerr << ierrors[i];
   }
 
   if (!lenientconflicterrors) {
-    const vector<string> &cerrors( props.getConflictErrors() );
+    const vectorstd::string &cerrors( props.getConflictErrors() );
     for(int4 i=0;i<cerrors.size();++i) {
       errors += 1;
       cerr << cerrors[i];
@@ -1605,9 +1605,9 @@ void SleighCompile::checkConsistency(void)
     return;
   }
   if ((!warnunnecessarypcode)&&(checker.getNumUnnecessaryPcode() > 0)) {
-    cerr << dec << checker.getNumUnnecessaryPcode();
-    cerr << " unnecessary extensions/truncations were converted to copies" << endl;
-    cerr << "Use -u switch to list each individually" << endl;
+    cerr << std::dec << checker.getNumUnnecessaryPcode();
+    cerr << " unnecessary extensions/truncations were converted to copies" << std::endl;
+    cerr << "Use -u switch to std::list each individually" << std::endl;
   }
   checker.optimizeAll();
   if (checker.getNumReadNoWrite() > 0) {
@@ -1615,9 +1615,9 @@ void SleighCompile::checkConsistency(void)
     return;
   }
   if ((!warndeadtemps)&&(checker.getNumWriteNoRead() > 0)) {
-    cerr << dec << checker.getNumWriteNoRead();
-    cerr << " operations wrote to temporaries that were not read" << endl;
-    cerr << "Use -t switch to list each individually" << endl;
+    cerr << std::dec << checker.getNumWriteNoRead();
+    cerr << " operations wrote to temporaries that were not read" << std::endl;
+    cerr << "Use -t switch to std::list each individually" << std::endl;
   }
 }
 
@@ -1627,18 +1627,18 @@ void SleighCompile::checkNops(void)
   if (noplist.size() > 0) {
     if (warnallnops) {
       for(int4 i=0;i<noplist.size();++i)
-	cerr << noplist[i] << endl;
+	cerr << noplist[i] << std::endl;
     }
-    cerr << dec << (int4)noplist.size() << " NOP constructors found" << endl;
+    cerr << std::dec << (int4)noplist.size() << " NOP constructors found" << std::endl;
     if (!warnallnops)
-      cerr << "Use -n switch to list each individually" << endl;
+      cerr << "Use -n switch to std::list each individually" << std::endl;
   }
 }
 
-string SleighCompile::checkSymbols(SymbolScope *scope)
+std::string SleighCompile::checkSymbols(SymbolScope *scope)
 
 { // Make sure label symbols are used properly
-  ostringstream s;
+  std::ostringstream s;
   SymbolTree::const_iterator iter;
   for(iter=scope->begin();iter!=scope->end();++iter) {
     LabelSymbol *sym = (LabelSymbol *)*iter;
@@ -1662,27 +1662,27 @@ void SleighCompile::addSymbol(SleighSymbol *sym)
   }
 }
 
-void SleighCompile::reportError(const string &msg,bool includeline)
+void SleighCompile::reportError(const std::string &msg,bool includeline)
 
 {
   cerr << "Error in " << filename.back() << ' ';
   if (includeline)
-    cerr << "at line " << dec << lineno.back() << ": ";
-  cerr << msg << endl;
+    cerr << "at line " << std::dec << lineno.back() << ": ";
+  cerr << msg << std::endl;
   errors += 1;
   if (errors >50) {
-    cerr << "Too many errors: Aborting" << endl;
+    cerr << "Too many errors: Aborting" << std::endl;
     exit(2);
   }
 }
 
-void SleighCompile::reportWarning(const string &msg,bool includeline)
+void SleighCompile::reportWarning(const std::string &msg,bool includeline)
 
 {
   cerr << "Warning in " << filename.back() << ' ';
   if (includeline)
-    cerr << "at line " << dec << lineno.back() << ": ";
-  cerr << msg << endl;
+    cerr << "at line " << std::dec << lineno.back() << ": ";
+  cerr << msg << std::endl;
 }
 
 uintb SleighCompile::getUniqueAddr(void)
@@ -1709,7 +1709,7 @@ void SleighCompile::process(void)
   try {
     buildXrefs();		// Make sure we can build crossrefs properly
   } catch(SleighError &err) {
-    cerr << err.explain << endl;
+    cerr << err.explain << std::endl;
     errors += 1;
     return;
   }
@@ -1748,23 +1748,23 @@ void SleighCompile::calcContextLayout(void)
   contexttable.clear();
 }
 
-string SleighCompile::grabCurrentFilePath(void) const
+std::string SleighCompile::grabCurrentFilePath(void) const
 
 { // Get the path of the current file being parse as either an absolute path, or relative to cwd
   if (relpath.empty()) return "";
   return (relpath.back() + filename.back());
 }
 
-void SleighCompile::parseFromNewFile(const string &fname)
+void SleighCompile::parseFromNewFile(const std::string &fname)
 
 {
-  string base,path;
+  std::string base,path;
   FileManage::splitPath(fname,path,base);
   filename.push_back(base);
   if (relpath.empty() || FileManage::isAbsolutePath(path))
     relpath.push_back(path);
   else {			// Relative paths from successive includes, combine
-    string totalpath = relpath.back();
+    std::string totalpath = relpath.back();
     totalpath += path;
     relpath.push_back(totalpath);
   }
@@ -1787,25 +1787,25 @@ void SleighCompile::parseFileFinished(void)
   lineno.pop_back();
 }
 
-bool SleighCompile::getPreprocValue(const string &nm,string &res) const
+bool SleighCompile::getPreprocValue(const std::string &nm,std::string &res) const
 
 {
-  map<string,string>::const_iterator iter = preproc_defines.find(nm);
+  std::map<std::string,std::string>::const_iterator iter = preproc_defines.find(nm);
   if (iter == preproc_defines.end()) return false;
   res = (*iter).second;
   return true;
 }
 
-void SleighCompile::setPreprocValue(const string &nm,const string &value)
+void SleighCompile::setPreprocValue(const std::string &nm,const std::string &value)
 
 {
   preproc_defines[nm] = value;
 }
 
-bool SleighCompile::undefinePreprocValue(const string &nm)
+bool SleighCompile::undefinePreprocValue(const std::string &nm)
 
 {
-  map<string,string>::iterator iter = preproc_defines.find(nm);
+  std::map<std::string,std::string>::iterator iter = preproc_defines.find(nm);
   if (iter==preproc_defines.end()) return false;
   preproc_defines.erase(iter);
   return true;
@@ -1813,7 +1813,7 @@ bool SleighCompile::undefinePreprocValue(const string &nm)
 
 // Functions needed by the parser
 
-TokenSymbol *SleighCompile::defineToken(string *name,uintb *sz)
+TokenSymbol *SleighCompile::defineToken(std::string *name,uintb *sz)
 
 {
   uint4 size = *sz;
@@ -1874,7 +1874,7 @@ void SleighCompile::newSpace(SpaceQuality *qual)
   addSymbol( new SpaceSymbol(spc) );
 }
 
-SectionSymbol *SleighCompile::newSectionSymbol(const string &nm)
+SectionSymbol *SleighCompile::newSectionSymbol(const std::string &nm)
 
 {
   SectionSymbol *sym = new SectionSymbol(nm,sections.size());
@@ -1896,7 +1896,7 @@ void SleighCompile::setEndian(int4 end)
   predefinedSymbols();		// Set up symbols now that we know endianess
 }
 
-void SleighCompile::defineVarnodes(SpaceSymbol *spacesym,uintb *off,uintb *size,vector<string> *names)
+void SleighCompile::defineVarnodes(SpaceSymbol *spacesym,uintb *off,uintb *size,vectorstd::string *names)
 
 {
   AddrSpace *spc = spacesym->getSpace();
@@ -1911,13 +1911,13 @@ void SleighCompile::defineVarnodes(SpaceSymbol *spacesym,uintb *off,uintb *size,
   delete size;
 }
 
-void SleighCompile::defineBitrange(string *name,VarnodeSymbol *sym,uint4 bitoffset,uint4 numb)
+void SleighCompile::defineBitrange(std::string *name,VarnodeSymbol *sym,uint4 bitoffset,uint4 numb)
 
 { // Define a new symbol as a subrange of bits within another symbol
   // If the ends of the range fall on byte boundaries, we
   // simply define a normal VarnodeSymbol, otherwise we create
   // a special symbol which is a place holder for the bitrange operator
-  string namecopy = *name;
+  std::string namecopy = *name;
   delete name;
   uint4 size = 8*sym->getSize(); // Number of bits
   if (numb == 0) {
@@ -1943,7 +1943,7 @@ void SleighCompile::defineBitrange(string *name,VarnodeSymbol *sym,uint4 bitoffs
     addSymbol( new BitrangeSymbol(namecopy,sym,bitoffset,numb) );
 }
 
-void SleighCompile::addUserOp(vector<string> *names)
+void SleighCompile::addUserOp(vectorstd::string *names)
 
 {
   for(int4 i=0;i<names->size();++i) {
@@ -1954,7 +1954,7 @@ void SleighCompile::addUserOp(vector<string> *names)
   delete names;
 }
 
-SleighSymbol *SleighCompile::dedupSymbolList(vector<SleighSymbol *> *symlist)
+SleighSymbol *SleighCompile::dedupSymbolList(std::vector<SleighSymbol *> *symlist)
 
 {				// Find duplicates in -symlist-, null out all but first
   SleighSymbol *res = (SleighSymbol *)0;
@@ -1971,18 +1971,18 @@ SleighSymbol *SleighCompile::dedupSymbolList(vector<SleighSymbol *> *symlist)
   return res;
 }
 
-void SleighCompile::attachValues(vector<SleighSymbol *> *symlist,vector<intb> *numlist)
+void SleighCompile::attachValues(std::vector<SleighSymbol *> *symlist,std::vector<intb> *numlist)
 
 {
   SleighSymbol *dupsym = dedupSymbolList(symlist);
   if (dupsym != (SleighSymbol *)0)
-    reportWarning("\"attach values\" list contains duplicate entries: "+dupsym->getName(),true);
+    reportWarning("\"attach values\" std::list contains duplicate entries: "+dupsym->getName(),true);
   for(int4 i=0;i<symlist->size();++i) {
     ValueSymbol *sym = (ValueSymbol *)(*symlist)[i];
     if (sym == (ValueSymbol *)0) continue;
     PatternValue *patval = sym->getPatternValue();
     if (patval->maxValue() + 1 != numlist->size()) {
-      reportError("Attach value " + sym->getName() + " is wrong size for list", true);
+      reportError("Attach value " + sym->getName() + " is wrong size for std::list", true);
     }
     symtab.replaceSymbol(sym, new ValueMapSymbol(sym->getName(),patval,*numlist));
   }
@@ -1990,18 +1990,18 @@ void SleighCompile::attachValues(vector<SleighSymbol *> *symlist,vector<intb> *n
   delete symlist;
 }
 
-void SleighCompile::attachNames(vector<SleighSymbol *> *symlist,vector<string> *names)
+void SleighCompile::attachNames(std::vector<SleighSymbol *> *symlist,vectorstd::string *names)
 
 {
   SleighSymbol *dupsym = dedupSymbolList(symlist);
   if (dupsym != (SleighSymbol *)0)
-    reportWarning("\"attach names\" list contains duplicate entries: "+dupsym->getName(),true);
+    reportWarning("\"attach names\" std::list contains duplicate entries: "+dupsym->getName(),true);
   for(int4 i=0;i<symlist->size();++i) {
     ValueSymbol *sym = (ValueSymbol *)(*symlist)[i];
     if (sym == (ValueSymbol *)0) continue;
     PatternValue *patval = sym->getPatternValue();
     if (patval->maxValue() + 1 != names->size()) {
-      reportError("Attach name " + sym->getName() + " is wrong size for list", true);
+      reportError("Attach name " + sym->getName() + " is wrong size for std::list", true);
     }
     symtab.replaceSymbol(sym,new NameSymbol(sym->getName(),patval,*names));
   }
@@ -2009,18 +2009,18 @@ void SleighCompile::attachNames(vector<SleighSymbol *> *symlist,vector<string> *
   delete symlist;
 }
 
-void SleighCompile::attachVarnodes(vector<SleighSymbol *> *symlist,vector<SleighSymbol *> *varlist)
+void SleighCompile::attachVarnodes(std::vector<SleighSymbol *> *symlist,std::vector<SleighSymbol *> *varlist)
 
 {
   SleighSymbol *dupsym = dedupSymbolList(symlist);
   if (dupsym != (SleighSymbol *)0)
-    reportWarning("\"attach variables\" list contains duplicate entries: "+dupsym->getName(),true);
+    reportWarning("\"attach variables\" std::list contains duplicate entries: "+dupsym->getName(),true);
   for(int4 i=0;i<symlist->size();++i) {
     ValueSymbol *sym = (ValueSymbol *)(*symlist)[i];
     if (sym == (ValueSymbol *)0) continue;
     PatternValue *patval = sym->getPatternValue();
     if (patval->maxValue() + 1 != varlist->size()) {
-      reportError("Attach varnode " + sym->getName() + " is wrong size for list", true);
+      reportError("Attach varnode " + sym->getName() + " is wrong size for std::list", true);
     }
     int4 sz = 0;      
     for(int4 j=0;j<varlist->size();++j) {
@@ -2040,7 +2040,7 @@ void SleighCompile::attachVarnodes(vector<SleighSymbol *> *symlist,vector<Sleigh
   delete symlist;
 }
 
-SubtableSymbol *SleighCompile::newTable(string *nm)
+SubtableSymbol *SleighCompile::newTable(std::string *nm)
 
 {
   SubtableSymbol *sym = new SubtableSymbol(*nm);
@@ -2050,7 +2050,7 @@ SubtableSymbol *SleighCompile::newTable(string *nm)
   return sym;
 }
 
-void SleighCompile::newOperand(Constructor *ct,string *nm)
+void SleighCompile::newOperand(Constructor *ct,std::string *nm)
 
 {
   int4 index = ct->getNumOperands();
@@ -2157,12 +2157,12 @@ ConstructTpl *SleighCompile::setResultStarVarnode(ConstructTpl *ct,StarQuality *
   return ct;
 }
 
-bool SleighCompile::contextMod(vector<ContextChange *> *vec,ContextSymbol *sym,PatternExpression *pe)
+bool SleighCompile::contextMod(std::vector<ContextChange *> *vec,ContextSymbol *sym,PatternExpression *pe)
 
 { // A temporary change to a context variable (within the parsing of a single instruction)
   // Because we are in the middle of parsing, the "inst_next" value has not been computed yet
   // So we check to make sure the value expression doesn't use this symbol
-  vector<const PatternValue *> vallist;
+  std::vector<const PatternValue *> vallist;
   pe->listValues(vallist);
   for(uint4 i=0;i<vallist.size();++i)
     if (dynamic_cast<const EndInstructionValue *>(vallist[i]) != (const EndInstructionValue *)0)
@@ -2174,18 +2174,18 @@ bool SleighCompile::contextMod(vector<ContextChange *> *vec,ContextSymbol *sym,P
   return true;
 }
 
-void SleighCompile::contextSet(vector<ContextChange *> *vec,TripleSymbol *sym,
+void SleighCompile::contextSet(std::vector<ContextChange *> *vec,TripleSymbol *sym,
 				ContextSymbol *cvar)
 
 { // A permanent (global) change to context.  During parsing of an instruction, this change
   // is put off until the full instruction has been parsed.  The existing value in the context
-  // field is set permanently to that value starting at the address given by the address expression
+  // field is std::set permanently to that value starting at the address given by the address expression
   ContextField *field = (ContextField *)cvar->getPatternValue();
   ContextCommit *op = new ContextCommit(sym,field->getStartBit(),field->getEndBit(),cvar->getFlow());
   vec->push_back(op);
 }
 
-MacroSymbol *SleighCompile::createMacro(string *name,vector<string> *params)
+MacroSymbol *SleighCompile::createMacro(std::string *name,vectorstd::string *params)
 
 {				// create a macro symbol (with parameter names)
   curct = (Constructor *)0;	// Not currently defining a Constructor
@@ -2203,7 +2203,7 @@ MacroSymbol *SleighCompile::createMacro(string *name,vector<string> *params)
   return curmacro;
 }
 
-void SleighCompile::compareMacroParams(MacroSymbol *sym,const vector<ExprTree *> &param)
+void SleighCompile::compareMacroParams(MacroSymbol *sym,const std::vector<ExprTree *> &param)
 
 { // Match up any qualities of the macro's OperandSymbols with
   // any OperandSymbol passed into the macro
@@ -2228,17 +2228,17 @@ void SleighCompile::compareMacroParams(MacroSymbol *sym,const vector<ExprTree *>
   }
 }
 
-vector<OpTpl *> *SleighCompile::createMacroUse(MacroSymbol *sym,vector<ExprTree *> *param)
+std::vector<OpTpl *> *SleighCompile::createMacroUse(MacroSymbol *sym,std::vector<ExprTree *> *param)
 
 { // Create macro build directive, given symbol and parameters
   if (sym->getNumOperands() != param->size()) {
-    string errmsg = "Invocation of macro \"" + sym->getName();
+    std::string errmsg = "Invocation of macro \"" + sym->getName();
     if (param->size() > sym->getNumOperands())
       errmsg += "\" passes too many parameters";
     else
       errmsg += "\" passes too few parameters";
     reportError(errmsg,true);
-    return new vector<OpTpl *>;
+    return new std::vector<OpTpl *>;
   }
   compareMacroParams(sym,*param);
   OpTpl *op = new OpTpl(MACROBUILD);
@@ -2293,11 +2293,11 @@ SectionVector *SleighCompile::finalNamedSection(SectionVector *vec,ConstructTpl 
   return vec;
 }
 
-vector<OpTpl *> *SleighCompile::createCrossBuild(VarnodeTpl *addr,SectionSymbol *sym)
+std::vector<OpTpl *> *SleighCompile::createCrossBuild(VarnodeTpl *addr,SectionSymbol *sym)
 
 { // Create the crossbuild directive as a pcode template
   unique_allocatemask = 1;
-  vector<OpTpl *> *res = new vector<OpTpl *>();
+  std::vector<OpTpl *> *res = new std::vector<OpTpl *>();
   VarnodeTpl *sectionid = new VarnodeTpl(ConstTpl(getConstantSpace()),
                                          ConstTpl(ConstTpl::real,sym->getTemplateId()),
                                          ConstTpl(ConstTpl::real,4));
@@ -2328,15 +2328,15 @@ Constructor *SleighCompile::createConstructor(SubtableSymbol *sym)
 
 void SleighCompile::resetConstructors(void)
 
-{				// Reset set state after a an error in previous constructor
+{				// Reset std::set state after a an error in previous constructor
   symtab.setCurrentScope(symtab.getGlobalScope()); // Purge any dangling local scopes
 }
 
-bool SleighCompile::expandMacros(ConstructTpl *ctpl,const vector<ConstructTpl *> &macrotable)
+bool SleighCompile::expandMacros(ConstructTpl *ctpl,const std::vector<ConstructTpl *> &macrotable)
 
 {
-  vector<OpTpl *> newvec;
-  vector<OpTpl *>::const_iterator iter;
+  std::vector<OpTpl *> newvec;
+  std::vector<OpTpl *>::const_iterator iter;
   OpTpl *op;
   
   for(iter=ctpl->getOpvec().begin();iter!=ctpl->getOpvec().end();++iter) {
@@ -2364,20 +2364,20 @@ bool SleighCompile::expandMacros(ConstructTpl *ctpl,const vector<ConstructTpl *>
 bool SleighCompile::finalizeSections(Constructor *big,SectionVector *vec)
 
 { // Do all final checks, expansions, and linking for p-code sections
-  vector<string> errors;
+  vectorstd::string errors;
 
   RtlPair cur = vec->getMainPair();
   int4 i=-1;
-  string sectionstring = "   Main section: ";
+  std::string sectionstring = "   Main section: ";
   int4 max = vec->getMaxId();
   for(;;) {
-    string errstring;
+    std::string errstring;
 
     errstring = checkSymbols(cur.scope); // Check labels in the section's scope
     if (errstring.size()==0) {
       if (!expandMacros(cur.section,macrotable))
 	errors.push_back(sectionstring + "Could not expand macros");
-      vector<int4> check;
+      std::vector<int4> check;
       big->markSubtableOperands(check);
       int4 res = cur.section->fillinBuild(check,getConstantSpace());
       if (res == 1)
@@ -2401,7 +2401,7 @@ bool SleighCompile::finalizeSections(Constructor *big,SectionVector *vec)
 	reportWarning("Delay slot used in",false);
 	cerr << "   ";
 	big->printInfo(cerr);
-	cerr << endl;
+	cerr << std::endl;
       }
       if (cur.section->delaySlot() > maxdelayslotbytes)	// Keep track of maximum delayslot parameter
 	maxdelayslotbytes = cur.section->delaySlot();
@@ -2417,12 +2417,12 @@ bool SleighCompile::finalizeSections(Constructor *big,SectionVector *vec)
     sectionstring = "   " + sym->getName() + " section: ";
   }
   if (!errors.empty()) {
-    ostringstream s;
+    std::ostringstream s;
     s << "in ";
     big->printInfo(s);
     reportError(s.str(),false);
     for(int4 j=0;j<errors.size();++j)
-      cerr << errors[j] << endl;
+      cerr << errors[j] << std::endl;
     return false;
   }
   return true;
@@ -2476,7 +2476,7 @@ void SleighCompile::shiftUniqueConstruct(ConstructTpl *tpl,int4 sa)
   HandleTpl *result = tpl->getResult();
   if (result != (HandleTpl *)0)
     shiftUniqueHandle(result,sa);
-  const vector<OpTpl *> &vec( tpl->getOpvec() );
+  const std::vector<OpTpl *> &vec( tpl->getOpvec() );
   for(int4 i=0;i<vec.size();++i)
     shiftUniqueOp(vec[i],sa);
 }
@@ -2515,11 +2515,11 @@ void SleighCompile::checkUniqueAllocation(void)
   setUniqueBase(ubase);
 }
 
-void SleighCompile::pushWith(SubtableSymbol *ss,PatternEquation *pateq,vector<ContextChange *> *contvec)
+void SleighCompile::pushWith(SubtableSymbol *ss,PatternEquation *pateq,std::vector<ContextChange *> *contvec)
 
 {
   withstack.push_back(WithBlock());
-  withstack.back().set(ss,pateq,contvec);
+  withstack.back().std::set(ss,pateq,contvec);
 }
 
 void SleighCompile::popWith(void)
@@ -2528,7 +2528,7 @@ void SleighCompile::popWith(void)
   withstack.pop_back();
 }
 
-void SleighCompile::buildConstructor(Constructor *big,PatternEquation *pateq,vector<ContextChange *> *contvec,SectionVector *vec)
+void SleighCompile::buildConstructor(Constructor *big,PatternEquation *pateq,std::vector<ContextChange *> *contvec,SectionVector *vec)
 
 { // Take all the different parse pieces for a Constructor and build the Constructor object
   bool noerrors = true;
@@ -2550,7 +2550,7 @@ void SleighCompile::buildConstructor(Constructor *big,PatternEquation *pateq,vec
     contvec = WithBlock::collectAndPrependContext(withstack, contvec);
     big->addEquation(pateq);
     big->removeTrailingSpace();
-    if (contvec != (vector<ContextChange *> *)0) {
+    if (contvec != (std::vector<ContextChange *> *)0) {
       big->addContext(*contvec);
       delete contvec;
     }
@@ -2561,7 +2561,7 @@ void SleighCompile::buildConstructor(Constructor *big,PatternEquation *pateq,vec
 void SleighCompile::buildMacro(MacroSymbol *sym,ConstructTpl *rtl)
 
 {
-  string errstring = checkSymbols(symtab.getCurrentScope());
+  std::string errstring = checkSymbols(symtab.getCurrentScope());
   if (errstring.size() != 0) {
     reportError(" in definition of macro "+sym->getName(),false);
     cerr << errstring;
@@ -2580,8 +2580,8 @@ void SleighCompile::buildMacro(MacroSymbol *sym,ConstructTpl *rtl)
 void SleighCompile::recordNop(void)
 
 {
-  ostringstream s;
-  s << "NOP detected at " << filename.back() << ':' << dec << lineno.back();
+  std::ostringstream s;
+  s << "NOP detected at " << filename.back() << ':' << std::dec << lineno.back();
   noplist.push_back(s.str());
 }
 
@@ -2592,7 +2592,7 @@ static int4 run_compilation(const char *filein,const char *fileout,SleighCompile
   slgh = &compiler;		// Set global pointer up for parser
   yyin = fopen(filein,"r");	// Open the file for the lexer
   if (yyin == (FILE *)0) {
-    cerr << "Unable to open specfile: " << filein << endl;
+    cerr << "Unable to open specfile: " << filein << std::endl;
     return 2;
   }
 
@@ -2604,7 +2604,7 @@ static int4 run_compilation(const char *filein,const char *fileout,SleighCompile
     if ((parseres==0)&&(compiler.numErrors()==0)) { // If no errors
       ofstream s(fileout);
       if (!s) {
-	ostringstream errs;
+	std::ostringstream errs;
 	errs << "Unable to open output file: " << fileout;
 	throw SleighError(errs.str());
       }
@@ -2612,12 +2612,12 @@ static int4 run_compilation(const char *filein,const char *fileout,SleighCompile
       s.close();
     }
     else {
-      cerr << "No output produced" <<endl;
+      cerr << "No output produced" <<std::endl;
       return 2;
     }
     yylex_destroy();		// Make sure lexer is reset so we can parse multiple files
   } catch(LowlevelError &err) {
-    cerr << "Unrecoverable error: " << err.explain << endl;
+    cerr << "Unrecoverable error: " << err.explain << std::endl;
     return 2;
   }
   return 0;
@@ -2628,23 +2628,23 @@ static int4 run_xml(const char *filein,SleighCompile &compiler)
 {
   ifstream s(filein);
   Document *doc;
-  string specfileout;
-  string specfilein;
+  std::string specfileout;
+  std::string specfilein;
 
   try {
     doc = xml_tree(s);
   }
   catch(XmlError &err) {
-    cerr << "Unable to parse single input file as XML spec: " << filein << endl;
+    cerr << "Unable to parse single input file as XML spec: " << filein << std::endl;
     exit(1);
   }
   s.close();
 
   Element *el = doc->getRoot();
   for(;;) {
-    const List &list(el->getChildren());
+    const List &std::list(el->getChildren());
     List::const_iterator iter;
-    for(iter=list.begin();iter!=list.end();++iter) {
+    for(iter=std::list.begin();iter!=std::list.end();++iter) {
       el = *iter;
       if (el->getName() == "processorfile") {
 	specfileout = el->getContent();
@@ -2662,40 +2662,40 @@ static int4 run_xml(const char *filein,SleighCompile &compiler)
       else if (el->getName() == "language_description")
 	break;
     }
-    if (iter==list.end()) break;
+    if (iter==std::list.end()) break;
   }
   delete doc;
 
   if (specfilein.size() == 0) {
-    cerr << "Input slaspec file was not specified in " << filein << endl;
+    cerr << "Input slaspec file was not specified in " << filein << std::endl;
     exit(1);
   }
   if (specfileout.size() == 0) {
-    cerr << "Output sla file was not specified in " << filein << endl;
+    cerr << "Output sla file was not specified in " << filein << std::endl;
     exit(1);
   }
   return run_compilation(specfilein.c_str(),specfileout.c_str(),compiler);
 }
 
-static void findSlaSpecs(vector<string> &res, const string &dir, const string &suffix)
+static void findSlaSpecs(vectorstd::string &res, const std::string &dir, const std::string &suffix)
 
 {
   FileManage::matchListDir(res, suffix, true, dir, false);
   
-  vector<string> dirs;
+  vectorstd::string dirs;
   FileManage::directoryList(dirs, dir);
-  vector<string>::const_iterator iter;
+  vectorstd::string::const_iterator iter;
   for(iter = dirs.begin();iter!=dirs.end();++iter) {
-    const string &nextdir( *iter );
+    const std::string &nextdir( *iter );
     findSlaSpecs(res, nextdir,suffix);
   }
 }
 
-static void initCompiler(SleighCompile &compiler, map<string,string> &defines, bool enableUnnecessaryPcodeWarning, bool disableLenientConflict,
+static void initCompiler(SleighCompile &compiler, std::map<std::string,std::string> &defines, bool enableUnnecessaryPcodeWarning, bool disableLenientConflict,
 			 bool enableAllNopWarning,bool enableDeadTempWarning,bool enforceLocalKeyWord)
 
 {
-  map<string,string>::iterator iter = defines.begin();
+  std::map<std::string,std::string>::iterator iter = defines.begin();
   for (iter = defines.begin(); iter != defines.end(); iter++) {
     compiler.setPreprocValue((*iter).first, (*iter).second);
   }
@@ -2732,21 +2732,21 @@ int main(int argc,char **argv)
 #endif
 
   if (argc < 2) {
-    cerr << "USAGE: sleigh [-x] [-dNAME=VALUE] inputfile [outputfile]" << endl;
-    cerr << "   -a              scan for all slaspec files recursively where inputfile is a directory" << endl;
-    cerr << "   -x              turns on parser debugging" << endl;
-    cerr << "   -u              print warnings for unnecessary pcode instructions" << endl;
-    cerr << "   -l              report pattern conflicts" << endl;
-    cerr << "   -n              print warnings for all NOP constructors" << endl;
-    cerr << "   -t              print warnings for dead temporaries" << endl;
-    cerr << "   -e              enforce use of 'local' keyword for temporaries" << endl;
-    cerr << "   -DNAME=VALUE    defines a preprocessor macro NAME with value VALUE" << endl;
+    cerr << "USAGE: sleigh [-x] [-dNAME=VALUE] inputfile [outputfile]" << std::endl;
+    cerr << "   -a              scan for all slaspec files recursively where inputfile is a directory" << std::endl;
+    cerr << "   -x              turns on parser debugging" << std::endl;
+    cerr << "   -u              print warnings for unnecessary pcode instructions" << std::endl;
+    cerr << "   -l              report pattern conflicts" << std::endl;
+    cerr << "   -n              print warnings for all NOP constructors" << std::endl;
+    cerr << "   -t              print warnings for dead temporaries" << std::endl;
+    cerr << "   -e              enforce use of 'local' keyword for temporaries" << std::endl;
+    cerr << "   -DNAME=VALUE    defines a preprocessor macro NAME with value VALUE" << std::endl;
     exit(2);
   }
 
-  const string SLAEXT(".sla");	// Default sla extension
-  const string SLASPECEXT(".slaspec");
-  map<string,string> defines;
+  const std::string SLAEXT(".sla");	// Default sla extension
+  const std::string SLASPECEXT(".slaspec");
+  std::map<std::string,std::string> defines;
   bool enableUnnecessaryPcodeWarning = false;
   bool disableLenientConflict = false;
   bool enableAllNopWarning = false;
@@ -2761,14 +2761,14 @@ int main(int argc,char **argv)
     if (argv[i][1] == 'a')
       compileAll = true;
     else if (argv[i][1] == 'D') {
-      string preproc(argv[i]+2);
-      string::size_type pos = preproc.find('=');
-      if (pos == string::npos) {
-	cerr << "Bad sleigh option: "<< argv[i] << endl;
+      std::string preproc(argv[i]+2);
+      std::string::size_type pos = preproc.find('=');
+      if (pos == std::string::npos) {
+	cerr << "Bad sleigh option: "<< argv[i] << std::endl;
 	exit(1);
       }
-      string name = preproc.substr(0,pos);
-      string value = preproc.substr(pos+1);
+      std::string name = preproc.substr(0,pos);
+      std::string value = preproc.substr(pos+1);
       defines[name] = value;
     }
     else if (argv[i][1] == 'u')
@@ -2786,7 +2786,7 @@ int main(int argc,char **argv)
       yydebug = 1;		// Debug option
 #endif
     else {
-      cerr << "Unknown option: " << argv[i] << endl;
+      cerr << "Unknown option: " << argv[i] << std::endl;
       exit(1);
     }
   }
@@ -2794,21 +2794,21 @@ int main(int argc,char **argv)
   if (compileAll) {
     
     if (i< argc-1) {
-      cerr << "Too many parameters" << endl;
+      cerr << "Too many parameters" << std::endl;
       exit(1);
     }
-    const string::size_type slaspecExtLen = SLASPECEXT.length();
+    const std::string::size_type slaspecExtLen = SLASPECEXT.length();
     
-    vector<string> slaspecs;
-    string dirStr = ".";
+    vectorstd::string slaspecs;
+    std::string dirStr = ".";
     if (i != argc)
       dirStr = argv[i];
     findSlaSpecs(slaspecs, dirStr,SLASPECEXT);
     cout << "Compiling " << slaspecs.size() << " slaspec files in " << dirStr << "\n";
     for(int4 j=0;j<slaspecs.size();++j) {
-      string slaspec = slaspecs[j];
+      std::string slaspec = slaspecs[j];
       cout << "Compiling (" << (j+1) << " of " << slaspecs.size() << ") " << slaspec << "\n";
-      string sla = slaspec;
+      std::string sla = slaspec;
       sla.replace(slaspec.length() - slaspecExtLen, slaspecExtLen, SLAEXT);
       SleighCompile compiler;
       initCompiler(compiler, defines, enableUnnecessaryPcodeWarning, 
@@ -2822,15 +2822,15 @@ int main(int argc,char **argv)
   } else { // compile single specification
     
     if (i==argc) {
-      cerr << "Missing input file name" << endl;
+      cerr << "Missing input file name" << std::endl;
       exit(1);
     }
     
-    string fileinExamine(argv[i]);
-    string::size_type extInPos = fileinExamine.find(SLASPECEXT);
+    std::string fileinExamine(argv[i]);
+    std::string::size_type extInPos = fileinExamine.find(SLASPECEXT);
     bool autoExtInSet = false;
-    string fileinPreExt = "";
-    if (extInPos == string::npos) { //No Extension Given...
+    std::string fileinPreExt = "";
+    if (extInPos == std::string::npos) { //No Extension Given...
       fileinPreExt = fileinExamine;
       fileinExamine.append(SLASPECEXT);
       autoExtInSet = true;
@@ -2839,7 +2839,7 @@ int main(int argc,char **argv)
     }
     
     if (i< argc-2) {
-      cerr << "Too many parameters" << endl;
+      cerr << "Too many parameters" << std::endl;
       exit(1);
     }
     
@@ -2848,16 +2848,16 @@ int main(int argc,char **argv)
 		 disableLenientConflict, enableAllNopWarning, enableDeadTempWarning, enforceLocalKeyWord);
     
     if (i < argc - 1) {
-      string fileoutExamine(argv[i+1]);
-      string::size_type extOutPos = fileoutExamine.find(SLAEXT);
-      if (extOutPos == string::npos) { // No Extension Given...
+      std::string fileoutExamine(argv[i+1]);
+      std::string::size_type extOutPos = fileoutExamine.find(SLAEXT);
+      if (extOutPos == std::string::npos) { // No Extension Given...
 	fileoutExamine.append(SLAEXT);
       }
       retval = run_compilation(fileinExamine.c_str(),fileoutExamine.c_str(),compiler);
     }else{
       //First determine whether or not to use Run_XML...
       if (autoExtInSet) { //Assumed format of at least "sleigh file" -> "sleigh file.slaspec file.sla"
-	string fileoutSTR = fileinPreExt;
+	std::string fileoutSTR = fileinPreExt;
 	fileoutSTR.append(SLAEXT);
 	retval = run_compilation(fileinExamine.c_str(),fileoutSTR.c_str(),compiler);
       }else{

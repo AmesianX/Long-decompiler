@@ -37,9 +37,9 @@ class PcodeCacher { // Cached chunk of pcode, prior to emitting
   VarnodeData *poolstart;
   VarnodeData *curpool;
   VarnodeData *endpool;
-  vector<PcodeData> issued;
-  list<RelativeRecord> label_refs; // References to labels
-  vector<uintb> labels;		// Locations of labels
+  std::vector<PcodeData> issued;
+  std::list<RelativeRecord> label_refs; // References to labels
+  std::vector<uintb> labels;		// Locations of labels
   VarnodeData *expandPool(uint4 size);
 public:
   PcodeCacher(void);
@@ -72,8 +72,8 @@ class DisassemblyCache {
   AddrSpace *constspace;
   int4 minimumreuse;		// Can call getParserContext this many times, before a ParserContext is reused
   uint4 mask;			// Size of the hashtable in form 2^n-1
-  ParserContext **list;		// (circular) array of currently cached ParserContext objects
-  int4 nextfree;		// Current end/beginning of circular list
+  ParserContext **std::list;		// (circular) array of currently cached ParserContext objects
+  int4 nextfree;		// Current end/beginning of circular std::list
   ParserContext **hashtable;	// Hashtable for looking up ParserContext via Address
   void initialize(int4 min,int4 hashsize);
   void free(void);
@@ -119,8 +119,8 @@ public:
   virtual ~Sleigh(void);
   void reset(LoadImage *ld,ContextDatabase *c_db);
   virtual void initialize(DocumentStorage &store);
-  virtual void registerContext(const string &name,int4 sbit,int4 ebit);
-  virtual void setContextDefault(const string &nm,uintm val);
+  virtual void registerContext(const std::string &name,int4 sbit,int4 ebit);
+  virtual void setContextDefault(const std::string &nm,uintm val);
   virtual void allowContextSet(bool val) const;
   virtual int4 instructionLength(const Address &baseaddr) const;
   virtual int4 oneInstruction(PcodeEmit &emit,const Address &baseaddr) const;
@@ -273,8 +273,8 @@ public:
 
   // Set up the loadimage
   // Providing an executable name and architecture
-  string loadimagename = "x86testcode";
-  string bfdtarget= "default";
+  std::string loadimagename = "x86testcode";
+  std::string bfdtarget= "default";
 
   loader = new LoadImageBfd(loadimagename,bfdtarget);
   loader->open();       // Load the executable from file
@@ -291,7 +291,7 @@ public:
   this.
 
   \code
-  string sleighfilename = "specfiles/x86.sla";
+  std::string sleighfilename = "specfiles/x86.sla";
   DocumentStorage docstorage;
   Element *sleighroot = docstorage.openDocument(sleighfilename)->getRoot();
   docstorage.registerTag(sleighroot);
@@ -311,9 +311,9 @@ public:
   \code
   class AssemblyRaw : public AssemblyEmit {
   public:
-    virtual void dump(const Address &addr,const string &mnem,const string &body) {
+    virtual void dump(const Address &addr,const std::string &mnem,const std::string &body) {
       addr.printRaw(cout);
-      cout << ": " << mnem << ' ' << body << endl;
+      cout << ": " << mnem << ' ' << body << std::endl;
     }
   };
   \endcode
@@ -354,12 +354,12 @@ public:
     virtual void dump(const Address &addr,OpCode opc,VarnodeData *outvar,VarnodeData *vars,int4 isize);
   };
 
-  static void print_vardata(ostream &s,VarnodeData &data)
+  static void print_vardata(std::ostream &s,VarnodeData &data)
 
   {
     s << '(' << data.space->getName() << ',';
     data.space->printOffset(s,data.offset);
-    s << ',' << dec << data.size << ')';
+    s << ',' << std::dec << data.size << ')';
   }
 
   void PcodeRawOut::dump(const Address &addr,OpCode opc,VarnodeData *outvar,VarnodeData *vars,int4 isize)
@@ -375,12 +375,12 @@ public:
       cout << ' ';
       print_vardata(cout,vars[i]);
     }
-    cout << endl;
+    cout << std::endl;
   }
   \endcode
 
   Notice that the \e dump routine uses the built-in function
-  \e get_opname to find a string version of the opcode.  Each
+  \e get_opname to find a std::string version of the opcode.  Each
   varnode is defined in terms of the VarnodeData object, which
   is defined simply:
 
@@ -430,9 +430,9 @@ public:
   \code
   class MyLoadImage : public LoadImage {
   public:
-    MyLoadImage(const string &nm) : Loadimage(nm) {}
+    MyLoadImage(const std::string &nm) : Loadimage(nm) {}
     virtual void loadFill(uint1 *ptr,int4 size,const Address &addr);
-    virtual string getArchType(void) const { return "mytype"; }
+    virtual std::string getArchType(void) const { return "mytype"; }
     virtual void adjustVma(long adjust) {}
   };
   \endcode
@@ -445,13 +445,13 @@ public:
   yourself, but can use the built-in class, ContextInternal.
   This provides the basic functionality required and will work
   for different architectures.  What you may need to do is
-  set values for certain variables, depending on the processor
+  std::set values for certain variables, depending on the processor
   and the environment it is running in.  For instance, for
-  the x86 platform, you need to set the \e addrsize and \e opsize
+  the x86 platform, you need to std::set the \e addrsize and \e opsize
   bits, to indicate the processor would be running in 32-bit
   mode.  The context variables specific to a particular processor
   are established by the SLEIGH spec.  So the variables can
-  only be set \e after the spec has been loaded.
+  only be std::set \e after the spec has been loaded.
 
   \code
     ...

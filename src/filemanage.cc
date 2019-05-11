@@ -37,7 +37,7 @@ char FileManage::separator = '\\';
 char FileManage::separator = '/';
 #endif
 
-void FileManage::addDir2Path(const string &path)
+void FileManage::addDir2Path(const std::string &path)
 
 {
   if (path.size()>0) {
@@ -47,10 +47,10 @@ void FileManage::addDir2Path(const string &path)
   }
 }
 
-void FileManage::findFile(string &res,const string &name) const
+void FileManage::findFile(std::string &res,const std::string &name) const
 
 {				// Search through paths to find file with given name
-  vector<string>::const_iterator iter;
+  vectorstd::string::const_iterator iter;
 
   if (name[0] == separator) {
     res = name;
@@ -70,7 +70,7 @@ void FileManage::findFile(string &res,const string &name) const
       }
     }
   }
-  res.clear();			// Can't find it, return empty string
+  res.clear();			// Can't find it, return empty std::string
 }
 
 #ifdef _WINDOWS
@@ -80,7 +80,7 @@ void FileManage::addCurrentDir(void)
   char dirname[256];
   
   if (0!=GetCurrentDirectoryA(256,dirname)) {
-    string filename(dirname);
+    std::string filename(dirname);
     addDir2Path(filename);
   }
 }
@@ -94,13 +94,13 @@ void FileManage::addCurrentDir(void)
 
   buf = getcwd(dirname,256);
   if ((char *)0 == buf) return;
-  string filename(buf);
+  std::string filename(buf);
   addDir2Path(filename);
 }
 #endif
 
 #ifdef _WINDOWS
-bool FileManage::isDirectory(const string &path)
+bool FileManage::isDirectory(const std::string &path)
 
 {
   DWORD attribs = GetFileAttributes(path.c_str());
@@ -109,7 +109,7 @@ bool FileManage::isDirectory(const string &path)
 }
 
 #else
-bool FileManage::isDirectory(const string &path)
+bool FileManage::isDirectory(const std::string &path)
 
 {
   struct stat buf;
@@ -122,22 +122,22 @@ bool FileManage::isDirectory(const string &path)
 #endif
 
 #ifdef _WINDOWS
-void FileManage::matchListDir(vector<string> &res,const string &match,bool isSuffix,const string &dirname,bool allowdot)
+void FileManage::matchListDir(vectorstd::string &res,const std::string &match,bool isSuffix,const std::string &dirname,bool allowdot)
 
 {
   WIN32_FIND_DATAA FindFileData;
   HANDLE hFind;
-  string dirfinal;
+  std::string dirfinal;
 
   dirfinal = dirname;
   if (dirfinal[dirfinal.size()-1] != separator)
     dirfinal += separator;
-  string regex = dirfinal + '*';
+  std::string regex = dirfinal + '*';
 
   hFind = FindFirstFileA(regex.c_str(),&FindFileData);
   if (hFind == INVALID_HANDLE_VALUE) return;
   do {
-    string fullname(FindFileData.cFileName);
+    std::string fullname(FindFileData.cFileName);
     if (match.size() <= fullname.size()) {
       if (allowdot||(fullname[0] != '.')) {
 	if (isSuffix) {
@@ -155,12 +155,12 @@ void FileManage::matchListDir(vector<string> &res,const string &match,bool isSuf
 }
 
 #else
-void FileManage::matchListDir(vector<string> &res,const string &match,bool isSuffix,const string &dirname,bool allowdot)
+void FileManage::matchListDir(vectorstd::string &res,const std::string &match,bool isSuffix,const std::string &dirname,bool allowdot)
 
 {				// Look through files in a directory for those matching -match-
   DIR *dir;
   struct dirent *entry;
-  string dirfinal = dirname;
+  std::string dirfinal = dirname;
   if (dirfinal[dirfinal.size()-1] != separator)
     dirfinal += separator;
 
@@ -168,7 +168,7 @@ void FileManage::matchListDir(vector<string> &res,const string &match,bool isSuf
   if (dir == (DIR *)0) return;
   entry = readdir(dir);
   while(entry != (struct dirent *)0) {
-    string fullname(entry->d_name);
+    std::string fullname(entry->d_name);
     if (match.size() <= fullname.size()) {
       if (allowdot||(fullname[0] != '.')) {
 	if (isSuffix) {
@@ -187,10 +187,10 @@ void FileManage::matchListDir(vector<string> &res,const string &match,bool isSuf
 }
 #endif
 
-void FileManage::matchList(vector<string> &res,const string &match,bool isSuffix) const
+void FileManage::matchList(vectorstd::string &res,const std::string &match,bool isSuffix) const
 
 {
-  vector<string>::const_iterator iter;
+  vectorstd::string::const_iterator iter;
 
   for(iter=pathlist.begin();iter!=pathlist.end();++iter)
     matchListDir(res,match,isSuffix,*iter,false);
@@ -198,15 +198,15 @@ void FileManage::matchList(vector<string> &res,const string &match,bool isSuffix
 
 #ifdef _WINDOWS
 
-void FileManage::directoryList(vector<string> &res,const string &dirname,bool allowdot)
+void FileManage::directoryList(vectorstd::string &res,const std::string &dirname,bool allowdot)
 
 {
   WIN32_FIND_DATAA FindFileData;
   HANDLE hFind;
-  string dirfinal = dirname;
+  std::string dirfinal = dirname;
   if (dirfinal[dirfinal.size()-1] != separator)
     dirfinal += separator;
-  string regex = dirfinal + "*";
+  std::string regex = dirfinal + "*";
   const char *s = regex.c_str();
   
 
@@ -214,7 +214,7 @@ void FileManage::directoryList(vector<string> &res,const string &dirname,bool al
   if (hFind == INVALID_HANDLE_VALUE) return;
   do {
     if ( (FindFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY ) {
-      string fullname(FindFileData.cFileName);
+      std::string fullname(FindFileData.cFileName);
       if (allowdot || (fullname[0] != '.'))
 	res.push_back(dirfinal + fullname);
     }
@@ -223,12 +223,12 @@ void FileManage::directoryList(vector<string> &res,const string &dirname,bool al
 }
 
 #else
-void FileManage::directoryList(vector<string> &res,const string &dirname,bool allowdot)
+void FileManage::directoryList(vectorstd::string &res,const std::string &dirname,bool allowdot)
 
 { // List full pathnames of all directories under the directory -dir-
   DIR *dir;
   struct dirent *entry;
-  string dirfinal;
+  std::string dirfinal;
 
   dirfinal = dirname;
   if (dirfinal[dirfinal.size()-1] != separator)
@@ -239,7 +239,7 @@ void FileManage::directoryList(vector<string> &res,const string &dirname,bool al
   entry = readdir(dir);
   while(entry != (struct dirent *)0) {
     if (entry->d_type == DT_DIR) {
-      string fullname(entry->d_name);
+      std::string fullname(entry->d_name);
       if ((fullname!=".")&&(fullname!="..")) {
 	if (allowdot || (fullname[0] != '.'))
 	  res.push_back( dirfinal + fullname );
@@ -252,52 +252,52 @@ void FileManage::directoryList(vector<string> &res,const string &dirname,bool al
 
 #endif
 
-void FileManage::scanDirectoryRecursive(vector<string> &res,const string &matchname,const string &rootpath,int maxdepth)
+void FileManage::scanDirectoryRecursive(vectorstd::string &res,const std::string &matchname,const std::string &rootpath,int maxdepth)
 
 {
   if (maxdepth == 0) return;
-  vector<string> subdir;
+  vectorstd::string subdir;
   directoryList(subdir,rootpath);
-  vector<string>::const_iterator iter;
+  vectorstd::string::const_iterator iter;
   for(iter = subdir.begin();iter!=subdir.end();++iter) {
-    const string &curpath( *iter );
-    string::size_type pos = curpath.rfind(separator);
-    if (pos == string::npos)
+    const std::string &curpath( *iter );
+    std::string::size_type pos = curpath.rfind(separator);
+    if (pos == std::string::npos)
       pos = 0;
     else
       pos = pos + 1;
-    if (curpath.compare(pos,string::npos,matchname)==0)
+    if (curpath.compare(pos,std::string::npos,matchname)==0)
       res.push_back(curpath);
     else
       scanDirectoryRecursive(res,matchname,curpath,maxdepth-1); // Recurse
   }
 }
 
-void FileManage::splitPath(const string &full,string &path,string &base)
+void FileManage::splitPath(const std::string &full,std::string &path,std::string &base)
 
-{ // Split path string -full- into its -base-name and -path- (relative or absolute)
-  // If there is no path, i.e. only a basename in full, then -path- will return as an empty string
+{ // Split path std::string -full- into its -base-name and -path- (relative or absolute)
+  // If there is no path, i.e. only a basename in full, then -path- will return as an empty std::string
   // otherwise -path- will be non-empty and end in a separator character
-  string::size_type end = full.size()-1;
+  std::string::size_type end = full.size()-1;
   if (full[full.size()-1] == separator) // Take into account terminating separator
     end = full.size()-2;
-  string::size_type pos = full.rfind(separator,end);
-  if (pos == string::npos) {	// Didn't find any separator
+  std::string::size_type pos = full.rfind(separator,end);
+  if (pos == std::string::npos) {	// Didn't find any separator
     base = full;
     path.clear();
   }
   else {
-    string::size_type sz = (end - pos);
+    std::string::size_type sz = (end - pos);
     base = full.substr(pos+1,sz);
     path = full.substr(0,pos+1);
   }
 }
 
-string FileManage::buildPath(const vector<string> &pathels,int level)
+std::string FileManage::buildPath(const vectorstd::string &pathels,int level)
 
 { // Build an absolute path using elements from -pathels-, in reverse order
   // Build up to and including pathels[level]
-  ostringstream s;
+  std::ostringstream s;
 
   for(int i=pathels.size()-1;i>=level;--i) {
     s << separator;
@@ -306,44 +306,44 @@ string FileManage::buildPath(const vector<string> &pathels,int level)
   return s.str();
 }
 
-bool FileManage::testDevelopmentPath(const vector<string> &pathels,int level,string &root)
+bool FileManage::testDevelopmentPath(const vectorstd::string &pathels,int level,std::string &root)
 
 { // Given pathels[level] is "Ghidra", determine if this is a Ghidra development layout
   if (level + 2 >= pathels.size()) return false;
-  string parent = pathels[level + 1];
+  std::string parent = pathels[level + 1];
   if (parent.size() < 11) return false;
-  string piecestr = parent.substr(0,7);
+  std::string piecestr = parent.substr(0,7);
   if (piecestr != "ghidra.") return false;
   piecestr = parent.substr(parent.size() - 4);
   if (piecestr != ".git") return false;
   root = buildPath(pathels,level+2);
-  vector<string> testpaths1;
-  vector<string> testpaths2;
+  vectorstd::string testpaths1;
+  vectorstd::string testpaths2;
   scanDirectoryRecursive(testpaths1,"ghidra.git",root,1);
   if (testpaths1.size() != 1) return false;
   scanDirectoryRecursive(testpaths2,"Ghidra",testpaths1[0],1);
   return (testpaths2.size() == 1);
 }
 
-bool FileManage::testInstallPath(const vector<string> &pathels,int level,string &root)
+bool FileManage::testInstallPath(const vectorstd::string &pathels,int level,std::string &root)
 
 {
   if (level + 1 >= pathels.size()) return false;
   root = buildPath(pathels,level+1);
-  vector<string> testpaths1;
-  vector<string> testpaths2;
+  vectorstd::string testpaths1;
+  vectorstd::string testpaths2;
   scanDirectoryRecursive(testpaths1,"server",root,1);
   if (testpaths1.size() != 1) return false;
   scanDirectoryRecursive(testpaths2,"server.conf",testpaths1[0],1);
   return (testpaths2.size() == 1);
 }
 
-string FileManage::discoverGhidraRoot(const char *argv0)
+std::string FileManage::discoverGhidraRoot(const char *argv0)
 
 { // Find the root of the ghidra distribution based on current working directory and passed in path
-  vector<string> pathels;
-  string cur(argv0);
-  string base;
+  vectorstd::string pathels;
+  std::string cur(argv0);
+  std::string base;
   int skiplevel = 0;
   bool isAbs = isAbsolutePath(cur);
 
@@ -374,7 +374,7 @@ string FileManage::discoverGhidraRoot(const char *argv0)
 
   for(int i=0;i<pathels.size();++i) {
     if (pathels[i] != "Ghidra") continue;
-    string root;
+    std::string root;
     if (testDevelopmentPath(pathels,i,root))
       return root;
     if (testInstallPath(pathels,i,root))

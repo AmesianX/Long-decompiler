@@ -24,12 +24,12 @@
 namespace GhidraDec {
 class Symbol;
 
-/// \brief A high-level variable modeled as a list of low-level variables, each written once
+/// \brief A high-level variable modeled as a std::list of low-level variables, each written once
 ///
 /// In the Static Single Assignment (SSA) representation of a function's data-flow, the Varnode
 /// object represents a variable node. This is a \b low-level \b variable: it is written to
 /// at most once, and there is 1 or more reads.  A \b high-level \b variable, in the source
-/// language may be written to multiple times. We model this idea as a list of Varnode objects, where
+/// language may be written to multiple times. We model this idea as a std::list of Varnode objects, where
 /// a different Varnode holds the value of the variable for different parts of the code. The range(s)
 /// of code for which a single Varnode holds the high-level variable's value is the \b cover or \b range
 /// of that Varnode and is modeled by the class Cover.  Within a high-level variable, HighVariable,
@@ -50,7 +50,7 @@ public:
   };
 private:
   friend class Merge;
-  vector<Varnode *> inst;		///< The member Varnode objects making up \b this HighVariable
+  std::vector<Varnode *> inst;		///< The member Varnode objects making up \b this HighVariable
   int4 numMergeClasses;			///< Number of different speculative merge classes in \b this
   mutable uint4 highflags;		///< Dirtiness flags
   mutable uint4 flags;			///< Boolean properties inherited from Varnode members
@@ -88,9 +88,9 @@ public:
   /// \brief Print details of the cover for \b this (for debug purposes)
   ///
   /// \param s is the output stream
-  void printCover(ostream &s) const { if ((highflags&HighVariable::coverdirty)==0) wholecover.print(s); else s << "Cover dirty"; }
+  void printCover(std::ostream &s) const { if ((highflags&HighVariable::coverdirty)==0) wholecover.print(s); else s << "Cover dirty"; }
 
-  void printInfo(ostream &s) const;		///< Print information about \b this HighVariable to stream
+  void printInfo(std::ostream &s) const;		///< Print information about \b this HighVariable to stream
   bool hasName(void) const;			///< Check if \b this HighVariable can be named
   Varnode *getTiedVarnode(void) const;		///< Find the first address tied member Varnode
   Varnode *getInputVarnode(void) const;		///< Find (the) input member Varnode

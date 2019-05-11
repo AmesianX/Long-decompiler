@@ -19,7 +19,7 @@
 namespace GhidraDec {
 /// \param f is the (path to the) underlying XML file
 /// \param el is the parsed form of the file
-LoadImageXml::LoadImageXml(const string &f,const Element *el) : LoadImage(f)
+LoadImageXml::LoadImageXml(const std::string &f,const Element *el) : LoadImage(f)
 
 {
   manage = (const AddrSpaceManager *)0;
@@ -33,14 +33,14 @@ LoadImageXml::LoadImageXml(const string &f,const Element *el) : LoadImage(f)
 
 /// Write out the byte chunks and symbols as XML tags
 /// \param s is the output stream
-void LoadImageXml::saveXml(ostream &s) const
+void LoadImageXml::saveXml(std::ostream &s) const
 
 {
   s << "<binaryimage arch=\"" << archtype << "\">\n";
 
-  map<Address,vector<uint1> >::const_iterator iter1;
+  std::map<Address,std::vector<uint1> >::const_iterator iter1;
   for(iter1=chunk.begin();iter1!=chunk.end();++iter1) {
-    const vector<uint1> &vec((*iter1).second);
+    const std::vector<uint1> &vec((*iter1).second);
     if (vec.size() == 0) continue;
     s << " <bytechunk";
     (*iter1).first.getSpace()->saveXmlAttributes(s,(*iter1).first.getOffset());
@@ -48,14 +48,14 @@ void LoadImageXml::saveXml(ostream &s) const
       s << " readonly=\"true\"";
     s << ">\n  " << setfill('0');
     for(int4 i=0;i<vec.size();++i) {
-      s << hex << setw(2) << (int4)vec[i];
+      s << std::dec << setw(2) << (int4)vec[i];
       if (i%20 == 19)
 	s << "\n  ";
     }
     s << "\n </bytechunk>\n";
   }
 
-  map<Address,string>::const_iterator iter2;
+  std::map<Address,std::string>::const_iterator iter2;
   for(iter2=addrtosymbol.begin();iter2!=addrtosymbol.end();++iter2) {
     s << " <symbol";
     (*iter2).first.getSpace()->saveXmlAttributes(s,(*iter2).first.getOffset());
@@ -72,10 +72,10 @@ void LoadImageXml::open(const AddrSpaceManager *m)
   uint4 sz;			// unused size
 
   // Read parsed xml file
-  const List &list(rootel->getChildren());
+  const List &std::list(rootel->getChildren());
   List::const_iterator iter;
-  iter = list.begin();
-  while(iter != list.end()) {
+  iter = std::list.begin();
+  while(iter != std::list.end()) {
     Element *subel = *iter++;
     if (subel->getName()=="symbol") {
       AddrSpace *base = (AddrSpace *)0;
@@ -83,7 +83,7 @@ void LoadImageXml::open(const AddrSpaceManager *m)
       if (base == (AddrSpace *)0)
 	throw LowlevelError("Unknown space name: "+subel->getAttributeValue("space"));
       Address addr(base,base->restoreXmlAttributes(subel,sz));
-      const string &nm(subel->getAttributeValue("name"));
+      const std::string &nm(subel->getAttributeValue("name"));
       addrtosymbol[addr] = nm;
     }
     else if (subel->getName() == "bytechunk") {
@@ -92,15 +92,15 @@ void LoadImageXml::open(const AddrSpaceManager *m)
       if (base == (AddrSpace *)0)
 	throw LowlevelError("Unknown space name: "+subel->getAttributeValue("space"));
       Address addr(base,base->restoreXmlAttributes(subel,sz));
-      map<Address,vector<uint1> >::iterator chnkiter;
-      vector<uint1> &vec( chunk[addr] );
+      std::map<Address,std::vector<uint1> >::iterator chnkiter;
+      std::vector<uint1> &vec( chunk[addr] );
       vec.clear();
       for(int4 i=0;i<subel->getNumAttributes();++i) {
 	if (subel->getAttributeName(i) == "readonly")
 	  if (xml_readbool(subel->getAttributeValue(i)))
 	    readonlyset.insert(addr);
       }
-      istringstream is(subel->getContent());
+      std::istringstream is(subel->getContent());
       int4 val;
       char c1,c2;
       is >> ws;
@@ -144,7 +144,7 @@ void LoadImageXml::clear(void)
 void LoadImageXml::pad(void)
 
 {
-  map<Address,vector<uint1> >::iterator iter,lastiter;
+  std::map<Address,std::vector<uint1> >::iterator iter,lastiter;
 
   // Search for completely redundant chunks
   if (chunk.empty()) return;
@@ -184,7 +184,7 @@ void LoadImageXml::pad(void)
       if ((uintb)maxsize > room)
 	maxsize = (int4)room;
     }
-    vector<uint1> &vec( chunk[endaddr] );
+    std::vector<uint1> &vec( chunk[endaddr] );
     for(int4 i=0;i<maxsize;++i)
       vec.push_back(0);
   }
@@ -193,7 +193,7 @@ void LoadImageXml::pad(void)
 void LoadImageXml::loadFill(uint1 *ptr,int4 size,const Address &addr)
 
 {
-  map<Address,vector<uint1> >::const_iterator iter;
+  std::map<Address,std::vector<uint1> >::const_iterator iter;
   Address curaddr;
   bool emptyhit = false;
   
@@ -202,7 +202,7 @@ void LoadImageXml::loadFill(uint1 *ptr,int4 size,const Address &addr)
   if (iter != chunk.begin())
     --iter;			// Last one less or equal
   while((size>0)&&(iter!=chunk.end())) {
-    const vector<uint1> &chnk((*iter).second);
+    const std::vector<uint1> &chnk((*iter).second);
     int4 chnksize = chnk.size();
     int4 over = curaddr.overlap(0,(*iter).first,chnksize);
     if (over!=-1) {
@@ -220,7 +220,7 @@ void LoadImageXml::loadFill(uint1 *ptr,int4 size,const Address &addr)
     }
   }
   if ((size>0)||emptyhit) {
-    ostringstream errmsg;
+    std::ostringstream errmsg;
     errmsg << "Bytes at ";
     curaddr.printRaw(errmsg);
     errmsg << " are not mapped";
@@ -244,18 +244,18 @@ bool LoadImageXml::getNextSymbol(LoadImageFunc &record) const
   return true;
 }
 
-void LoadImageXml::getReadonly(RangeList &list) const
+void LoadImageXml::getReadonly(RangeList &std::list) const
 
 {
-  map<Address,vector<uint1> >::const_iterator iter;
+  std::map<Address,std::vector<uint1> >::const_iterator iter;
 
   // List all the readonly chunks
   for(iter=chunk.begin();iter!=chunk.end();++iter) {
     if (readonlyset.find((*iter).first) != readonlyset.end()) {
-      const vector<uint1> &chnk((*iter).second);
+      const std::vector<uint1> &chnk((*iter).second);
       uintb start = (*iter).first.getOffset();
       uintb stop = start + chnk.size() - 1;
-      list.insertRange((*iter).first.getSpace(),start,stop);
+      std::list.insertRange((*iter).first.getSpace(),start,stop);
     }
   }
 }
@@ -263,11 +263,11 @@ void LoadImageXml::getReadonly(RangeList &list) const
 void LoadImageXml::adjustVma(long adjust)
 
 {
-  map<Address,vector<uint1> >::iterator iter1;
-  map<Address,string>::iterator iter2;
+  std::map<Address,std::vector<uint1> >::iterator iter1;
+  std::map<Address,std::string>::iterator iter2;
 
-  map<Address,vector<uint1> > newchunk;
-  map<Address,string> newsymbol;
+  std::map<Address,std::vector<uint1> > newchunk;
+  std::map<Address,std::string> newsymbol;
 
   for(iter1=chunk.begin();iter1!=chunk.end();++iter1) {
     AddrSpace *spc = (*iter1).first.getSpace();

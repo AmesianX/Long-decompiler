@@ -182,7 +182,7 @@ void CoverBlock::merge(const CoverBlock &op2)
 
 /// Print a description of the covered range of ops in this block
 /// \param s is the output stream
-void CoverBlock::print(ostream &s) const
+void CoverBlock::print(std::ostream &s) const
 
 {
   uintm ustart,ustop;
@@ -222,7 +222,7 @@ int4 Cover::compareTo(const Cover &op2) const
 {
   int4 a,b;
 
-  map<int4,CoverBlock>::const_iterator iter;
+  std::map<int4,CoverBlock>::const_iterator iter;
   iter = cover.begin();
   if (iter==cover.end())
     a = 1000000;
@@ -250,7 +250,7 @@ int4 Cover::compareTo(const Cover &op2) const
 const CoverBlock &Cover::getCoverBlock(int4 i) const
 
 {
-  map<int4,CoverBlock>::const_iterator iter = cover.find(i);
+  std::map<int4,CoverBlock>::const_iterator iter = cover.find(i);
   if (iter == cover.end())
     return emptyblock;
   return (*iter).second;
@@ -266,7 +266,7 @@ const CoverBlock &Cover::getCoverBlock(int4 i) const
 int4 Cover::intersect(const Cover &op2) const
 
 {
-  map<int4,CoverBlock>::const_iterator iter,iter2;
+  std::map<int4,CoverBlock>::const_iterator iter,iter2;
   int4 res,newres;
 
   res = 0;
@@ -293,18 +293,18 @@ int4 Cover::intersect(const Cover &op2) const
   return res;
 }
 
-/// \brief Generate a list of blocks that intersect
+/// \brief Generate a std::list of blocks that intersect
 ///
 /// For each block for which \b this and another Cover intersect,
-/// and the block's index to a result list if the type of intersection
+/// and the block's index to a result std::list if the type of intersection
 /// exceeds a characterization level.
-/// \param listout will hold the list of intersecting block indices
+/// \param listout will hold the std::list of intersecting block indices
 /// \param op2 is the other Cover
 /// \param level is the characterization threshold which must be exceeded
-void Cover::intersectList(vector<int4> &listout,const Cover &op2,int4 level) const
+void Cover::intersectList(std::vector<int4> &listout,const Cover &op2,int4 level) const
 
 {
-  map<int4,CoverBlock>::const_iterator iter,iter2;
+  std::map<int4,CoverBlock>::const_iterator iter,iter2;
   int4 val;
 
   listout.clear();
@@ -341,12 +341,12 @@ void Cover::intersectList(vector<int4> &listout,const Cover &op2,int4 level) con
 int4 Cover::intersectByBlock(int4 blk,const Cover &op2) const
 
 {
-  map<int4,CoverBlock>::const_iterator iter;
+  std::map<int4,CoverBlock>::const_iterator iter;
 
   iter = cover.find(blk);
   if (iter == cover.end()) return 0;
   
-  map<int4,CoverBlock>::const_iterator iter2;
+  std::map<int4,CoverBlock>::const_iterator iter2;
 
   iter2 = op2.cover.find(blk);
   if (iter2 == op2.cover.end()) return 0;
@@ -362,7 +362,7 @@ int4 Cover::intersectByBlock(int4 blk,const Cover &op2) const
 bool Cover::contain(const PcodeOp *op,int4 max) const
 
 {
-  map<int4,CoverBlock>::const_iterator iter;
+  std::map<int4,CoverBlock>::const_iterator iter;
 
   iter = cover.find(op->getParent()->getIndex());
   if (iter == cover.end()) return false;
@@ -399,7 +399,7 @@ int4 Cover::containVarnodeDef(const Varnode *vn) const
   }
   else
     blk = op->getParent()->getIndex();
-  map<int4,CoverBlock>::const_iterator iter = cover.find(blk);
+  std::map<int4,CoverBlock>::const_iterator iter = cover.find(blk);
   if (iter == cover.end()) return 0;
   if ((*iter).second.contain(op)) {
     int4 boundtype = (*iter).second.boundary(op);
@@ -414,19 +414,19 @@ int4 Cover::containVarnodeDef(const Varnode *vn) const
 void Cover::merge(const Cover &op2)
 
 {
-  map<int4,CoverBlock>::const_iterator iter;
+  std::map<int4,CoverBlock>::const_iterator iter;
 
   for(iter=op2.cover.begin();iter!=op2.cover.end();++iter)
     cover[(*iter).first].merge((*iter).second);
 }
 
-/// The cover is set to all p-code ops between the point where
+/// The cover is std::set to all p-code ops between the point where
 /// the Varnode is defined and all the points where it is read
 /// \param vn is the single Varnode
 void Cover::rebuild(const Varnode *vn)
 
 {
-  list<PcodeOp *>::const_iterator iter;
+  std::list<PcodeOp *>::const_iterator iter;
 
   addDefPoint(vn);
   for(iter=vn->beginDescend();iter!=vn->endDescend();++iter)
@@ -550,15 +550,15 @@ void Cover::addRefPoint(const PcodeOp *ref,const Varnode *vn)
 }
 
 /// \param s is the output stream
-void Cover::print(ostream &s) const
+void Cover::print(std::ostream &s) const
 
 {
-  map<int4,CoverBlock>::const_iterator iter;
+  std::map<int4,CoverBlock>::const_iterator iter;
 
   for(iter=cover.begin();iter!=cover.end();++iter) {
-    s << dec << (*iter).first << ": ";
+    s << std::dec << (*iter).first << ": ";
     (*iter).second.print(s);
-    s << endl;
+    s << std::endl;
   }
 }
 }

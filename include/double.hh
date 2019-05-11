@@ -65,8 +65,8 @@ public:
   static bool adjacentOffsets(Varnode *vn1,Varnode *vn2,uintb size1);
   static bool testContiguousLoad(PcodeOp *most,PcodeOp *least,bool allowfree,PcodeOp *&first,PcodeOp *&second,AddrSpace *&spc,int4 &sizeres);
   static bool isAddrTiedContiguous(Varnode *lo,Varnode *hi,Address &res);
-  static void wholeList(Varnode *w,vector<SplitVarnode> &splitvec);
-  static void findCopies(const SplitVarnode &in,vector<SplitVarnode> &splitvec);
+  static void wholeList(Varnode *w,std::vector<SplitVarnode> &splitvec);
+  static void findCopies(const SplitVarnode &in,std::vector<SplitVarnode> &splitvec);
   static void getTrueFalse(PcodeOp *boolop,bool flip,BlockBasic *&trueout,BlockBasic *&falseout);
   static bool otherwiseEmpty(PcodeOp *branchop);
   static bool verifyMultNegOne(PcodeOp *op);
@@ -81,8 +81,8 @@ public:
   static bool prepareBoolOp(SplitVarnode &in1,SplitVarnode &in2,PcodeOp *testop);
   static void createBoolOp(Funcdata &data,PcodeOp *cbranch,SplitVarnode &in1,SplitVarnode &in2,
 			   OpCode opc);
-  static PcodeOp *preparePhiOp(SplitVarnode &out,vector<SplitVarnode> &inlist);
-  static void createPhiOp(Funcdata &data,SplitVarnode &out,vector<SplitVarnode> &inlist,
+  static PcodeOp *preparePhiOp(SplitVarnode &out,std::vector<SplitVarnode> &inlist);
+  static void createPhiOp(Funcdata &data,SplitVarnode &out,std::vector<SplitVarnode> &inlist,
 			  PcodeOp *existop);
   static bool prepareIndirectOp(SplitVarnode &in,PcodeOp *affector);
   static void replaceIndirectOp(Funcdata &data,SplitVarnode &out,SplitVarnode &in,PcodeOp *affector);
@@ -292,24 +292,24 @@ public:
 
 class RuleDoubleIn : public Rule {
 public:
-  RuleDoubleIn(const string &g) : Rule(g, 0, "doublein") {}
+  RuleDoubleIn(const std::string &g) : Rule(g, 0, "doublein") {}
   virtual Rule *clone(const ActionGroupList &grouplist) const {
     if (!grouplist.contains(getGroup())) return (Rule *)0;
     return new RuleDoubleIn(getGroup());
   }
   virtual void reset(Funcdata &data);
-  virtual void getOpList(vector<uint4> &oplist) const;
+  virtual void getOpList(std::vector<uint4> &oplist) const;
   virtual int4 applyOp(PcodeOp *op,Funcdata &data);
 };
 
 class RuleDoubleLoad : public Rule {
 public:
-  RuleDoubleLoad(const string &g) : Rule( g, 0, "doubleload") {}
+  RuleDoubleLoad(const std::string &g) : Rule( g, 0, "doubleload") {}
   virtual Rule *clone(const ActionGroupList &grouplist) const {
     if (!grouplist.contains(getGroup())) return (Rule *)0;
     return new RuleDoubleLoad(getGroup());
   }
-  virtual void getOpList(vector<uint4> &oplist) const;
+  virtual void getOpList(std::vector<uint4> &oplist) const;
   virtual int4 applyOp(PcodeOp *op,Funcdata &data);
   static PcodeOp *noWriteConflict(PcodeOp *op1,PcodeOp *op2,AddrSpace *spc);
 };

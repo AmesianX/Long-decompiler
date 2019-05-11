@@ -54,7 +54,7 @@ public:
   ~Statistics(void);		///< Destructor
   void countCast(void) { castcount += 1; }	///< Count a single cast
   void process(const Funcdata &fd);	///< Accumulate statistics for one function
-  void printResults(ostream &s);	///< Display accumulated statistics
+  void printResults(std::ostream &s);	///< Display accumulated statistics
 };
 
 #endif
@@ -71,11 +71,11 @@ class Architecture;
 class ArchitectureCapability : public CapabilityPoint {
   static const uint4 majorversion;			///< Current major version of decompiler
   static const uint4 minorversion;			///< Current minor version of decompiler
-  static vector<ArchitectureCapability *> thelist;	///< The list of registered extensions
+  static std::vector<ArchitectureCapability *> thelist;	///< The std::list of registered extensions
 protected:
-  string name;						///< Identifier for this capability
+  std::string name;						///< Identifier for this capability
 public:
-  const string &getName(void) const { return name; }	///< Get the capability identifier
+  const std::string &getName(void) const { return name; }	///< Get the capability identifier
   virtual void initialize(void);			///< Do specialized initialization
 
   /// \brief Build an Architecture given a raw file or data
@@ -84,15 +84,15 @@ public:
   /// a \e filename and possibly external target information and must build
   /// the Architecture object, initializing all the major subcomponents, using just this info.
   /// \param filename is the path to the executable file to examine
-  /// \param target if non-empty is a language id string
+  /// \param target if non-empty is a language id std::string
   /// \param estream is an output stream for error messages
-  virtual Architecture *buildArchitecture(const string &filename,const string &target,ostream *estream)=0;
+  virtual Architecture *buildArchitecture(const std::string &filename,const std::string &target,std::ostream *estream)=0;
 
   /// \brief Determine if this extension can handle this file
   ///
   /// \param filename is the name of the file to examine
   /// \return \b true is \b this extension is suitable for analyzing the file
-  virtual bool isFileMatch(const string &filename) const=0;
+  virtual bool isFileMatch(const std::string &filename) const=0;
 
   /// \brief Determine is this extension can handle this XML document
   ///
@@ -102,7 +102,7 @@ public:
   /// \return \b true if \b this extension understands the XML
   virtual bool isXmlMatch(Document *doc) const=0;
 
-  static ArchitectureCapability *findCapability(const string &filename);	///< Find an extension to process a file
+  static ArchitectureCapability *findCapability(const std::string &filename);	///< Find an extension to process a file
   static ArchitectureCapability *findCapability(Document *doc);		///< Find an extension to process an XML document
   static void sortCapabilities(void);					///< Sort extensions
   static uint4 getMajorVersion(void) { return majorversion; }		///< Get \e major decompiler version
@@ -117,7 +117,7 @@ public:
 /// This class also holds numerous configuration parameters for the analysis process
 class Architecture : public AddrSpaceManager {
 public:
-  string archid;		///< ID string uniquely describing this architecture
+  std::string archid;		///< ID std::string uniquely describing this architecture
 
 				// Configuration data
   int4 trim_recurse_max;	///< How many levels to let parameter trims recurse
@@ -131,11 +131,11 @@ public:
   uintb pointer_lowerbound;	///< Zero or lowest value that can be inferred as an address
   int4 funcptr_align;		///< How many bits of alignment a function ptr has
   uint4 flowoptions;            ///< options passed to flow following engine
-  vector<Rule *> extra_pool_rules; ///< Extra rules that go in the main pool (cpu specific, experimental)
+  std::vector<Rule *> extra_pool_rules; ///< Extra rules that go in the main pool (cpu specific, experimental)
 
-  Database *symboltab;		///< Memory map of global variables and functions
+  Database *symboltab;		///< Memory std::map of global variables and functions
   ContextDatabase *context;	///< Map from addresses to context settings
-  map<string,ProtoModel *> protoModels; ///< Parsed forms of possible prototypes
+  std::map<std::string,ProtoModel *> protoModels; ///< Parsed forms of possible prototypes
   ProtoModel *defaultfp;	///< Parsed form of default prototype
   VarnodeData defaultReturnAddr;	///< Default storage location of return address (for current function)
   ProtoModel *evalfp_current;	///< Function proto to use when evaluating current function
@@ -148,52 +148,52 @@ public:
   CommentDatabase *commentdb;	///< Comments for this architecture
   ConstantPool *cpool;		///< Deferred constant values
   PrintLanguage *print;	        ///< Current high-level language printer
-  vector<PrintLanguage *> printlist;	///< List of high-level language printers supported
+  std::vector<PrintLanguage *> printlist;	///< List of high-level language printers supported
   OptionDatabase *options;	///< Options that can be configured
-  vector<TypeOp *> inst;	///< Registered p-code instructions
+  std::vector<TypeOp *> inst;	///< Registered p-code instructions
   UserOpManage userops;		///< Specifically registered user-defined p-code ops
-  vector<PreferSplitRecord> splitrecords; ///< registers that we would prefer to see split for this processor
+  std::vector<PreferSplitRecord> splitrecords; ///< registers that we would prefer to see split for this processor
   ActionDatabase allacts;	///< Actions that can be applied in this architecture
   bool loadersymbols_parsed;	///< True if loader symbols have been read
 #ifdef CPUI_STATISTICS
   Statistics *stats;		///< Statistics collector
 #endif
 #ifdef OPACTION_DEBUG
-  ostream *debugstream;		///< The error console
+  std::ostream *debugstream;		///< The error console
 #endif
   Architecture(void);		///< Construct an uninitialized Architecture
   void init(DocumentStorage &store); ///< Load the image and configure architecture
-  ProtoModel *getModel(const string &nm) const;		///< Get a specific PrototypeModel
-  bool hasModel(const string &nm) const;		///< Does this Architecture have a specific PrototypeModel
+  ProtoModel *getModel(const std::string &nm) const;		///< Get a specific PrototypeModel
+  bool hasModel(const std::string &nm) const;		///< Does this Architecture have a specific PrototypeModel
   bool highPtrPossible(const Address &loc,int4 size) const; ///< Are pointers possible to the given location?
   AddrSpace *getSpaceBySpacebase(const Address &loc,int4 size) const; ///< Get space associated with a \e spacebase register
-  void setDefaultModel(const string &nm);		///< Set the default PrototypeModel
+  void setDefaultModel(const std::string &nm);		///< Set the default PrototypeModel
   void clearAnalysis(Funcdata *fd);			///< Clear analysis specific to a function
   void readLoaderSymbols(void);		 		///< Read any symbols from loader into database
-  void collectBehaviors(vector<OpBehavior *> &behave) const;	///< Provide a list of OpBehavior objects
+  void collectBehaviors(std::vector<OpBehavior *> &behave) const;	///< Provide a std::list of OpBehavior objects
   bool hasNearPointers(AddrSpace *spc) const;		///< Does the given address space support \e near pointers
   void setPrototype(const PrototypePieces &pieces);	///< Set the prototype for a particular function
-  void setPrintLanguage(const string &nm);		///< Establish a particular output language
+  void setPrintLanguage(const std::string &nm);		///< Establish a particular output language
   void globalify(void);					///< Mark \e all spaces as global
   void restoreFlowOverride(const Element *el);		///< Set flow overrides from XML
   virtual ~Architecture(void);				///< Destructor
 
-  virtual string getDescription(void) const { return archid; }	///< Get a string describing \b this architecture
+  virtual std::string getDescription(void) const { return archid; }	///< Get a std::string describing \b this architecture
 
   /// \brief Print an error message to console
   ///
   /// Write the given message to whatever the registered error stream is
   /// \param message is the error message
-  virtual void printMessage(const string &message) const=0;
-  virtual void saveXml(ostream &s) const;		///< Serialize this architecture to XML
+  virtual void printMessage(const std::string &message) const=0;
+  virtual void saveXml(std::ostream &s) const;		///< Serialize this architecture to XML
   virtual void restoreXml(DocumentStorage &store);	///< Restore the Architecture state from an XML stream
-  virtual void nameFunction(const Address &addr,string &name) const;	///< Pick a default name for a function
+  virtual void nameFunction(const Address &addr,std::string &name) const;	///< Pick a default name for a function
 #ifdef OPACTION_DEBUG
-  void setDebugStream(ostream *s) { debugstream = s; }	///< Establish the debug console stream
-  void printDebug(const string &message) const { *debugstream << message << endl; }	///< Print message to the debug stream
+  void setDebugStream(std::ostream *s) { debugstream = s; }	///< Establish the debug console stream
+  void printDebug(const std::string &message) const { *debugstream << message << std::endl; }	///< Print message to the debug stream
 #endif
 protected:
-  void addSpacebase(AddrSpace *basespace,const string &nm,const VarnodeData &ptrdata,
+  void addSpacebase(AddrSpace *basespace,const std::string &nm,const VarnodeData &ptrdata,
 		    int4 truncSize,bool isreversejustified,bool stackGrowth); ///< Create a new space and associated pointer
   void addNoHighPtr(const Range &rng); ///< Add a new region where pointers do not exist
 

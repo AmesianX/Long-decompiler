@@ -32,7 +32,7 @@ InjectPayloadSleigh::~InjectPayloadSleigh(void)
     delete tpl;
 }
 
-InjectPayloadSleigh::InjectPayloadSleigh(const string &src,const string &nm,int4 tp)
+InjectPayloadSleigh::InjectPayloadSleigh(const std::string &src,const std::string &nm,int4 tp)
   : InjectPayload(nm,tp)
 {
   source = src;
@@ -66,9 +66,9 @@ void InjectPayloadSleigh::restoreXml(const Element *el)
 
 {
   InjectPayload::restoreXml(el);
-  const List &list(el->getChildren());
+  const List &std::list(el->getChildren());
   List::const_iterator iter;
-  for(iter=list.begin();iter!=list.end();++iter) {
+  for(iter=std::list.begin();iter!=std::list.end();++iter) {
     const Element *subel = *iter;
     if (subel->getName() == "body") {
       parsestring = subel->getContent();
@@ -78,19 +78,19 @@ void InjectPayloadSleigh::restoreXml(const Element *el)
     throw LowlevelError("Missing <body> subtag in <pcode>: "+getSource());
 }
 
-void InjectPayloadSleigh::printTemplate(ostream &s) const
+void InjectPayloadSleigh::printTemplate(std::ostream &s) const
 
 {
   tpl->saveXml(s,-1);
 }
 
 void InjectPayloadSleigh::checkParameterRestrictions(InjectContextSleigh &con,
-						     const vector<InjectParameter> &inputlist,
-						     const vector<InjectParameter> &output,
-						     const string &source)
-{ // Verify that the storage locations passed in -con- match the restrictions set for this payload
+						     const std::vector<InjectParameter> &inputlist,
+						     const std::vector<InjectParameter> &output,
+						     const std::string &source)
+{ // Verify that the storage locations passed in -con- match the restrictions std::set for this payload
   if (inputlist.size() != con.inputlist.size())
-    throw LowlevelError("Injection parameter list has different number of parameters than p-code operation: "+source);
+    throw LowlevelError("Injection parameter std::list has different number of parameters than p-code operation: "+source);
   for(int4 i=0;i<inputlist.size();++i) {
     uint4 sz = inputlist[i].getSize();
     if ((sz != 0) && (sz != con.inputlist[i].size))
@@ -106,9 +106,9 @@ void InjectPayloadSleigh::checkParameterRestrictions(InjectContextSleigh &con,
 }
 
 void InjectPayloadSleigh::setupParameters(InjectContextSleigh &con,ParserWalkerChange &walker,
-					  const vector<InjectParameter> &inputlist,
-					  const vector<InjectParameter> &output,
-					  const string &source)
+					  const std::vector<InjectParameter> &inputlist,
+					  const std::vector<InjectParameter> &output,
+					  const std::string &source)
 { // Set-up operands in the parser state so that they pick up storage locations in InjectContext
   checkParameterRestrictions(con,inputlist,output,source);
   ParserContext *pos = walker.getParserContext();
@@ -134,7 +134,7 @@ void InjectPayloadSleigh::setupParameters(InjectContextSleigh &con,ParserWalkerC
   }
 }
 
-InjectPayloadCallfixup::InjectPayloadCallfixup(const string &sourceName)
+InjectPayloadCallfixup::InjectPayloadCallfixup(const std::string &sourceName)
   : InjectPayloadSleigh(sourceName,"unknown",CALLFIXUP_TYPE)
 {
 }
@@ -142,12 +142,12 @@ InjectPayloadCallfixup::InjectPayloadCallfixup(const string &sourceName)
 void InjectPayloadCallfixup::restoreXml(const Element *el)
 
 {
-  const List &list(el->getChildren());
+  const List &std::list(el->getChildren());
   List::const_iterator iter;
   name = el->getAttributeValue("name");
   bool pcodeSubtag = false;
 
-  for(iter=list.begin();iter!=list.end();++iter) {
+  for(iter=std::list.begin();iter!=std::list.end();++iter) {
     const Element *subel = *iter;
     if (subel->getName() == "pcode") {
       InjectPayloadSleigh::restoreXml(subel);
@@ -160,7 +160,7 @@ void InjectPayloadCallfixup::restoreXml(const Element *el)
     throw LowlevelError("<callfixup> is missing <pcode> subtag: "+name);
 }
 
-InjectPayloadCallother::InjectPayloadCallother(const string &sourceName)
+InjectPayloadCallother::InjectPayloadCallother(const std::string &sourceName)
   : InjectPayloadSleigh(sourceName,"unknown",CALLOTHERFIXUP_TYPE)
 {
 }
@@ -168,16 +168,16 @@ InjectPayloadCallother::InjectPayloadCallother(const string &sourceName)
 void InjectPayloadCallother::restoreXml(const Element *el)
 
 {
-  const List &list(el->getChildren());
+  const List &std::list(el->getChildren());
   List::const_iterator iter;
   name = el->getAttributeValue("targetop");
-  iter = list.begin();
-  if ((iter == list.end()) || ((*iter)->getName() != "pcode"))
+  iter = std::list.begin();
+  if ((iter == std::list.end()) || ((*iter)->getName() != "pcode"))
     throw LowlevelError("<callotherfixup> does not contain a <pcode> tag");
   InjectPayloadSleigh::restoreXml(*iter);
 }
 
-ExecutablePcodeSleigh::ExecutablePcodeSleigh(Architecture *g,const string &src,const string &nm)
+ExecutablePcodeSleigh::ExecutablePcodeSleigh(Architecture *g,const std::string &src,const std::string &nm)
   : ExecutablePcode(g,src,nm)
 {
   tpl = (ConstructTpl *)0;
@@ -216,10 +216,10 @@ void ExecutablePcodeSleigh::restoreXml(const Element *el)
 
 {
   InjectPayload::restoreXml(el);
-  const List &list(el->getChildren());
+  const List &std::list(el->getChildren());
   List::const_iterator iter;
   bool hasbody = false;
-  for (iter = list.begin(); iter != list.end(); ++iter) {
+  for (iter = std::list.begin(); iter != std::list.end(); ++iter) {
     const Element *subel = *iter;
     if (subel->getName() == "body") {
       hasbody = true;
@@ -230,7 +230,7 @@ void ExecutablePcodeSleigh::restoreXml(const Element *el)
     throw LowlevelError("Missing <body> subtag in <pcode>: " + getSource());
 }
 
-void ExecutablePcodeSleigh::printTemplate(ostream &s) const
+void ExecutablePcodeSleigh::printTemplate(std::ostream &s) const
 
 {
   tpl->saveXml(s,-1);
@@ -239,7 +239,7 @@ void ExecutablePcodeSleigh::printTemplate(ostream &s) const
 InjectPayloadDynamic::~InjectPayloadDynamic(void)
 
 {
-  map<Address,Document *>::iterator iter;
+  std::map<Address,Document *>::iterator iter;
   for(iter=addrMap.begin();iter!=addrMap.end();++iter)
     delete (*iter).second;
 }
@@ -247,16 +247,16 @@ InjectPayloadDynamic::~InjectPayloadDynamic(void)
 void InjectPayloadDynamic::restoreEntry(const Element *el)
 
 {
-  const List &list(el->getChildren());
+  const List &std::list(el->getChildren());
   List::const_iterator iter;
 
-  iter = list.begin();
+  iter = std::list.begin();
   Address addr = Address::restoreXml(*iter,glb);
   ++iter;
-  istringstream s((*iter)->getContent());
+  std::istringstream s((*iter)->getContent());
   try {
     Document *doc = xml_tree(s);
-    map<Address,Document *>::iterator iter = addrMap.find(addr);
+    std::map<Address,Document *>::iterator iter = addrMap.find(addr);
     if (iter != addrMap.end())
       delete (*iter).second;		// Delete any preexisting document
     addrMap[addr] = doc;
@@ -269,13 +269,13 @@ void InjectPayloadDynamic::restoreEntry(const Element *el)
 void InjectPayloadDynamic::inject(InjectContext &context,PcodeEmit &emit) const
 
 {
-  map<Address,Document *>::const_iterator eiter = addrMap.find(context.baseaddr);
+  std::map<Address,Document *>::const_iterator eiter = addrMap.find(context.baseaddr);
   if (eiter == addrMap.end())
     throw LowlevelError("Missing dynamic inject");
   const Element *el = (*eiter).second->getRoot();
-  const List &list(el->getChildren());
+  const List &std::list(el->getChildren());
   List::const_iterator iter;
-  for(iter=list.begin();iter!=list.end();++iter)
+  for(iter=std::list.begin();iter!=std::list.end();++iter)
     emit.restoreXmlOp(*iter,glb->translate);
 }
 
@@ -321,7 +321,7 @@ void PcodeInjectLibrarySleigh::parseInject(InjectPayload *payload)
   if (payload->getType() == InjectPayload::EXECUTABLEPCODE_TYPE) {
     compiler.setUniqueBase(0x2000);	// Don't need to deconflict with anything other injects
     ExecutablePcodeSleigh *sleighpayload = (ExecutablePcodeSleigh *)payload;
-    istringstream s(sleighpayload->parsestring);
+    std::istringstream s(sleighpayload->parsestring);
     if (!compiler.parseStream(s))
       throw LowlevelError(payload->getSource() + ": Unable to compile pcode: "+compiler.getErrorMessage());
     sleighpayload->tpl = compiler.releaseResult();
@@ -330,7 +330,7 @@ void PcodeInjectLibrarySleigh::parseInject(InjectPayload *payload)
   else {
     compiler.setUniqueBase(tempbase);
     InjectPayloadSleigh *sleighpayload = (InjectPayloadSleigh *)payload;
-    istringstream s(sleighpayload->parsestring);
+    std::istringstream s(sleighpayload->parsestring);
     if (!compiler.parseStream(s))
       throw LowlevelError(payload->getSource() + ": Unable to compile pcode: "+compiler.getErrorMessage());
     tempbase = compiler.getUniqueBase();
@@ -339,7 +339,7 @@ void PcodeInjectLibrarySleigh::parseInject(InjectPayload *payload)
   }
 }
 
-int4 PcodeInjectLibrarySleigh::allocateInject(const string &sourceName,const string &name,int4 type)
+int4 PcodeInjectLibrarySleigh::allocateInject(const std::string &sourceName,const std::string &name,int4 type)
 
 {
   int4 injectid = injection.size();
@@ -389,15 +389,15 @@ void PcodeInjectLibrarySleigh::registerInject(int4 injectid)
 void PcodeInjectLibrarySleigh::restoreDebug(const Element *el)
 
 {
-  const List &list(el->getChildren());
+  const List &std::list(el->getChildren());
   List::const_iterator iter;
 
-  for(iter=list.begin();iter!=list.end();++iter) {
+  for(iter=std::list.begin();iter!=std::list.end();++iter) {
     const Element *subel = *iter;
-    const string &name( subel->getAttributeValue("name") );
-    istringstream s( subel->getAttributeValue("type") );
+    const std::string &name( subel->getAttributeValue("name") );
+    std::istringstream s( subel->getAttributeValue("type") );
     int4 type = -1;
-    s.unsetf(ios::dec | ios::hex | ios::oct);
+    s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
     s >> type;
     int4 id = getPayloadId(type,name);
     InjectPayloadDynamic *payload = (InjectPayloadDynamic *)getPayload(id);
@@ -407,7 +407,7 @@ void PcodeInjectLibrarySleigh::restoreDebug(const Element *el)
   }
 }
 
-const vector<OpBehavior *> &PcodeInjectLibrarySleigh::getBehaviors(void)
+const std::vector<OpBehavior *> &PcodeInjectLibrarySleigh::getBehaviors(void)
 
 {
   if (inst.empty())
@@ -415,10 +415,10 @@ const vector<OpBehavior *> &PcodeInjectLibrarySleigh::getBehaviors(void)
   return inst;
 }
 
-int4 PcodeInjectLibrarySleigh::manualCallFixup(const string &name,const string &snippetstring)
+int4 PcodeInjectLibrarySleigh::manualCallFixup(const std::string &name,const std::string &snippetstring)
 
 {
-  string sourceName = "(manual callfixup name=\"" + name + "\")";
+  std::string sourceName = "(manual callfixup name=\"" + name + "\")";
   int4 injectid = allocateInject(sourceName, name, InjectPayload::CALLFIXUP_TYPE);
   InjectPayloadSleigh *payload = (InjectPayloadSleigh *)getPayload(injectid);
   payload->parsestring = snippetstring;
@@ -426,10 +426,10 @@ int4 PcodeInjectLibrarySleigh::manualCallFixup(const string &name,const string &
   return injectid;
 }
 
-int4 PcodeInjectLibrarySleigh::manualCallOtherFixup(const string &name,const string &outname,
-						    const vector<string> &inname,const string &snippet)
+int4 PcodeInjectLibrarySleigh::manualCallOtherFixup(const std::string &name,const std::string &outname,
+						    const vectorstd::string &inname,const std::string &snippet)
 {
-  string sourceName = "<manual callotherfixup name=\"" + name + "\")";
+  std::string sourceName = "<manual callotherfixup name=\"" + name + "\")";
   int4 injectid = allocateInject(sourceName, name, InjectPayload::CALLOTHERFIXUP_TYPE);
   InjectPayloadSleigh *payload = (InjectPayloadSleigh *)getPayload(injectid);
   for(int4 i=0;i<inname.size();++i)

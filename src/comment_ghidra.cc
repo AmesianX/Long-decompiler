@@ -57,13 +57,13 @@ void CommentDatabaseGhidra::fillCache(const Address &fad) const
 void CommentDatabaseGhidra::addComment(uint4 tp,
 				       const Address &fad,
 				       const Address &ad,
-				       const string &txt)
+				       const std::string &txt)
 {
   cache.addComment(tp,fad,ad,txt);
 }
 
 bool CommentDatabaseGhidra::addCommentNoDuplicate(uint4 tp,const Address &fad,const Address &ad,
-						  const string &txt)
+						  const std::string &txt)
 {
   return cache.addCommentNoDuplicate(tp,fad,ad,txt);
 }

@@ -57,20 +57,20 @@ public:
   ParamMeasure( const Address &addr, int4 sz, Datatype *dt, ParamIDIO io_in) {
     vndata.space=addr.getSpace(); vndata.offset=addr.getOffset(); vndata.size = sz; vntype=dt; io = io_in; rank=WORSTRANK; }
   void calculateRank(bool best,Varnode *basevn,PcodeOp *ignoreop);
-  void saveXml( ostream &s,string tag,bool moredetail ) const;
-  void savePretty( ostream &s,bool moredetail ) const;
+  void saveXml( std::ostream &s,std::string tag,bool moredetail ) const;
+  void savePretty( std::ostream &s,bool moredetail ) const;
   int4 getMeasure(void) const { return (int4) rank; }
 };
 
 class ParamIDAnalysis
 {
   Funcdata *fd;
-  list<ParamMeasure> InputParamMeasures;
-  list<ParamMeasure> OutputParamMeasures;
+  std::list<ParamMeasure> InputParamMeasures;
+  std::list<ParamMeasure> OutputParamMeasures;
 public:
   ParamIDAnalysis( Funcdata *fd_in, bool justproto );
-  void saveXml( ostream &s, bool moredetail ) const;
-  void savePretty( ostream &s, bool moredetail ) const;
+  void saveXml( std::ostream &s, bool moredetail ) const;
+  void savePretty( std::ostream &s, bool moredetail ) const;
 };
 
 }

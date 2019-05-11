@@ -37,14 +37,14 @@ void BlockEdge::restoreXml(const Element *el,BlockMap &resolver)
 {
   label = 0;		// Tag does not currently contain info about label
   int4 endIndex;
-  istringstream s(el->getAttributeValue("end"));
-  s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+  std::istringstream s(el->getAttributeValue("end"));
+  s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
   s >> endIndex;
   point = resolver.findLevelBlock(endIndex);
   if (point == (FlowBlock *)0)
     throw LowlevelError("Bad serialized edge in block graph");
-  istringstream s2(el->getAttributeValue("rev"));
-  s2.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+  std::istringstream s2(el->getAttributeValue("rev"));
+  s2.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
   s2 >> reverse_index;
 }
 
@@ -253,11 +253,11 @@ void FlowBlock::markLabelBumpUp(bool bump)
 }
 
 /// Block references are updated using the getCopyMap() reference on the original block
-/// \param vec is the list of edges whose block references should be updated
-void FlowBlock::replaceEdgeMap(vector<BlockEdge> &vec)
+/// \param vec is the std::list of edges whose block references should be updated
+void FlowBlock::replaceEdgeMap(std::vector<BlockEdge> &vec)
 
 {
-  vector<BlockEdge>::iterator iter;
+  std::vector<BlockEdge>::iterator iter;
 
   for(iter=vec.begin();iter!=vec.end();++iter)
     (*iter).point = (*iter).point->getCopyMap();
@@ -433,12 +433,12 @@ void FlowBlock::eliminateOutDups(FlowBlock *bl)
 
 /// \brief Find blocks that are at the end of multiple edges
 ///
-/// \param ref is the list of BlockEdges to search
-/// \param duplist will contain the list of blocks with duplicate edges
-void FlowBlock::findDups(const vector<BlockEdge> &ref,vector<FlowBlock *> &duplist)
+/// \param ref is the std::list of BlockEdges to search
+/// \param duplist will contain the std::list of blocks with duplicate edges
+void FlowBlock::findDups(const std::vector<BlockEdge> &ref,std::vector<FlowBlock *> &duplist)
 
 {
-  vector<BlockEdge>::const_iterator iter;
+  std::vector<BlockEdge>::const_iterator iter;
 
   for(iter=ref.begin();iter!=ref.end();++iter) {
     if (((*iter).point->flags&f_mark2)!=0) continue; // Already marked as a duplicate
@@ -456,8 +456,8 @@ void FlowBlock::findDups(const vector<BlockEdge> &ref,vector<FlowBlock *> &dupli
 void FlowBlock::dedup(void)
 
 {
-  vector<FlowBlock *> duplist;
-  vector<FlowBlock *>::iterator iter;
+  std::vector<FlowBlock *> duplist;
+  std::vector<FlowBlock *>::iterator iter;
 
   findDups(intothis,duplist);
   for(iter=duplist.begin();iter!=duplist.end();++iter)
@@ -535,7 +535,7 @@ int4 FlowBlock::getOutIndex(const FlowBlock *bl) const
 void FlowBlock::printHeader(std::ostream &s) const
 
 {
-  s << dec << index << ' ' << getStart() << '-' << getStop();
+  s << std::dec << index << ' ' << getStart() << '-' << getStop();
 }
 
 /// Recursively print out the hierarchical structure of \b this FlowBlock.
@@ -549,7 +549,7 @@ void FlowBlock::printTree(std::ostream &s,int4 level) const
   for(i=0;i<level;++i)
     s << "  ";
   printHeader(s);
-  s << endl;
+  s << std::endl;
 }
 
 /// If \b this FlowBlock was ends with a computed jump, retrieve
@@ -602,7 +602,7 @@ std::string FlowBlock::typeToName(FlowBlock::block_type bt)
   case t_multigoto:
     return "multigoto";
   case t_ls:
-    return "list";
+    return "std::list";
   case t_condition:
     return "condition";
   case t_if:
@@ -706,7 +706,7 @@ FlowBlock *FlowBlock::findCommonBlock(FlowBlock *bl1,FlowBlock *bl2)
   return common;
 }
 
-/// Add the given FlowBlock to the list and make \b this the parent
+/// Add the given FlowBlock to the std::list and make \b this the parent
 /// Update \b index so that it has the minimum over all components
 /// \param bl is the given FlowBlock
 void BlockGraph::addBlock(FlowBlock *bl)
@@ -714,14 +714,14 @@ void BlockGraph::addBlock(FlowBlock *bl)
 {
   int4 min = bl->index;
 
-  if (list.empty()) {
+  if (std::list.empty()) {
     index = min;
   }
   else {
     if (min < index) index = min;
   }
   bl->parent = this;
-  list.push_back(bl);
+  std::list.push_back(bl);
 }
 
 /// Force \b this FlowBlock to have the indicated number of outputs.
@@ -738,19 +738,19 @@ void BlockGraph::forceOutputNum(int4 i)
     addInEdge(this,f_loop_edge|f_back_edge);
 }
 
-/// Examine the set of components and their incoming and outgoing edges.  If both
-/// ends of the edge are not within the set, then \b this block inherits the edge.
-/// A formal BlockEdge is added between \b this and the FlowBlock outside the set.
+/// Examine the std::set of components and their incoming and outgoing edges.  If both
+/// ends of the edge are not within the std::set, then \b this block inherits the edge.
+/// A formal BlockEdge is added between \b this and the FlowBlock outside the std::set.
 /// The edges are deduplicated.
 void BlockGraph::selfIdentify(void)
 
 {
-  vector<BlockEdge>::iterator tmp;
-  vector<FlowBlock *>::iterator iter;
+  std::vector<BlockEdge>::iterator tmp;
+  std::vector<FlowBlock *>::iterator iter;
   FlowBlock *mybl,*otherbl;
 
-  if (list.empty()) return;
-  for(iter=list.begin();iter!=list.end();++iter) {
+  if (std::list.empty()) return;
+  for(iter=std::list.begin();iter!=std::list.end();++iter) {
     mybl = *iter;
     int4 i = 0;
     while(i<mybl->intothis.size()) {
@@ -783,15 +783,15 @@ void BlockGraph::selfIdentify(void)
 
 /// \brief Move nodes from \b this into a new BlockGraph
 ///
-/// This does most of the work of collapsing a set of components in \b this
+/// This does most of the work of collapsing a std::set of components in \b this
 /// into a single node. The components are removed from \b this, put in the new FlowBlock
 /// and adjusts edges. The new FlowBlock must be added back into \b this.
 /// \param ident is the new FlowBlock
-/// \param nodes is the list component FlowBlocks to move
-void BlockGraph::identifyInternal(BlockGraph *ident,const vector<FlowBlock *> &nodes)
+/// \param nodes is the std::list component FlowBlocks to move
+void BlockGraph::identifyInternal(BlockGraph *ident,const std::vector<FlowBlock *> &nodes)
 
 {
-  vector<FlowBlock *>::const_iterator iter;
+  std::vector<FlowBlock *>::const_iterator iter;
   for(iter=nodes.begin();iter!=nodes.end();++iter) {
 #ifdef BLOCKCONSISTENT_DEBUG
     if ((*iter)->parent != this)
@@ -801,26 +801,26 @@ void BlockGraph::identifyInternal(BlockGraph *ident,const vector<FlowBlock *> &n
     ident->addBlock(*iter);	// Maintain order of blocks
     ident->flags |= ((*iter)->flags & (f_interior_gotoout | f_interior_gotoin));
   }
-  vector<FlowBlock *> newlist;
-  for(iter=list.begin();iter!=list.end();++iter) { // Remove -nodes- from our list
+  std::vector<FlowBlock *> newlist;
+  for(iter=std::list.begin();iter!=std::list.end();++iter) { // Remove -nodes- from our std::list
     if (!(*iter)->isMark())
       newlist.push_back(*iter);
     else
       (*iter)->clearMark();
   }
-  list = newlist;
+  std::list = newlist;
 
   ident->selfIdentify();
 }
 
-/// \param flags is the set of boolean properties
+/// \param flags is the std::set of boolean properties
 void BlockGraph::clearEdgeFlags(uint4 flags)
 
 {
   flags = ~flags;
-  int4 size = list.size();
+  int4 size = std::list.size();
   for(int4 i=0;i<size;++i) {
-    FlowBlock *bl = list[i];
+    FlowBlock *bl = std::list[i];
     for(int4 i=0;i<bl->intothis.size();++i)
       bl->intothis[i].label &= flags;
     for(int4 i=0;i<bl->outofthis.size();++i)
@@ -834,9 +834,9 @@ void BlockGraph::clearEdgeFlags(uint4 flags)
 /// this routine creates an artificial root with no \e in edges and an \e out
 /// edge to each of the real entry points.  The resulting root FlowBlock isn't
 /// owned by any BlockGraph, and the caller is responsible for freeing it.
-/// \param rootlist is the given set of entry point FlowBlocks
+/// \param rootlist is the given std::set of entry point FlowBlocks
 /// \return the new artificial root FlowBlock
-FlowBlock *BlockGraph::createVirtualRoot(const vector<FlowBlock *> &rootlist)
+FlowBlock *BlockGraph::createVirtualRoot(const std::vector<FlowBlock *> &rootlist)
 
 {
   FlowBlock *newroot = new FlowBlock();
@@ -855,24 +855,24 @@ FlowBlock *BlockGraph::createVirtualRoot(const vector<FlowBlock *> &rootlist)
 ///
 /// Algorithm originally due to Tarjan.
 /// The first block is the entry block, and should remain the first block
-/// \param preorder will hold the list of FlowBlock components in pre-order
-/// \param rootlist will hold the list of entry points
-void BlockGraph::findSpanningTree(vector<FlowBlock *> &preorder,vector<FlowBlock *> &rootlist)
+/// \param preorder will hold the std::list of FlowBlock components in pre-order
+/// \param rootlist will hold the std::list of entry points
+void BlockGraph::findSpanningTree(std::vector<FlowBlock *> &preorder,std::vector<FlowBlock *> &rootlist)
 
 {
-  if (list.size()==0) return;
-  vector<FlowBlock *> rpostorder;
-  vector<FlowBlock *> state;
-  vector<int4> istate;
+  if (std::list.size()==0) return;
+  std::vector<FlowBlock *> rpostorder;
+  std::vector<FlowBlock *> state;
+  std::vector<int4> istate;
   FlowBlock *tmpbl;
   int4 origrootpos;
 
-  preorder.reserve(list.size());
-  rpostorder.resize(list.size());
-  state.reserve(list.size());
-  istate.reserve(list.size());
-  for(int4 i=0;i<list.size();++i) {
-    tmpbl = list[i];
+  preorder.reserve(std::list.size());
+  rpostorder.resize(std::list.size());
+  state.reserve(std::list.size());
+  istate.reserve(std::list.size());
+  for(int4 i=0;i<std::list.size();++i) {
+    tmpbl = std::list[i];
     tmpbl->index = -1;	// reverse post-order starts at 0
     tmpbl->visitcount = -1;
     tmpbl->copymap = tmpbl;
@@ -885,16 +885,16 @@ void BlockGraph::findSpanningTree(vector<FlowBlock *> &preorder,vector<FlowBlock
     rootlist[0] = tmpbl;
   }
   else if (rootlist.size() == 0) {	// If there's no obvious starting block
-    rootlist.push_back(list[0]);	// Assume first block is entry point
+    rootlist.push_back(std::list[0]);	// Assume first block is entry point
   }
   origrootpos = rootlist.size()-1; // Position of original head in rootlist
 
   for(int4 repeat=0;repeat<2;++repeat) {
     bool extraroots = false;
-    int4 rpostcount = list.size();
+    int4 rpostcount = std::list.size();
     int4 rootindex = 0;
     clearEdgeFlags(~((uint4)0));	// Clear all edge flags
-    while(preorder.size() < list.size()) {
+    while(preorder.size() < std::list.size()) {
       FlowBlock *startbl = (FlowBlock *)0;
       while(rootindex<rootlist.size()) { // Go thru blocks with no in edges
 	startbl = rootlist[rootindex];
@@ -909,8 +909,8 @@ void BlockGraph::findSpanningTree(vector<FlowBlock *> &preorder,vector<FlowBlock
       }
       if (startbl == (FlowBlock *)0) {	// If we didn't find one, just take next unvisited
 	extraroots = true;
-	for(int4 i=0;i<list.size();++i) {
-	  startbl = list[i];
+	for(int4 i=0;i<std::list.size();++i) {
+	  startbl = std::list[i];
 	  if (startbl->visitcount == -1) break;
 	}
 	rootlist.push_back(startbl); // We have to treat this block as another root
@@ -966,8 +966,8 @@ void BlockGraph::findSpanningTree(vector<FlowBlock *> &preorder,vector<FlowBlock
     rootlist[rootlist.size()-1] = rootlist[origrootpos]; // Move entry block to last position in rootlist
     rootlist[origrootpos] = tmpbl;
 
-    for(int4 i=0;i<list.size();++i) {
-      tmpbl = list[i];
+    for(int4 i=0;i<std::list.size();++i) {
+      tmpbl = std::list[i];
       tmpbl->index = -1;	// reverse post-order starts at 0
       tmpbl->visitcount = -1;
       tmpbl->copymap = tmpbl;
@@ -983,7 +983,7 @@ void BlockGraph::findSpanningTree(vector<FlowBlock *> &preorder,vector<FlowBlock
     rootlist[0] = tmpbl;
   }
   
-  list = rpostorder;
+  std::list = rpostorder;
 }
 
 /// \brief Identify irreducible edges
@@ -992,13 +992,13 @@ void BlockGraph::findSpanningTree(vector<FlowBlock *> &preorder,vector<FlowBlock
 /// test for and label and irreducible edges (the test ignores any edges already labeled as irreducible).
 /// Return \b true if the spanning tree needs to be rebuilt, because one of the tree edges is irreducible.
 /// Original algorithm due to Tarjan.
-/// \param preorder is the list of FlowBlocks in pre-order
+/// \param preorder is the std::list of FlowBlocks in pre-order
 /// \param irreduciblecount will hold the number of irreducible edges
 /// \return true if the spanning tree needs to be rebuilt
-bool BlockGraph::findIrreducible(const vector<FlowBlock *> &preorder,int4 &irreduciblecount)
+bool BlockGraph::findIrreducible(const std::vector<FlowBlock *> &preorder,int4 &irreduciblecount)
 
 {
-  vector<FlowBlock *> reachunder; // The current reachunder set being built (also with mark set on each block)
+  std::vector<FlowBlock *> reachunder; // The current reachunder std::set being built (also with mark std::set on each block)
   bool needrebuild = false;
   int4 xi = preorder.size()-1;
   while(xi >= 0) {		// For each vertex in reverse pre-order
@@ -1008,7 +1008,7 @@ bool BlockGraph::findIrreducible(const vector<FlowBlock *> &preorder,int4 &irred
     for(int4 i=0;i<sizein;++i) {
       if (!x->isBackEdgeIn(i)) continue; // For each back-edge into x
       FlowBlock *y = x->getIn(i);
-      if (y==x) continue;	// Reachunder set does not include the loop head
+      if (y==x) continue;	// Reachunder std::set does not include the loop head
       reachunder.push_back(y->copymap);	// Add FIND(y) to reachunder
       y->copymap->setMark();
     }
@@ -1072,15 +1072,15 @@ void BlockGraph::forceFalseEdge(const FlowBlock *out0)
 void BlockGraph::swapBlocks(int4 i,int4 j)
 
 {
-  FlowBlock *bl = list[i];
-  list[i] = list[j];
-  list[j] = bl;
+  FlowBlock *bl = std::list[i];
+  std::list[i] = std::list[j];
+  std::list[j] = bl;
 }
 
 /// For the given BlockGraph find the first component leaf FlowBlock and
-/// set its properties
+/// std::set its properties
 /// \param bl is the given BlockGraph
-/// \param fl is the property to set
+/// \param fl is the property to std::set
 void BlockGraph::markCopyBlock(FlowBlock *bl,uint4 fl)
 
 {
@@ -1090,19 +1090,19 @@ void BlockGraph::markCopyBlock(FlowBlock *bl,uint4 fl)
 void BlockGraph::clear(void)
 
 {
-  vector<FlowBlock *>::iterator iter;
+  std::vector<FlowBlock *>::iterator iter;
 
-  for(iter=list.begin();iter!=list.end();++iter)
+  for(iter=std::list.begin();iter!=std::list.end();++iter)
     delete *iter;
-  list.clear();
+  std::list.clear();
 }
 
 void BlockGraph::markUnstructured(void)
 
 {
-  vector<FlowBlock *>::iterator iter;
+  std::vector<FlowBlock *>::iterator iter;
 
-  for(iter=list.begin();iter!=list.end();++iter)
+  for(iter=std::list.begin();iter!=std::list.end();++iter)
     (*iter)->markUnstructured(); // Recurse
 }
   
@@ -1110,26 +1110,26 @@ void BlockGraph::markLabelBumpUp(bool bump)
 
 {
   FlowBlock::markLabelBumpUp(bump); // Mark ourselves if true
-  if (list.empty()) return;
-  vector<FlowBlock *>::iterator iter = list.begin();
+  if (std::list.empty()) return;
+  std::vector<FlowBlock *>::iterator iter = std::list.begin();
   (*iter)->markLabelBumpUp(bump); // Only pass true down to first subblock
   ++iter;
-  for(;iter!=list.end();++iter)
+  for(;iter!=std::list.end();++iter)
     (*iter)->markLabelBumpUp(false);
 }
 
 void BlockGraph::scopeBreak(int4 curexit,int4 curloopexit)
 
 {
-  vector<FlowBlock *>::iterator iter;
+  std::vector<FlowBlock *>::iterator iter;
   FlowBlock *curbl;
   int4 ind;
 
-  iter = list.begin();
-  while(iter != list.end()) {
+  iter = std::list.begin();
+  while(iter != std::list.end()) {
     curbl = *iter;
     ++iter;
-    if (iter == list.end())
+    if (iter == std::list.end())
       ind = curexit;
     else
       ind = (*iter)->getIndex();
@@ -1141,21 +1141,21 @@ void BlockGraph::scopeBreak(int4 curexit,int4 curloopexit)
 void BlockGraph::printTree(std::ostream &s,int4 level) const
 
 {
-  vector<FlowBlock *>::const_iterator iter;
+  std::vector<FlowBlock *>::const_iterator iter;
 
   FlowBlock::printTree(s,level);
-  for(iter=list.begin();iter!=list.end();++iter)
+  for(iter=std::list.begin();iter!=std::list.end();++iter)
     (*iter)->printTree(s,level+1);
 }
 
 void BlockGraph::printRaw(std::ostream &s) const
 
 {
-  vector<FlowBlock *>::const_iterator iter;
+  std::vector<FlowBlock *>::const_iterator iter;
 
   printHeader(s);
-  s << endl;
-  for(iter=list.begin();iter!=list.end();++iter)
+  s << std::endl;
+  for(iter=std::list.begin();iter!=std::list.end();++iter)
     (*iter)->printRaw(s);
 }
 
@@ -1163,12 +1163,12 @@ FlowBlock *BlockGraph::nextFlowAfter(const FlowBlock *bl) const
 
 {
   FlowBlock *nextbl;
-  vector<FlowBlock *>::const_iterator iter;
-  for(iter=list.begin();iter!=list.end();++iter)
+  std::vector<FlowBlock *>::const_iterator iter;
+  for(iter=std::list.begin();iter!=std::list.end();++iter)
     if ((*iter)==bl)
       break;
   ++iter;			// Find the first block after bl
-  if (iter == list.end()) {
+  if (iter == std::list.end()) {
     if (getParent() == (FlowBlock *)0)
       return (FlowBlock *)0;
     return getParent()->nextFlowAfter(this);
@@ -1182,8 +1182,8 @@ FlowBlock *BlockGraph::nextFlowAfter(const FlowBlock *bl) const
 void BlockGraph::orderSwitchCases(void) const
 
 {
-  vector<FlowBlock *>::const_iterator iter;
-  for(iter=list.begin();iter!=list.end();++iter)
+  std::vector<FlowBlock *>::const_iterator iter;
+  for(iter=std::list.begin();iter!=std::list.end();++iter)
     (*iter)->orderSwitchCases();
 }
 
@@ -1191,8 +1191,8 @@ void BlockGraph::saveXmlBody(std::ostream &s) const
 
 {
   FlowBlock::saveXmlBody(s);
-  for(int4 i=0;i<list.size();++i) {
-    FlowBlock *bl = list[i];
+  for(int4 i=0;i<std::list.size();++i) {
+    FlowBlock *bl = std::list[i];
     s << "<bhead";
     a_v_i(s,"index",bl->getIndex());
     FlowBlock::block_type bt = bl->getType();
@@ -1211,8 +1211,8 @@ void BlockGraph::saveXmlBody(std::ostream &s) const
     a_v(s,"type",nm);
     s << "/>\n";
   }
-  for(int4 i=0;i<list.size();++i)
-    list[i]->saveXml(s);
+  for(int4 i=0;i<std::list.size();++i)
+    std::list[i]->saveXml(s);
 }
 
 void BlockGraph::restoreXmlBody(List::const_iterator &iter,List::const_iterator enditer,BlockMap &resolver)
@@ -1220,19 +1220,19 @@ void BlockGraph::restoreXmlBody(List::const_iterator &iter,List::const_iterator 
 {
   BlockMap newresolver(resolver);
   FlowBlock::restoreXmlBody(iter,enditer,newresolver);
-  vector<FlowBlock *> tmplist;
+  std::vector<FlowBlock *> tmplist;
 
   while(iter != enditer) {
     const Element *el = *iter;
     if (el->getName() != "bhead") break;
     ++iter;
     int4 newindex;
-    istringstream s(el->getAttributeValue("index"));
-    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+    std::istringstream s(el->getAttributeValue("index"));
+    s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
     s >> newindex;
     const std::string &nm( el->getAttributeValue("type") );
     FlowBlock *bl = newresolver.createBlock(nm);
-    bl->index = newindex;	// Need to set index here for sort
+    bl->index = newindex;	// Need to std::set index here for sort
     tmplist.push_back(bl);
   }
   newresolver.sortList();
@@ -1336,7 +1336,7 @@ void BlockGraph::moveOutEdge(FlowBlock *blold,int4 slot,FlowBlock *blnew)
   outbl->replaceInEdge(i,blnew);
 }
 
-/// The indicated block is pulled out of the component list and deleted.
+/// The indicated block is pulled out of the component std::list and deleted.
 /// Any edges between it and the rest of the BlockGraph are simply removed.
 /// \param bl is the indicated block
 void BlockGraph::removeBlock(FlowBlock *bl)
@@ -1346,15 +1346,15 @@ void BlockGraph::removeBlock(FlowBlock *bl)
   if (bl->parent != this)
     throw LowlevelError("Bad block remove");
 #endif
-  vector<FlowBlock *>::iterator iter;
+  std::vector<FlowBlock *>::iterator iter;
   while(bl->sizeIn()>0)		// Rip the block out of the graph
     removeEdge(bl->getIn(0),bl);
   while(bl->sizeOut()>0)
     removeEdge(bl,bl->getOut(0));
 
-  for(iter=list.begin();iter!=list.end();++iter)
+  for(iter=std::list.begin();iter!=std::list.end();++iter)
     if (*iter == bl) {
-      list.erase(iter);
+      std::list.erase(iter);
       break;
     }
   delete bl;			// Free up memory
@@ -1444,7 +1444,7 @@ void BlockGraph::spliceBlock(FlowBlock *bl)
   bl->flags = fl1 | fl2;
 }
 
-/// The component list is reordered to make the given FlowBlock first.
+/// The component std::list is reordered to make the given FlowBlock first.
 /// The \e f_entry_point property is updated.
 /// \param bl is the given FlowBlock to make the entry point
 void BlockGraph::setStartBlock(FlowBlock *bl)
@@ -1452,20 +1452,20 @@ void BlockGraph::setStartBlock(FlowBlock *bl)
 {
 #ifdef BLOCKCONSISTENT_DEBUG
   if (bl->parent != this)
-    throw LowlevelError("Bad set start");
+    throw LowlevelError("Bad std::set start");
 #endif
-  if ((list[0]->flags&f_entry_point)!=0) {
-    if (bl == list[0]) return;	// Already set as start block
-    list[0]->flags &= ~f_entry_point; // Remove old entry point
+  if ((std::list[0]->flags&f_entry_point)!=0) {
+    if (bl == std::list[0]) return;	// Already std::set as start block
+    std::list[0]->flags &= ~f_entry_point; // Remove old entry point
   }
 
   int4 i;
-  for(i=0;i<list.size();++i)
-    if (list[i] == bl) break;
+  for(i=0;i<std::list.size();++i)
+    if (std::list[i] == bl) break;
 
   for(int4 j=i;j>0;--j)		// Slide everybody down
-    list[j] = list[j-1];
-  list[0] = bl;
+    std::list[j] = std::list[j-1];
+  std::list[0] = bl;
   bl->flags |= f_entry_point;
 }
 
@@ -1474,9 +1474,9 @@ void BlockGraph::setStartBlock(FlowBlock *bl)
 FlowBlock *BlockGraph::getStartBlock(void) const
 
 {
-  if (list.empty() || ((list[0]->flags&f_entry_point)==0))
+  if (std::list.empty() || ((std::list[0]->flags&f_entry_point)==0))
     throw LowlevelError("No start block registered");
-  return list[0];
+  return std::list[0];
 }
 
 /// Add the new FlowBlock to \b this
@@ -1528,7 +1528,7 @@ BlockGoto *BlockGraph::newBlockGoto(FlowBlock *bl)
 
 {
   BlockGoto *ret = new BlockGoto(bl->getOut(0));
-  vector<FlowBlock *> nodes;
+  std::vector<FlowBlock *> nodes;
   nodes.push_back(bl);
   identifyInternal(ret,nodes);
   addBlock(ret);
@@ -1557,7 +1557,7 @@ BlockMultiGoto *BlockGraph::newBlockMultiGoto(FlowBlock *bl,int4 outedge)
   }
   else {
     ret = new BlockMultiGoto(bl);
-    vector<FlowBlock *> nodes;
+    std::vector<FlowBlock *> nodes;
     nodes.push_back(bl);
     identifyInternal(ret,nodes);
     addBlock(ret);
@@ -1571,9 +1571,9 @@ BlockMultiGoto *BlockGraph::newBlockMultiGoto(FlowBlock *bl,int4 outedge)
 }
 
 /// Add the new BlockList to \b this, collapsing the given FlowBlock components into it.
-/// \param nodes is the given set of FlowBlocks components
+/// \param nodes is the given std::set of FlowBlocks components
 /// \return the new BlockList
-BlockList *BlockGraph::newBlockList(const vector<FlowBlock *> &nodes)
+BlockList *BlockGraph::newBlockList(const std::vector<FlowBlock *> &nodes)
 
 {
   const FlowBlock *out0 = (const FlowBlock *)0;
@@ -1599,7 +1599,7 @@ BlockCondition *BlockGraph::newBlockCondition(FlowBlock *b1,FlowBlock *b2)
 
 {
   const FlowBlock *out0 = b2->getOut(0);
-  vector<FlowBlock *> nodes;
+  std::vector<FlowBlock *> nodes;
   OpCode opc = (b1->getFalseOut() == b2) ? CPUI_INT_OR : CPUI_INT_AND;
   BlockCondition *ret = new BlockCondition(opc);
   nodes.push_back(b1);
@@ -1621,7 +1621,7 @@ BlockIf *BlockGraph::newBlockIfGoto(FlowBlock *cond)
     throw LowlevelError("Building ifgoto where true branch is not the goto");
 
   const FlowBlock *out0 = cond->getOut(0);
-  vector<FlowBlock *> nodes;
+  std::vector<FlowBlock *> nodes;
   BlockIf *ret = new BlockIf();
   ret->setGotoTarget(cond->getOut(1)); // Store the target
   nodes.push_back(cond);
@@ -1640,7 +1640,7 @@ BlockIf *BlockGraph::newBlockIfGoto(FlowBlock *cond)
 BlockIf *BlockGraph::newBlockIf(FlowBlock *cond,FlowBlock *tc)
 
 {
-  vector<FlowBlock *> nodes;
+  std::vector<FlowBlock *> nodes;
   BlockIf *ret = new BlockIf();
   nodes.push_back(cond);
   nodes.push_back(tc);
@@ -1658,7 +1658,7 @@ BlockIf *BlockGraph::newBlockIf(FlowBlock *cond,FlowBlock *tc)
 BlockIf *BlockGraph::newBlockIfElse(FlowBlock *cond,FlowBlock *tc,FlowBlock *fc)
 
 {
-  vector<FlowBlock *> nodes;
+  std::vector<FlowBlock *> nodes;
   BlockIf *ret = new BlockIf();
   nodes.push_back(cond);
   nodes.push_back(tc);
@@ -1676,7 +1676,7 @@ BlockIf *BlockGraph::newBlockIfElse(FlowBlock *cond,FlowBlock *tc,FlowBlock *fc)
 BlockWhileDo *BlockGraph::newBlockWhileDo(FlowBlock *cond,FlowBlock *cl)
 
 {
-  vector<FlowBlock *> nodes;
+  std::vector<FlowBlock *> nodes;
   BlockWhileDo *ret = new BlockWhileDo();
   nodes.push_back(cond);
   nodes.push_back(cl);
@@ -1692,7 +1692,7 @@ BlockWhileDo *BlockGraph::newBlockWhileDo(FlowBlock *cond,FlowBlock *cl)
 BlockDoWhile *BlockGraph::newBlockDoWhile(FlowBlock *condcl)
 
 {
-  vector<FlowBlock *> nodes;
+  std::vector<FlowBlock *> nodes;
   BlockDoWhile *ret = new BlockDoWhile();
   nodes.push_back(condcl);
   identifyInternal(ret,nodes);
@@ -1707,7 +1707,7 @@ BlockDoWhile *BlockGraph::newBlockDoWhile(FlowBlock *condcl)
 BlockInfLoop *BlockGraph::newBlockInfLoop(FlowBlock *body)
 
 {
-  vector<FlowBlock *> nodes;
+  std::vector<FlowBlock *> nodes;
   BlockInfLoop *ret = new BlockInfLoop();
   nodes.push_back(body);
   identifyInternal(ret,nodes);
@@ -1716,9 +1716,9 @@ BlockInfLoop *BlockGraph::newBlockInfLoop(FlowBlock *body)
 }
 
 /// Add the new BlockSwitch to \b this, collapsing all the case FlowBlocks into it.
-/// \param cs is the list of case FlowBlocks
+/// \param cs is the std::list of case FlowBlocks
 /// \return the new BlockSwitch
-BlockSwitch *BlockGraph::newBlockSwitch(const vector<FlowBlock *> &cs)
+BlockSwitch *BlockGraph::newBlockSwitch(const std::vector<FlowBlock *> &cs)
 
 {
   FlowBlock *rootbl = cs[0];
@@ -1741,46 +1741,46 @@ void BlockGraph::buildCopy(const BlockGraph &graph)
 
 {
   BlockCopy *copyblock;
-  int4 startsize = list.size();
-  vector<FlowBlock *>::const_iterator iter;
+  int4 startsize = std::list.size();
+  std::vector<FlowBlock *>::const_iterator iter;
   
-  for(iter=graph.list.begin();iter!=graph.list.end();++iter) {
+  for(iter=graph.std::list.begin();iter!=graph.std::list.end();++iter) {
     copyblock = newBlockCopy(*iter);
-    (*iter)->copymap = copyblock; // Store map basic->copy
+    (*iter)->copymap = copyblock; // Store std::map basic->copy
   }
-  for(iter=list.begin()+startsize;iter!=list.end();++iter)
+  for(iter=std::list.begin()+startsize;iter!=std::list.end();++iter)
     (*iter)->replaceUsingMap();
 }
 
 void BlockGraph::clearVisitCount(void)
 
 {
-  for(int4 i=0;i<list.size();++i)
-    list[i]->visitcount = 0;
+  for(int4 i=0;i<std::list.size();++i)
+    std::list[i]->visitcount = 0;
 }
 
 /// Calculate the immediate dominator for each FlowBlock node in \b this BlockGraph,
 /// for forward control-flow.
-/// The algorithm must be provided a list of entry points for the graph.
+/// The algorithm must be provided a std::list of entry points for the graph.
 /// We assume the blocks are in reverse post-order and this is reflected in the index field.
 /// Using an algorithm by Cooper, Harvey, and Kennedy.
 /// Softw. Pract. Exper. 2001; 4: 1-10
-/// \param rootlist is the list of entry point FlowBlocks
-void BlockGraph::calcForwardDominator(const vector<FlowBlock *> &rootlist)
+/// \param rootlist is the std::list of entry point FlowBlocks
+void BlockGraph::calcForwardDominator(const std::vector<FlowBlock *> &rootlist)
 
 {
-  vector<FlowBlock *> postorder;
+  std::vector<FlowBlock *> postorder;
   FlowBlock *virtualroot;
   FlowBlock *b,*new_idom,*rho;
   bool changed;
   int4 i,j,finger1,finger2;
 
-  if (list.empty()) return;
-  int4 numnodes = list.size()-1;
-  postorder.resize(list.size());
-  for(i=0;i<list.size();++i) {
-    list[i]->immed_dom = (FlowBlock *)0; // Clear the dominator field
-    postorder[ numnodes-i ] = list[i]; // Construct a forward post order list
+  if (std::list.empty()) return;
+  int4 numnodes = std::list.size()-1;
+  postorder.resize(std::list.size());
+  for(i=0;i<std::list.size();++i) {
+    std::list[i]->immed_dom = (FlowBlock *)0; // Clear the dominator field
+    postorder[ numnodes-i ] = std::list[i]; // Construct a forward post order std::list
   }
   if (rootlist.size() > 1) {
     virtualroot = createVirtualRoot(rootlist);
@@ -1835,7 +1835,7 @@ void BlockGraph::calcForwardDominator(const vector<FlowBlock *> &rootlist)
     }
   }
   if (virtualroot != (FlowBlock *)0) { // If there was a virtual root, excise it from the dominator tree
-    for(i=0;i<list.size();++i)
+    for(i=0;i<std::list.size();++i)
       if (postorder[i]->immed_dom == virtualroot)
 	postorder[i]->immed_dom = (FlowBlock *)0; // Remove the dominator link to virtualroot
     while(virtualroot->sizeOut() > 0)
@@ -1846,21 +1846,21 @@ void BlockGraph::calcForwardDominator(const vector<FlowBlock *> &rootlist)
     postorder.back()->immed_dom = (FlowBlock *)0;
 }
 
-/// Associate dominator children with each node via a list (of lists) indexed by the FlowBlock index.
-/// \param child is the initially empty list of lists
-void BlockGraph::buildDomTree(vector<vector<FlowBlock *> > &child) const
+/// Associate dominator children with each node via a std::list (of lists) indexed by the FlowBlock index.
+/// \param child is the initially empty std::list of lists
+void BlockGraph::buildDomTree(std::vector<std::vector<FlowBlock *> > &child) const
 
 {
   FlowBlock *bl;
 
   child.clear();
-  child.resize(list.size()+1);
-  for(int4 i=0;i<list.size();++i) {
-    bl = list[i];
+  child.resize(std::list.size()+1);
+  for(int4 i=0;i<std::list.size();++i) {
+    bl = std::list[i];
     if (bl->immed_dom != (FlowBlock *)0)
       child[bl->immed_dom->index].push_back(bl);
     else
-      child[list.size()].push_back(bl);
+      child[std::list.size()].push_back(bl);
   }
 }
 
@@ -1868,15 +1868,15 @@ void BlockGraph::buildDomTree(vector<vector<FlowBlock *> > &child) const
 /// The dominator root has depth 1, the nodes it immediately dominates have depth 2, etc.
 /// \param depth is array that will be populated with depths
 /// \return the maximum depth across all nodes
-int4 BlockGraph::buildDomDepth(vector<int4> &depth) const
+int4 BlockGraph::buildDomDepth(std::vector<int4> &depth) const
 
 {
   FlowBlock *bl;
   int4 max = 0;
 
-  depth.resize(list.size()+1);
-  for(int4 i=0;i<list.size();++i) {
-    bl = list[i]->immed_dom;
+  depth.resize(std::list.size()+1);
+  for(int4 i=0;i<std::list.size();++i) {
+    bl = std::list[i]->immed_dom;
     if (bl != (FlowBlock *)0)
       depth[i] = depth[bl->getIndex()] + 1;
     else
@@ -1884,22 +1884,22 @@ int4 BlockGraph::buildDomDepth(vector<int4> &depth) const
     if (max<depth[i])
       max = depth[i];
   }
-  depth[list.size()] = 0;
+  depth[std::list.size()] = 0;
   return max;
 }
 
 /// Collect all nodes in the dominator sub-tree starting at a given root FlowBlock.
 /// We assume blocks in are reverse post order.
-/// \param res will hold the list of nodes in the sub-tree
+/// \param res will hold the std::list of nodes in the sub-tree
 /// \param root is the given root FlowBlock
-void BlockGraph::buildDomSubTree(vector<FlowBlock *> &res,FlowBlock *root) const
+void BlockGraph::buildDomSubTree(std::vector<FlowBlock *> &res,FlowBlock *root) const
 
 {
   FlowBlock *bl,*dombl;
   int4 rootindex = root->getIndex();
   res.push_back(root);
-  for(int4 i=rootindex+1;i<list.size();++i) {
-    bl = list[i];
+  for(int4 i=rootindex+1;i<std::list.size();++i) {
+    bl = std::list[i];
     dombl = bl->getImmedDom();
     if (dombl == (FlowBlock *)0) break;
     if (dombl->getIndex() > rootindex) break;
@@ -1907,12 +1907,12 @@ void BlockGraph::buildDomSubTree(vector<FlowBlock *> &res,FlowBlock *root) const
   }
 }
 
-/// This algorithm identifies a set of edges such that,
+/// This algorithm identifies a std::set of edges such that,
 /// if the edges are removed, the remaining graph has NO directed cycles
 /// The algorithm works as follows:
 /// Starting from the start block, do a depth first search through the "out" edges
 /// of the block.  If the outblock is already on the current path from root to node,
-/// we have found a cycle, we add the last edge to the list and continue pretending
+/// we have found a cycle, we add the last edge to the std::list and continue pretending
 /// that edge didn't exist.  If the outblock is not on the current path but has
 /// been visited before, we can truncate the search.
 /// This is now only applied as a failsafe if the graph has irreducible edges.
@@ -1921,18 +1921,18 @@ void BlockGraph::calcLoop(void)
 {				// Look for directed cycles in graph
 				// Mark edges (loopedges) that can be removed
 				// to prevent looping
-  vector<FlowBlock *>::iterator iter;
+  std::vector<FlowBlock *>::iterator iter;
   FlowBlock *bl,*nextbl;
   int4 i;
 
-  if (list.empty()) return;	// Nothing to do
+  if (std::list.empty()) return;	// Nothing to do
 
-  vector<FlowBlock *> path;		// Current depth first path
-  vector<int4> state;
+  std::vector<FlowBlock *> path;		// Current depth first path
+  std::vector<int4> state;
 
-  path.push_back(list.front());
+  path.push_back(std::list.front());
   state.push_back(0);		// No children visited yet
-  list.front()->setFlag(f_mark|f_mark2); // Mark this node as visited and on path
+  std::list.front()->setFlag(f_mark|f_mark2); // Mark this node as visited and on path
   while(!path.empty()) {
     bl = path.back();
     i = state.back();
@@ -1957,7 +1957,7 @@ void BlockGraph::calcLoop(void)
       }
     }
   }
-  for(iter=list.begin();iter!=list.end();++iter)
+  for(iter=std::list.begin();iter!=std::list.end();++iter)
     (*iter)->clearFlag(f_mark|f_mark2);	// Clear our marks
 }
 
@@ -1966,7 +1966,7 @@ void BlockGraph::calcLoop(void)
 /// \param res will hold the reachable or unreachable FlowBlocks
 /// \param bl is the starting FlowBlock
 /// \param un toggles reachable,unreachable
-void BlockGraph::collectReachable(vector<FlowBlock *> &res,FlowBlock *bl,bool un) const
+void BlockGraph::collectReachable(std::vector<FlowBlock *> &res,FlowBlock *bl,bool un) const
 
 {
   FlowBlock *blk,*blk2;
@@ -1987,8 +1987,8 @@ void BlockGraph::collectReachable(vector<FlowBlock *> &res,FlowBlock *bl,bool un
   }
   if (un) {
     res.clear();		// Anything not marked is unreachable
-    for(int4 i=0;i<list.size();++i) {
-      blk = list[i];
+    for(int4 i=0;i<std::list.size();++i) {
+      blk = std::list[i];
       if (blk->isMark())
 	blk->clearMark();
       else
@@ -2006,10 +2006,10 @@ void BlockGraph::collectReachable(vector<FlowBlock *> &res,FlowBlock *bl,bool un
 /// - Set FlowBlock indices in reverse-post order
 /// - Label tree-edges, forward-edges, cross-edges, and back-edges
 /// \param rootlist will contain the entry points for the graph
-void BlockGraph::structureLoops(vector<FlowBlock *> &rootlist)
+void BlockGraph::structureLoops(std::vector<FlowBlock *> &rootlist)
 
 {
-  vector<FlowBlock *> preorder;
+  std::vector<FlowBlock *> preorder;
   bool needrebuild;
   int4 irreduciblecount = 0;
 
@@ -2037,8 +2037,8 @@ bool BlockGraph::isConsistent(void) const
   int4 i,j,k;
   int4 count1,count2;
 
-  for(i=0;i<list.size();++i) {
-    bl1 = list[i];
+  for(i=0;i<std::list.size();++i) {
+    bl1 = std::list[i];
     for(j=0;j<bl1->sizeIn();++j) {
       bl2 = bl1->getIn(j);		// For each in edge
       count1 = 0;
@@ -2070,11 +2070,11 @@ bool BlockGraph::isConsistent(void) const
 /// This method also assigns the ordering index for the PcodeOp, getSeqNum().getOrder()
 /// \param iter points at the PcodeOp to insert before
 /// \param inst is the PcodeOp to insert
-void BlockBasic::insert(list<PcodeOp *>::iterator iter,PcodeOp *inst)
+void BlockBasic::insert(std::list<PcodeOp *>::iterator iter,PcodeOp *inst)
 
 {
   uintm ordbefore,ordafter;
-  list<PcodeOp *>::iterator newiter;
+  std::list<PcodeOp *>::iterator newiter;
 
   inst->setParent( this );
   newiter = op.insert(iter,inst);
@@ -2173,7 +2173,7 @@ FlowBlock *BlockBasic::getSplitPoint(void)
   return this;
 }
 
-int4 BlockBasic::flipInPlaceTest(vector<PcodeOp *> &fliplist) const
+int4 BlockBasic::flipInPlaceTest(std::vector<PcodeOp *> &fliplist) const
 
 {
   if (op.empty()) return 2;
@@ -2187,7 +2187,7 @@ void BlockBasic::flipInPlaceExecute(void)
 
 {
   PcodeOp *lastop = op.back();
-  // This is similar to negateCondition but we don't need to set the boolean_flip flag on lastop
+  // This is similar to negateCondition but we don't need to std::set the boolean_flip flag on lastop
   // because it is getting explicitly changed
   lastop->flipFlag(PcodeOp::fallthru_true); // Flip whether the fallthru block is true/false
   FlowBlock::negateCondition(true); // Flip the order of outof this
@@ -2196,7 +2196,7 @@ void BlockBasic::flipInPlaceExecute(void)
 bool BlockBasic::isComplex(void) const
 
 {
-  list<PcodeOp *>::const_iterator iter,iter2;
+  std::list<PcodeOp *>::const_iterator iter,iter2;
   PcodeOp *inst,*d_op;
   Varnode *vn;
   int4 statement,maxref;
@@ -2262,8 +2262,8 @@ void FlowBlock::saveXmlHeader(std::ostream &s) const
 void FlowBlock::restoreXmlHeader(const Element *el)
 
 {
-  istringstream s(el->getAttributeValue("index"));
-  s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+  std::istringstream s(el->getAttributeValue("index"));
+  s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
   s >> index;
 }
 
@@ -2280,7 +2280,7 @@ void FlowBlock::saveXmlEdges(std::ostream &s) const
 /// \brief Restore edges from an XML stream
 ///
 /// \param iter is an iterator to the \<edge> tags
-/// \param enditer marks the end of the list of tags
+/// \param enditer marks the end of the std::list of tags
 /// \param resolver is used to recover FlowBlock cross-references
 void FlowBlock::restoreXmlEdges(List::const_iterator &iter,List::const_iterator enditer,BlockMap &resolver)
 
@@ -2316,12 +2316,12 @@ void FlowBlock::restoreXml(const Element *el,BlockMap &resolver)
 
 {
   restoreXmlHeader(el);
-  const List &list(el->getChildren());
+  const List &std::list(el->getChildren());
   List::const_iterator iter;
 
-  iter = list.begin();
-  restoreXmlBody(iter,list.end(),resolver);
-  restoreXmlEdges(iter,list.end(),resolver);
+  iter = std::list.begin();
+  restoreXmlBody(iter,std::list.end(),resolver);
+  restoreXmlEdges(iter,std::list.end(),resolver);
 }
 
 /// If there are two branches, pick the fall-thru branch
@@ -2352,12 +2352,12 @@ bool BlockBasic::unblockedMulti(int4 outslot) const
   const BlockBasic *blout = (const BlockBasic *)getOut(outslot);
   const FlowBlock *bl;
   PcodeOp *multiop,*othermulti;
-  list<PcodeOp *>::const_iterator iter;
+  std::list<PcodeOp *>::const_iterator iter;
   Varnode *vnremove,*vnredund;
   
-				// First we build list of blocks which would have
+				// First we build std::list of blocks which would have
 				// redundant branches into blout
-  vector<const FlowBlock *> redundlist;
+  std::vector<const FlowBlock *> redundlist;
   for(int4 i=0;i<sizeIn();++i) {
     bl = getIn(i);
     for(int4 j=0;j<bl->sizeOut();++j)
@@ -2370,7 +2370,7 @@ bool BlockBasic::unblockedMulti(int4 outslot) const
   for(iter=blout->op.begin();iter!=blout->op.end();++iter) {
     multiop = *iter;
     if (multiop->code() != CPUI_MULTIEQUAL) continue;
-    for(vector<const FlowBlock *>::iterator biter=redundlist.begin();biter!=redundlist.end();++biter) {
+    for(std::vector<const FlowBlock *>::iterator biter=redundlist.begin();biter!=redundlist.end();++biter) {
       bl = *biter;
       vnredund = multiop->getIn(blout->getInIndex(bl)); // One of the redundant varnodes
       vnremove = multiop->getIn(blout->getInIndex(this));
@@ -2394,7 +2394,7 @@ bool BlockBasic::hasOnlyMarkers(void) const
 
 {
   // (and a branch)
-  list<PcodeOp *>::const_iterator iter;
+  std::list<PcodeOp *>::const_iterator iter;
   const PcodeOp *bop;
 
   for(iter=op.begin();iter!=op.end();++iter) {
@@ -2446,7 +2446,7 @@ void BlockBasic::setInitialRange(const Address &beg,const Address &end)
 void BlockBasic::setOrder(void)
 
 {
-  list<PcodeOp *>::iterator iter;
+  std::list<PcodeOp *>::iterator iter;
   uintm count,step;
 
   step = ~((uintm)0);
@@ -2481,16 +2481,16 @@ void BlockBasic::printHeader(std::ostream &s) const
 void BlockBasic::printRaw(std::ostream &s) const
   
 {
-  list<PcodeOp *>::const_iterator iter;
+  std::list<PcodeOp *>::const_iterator iter;
   PcodeOp *inst;
 
   printHeader(s);
-  s << endl;
+  s << std::endl;
   for(iter=op.begin();iter!=op.end();++iter) {
     inst = *iter;
     s << inst->getSeqNum() << ":\t";
     inst->printRaw(s);
-    s << endl;
+    s << std::endl;
   }
 }
 
@@ -2675,7 +2675,7 @@ void BlockList::printHeader(std::ostream &s) const
   FlowBlock::printHeader(s);
 }
 
-int4 BlockCondition::flipInPlaceTest(vector<PcodeOp *> &fliplist) const
+int4 BlockCondition::flipInPlaceTest(std::vector<PcodeOp *> &fliplist) const
 
 {
   FlowBlock *split1 = getBlock(0)->getSplitPoint();
@@ -2787,7 +2787,7 @@ bool BlockIf::preferComplement(Funcdata &data)
   FlowBlock *split = getBlock(0)->getSplitPoint();
   if (split == (FlowBlock *)0)
     return false;
-  vector<PcodeOp *> fliplist;
+  std::vector<PcodeOp *> fliplist;
   if (0 != split->flipInPlaceTest(fliplist))
     return false;
   split->flipInPlaceExecute();
@@ -2966,21 +2966,21 @@ void BlockSwitch::addCase(FlowBlock *switchbl,FlowBlock *bl,uint4 gt)
   curcase.isdefault = switchbl->isDefaultBranch( curcase.outindex );
  }
 
-/// Given the list of components for the switch structure, build the annotated descriptions
+/// Given the std::list of components for the switch structure, build the annotated descriptions
 /// of the cases.  Work out flow between cases and if there are any unstructured cases.
-/// The first FlowBlock in the component list is the switch component itself.  All other
-/// FlowBlocks in the list are the \e case components.
+/// The first FlowBlock in the component std::list is the switch component itself.  All other
+/// FlowBlocks in the std::list are the \e case components.
 /// \param switchbl is the underlying basic block, with multiple outgoing edges, for the switch
-/// \param cs is the list of switch and case components
-void BlockSwitch::grabCaseBasic(FlowBlock *switchbl,const vector<FlowBlock *> &cs)
+/// \param cs is the std::list of switch and case components
+void BlockSwitch::grabCaseBasic(FlowBlock *switchbl,const std::vector<FlowBlock *> &cs)
 
 {
-  vector<int4> casemap(switchbl->sizeOut(),-1);	// Map from from switchtarget's outindex to position in caseblocks
+  std::vector<int4> casemap(switchbl->sizeOut(),-1);	// Map from from switchtarget's outindex to position in caseblocks
   caseblocks.clear();
   for(int4 i=1;i<cs.size();++i) {
     FlowBlock *casebl = cs[i];
     addCase(switchbl,casebl,0);
-    casemap[caseblocks[i-1].outindex] = i-1; // Build map from outindex to caseblocks index
+    casemap[caseblocks[i-1].outindex] = i-1; // Build std::map from outindex to caseblocks index
     
   }
   // Fillin fallthru chaining
@@ -3019,13 +3019,13 @@ void BlockSwitch::orderSwitchCases(void) const
   for(int4 i=0;i<caseblocks.size();++i) {
     CaseOrder &curcase( caseblocks[i] );
     if (jump->numIndicesByBlock(curcase.basicblock) > 0) {
-      if (curcase.depth == 0) {	// Only set label on chain roots
+      if (curcase.depth == 0) {	// Only std::set label on chain roots
 	int4 index = jump->getIndexByBlock(curcase.basicblock,0);
 	curcase.label = jump->getLabelByIndex(index);
 	int4 j = curcase.chain;
 	int4 depthcount = 1;
 	while(j != -1) {
-	  if (caseblocks[j].depth > 0) break; // Has this node had its depth set. Break any possible loops.
+	  if (caseblocks[j].depth > 0) break; // Has this node had its depth std::set. Break any possible loops.
 	  caseblocks[j].depth = depthcount++;
 	  caseblocks[j].label = curcase.label;
 	  j = caseblocks[j].chain;
@@ -3127,19 +3127,19 @@ FlowBlock *BlockMap::resolveBlock(FlowBlock::block_type bt)
   return (FlowBlock *)0;
 }
 
-/// Given a list of FlowBlock objects sorted by index, use binary search to find the FlowBlock with matching index
-/// \param list is the sorted list of FlowBlock objects
+/// Given a std::list of FlowBlock objects sorted by index, use binary search to find the FlowBlock with matching index
+/// \param std::list is the sorted std::list of FlowBlock objects
 /// \param ind is the FlowBlock index to match
 /// \return the matching FlowBlock or NULL
-FlowBlock *BlockMap::findBlock(const vector<FlowBlock *> &list,int4 ind)
+FlowBlock *BlockMap::findBlock(const std::vector<FlowBlock *> &std::list,int4 ind)
 
 {
   int4 min = 0;
-  int4 max = list.size();
+  int4 max = std::list.size();
   max -= 1;
   while(min <= max) {
     int4 mid = (min + max)/2;
-    FlowBlock *block = list[mid];
+    FlowBlock *block = std::list[mid];
     if (block->getIndex() == ind)
       return block;
     if (block->getIndex() < ind)

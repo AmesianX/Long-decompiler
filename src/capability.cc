@@ -17,9 +17,9 @@
 
 namespace GhidraDec {
 /// Access static std::vector of CapabilityPoint objects that are registered during static initialization
-/// The list itself is created once on the first call to this method
+/// The std::list itself is created once on the first call to this method
 /// \e after all the static initializers have run
-/// \return the list of registered extensions
+/// \return the std::list of registered extensions
 std::vector<CapabilityPoint *> &CapabilityPoint::getList(void)
 
 {

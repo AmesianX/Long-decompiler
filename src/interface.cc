@@ -16,7 +16,7 @@
 #include "interface.hh"
 
 namespace GhidraDec {
-vector<IfaceCapability *> IfaceCapability::thelist;
+std::vector<IfaceCapability *> IfaceCapability::thelist;
 
 void IfaceCapability::initialize(void)
 
@@ -31,7 +31,7 @@ void IfaceCapability::registerAllCommands(IfaceStatus *status)
     thelist[i]->registerCommands(status);
 }
 
-IfaceStatus::IfaceStatus(const string &prmpt,istream &is,ostream &os,int4 mxhist)
+IfaceStatus::IfaceStatus(const std::string &prmpt,istream &is,std::ostream &os,int4 mxhist)
 
 {
   sptr = &is;
@@ -46,7 +46,7 @@ IfaceStatus::IfaceStatus(const string &prmpt,istream &is,ostream &os,int4 mxhist
   curhistory = 0;
 }
 
-void IfaceStatus::pushScript(const string &filename,const string &newprompt)
+void IfaceStatus::pushScript(const std::string &filename,const std::string &newprompt)
 
 { // Push new input stream on stack (with new prompt)
   ifstream *s = new ifstream(filename.c_str());
@@ -76,7 +76,7 @@ void IfaceStatus::popScript(void)
   inerror = false;
 }
 
-void IfaceStatus::saveHistory(const string &line)
+void IfaceStatus::saveHistory(const std::string &line)
 
 {				// Save line in circular history buffer
   if (history.size() < maxhistory)
@@ -88,7 +88,7 @@ void IfaceStatus::saveHistory(const string &line)
     curhistory = 0;
 }
 
-void IfaceStatus::getHistory(string &line,int4 i) const
+void IfaceStatus::getHistory(std::string &line,int4 i) const
 
 {
   if (i>=history.size())
@@ -103,27 +103,27 @@ void IfaceStatus::evaluateError(void)
 
 { // The last command has failed, decide if we are completely abandoning this stream
   if (errorisdone) {
-    *optr << "Aborting process" << endl;
+    *optr << "Aborting process" << std::endl;
     inerror = true;
     done = true;
     return;
   }
   if (getNumInputStreamSize()!=0) { // we have something to pop
-    *optr << "Aborting " << prompt << endl;
+    *optr << "Aborting " << prompt << std::endl;
     inerror = true;
     return;
   }
   inerror = false;
 }
 
-void IfaceStatus::wordsToString(string &res,const vector<string> &list)
+void IfaceStatus::wordsToString(std::string &res,const vectorstd::string &std::list)
 
 {
-  vector<string>::const_iterator iter;
+  vectorstd::string::const_iterator iter;
 
   res.erase();
-  for(iter=list.begin();iter!=list.end();++iter) {
-    if (iter != list.begin())
+  for(iter=std::list.begin();iter!=std::list.end();++iter) {
+    if (iter != std::list.begin())
       res += ' ';
     res += *iter;
   }
@@ -140,7 +140,7 @@ IfaceStatus::~IfaceStatus(void)
     popScript();
   for(int4 i=0;i<comlist.size();++i)
     delete comlist[i];
-  map<string,IfaceData *>::const_iterator iter;
+  std::map<std::string,IfaceData *>::const_iterator iter;
   for(iter=datamap.begin();iter!=datamap.end();++iter)
     if ((*iter).second != (IfaceData *)0)
       delete (*iter).second;
@@ -166,8 +166,8 @@ void IfaceStatus::registerCom(IfaceCommand *fptr,const char *nm1,
   comlist.push_back(fptr);	// Enter new command
   sorted = false;
 
-  const string &nm( fptr->getModule() ); // Name of module this command belongs to
-  map<string,IfaceData *>::const_iterator iter = datamap.find( nm );
+  const std::string &nm( fptr->getModule() ); // Name of module this command belongs to
+  std::map<std::string,IfaceData *>::const_iterator iter = datamap.find( nm );
   IfaceData *data;
   if (iter == datamap.end()) {
     data = fptr->createData();
@@ -178,10 +178,10 @@ void IfaceStatus::registerCom(IfaceCommand *fptr,const char *nm1,
   fptr->setData(this,data);	// Inform command of its data
 }
 
-IfaceData *IfaceStatus::getData(const string &nm) const
+IfaceData *IfaceStatus::getData(const std::string &nm) const
 
 {				// Get data corresponding to the named module
-  map<string,IfaceData *>::const_iterator iter = datamap.find(nm);
+  std::map<std::string,IfaceData *>::const_iterator iter = datamap.find(nm);
   if (iter == datamap.end())
     return (IfaceData *)0;
   return (*iter).second;
@@ -190,7 +190,7 @@ IfaceData *IfaceStatus::getData(const string &nm) const
 bool IfaceStatus::runCommand(void)
 
 {
-  string line;			// Next line from input stream
+  std::string line;			// Next line from input stream
 
   if (!sorted) {
     sort(comlist.begin(),comlist.end(),compare_ifacecommand);
@@ -200,44 +200,44 @@ bool IfaceStatus::runCommand(void)
   if (line.empty()) return false;
   saveHistory(line);
 
-  vector<string> fullcommand;
-  vector<IfaceCommand *>::const_iterator first = comlist.begin();
-  vector<IfaceCommand *>::const_iterator last = comlist.end();
-  istringstream is(line);
+  vectorstd::string fullcommand;
+  std::vector<IfaceCommand *>::const_iterator first = comlist.begin();
+  std::vector<IfaceCommand *>::const_iterator last = comlist.end();
+  std::istringstream is(line);
   int4 match;
 
   match = expandCom(fullcommand, is,first,last); // Try to expand the command
   if (match == 0) {
-    *optr << "ERROR: Invalid command" << endl;
+    *optr << "ERROR: Invalid command" << std::endl;
     return false;
   }
   else if ( fullcommand.size() == 0 ) // Nothing useful typed
     return false;
   else if (match>1) {
     if ( (*first)->numWords() != fullcommand.size()) { // Check for complete but not unique
-      *optr << "ERROR: Incomplete command" << endl;
+      *optr << "ERROR: Incomplete command" << std::endl;
       return false;
     }
   }
   else if (match<0)
-    *optr << "ERROR: Incomplete command" << endl;
+    *optr << "ERROR: Incomplete command" << std::endl;
 
   (*first)->execute(is);	// Try to execute the (first) command
   return true;			// Indicate a command was executed
 }
 
-void IfaceStatus::restrict(vector<IfaceCommand *>::const_iterator &first,
-			   vector<IfaceCommand *>::const_iterator &last,
-			   vector<string> &input)
+void IfaceStatus::restrict(std::vector<IfaceCommand *>::const_iterator &first,
+			   std::vector<IfaceCommand *>::const_iterator &last,
+			   vectorstd::string &input)
 
 {
-  vector<IfaceCommand *>::const_iterator newfirst,newlast;
+  std::vector<IfaceCommand *>::const_iterator newfirst,newlast;
   IfaceCommandDummy dummy;
   
   dummy.addWords(input);
   newfirst = lower_bound(first,last,&dummy,compare_ifacecommand);
   dummy.removeWord();
-  string temp( input.back() );	// Make copy of last word
+  std::string temp( input.back() );	// Make copy of last word
   temp[ temp.size()-1 ] += 1;	// temp will now be greater than any word
 				// whose first letters match input.back()
   dummy.addWord(temp);
@@ -246,7 +246,7 @@ void IfaceStatus::restrict(vector<IfaceCommand *>::const_iterator &first,
   last = newlast;
 }
 
-static bool maxmatch(string &res,const string &op1,const string &op2)
+static bool maxmatch(std::string &res,const std::string &op1,const std::string &op2)
 
 {				// Set res to maximum characters in common
 				// at the beginning of op1 and op2
@@ -272,9 +272,9 @@ static bool maxmatch(string &res,const string &op1,const string &op2)
   return equal;
 }
 
-int4 IfaceStatus::expandCom(vector<string> &expand,istream &s,
-			   vector<IfaceCommand *>::const_iterator &first,
-			   vector<IfaceCommand *>::const_iterator &last)
+int4 IfaceStatus::expandCom(vectorstd::string &expand,istream &s,
+			   std::vector<IfaceCommand *>::const_iterator &first,
+			   std::vector<IfaceCommand *>::const_iterator &last)
 
 {				// Expand tokens on stream to full command
 				// Return range of possible commands
@@ -283,10 +283,10 @@ int4 IfaceStatus::expandCom(vector<string> &expand,istream &s,
 				// Return number of matching commands
 
   int4 pos;			// Which word are we currently expanding
-  string tok;
+  std::string tok;
   bool res;
 
-  expand.clear();		// Make sure command list is empty
+  expand.clear();		// Make sure command std::list is empty
   res = true;
   if (first == last)		// If subrange is empty, return 0
     return 0;
@@ -319,10 +319,10 @@ int4 IfaceStatus::expandCom(vector<string> &expand,istream &s,
   }
 }
 
-void IfaceCommand::addWords(const vector<string> &wordlist)
+void IfaceCommand::addWords(const vectorstd::string &wordlist)
 
 {
-  vector<string>::const_iterator iter;
+  vectorstd::string::const_iterator iter;
 
   for(iter=wordlist.begin();iter!=wordlist.end();++iter)
     com.push_back( *iter );
@@ -332,7 +332,7 @@ int4 IfaceCommand::compare(const IfaceCommand &op2) const
 
 {				// Sort command based on names
   int4 res;
-  vector<string>::const_iterator iter1,iter2;
+  vectorstd::string::const_iterator iter1,iter2;
 
   for(iter1=com.begin(),iter2=op2.com.begin();;++iter1,++iter2) {
     if (iter1 == com.end()) {
@@ -349,7 +349,7 @@ int4 IfaceCommand::compare(const IfaceCommand &op2) const
   return 0;			// Never reaches here
 }
 
-void IfaceCommand::commandString(string &res) const
+void IfaceCommand::commandString(std::string &res) const
 
 {
   IfaceStatus::wordsToString(res,com);
@@ -368,7 +368,7 @@ void IfcHistory::execute(istream &s)
 
 {				// List most recent command lines
   int4 num;
-  string historyline;
+  std::string historyline;
 
   if (!s.eof()) {
     s >> num >> ws;
@@ -383,14 +383,14 @@ void IfcHistory::execute(istream &s)
 
   for(int4 i=num-1;i>=0;--i) {	// List oldest to newest
     status->getHistory(historyline,i);
-    *status->optr << historyline << endl;
+    *status->optr << historyline << std::endl;
   }
 }
 
 void IfcOpenfile::execute(istream &s)
 
 {
-  string filename;
+  std::string filename;
 
   if (status->optr != status->fileoptr)
     throw IfaceExecutionError("Output file already opened");
@@ -410,7 +410,7 @@ void IfcOpenfile::execute(istream &s)
 void IfcOpenfileAppend::execute(istream &s)
 
 {
-  string filename;
+  std::string filename;
 
   if (status->optr != status->fileoptr)
     throw IfaceExecutionError("Output file already opened");
@@ -444,6 +444,6 @@ void IfcEcho::execute(istream &s)
 
   while(s.get(c))
     status->fileoptr->put(c);
-  *status->fileoptr << endl;
+  *status->fileoptr << std::endl;
 }
 }

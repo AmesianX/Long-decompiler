@@ -254,19 +254,19 @@ PatternBlock::PatternBlock(const PatternBlock *a,const PatternBlock *b)
   delete res;
 }
 
-PatternBlock::PatternBlock(std::vector<PatternBlock *> &list)
+PatternBlock::PatternBlock(std::vector<PatternBlock *> &std::list)
 
 {				// AND several blocks together to construct new block
   PatternBlock *res,*next;
 
-  if (list.empty()) {		// If not ANDing anything
+  if (std::list.empty()) {		// If not ANDing anything
     offset = 0;			// make constructed block always true
     nonzerosize = 0;
     return;
   }
-  res = list[0];
-  for(int4 i=1;i<list.size();++i) {
-    next = res->intersect(list[i]);
+  res = std::list[0];
+  for(int4 i=1;i<std::list.size();++i) {
+    next = res->intersect(std::list[i]);
     delete res;
     res = next;
   }
@@ -488,11 +488,11 @@ void PatternBlock::saveXml(std::ostream &s) const
 
 {
   s << "<pat_block ";
-  s << "offset=\"" << dec << offset << "\" ";
+  s << "offset=\"" << std::dec << offset << "\" ";
   s << "nonzero=\"" << nonzerosize << "\">\n";
   for(int4 i=0;i<maskvec.size();++i) {
     s << "  <mask_word ";
-    s << "mask=\"0x" << hex << maskvec[i] << "\" ";
+    s << "mask=\"0x" << std::dec << maskvec[i] << "\" ";
     s << "val=\"0x" << valvec[i] << "\"/>\n";
   }
   s << "</pat_block>\n";
@@ -502,29 +502,29 @@ void PatternBlock::restoreXml(const Element *el)
 
 {
   {
-    istringstream s(el->getAttributeValue("offset"));
-    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+    std::istringstream s(el->getAttributeValue("offset"));
+    s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
     s >> offset;
   }
   {
-    istringstream s(el->getAttributeValue("nonzero"));
-    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+    std::istringstream s(el->getAttributeValue("nonzero"));
+    s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
     s >> nonzerosize;
   }
-  const List &list(el->getChildren());
+  const List &std::list(el->getChildren());
   List::const_iterator iter;
-  iter = list.begin();
+  iter = std::list.begin();
   uintm mask,val;
-  while(iter != list.end()) {
+  while(iter != std::list.end()) {
     Element *subel = *iter;
     {
-      istringstream s(subel->getAttributeValue("mask"));
-      s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+      std::istringstream s(subel->getAttributeValue("mask"));
+      s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
       s >> mask;
     }
     {
-      istringstream s(subel->getAttributeValue("val"));
-      s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+      std::istringstream s(subel->getAttributeValue("val"));
+      s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
       s >> val;
     }
     maskvec.push_back(mask);
@@ -633,9 +633,9 @@ void InstructionPattern::saveXml(std::ostream &s) const
 void InstructionPattern::restoreXml(const Element *el)
 
 {
-  const List &list(el->getChildren());
+  const List &std::list(el->getChildren());
   List::const_iterator iter;
-  iter = list.begin();
+  iter = std::list.begin();
   maskvalue = new PatternBlock(true);
   maskvalue->restoreXml(*iter);
 }
@@ -683,9 +683,9 @@ void ContextPattern::saveXml(std::ostream &s) const
 void ContextPattern::restoreXml(const Element *el)
 
 {
-  const List &list(el->getChildren());
+  const List &std::list(el->getChildren());
   List::const_iterator iter;
-  iter = list.begin();
+  iter = std::list.begin();
   maskvalue = new PatternBlock(true);
   maskvalue->restoreXml(*iter);
 }
@@ -815,9 +815,9 @@ void CombinePattern::saveXml(std::ostream &s) const
 void CombinePattern::restoreXml(const Element *el)
 
 {
-  const List &list(el->getChildren());
+  const List &std::list(el->getChildren());
   List::const_iterator iter;
-  iter = list.begin();
+  iter = std::list.begin();
   context = new ContextPattern();
   context->restoreXml(*iter);
   ++iter;
@@ -832,12 +832,12 @@ OrPattern::OrPattern(DisjointPattern *a,DisjointPattern *b)
   orlist.push_back(b);
 }
 
-OrPattern::OrPattern(const std::vector<DisjointPattern *> &list)
+OrPattern::OrPattern(const std::vector<DisjointPattern *> &std::list)
 
 {
   std::vector<DisjointPattern *>::const_iterator iter;
 
-  for(iter=list.begin();iter!=list.end();++iter)
+  for(iter=std::list.begin();iter!=std::list.end();++iter)
     orlist.push_back(*iter);
 }
 
@@ -1006,10 +1006,10 @@ void OrPattern::saveXml(std::ostream &s) const
 void OrPattern::restoreXml(const Element *el)
 
 {
-  const List &list(el->getChildren());
+  const List &std::list(el->getChildren());
   List::const_iterator iter;
-  iter = list.begin();
-  while(iter != list.end()) {
+  iter = std::list.begin();
+  while(iter != std::list.end()) {
     DisjointPattern *pat = DisjointPattern::restoreDisjoint(*iter);
     orlist.push_back(pat);
     ++iter;

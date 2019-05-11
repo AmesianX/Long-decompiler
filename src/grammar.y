@@ -24,14 +24,14 @@ extern int yydebug;
 
 %union {
   uint4 flags;
-  TypeDeclarator *dec;
-  vector<TypeDeclarator *> *declist;
+  TypeDeclarator *std::dec;
+  std::vector<TypeDeclarator *> *declist;
   TypeSpecifiers *spec;
-  vector<uint4> *ptrspec;
+  std::vector<uint4> *ptrspec;
   Datatype *type;
   Enumerator *enumer;
-  vector<Enumerator *> *vecenum;
-  string *str;
+  std::vector<Enumerator *> *vecenum;
+  std::string *str;
   uintb *i;
 }
 
@@ -45,8 +45,8 @@ extern int yydebug;
 
 %type <declist> declaration init_declarator_list parameter_list parameter_type_list
 %type <declist> struct_declaration_list struct_declaration struct_declarator_list
-%type <dec> declarator init_declarator direct_declarator parameter_declaration
-%type <dec> abstract_declarator direct_abstract_declarator struct_declarator
+%type <std::dec> declarator init_declarator direct_declarator parameter_declaration
+%type <std::dec> abstract_declarator direct_abstract_declarator struct_declarator
 %type <spec> declaration_specifiers specifier_qualifier_list
 %type <flags> type_qualifier_list
 %type <ptrspec> pointer
@@ -58,7 +58,7 @@ extern int yydebug;
 
 document:
   DECLARATION_RESULT declaration { parse->setResultDeclarations($2); }
-| PARAM_RESULT parameter_declaration { vector<TypeDeclarator *> *res = parse->newVecDeclarator(); res->push_back($2); parse->setResultDeclarations(res); }
+| PARAM_RESULT parameter_declaration { std::vector<TypeDeclarator *> *res = parse->newVecDeclarator(); res->push_back($2); parse->setResultDeclarations(res); }
 ;
 
 declaration:
@@ -209,22 +209,22 @@ assignment_expression:
 
 %%
 
-void GrammarToken::set(uint4 tp)
+void GrammarToken::std::set(uint4 tp)
 
 {
   type = tp;
 }
 
-void GrammarToken::set(uint4 tp,char *ptr,int4 len)
+void GrammarToken::std::set(uint4 tp,char *ptr,int4 len)
 
 {
   type = tp;
   switch(tp) {
   case integer:
     {
-      string charstring(ptr,len);
-      istringstream s(charstring);
-      s.unsetf(ios::dec | ios::hex | ios::oct);
+      std::string charstring(ptr,len);
+      std::istringstream s(charstring);
+      s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
       intb val;
       s >> val;
       value.integer = (uintb)val;
@@ -232,7 +232,7 @@ void GrammarToken::set(uint4 tp,char *ptr,int4 len)
     break;
   case identifier:
   case stringval:
-    value.stringval = new string(ptr,len);
+    value.stringval = new std::string(ptr,len);
     break;
   case charconstant:
     if (len==1)
@@ -270,7 +270,7 @@ void GrammarToken::set(uint4 tp,char *ptr,int4 len)
     }
     break;
   default:
-    throw LowlevelError("Bad internal grammar token set");
+    throw LowlevelError("Bad internal grammar token std::set");
   }
 }
 
@@ -481,7 +481,7 @@ uint4 GrammarLexer::moveState(char lookahead)
   case doublequote:
     if (lookahead == '\"')
       state = doublequoteend;
-    break;			// Anything else is part of string
+    break;			// Anything else is part of std::string
   case doublequoteend:
     state = start;
     res = GrammarToken::stringval;
@@ -491,18 +491,18 @@ uint4 GrammarLexer::moveState(char lookahead)
       state = singlebackslash;
     else if (lookahead == '\'')
       state = singlequoteend;
-    break;			// Anything else is part of string
+    break;			// Anything else is part of std::string
   case singlequoteend:
     state = start;
     res = GrammarToken::charconstant;
     break;
-  case singlebackslash:	// Seen backslash in a single quoted string
+  case singlebackslash:	// Seen backslash in a single quoted std::string
     state = singlequote;
     break;
   case number:
     if (lookahead=='x') {
       if (((bufend-bufstart)!=2)||(buffer[bufstart]!='0'))
-	syntaxerror = true;	// x only allowed as 0x hex indicator
+	syntaxerror = true;	// x only allowed as 0x std::dec indicator
     }
     else if ((lookahead>='0')&&(lookahead<='9')) {
     }
@@ -544,9 +544,9 @@ void GrammarLexer::establishToken(GrammarToken &token,uint4 val)
 
 {
   if (val < GrammarToken::integer)
-    token.set(val);
+    token.std::set(val);
   else {
-    token.set(val,buffer+bufstart,(bufend-bufstart)-1);
+    token.std::set(val,buffer+bufstart,(bufend-bufstart)-1);
   }
   token.setPosition(filestack.back(),curlineno,bufstart);
 }
@@ -566,14 +566,14 @@ void GrammarLexer::clear(void)
   error.clear();
 }
 
-void GrammarLexer::writeLocation(ostream &s,int4 line,int4 filenum)
+void GrammarLexer::writeLocation(std::ostream &s,int4 line,int4 filenum)
 
 {
-  s << " at line " << dec << line;
+  s << " at line " << std::dec << line;
   s << " in " << filenamemap[filenum];
 }
 
-void GrammarLexer::writeTokenLocation(ostream &s,int4 line,int4 colno)
+void GrammarLexer::writeTokenLocation(std::ostream &s,int4 line,int4 colno)
 
 {
   if (line!=curlineno) return;	// Does line match current line in buffer
@@ -585,7 +585,7 @@ void GrammarLexer::writeTokenLocation(ostream &s,int4 line,int4 colno)
   s << "^--\n";
 }
 
-void GrammarLexer::pushFile(const string &filename,istream *i)
+void GrammarLexer::pushFile(const std::string &filename,istream *i)
 
 {
   int4 filenum = filenamemap.size();
@@ -616,7 +616,7 @@ void GrammarLexer::getNextToken(GrammarToken &token)
   bool firsttimethru = true;
 
   if (endoffile) {
-    token.set(GrammarToken::endoffile);
+    token.std::set(GrammarToken::endoffile);
     return;
   }
   do {
@@ -665,7 +665,7 @@ Datatype *ArrayModifier::modType(Datatype *base,const TypeDeclarator *decl,Archi
   return restype;
 }
 
-FunctionModifier::FunctionModifier(const vector<TypeDeclarator *> *p,bool dtdtdt)
+FunctionModifier::FunctionModifier(const std::vector<TypeDeclarator *> *p,bool dtdtdt)
 
 {
   paramlist = *p;
@@ -680,7 +680,7 @@ FunctionModifier::FunctionModifier(const vector<TypeDeclarator *> *p,bool dtdtdt
   dotdotdot = dtdtdt;
 }
 
-void FunctionModifier::getInTypes(vector<Datatype *> &intypes,Architecture *glb) const
+void FunctionModifier::getInTypes(std::vector<Datatype *> &intypes,Architecture *glb) const
 
 {
   for(uint4 i=0;i<paramlist.size();++i) {
@@ -689,7 +689,7 @@ void FunctionModifier::getInTypes(vector<Datatype *> &intypes,Architecture *glb)
   }
 }
 
-void FunctionModifier::getInNames(vector<string> &innames) const
+void FunctionModifier::getInNames(vectorstd::string &innames) const
 
 {
   for(uint4 i=0;i<paramlist.size();++i)
@@ -714,7 +714,7 @@ bool FunctionModifier::isValid(void) const
 Datatype *FunctionModifier::modType(Datatype *base,const TypeDeclarator *decl,Architecture *glb) const
 
 {
-  vector<Datatype *> intypes;
+  std::vector<Datatype *> intypes;
 
   // Varargs is encoded as extra null pointer in paramlist
   bool dotdotdot = false;
@@ -739,7 +739,7 @@ Datatype *TypeDeclarator::buildType(Architecture *glb) const
 
 { // Apply modifications to the basetype, (in reverse order of binding)
   Datatype *restype = basetype;
-  vector<TypeModifier *>::const_iterator iter;
+  std::vector<TypeModifier *>::const_iterator iter;
   iter = mods.end();
   while(iter != mods.begin()) {
     --iter;
@@ -780,7 +780,7 @@ bool TypeDeclarator::getPrototype(PrototypePieces &pieces,Architecture *glb) con
 
   // Construct the output type
   pieces.outtype = basetype;
-  vector<TypeModifier *>::const_iterator iter;
+  std::vector<TypeModifier *>::const_iterator iter;
   iter = mods.end();
   --iter;			// At least one modification
   while(iter != mods.begin()) { // Do not apply function modifier
@@ -832,7 +832,7 @@ CParse::CParse(Architecture *g,int4 maxbuf)
 {
   glb = g;
   firsttoken = -1;
-  lastdecls = (vector<TypeDeclarator *> *)0;
+  lastdecls = (std::vector<TypeDeclarator *> *)0;
   keywords["typedef"] = f_typedef;
   keywords["extern"] = f_extern;
   keywords["static"] = f_static;
@@ -858,29 +858,29 @@ void CParse::clear(void)
 {
   clearAllocation();
   lasterror.clear();
-  lastdecls = (vector<TypeDeclarator *> *)0;
+  lastdecls = (std::vector<TypeDeclarator *> *)0;
   lexer.clear();
   firsttoken = -1;
 }
 
-TypeDeclarator *CParse::mergeSpecDec(TypeSpecifiers *spec,TypeDeclarator *dec)
+TypeDeclarator *CParse::mergeSpecDec(TypeSpecifiers *spec,TypeDeclarator *std::dec)
 
 {
-  dec->basetype = spec->type_specifier;
-  dec->model = spec->function_specifier;
-  dec->flags |= spec->flags;
-  return dec;
+  std::dec->basetype = spec->type_specifier;
+  std::dec->model = spec->function_specifier;
+  std::dec->flags |= spec->flags;
+  return std::dec;
 }
 
 TypeDeclarator *CParse::mergeSpecDec(TypeSpecifiers *spec)
 
 {
-  TypeDeclarator *dec = new TypeDeclarator();
-  typedec_alloc.push_back(dec);
-  return mergeSpecDec(spec,dec);
+  TypeDeclarator *std::dec = new TypeDeclarator();
+  typedec_alloc.push_back(std::dec);
+  return mergeSpecDec(spec,std::dec);
 }
 
-vector<TypeDeclarator *> *CParse::mergeSpecDecVec(TypeSpecifiers *spec,vector<TypeDeclarator *> *declist)
+std::vector<TypeDeclarator *> *CParse::mergeSpecDecVec(TypeSpecifiers *spec,std::vector<TypeDeclarator *> *declist)
 
 {
   for(uint4 i=0;i<declist->size();++i)
@@ -888,22 +888,22 @@ vector<TypeDeclarator *> *CParse::mergeSpecDecVec(TypeSpecifiers *spec,vector<Ty
   return declist;
 }
 
-vector<TypeDeclarator *> *CParse::mergeSpecDecVec(TypeSpecifiers *spec)
+std::vector<TypeDeclarator *> *CParse::mergeSpecDecVec(TypeSpecifiers *spec)
 
 {
-  vector<TypeDeclarator *> *declist;
-  declist = new vector<TypeDeclarator *>();
+  std::vector<TypeDeclarator *> *declist;
+  declist = new std::vector<TypeDeclarator *>();
   vecdec_alloc.push_back(declist);
-  TypeDeclarator *dec = new TypeDeclarator();
-  typedec_alloc.push_back(dec);
-  declist->push_back( dec );
+  TypeDeclarator *std::dec = new TypeDeclarator();
+  typedec_alloc.push_back(std::dec);
+  declist->push_back( std::dec );
   return mergeSpecDecVec(spec,declist);
 }
 
-uint4 CParse::convertFlag(string *str)
+uint4 CParse::convertFlag(std::string *str)
 
 {
-  map<string,uint4>::const_iterator iter;
+  std::map<std::string,uint4>::const_iterator iter;
 
   iter = keywords.find(*str);
   if (iter != keywords.end())
@@ -912,7 +912,7 @@ uint4 CParse::convertFlag(string *str)
   return 0;
 }
 
-TypeSpecifiers *CParse::addSpecifier(TypeSpecifiers *spec,string *str)
+TypeSpecifiers *CParse::addSpecifier(TypeSpecifiers *spec,std::string *str)
 
 {
   uint4 flag = convertFlag(str);
@@ -929,10 +929,10 @@ TypeSpecifiers *CParse::addTypeSpecifier(TypeSpecifiers *spec,Datatype *tp)
   return spec;
 }
 
-TypeSpecifiers *CParse::addFuncSpecifier(TypeSpecifiers *spec,string *str)
+TypeSpecifiers *CParse::addFuncSpecifier(TypeSpecifiers *spec,std::string *str)
 
 {
-  map<string,uint4>::const_iterator iter;
+  std::map<std::string,uint4>::const_iterator iter;
 
   iter = keywords.find(*str);
   if (iter != keywords.end())
@@ -945,17 +945,17 @@ TypeSpecifiers *CParse::addFuncSpecifier(TypeSpecifiers *spec,string *str)
   return spec;
 }
 
-TypeDeclarator *CParse::mergePointer(vector<uint4> *ptr,TypeDeclarator *dec)
+TypeDeclarator *CParse::mergePointer(std::vector<uint4> *ptr,TypeDeclarator *std::dec)
 
 {
   for(uint4 i=0;i<ptr->size();++i) {
     PointerModifier *newmod = new PointerModifier((*ptr)[i]);
-    dec->mods.push_back(newmod);
+    std::dec->mods.push_back(newmod);
   }
-  return dec;
+  return std::dec;
 }
 
-TypeDeclarator *CParse::newDeclarator(string *str)
+TypeDeclarator *CParse::newDeclarator(std::string *str)
 
 {
   TypeDeclarator *res = new TypeDeclarator(*str);
@@ -979,31 +979,31 @@ TypeSpecifiers *CParse::newSpecifier(void)
   return spec;
 }
 
-vector<TypeDeclarator *> *CParse::newVecDeclarator(void)
+std::vector<TypeDeclarator *> *CParse::newVecDeclarator(void)
 
 {
-  vector<TypeDeclarator *> *res = new vector<TypeDeclarator *>();
+  std::vector<TypeDeclarator *> *res = new std::vector<TypeDeclarator *>();
   vecdec_alloc.push_back(res);
   return res;
 }
 
-vector<uint4> *CParse::newPointer(void)
+std::vector<uint4> *CParse::newPointer(void)
 
 {
-  vector<uint4> *res = new vector<uint4>();
+  std::vector<uint4> *res = new std::vector<uint4>();
   vecuint4_alloc.push_back(res);
   return res;
 }
 
-TypeDeclarator *CParse::newArray(TypeDeclarator *dec,uint4 flags,uintb *num)
+TypeDeclarator *CParse::newArray(TypeDeclarator *std::dec,uint4 flags,uintb *num)
 
 {
   ArrayModifier *newmod = new ArrayModifier(flags,(int4)*num);
-  dec->mods.push_back(newmod);
-  return dec;
+  std::dec->mods.push_back(newmod);
+  return std::dec;
 }
 
-TypeDeclarator *CParse::newFunc(TypeDeclarator *dec,vector<TypeDeclarator *> *declist)
+TypeDeclarator *CParse::newFunc(TypeDeclarator *std::dec,std::vector<TypeDeclarator *> *declist)
 
 {
   bool dotdotdot = false;
@@ -1014,15 +1014,15 @@ TypeDeclarator *CParse::newFunc(TypeDeclarator *dec,vector<TypeDeclarator *> *de
     }
   }
   FunctionModifier *newmod = new FunctionModifier(declist,dotdotdot);
-  dec->mods.push_back(newmod);
-  return dec;
+  std::dec->mods.push_back(newmod);
+  return std::dec;
 }
 
-Datatype *CParse::newStruct(const string &ident,vector<TypeDeclarator *> *declist)
+Datatype *CParse::newStruct(const std::string &ident,std::vector<TypeDeclarator *> *declist)
 
 { // Build a new structure
   TypeStruct *res = glb->types->getTypeStruct(ident); // Create stub (for recursion)
-  vector<TypeField> sublist;
+  std::vector<TypeField> sublist;
   
   for(uint4 i=0;i<declist->size();++i) {
     TypeDeclarator *decl = (*declist)[i];
@@ -1045,7 +1045,7 @@ Datatype *CParse::newStruct(const string &ident,vector<TypeDeclarator *> *declis
   return res;
 }
 
-Datatype *CParse::oldStruct(const string &ident)
+Datatype *CParse::oldStruct(const std::string &ident)
 
 {
   Datatype *res = glb->types->findByName(ident);
@@ -1054,21 +1054,21 @@ Datatype *CParse::oldStruct(const string &ident)
   return res;
 }
 
-Datatype *CParse::newUnion(const string &ident,vector<TypeDeclarator *> *declist)
+Datatype *CParse::newUnion(const std::string &ident,std::vector<TypeDeclarator *> *declist)
 
 {
   setError("Unions are currently unsupported");
   return (Datatype *)0;
 }
 
-Datatype *CParse::oldUnion(const string &ident)
+Datatype *CParse::oldUnion(const std::string &ident)
 
 {
   setError("Unions are currently unsupported");
   return (Datatype *)0;
 }
 
-Enumerator *CParse::newEnumerator(const string &ident)
+Enumerator *CParse::newEnumerator(const std::string &ident)
 
 {
   Enumerator *res = new Enumerator(ident);
@@ -1076,7 +1076,7 @@ Enumerator *CParse::newEnumerator(const string &ident)
   return res;
 }
 
-Enumerator *CParse::newEnumerator(const string &ident,uintb val)
+Enumerator *CParse::newEnumerator(const std::string &ident,uintb val)
 
 {
   Enumerator *res = new Enumerator(ident,val);
@@ -1084,21 +1084,21 @@ Enumerator *CParse::newEnumerator(const string &ident,uintb val)
   return res;
 }
 
-vector<Enumerator *> *CParse::newVecEnumerator(void)
+std::vector<Enumerator *> *CParse::newVecEnumerator(void)
 
 {
-  vector<Enumerator *> *res = new vector<Enumerator *>();
+  std::vector<Enumerator *> *res = new std::vector<Enumerator *>();
   vecenum_alloc.push_back(res);
   return res;
 }
 
-Datatype *CParse::newEnum(const string &ident,vector<Enumerator *> *vecenum)
+Datatype *CParse::newEnum(const std::string &ident,std::vector<Enumerator *> *vecenum)
 
 {
   TypeEnum *res = glb->types->getTypeEnum(ident);
-  vector<string> namelist;
-  vector<uintb> vallist;
-  vector<bool> assignlist;
+  vectorstd::string namelist;
+  std::vector<uintb> vallist;
+  std::vector<bool> assignlist;
   for(uint4 i=0;i<vecenum->size();++i) {
     Enumerator *enumer = (*vecenum)[i];
     namelist.push_back(enumer->enumconstant);
@@ -1113,7 +1113,7 @@ Datatype *CParse::newEnum(const string &ident,vector<Enumerator *> *vecenum)
   return res;
 }
 
-Datatype *CParse::oldEnum(const string &ident)
+Datatype *CParse::oldEnum(const std::string &ident)
 
 {
   Datatype *res = glb->types->findByName(ident);
@@ -1125,52 +1125,52 @@ Datatype *CParse::oldEnum(const string &ident)
 void CParse::clearAllocation(void)
 
 {
-  list<TypeDeclarator *>::iterator iter1;
+  std::list<TypeDeclarator *>::iterator iter1;
 
   for(iter1=typedec_alloc.begin();iter1!=typedec_alloc.end();++iter1)
     delete *iter1;
   typedec_alloc.clear();
 
-  list<TypeSpecifiers *>::iterator iter2;
+  std::list<TypeSpecifiers *>::iterator iter2;
   for(iter2=typespec_alloc.begin();iter2!=typespec_alloc.end();++iter2)
     delete *iter2;
   typespec_alloc.clear();
 
-  list<vector<uint4> *>::iterator iter3;
+  std::list<std::vector<uint4> *>::iterator iter3;
   for(iter3=vecuint4_alloc.begin();iter3!=vecuint4_alloc.end();++iter3)
     delete *iter3;
   vecuint4_alloc.clear();
 
-  list<vector<TypeDeclarator *> *>::iterator iter4;
+  std::list<std::vector<TypeDeclarator *> *>::iterator iter4;
   for(iter4=vecdec_alloc.begin();iter4!=vecdec_alloc.end();++iter4)
     delete *iter4;
   vecdec_alloc.clear();
 
-  list<string *>::iterator iter5;
+  std::list<std::string *>::iterator iter5;
   for(iter5=string_alloc.begin();iter5!=string_alloc.end();++iter5)
     delete *iter5;
   string_alloc.clear();
 
-  list<uintb *>::iterator iter6;
+  std::list<uintb *>::iterator iter6;
   for(iter6=num_alloc.begin();iter6!=num_alloc.end();++iter6)
     delete *iter6;
   num_alloc.clear();
 
-  list<Enumerator *>::iterator iter7;
+  std::list<Enumerator *>::iterator iter7;
   for(iter7=enum_alloc.begin();iter7!=enum_alloc.end();++iter7)
     delete *iter7;
   enum_alloc.clear();
 
-  list<vector<Enumerator *> *>::iterator iter8;
+  std::list<std::vector<Enumerator *> *>::iterator iter8;
   for(iter8=vecenum_alloc.begin();iter8!=vecenum_alloc.end();++iter8)
     delete *iter8;
   vecenum_alloc.clear();
 }
 
-int4 CParse::lookupIdentifier(const string &nm)
+int4 CParse::lookupIdentifier(const std::string &nm)
 
 {
-  map<string,uint4>::const_iterator iter = keywords.find(nm);
+  std::map<std::string,uint4>::const_iterator iter = keywords.find(nm);
   if (iter != keywords.end()) {
     switch( (*iter).second ) {
     case f_typedef:
@@ -1233,7 +1233,7 @@ int4 CParse::lex(void)
     return lookupIdentifier(*yylval.str);
   case GrammarToken::stringval:
     delete tok.getString();
-    setError("Illegal string constant");
+    setError("Illegal std::string constant");
     return BADTOKEN;
   case GrammarToken::dotdotdot:
     return DOTDOTDOT;
@@ -1247,10 +1247,10 @@ int4 CParse::lex(void)
   }
 }
 
-void CParse::setError(const string &msg)
+void CParse::setError(const std::string &msg)
 
 {
-  ostringstream s;
+  std::ostringstream s;
 
   s << msg;
   lexer.writeLocation(s,lineno,filenum);
@@ -1282,7 +1282,7 @@ bool CParse::runParse(uint4 doctype)
   return true;
 }
 
-bool CParse::parseFile(const string &nm,uint4 doctype)
+bool CParse::parseFile(const std::string &nm,uint4 doctype)
 
 { // Run the parser on a file, return true if no parse errors
   clear();			// Clear out any old parsing
@@ -1318,15 +1318,15 @@ int yyerror(const char *str)
   return 0;
 }
 
-Datatype *parse_type(istream &s,string &name,Architecture *glb)
+Datatype *parse_type(istream &s,std::string &name,Architecture *glb)
 
 {
   CParse parser(glb,1000);
 
   if (!parser.parseStream(s,CParse::doc_parameter_declaration))
     throw ParseError(parser.getError());
-  vector<TypeDeclarator *> *decls = parser.getResultDeclarations();
-  if ((decls == (vector<TypeDeclarator *> *)0)||(decls->size()==0))
+  std::vector<TypeDeclarator *> *decls = parser.getResultDeclarations();
+  if ((decls == (std::vector<TypeDeclarator *> *)0)||(decls->size()==0))
     throw ParseError("Did not parse a datatype");
   if (decls->size() > 1)
     throw ParseError("Parsed multiple declarations");
@@ -1344,8 +1344,8 @@ void parse_protopieces(PrototypePieces &pieces,
 
   if (!parser.parseStream(s,CParse::doc_declaration))
     throw ParseError(parser.getError());
-  vector<TypeDeclarator *> *decls = parser.getResultDeclarations();
-  if ((decls == (vector<TypeDeclarator *> *)0)||(decls->size()==0))
+  std::vector<TypeDeclarator *> *decls = parser.getResultDeclarations();
+  if ((decls == (std::vector<TypeDeclarator *> *)0)||(decls->size()==0))
     throw ParseError("Did not parse a datatype");
   if (decls->size() > 1)
     throw ParseError("Parsed multiple declarations");
@@ -1364,8 +1364,8 @@ void parse_C(Architecture *glb,istream &s)
 
   if (!parser.parseStream(s,CParse::doc_declaration))
     throw ParseError(parser.getError());
-  vector<TypeDeclarator *> *decls = parser.getResultDeclarations();
-  if ((decls == (vector<TypeDeclarator *> *)0)||(decls->size()==0))
+  std::vector<TypeDeclarator *> *decls = parser.getResultDeclarations();
+  if ((decls == (std::vector<TypeDeclarator *> *)0)||(decls->size()==0))
     throw ParseError("Did not parse a datatype");
   if (decls->size() > 1)
     throw ParseError("Parsed multiple declarations");
@@ -1395,7 +1395,7 @@ void parse_C(Architecture *glb,istream &s)
     throw LowlevelError("Not sure what to do with this type");
 }
 
-void parse_toseparator(istream &s,string &name)
+void parse_toseparator(istream &s,std::string &name)
 
 {				// parse to next (C) separator
   char tok;
@@ -1427,12 +1427,12 @@ Address parse_varnode(istream &s,int4 &size,Address &pc,uintm &uq,const TypeFact
   if (tok == 'i')
     s >> tok;
   else if (s.peek() != ':') {
-    s.unsetf(ios::dec | ios::hex | ios::oct); // Let user specify base
+    s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct); // Let user specify base
     pc = parse_machaddr(s,discard,typegrp,true);
   }
   s >> ws;
   if (s.peek() == ':') {	// Scan uniq
-    s >> tok >> ws >> hex >> uq; // Assume uniq is in hex
+    s >> tok >> ws >> std::dec >> uq; // Assume uniq is in std::dec
   }
   else
     uq = ~((uintm)0);
@@ -1451,14 +1451,14 @@ Address parse_op(istream &s,uintm &uq,const TypeFactory &typegrp)
   s >> ws >> tok;
   if (tok != ':')
     throw ParseError("Missing ':'");
-  s >> ws >> hex >> uq;		// Assume uniq is in hex
+  s >> ws >> std::dec >> uq;		// Assume uniq is in std::dec
   return loc;
 }
 
 Address parse_machaddr(istream &s,int4 &defaultsize,const TypeFactory &typegrp,bool ignorecolon)
 
 {				// Read Address from ASCII stream
-  string token;
+  std::string token;
   AddrSpace *b;
   int4 size = -1;
   int4 oversize;
@@ -1479,7 +1479,7 @@ Address parse_machaddr(istream &s,int4 &defaultsize,const TypeFactory &typegrp,b
     parse_toseparator(s,token);	// Get the offset portion of the address
     s >> ws >> tok;
     if (tok == ',') {		// Optional size specifier
-      s.unsetf(ios::dec | ios::hex | ios::oct);
+      s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
       s >> size;
       s >> ws >> tok;
     }
@@ -1503,7 +1503,7 @@ Address parse_machaddr(istream &s,int4 &defaultsize,const TypeFactory &typegrp,b
     }
     if (b==(AddrSpace *)0) {
       s >> token;
-      string errmsg = "Bad address: ";
+      std::string errmsg = "Bad address: ";
       errmsg += tok;
       errmsg += token;
       throw ParseError(errmsg);

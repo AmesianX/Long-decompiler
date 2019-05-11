@@ -127,7 +127,7 @@ void EmulatePcodeOp::executeSegmentOp(void)
 
   uintb in1 = getVarnodeValue(currentOp->getIn(1));
   uintb in2 = getVarnodeValue(currentOp->getIn(2));
-  vector<uintb> bindlist;
+  std::vector<uintb> bindlist;
   bindlist.push_back(in2);
   bindlist.push_back(in1);
   uintb res = segdef->execute(bindlist);
@@ -197,7 +197,7 @@ void EmulateSnippet::executeLoad(void)
 void EmulateSnippet::executeStore(void)
 
 {
-  throw LowlevelError("Illegal p-code operation in snippet: "+ (string)get_opname(currentOp->getOpcode()));
+  throw LowlevelError("Illegal p-code operation in snippet: "+ (std::string)get_opname(currentOp->getOpcode()));
 }
 
 void EmulateSnippet::executeBranch(void)
@@ -229,55 +229,55 @@ bool EmulateSnippet::executeCbranch(void)
 void EmulateSnippet::executeBranchind(void)
 
 {
-  throw LowlevelError("Illegal p-code operation in snippet: "+ (string)get_opname(currentOp->getOpcode()));
+  throw LowlevelError("Illegal p-code operation in snippet: "+ (std::string)get_opname(currentOp->getOpcode()));
 }
 
 void EmulateSnippet::executeCall(void)
 
 {
-  throw LowlevelError("Illegal p-code operation in snippet: "+ (string)get_opname(currentOp->getOpcode()));
+  throw LowlevelError("Illegal p-code operation in snippet: "+ (std::string)get_opname(currentOp->getOpcode()));
 }
 
 void EmulateSnippet::executeCallind(void)
 
 {
-  throw LowlevelError("Illegal p-code operation in snippet: "+ (string)get_opname(currentOp->getOpcode()));
+  throw LowlevelError("Illegal p-code operation in snippet: "+ (std::string)get_opname(currentOp->getOpcode()));
 }
 
 void EmulateSnippet::executeCallother(void)
 
 {
-  throw LowlevelError("Illegal p-code operation in snippet: "+ (string)get_opname(currentOp->getOpcode()));
+  throw LowlevelError("Illegal p-code operation in snippet: "+ (std::string)get_opname(currentOp->getOpcode()));
 }
 
 void EmulateSnippet::executeMultiequal(void)
 
 {
-  throw LowlevelError("Illegal p-code operation in snippet: "+ (string)get_opname(currentOp->getOpcode()));
+  throw LowlevelError("Illegal p-code operation in snippet: "+ (std::string)get_opname(currentOp->getOpcode()));
 }
 
 void EmulateSnippet::executeIndirect(void)
 
 {
-  throw LowlevelError("Illegal p-code operation in snippet: "+ (string)get_opname(currentOp->getOpcode()));
+  throw LowlevelError("Illegal p-code operation in snippet: "+ (std::string)get_opname(currentOp->getOpcode()));
 }
 
 void EmulateSnippet::executeSegmentOp(void)
 
 {
-  throw LowlevelError("Illegal p-code operation in snippet: "+ (string)get_opname(currentOp->getOpcode()));
+  throw LowlevelError("Illegal p-code operation in snippet: "+ (std::string)get_opname(currentOp->getOpcode()));
 }
 
 void EmulateSnippet::executeCpoolRef(void)
 
 {
-  throw LowlevelError("Illegal p-code operation in snippet: "+ (string)get_opname(currentOp->getOpcode()));
+  throw LowlevelError("Illegal p-code operation in snippet: "+ (std::string)get_opname(currentOp->getOpcode()));
 }
 
 void EmulateSnippet::executeNew(void)
 
 {
-  throw LowlevelError("Illegal p-code operation in snippet: "+ (string)get_opname(currentOp->getOpcode()));
+  throw LowlevelError("Illegal p-code operation in snippet: "+ (std::string)get_opname(currentOp->getOpcode()));
 }
 
 void EmulateSnippet::fallthruOp(void)
@@ -305,10 +305,10 @@ EmulateSnippet::~EmulateSnippet(void)
 /// Any p-code produced by the PcodeEmit, when triggered by the caller, becomes
 /// part of the \e snippet that will get emulated by \b this. The caller should
 /// free the PcodeEmit object immediately after use.
-/// \param inst is the \e opcode to \e behavior map the emitter will use
+/// \param inst is the \e opcode to \e behavior std::map the emitter will use
 /// \param uniqReserve is the starting offset within the \e unique address space for any temporary registers
 /// \return the newly constructed emitter
-PcodeEmit *EmulateSnippet::buildEmitter(const vector<OpBehavior *> &inst,uintb uniqReserve)
+PcodeEmit *EmulateSnippet::buildEmitter(const std::vector<OpBehavior *> &inst,uintb uniqReserve)
 
 {
   return new PcodeEmitCache(opList,varList,inst,uniqReserve);
@@ -368,7 +368,7 @@ uintb EmulateSnippet::getVarnodeValue(VarnodeData *vn) const
   if (spc->getType() == IPTR_CONSTANT)
     return vn->offset;
   if (spc->getType() == IPTR_INTERNAL) {
-    map<uintb,uintb>::const_iterator iter;
+    std::map<uintb,uintb>::const_iterator iter;
     iter = tempValues.find(vn->offset);
     if (iter != tempValues.end())
       return (*iter).second;	// We have seen this varnode before
@@ -387,7 +387,7 @@ uintb EmulateSnippet::getVarnodeValue(VarnodeData *vn) const
 uintb EmulateSnippet::getTempValue(uintb offset) const
 
 {
-  map<uintb,uintb>::const_iterator iter = tempValues.find(offset);
+  std::map<uintb,uintb>::const_iterator iter = tempValues.find(offset);
   if (iter == tempValues.end())
     return 0;
   return (*iter).second;

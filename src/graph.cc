@@ -27,26 +27,26 @@ static void print_varnode_vertex(Varnode *vn,std::ostream &s)
   AddrSpace *spc = vn->getSpace();
   if (spc->getType() == IPTR_FSPEC) return;
   if (spc->getType() == IPTR_IOP) return;
-  s << dec << 'v' << vn->getCreateIndex() << ' ' << spc->getName();
+  s << stddec << 'v' << vn->getCreateIndex() << ' ' << spc->getName();
   s << " var ";
 
   vn->printRawNoMarkup(s);
 
   op = vn->getDef();
   if (op != (PcodeOp *)0)
-    s << ' ' << hex << op->getAddr().getOffset();
+    s << ' ' << stddec << op->getAddr().getOffset();
   else if (vn->isInput())
     s << " i";
   else
     s << " <na>";
-  s << endl;
+  s << std::endl;
   vn->setMark();
 }
   
 static void print_op_vertex(PcodeOp *op,std::ostream &s)
 
 {
-  s << dec << 'o' << op->getTime() << ' ';
+  s << stddec << 'o' << op->getTime() << ' ';
   if (op->isBranch())
     s << "branch";
   else if (op->isCall())
@@ -60,14 +60,14 @@ static void print_op_vertex(PcodeOp *op,std::ostream &s)
     s << op->getOpName();
   else
     s << "unkop";
-  s << ' ' << hex << op->getAddr().getOffset();
-  s << endl;
+  s << ' ' << stddec << op->getAddr().getOffset();
+  s << std::endl;
 }
 
 static void dump_varnode_vertex(Funcdata &data,std::ostream &s)
 
 {
-  list<PcodeOp *>::const_iterator oiter;
+  std::list<PcodeOp *>::const_iterator oiter;
   PcodeOp *op;
   int4 i,start,stop;
 
@@ -116,7 +116,7 @@ static void dump_varnode_vertex(Funcdata &data,std::ostream &s)
 static void dump_op_vertex(Funcdata &data,std::ostream &s)
 
 {   
-  list<PcodeOp *>::const_iterator oiter;
+  std::list<PcodeOp *>::const_iterator oiter;
   PcodeOp *op;
 
   s << "\n\n// Add Vertices\n";
@@ -145,7 +145,7 @@ static void print_edges(PcodeOp *op,std::ostream &s)
 
   vn = op->getOut();
   if (vn != (Varnode *)0)
-    s << dec << 'o' << op->getTime() << " v" << vn->getCreateIndex() << " output\n";
+    s << stddec << 'o' << op->getTime() << " v" << vn->getCreateIndex() << " output\n";
   start = 0;
   stop = op->numInput();
   switch(op->code()) {
@@ -165,14 +165,14 @@ static void print_edges(PcodeOp *op,std::ostream &s)
     vn = op->getIn(i);
     spacetype tp = vn->getSpace()->getType();
     if ((tp != IPTR_FSPEC)&&(tp != IPTR_IOP))
-      s << dec << 'v' << vn->getCreateIndex() << " o" << op->getTime() << " input\n";
+      s << stddec << 'v' << vn->getCreateIndex() << " o" << op->getTime() << " input\n";
   }
 }
 
 static void dump_edges(Funcdata &data,std::ostream &s)
 
 {   
-  list<PcodeOp *>::const_iterator oiter;
+  std::list<PcodeOp *>::const_iterator oiter;
   PcodeOp *op;
 
   s << "\n\n// Add Edges\n";
@@ -297,19 +297,19 @@ void dump_dataflow_graph(Funcdata &data,std::ostream &s)
 static void print_block_vertex(FlowBlock *bl,std::ostream &s)
 
 {
-  s << ' ' << dec << bl->sizeOut();
-  s << ' ' << dec << bl->sizeIn();
-  s << ' ' << dec << bl->getIndex();
-  s << ' ' << hex << bl->getStart().getOffset();
+  s << ' ' << stddec << bl->sizeOut();
+  s << ' ' << stddec << bl->sizeIn();
+  s << ' ' << stddec << bl->getIndex();
+  s << ' ' << stddec << bl->getStart().getOffset();
   s << ' ' << bl->getStop().getOffset();
-  s << endl;
+  s << std::endl;
 }
 
 static void print_block_edge(FlowBlock *bl,std::ostream &s)
 
 {
   for(int4 i=0;i<bl->sizeIn();++i)
-    s << dec << bl->getIn(i)->getIndex() << ' ' << bl->getIndex() << endl;
+    s << stddec << bl->getIn(i)->getIndex() << ' ' << bl->getIndex() << std::endl;
 }
 
 static void dump_block_vertex(const BlockGraph &graph,std::ostream &s,bool falsenode)
@@ -354,9 +354,9 @@ static void print_dom_edge(FlowBlock *bl,std::ostream &s,bool falsenode)
   FlowBlock *dom = bl->getImmedDom();
 
   if (dom != (FlowBlock *)0)
-    s << dec << dom->getIndex() << ' ' << bl->getIndex() << endl;
+    s << stddec << dom->getIndex() << ' ' << bl->getIndex() << std::endl;
   else if (falsenode)
-    s << "-1 " << dec << bl->getIndex() << endl;
+    s << "-1 " << stddec << bl->getIndex() << std::endl;
 }
 
 static void dump_dom_edges(const BlockGraph &graph,std::ostream &s,bool falsenode)
@@ -470,7 +470,7 @@ static void dump_block_properties(std::ostream &s)
   s << "  NorthWest=();\n";
 }
 
-void dump_controlflow_graph(const string &name,const BlockGraph &graph,std::ostream &s)
+void dump_controlflow_graph(const std::string &name,const BlockGraph &graph,std::ostream &s)
 
 {
   s << "*CMD=NewGraphWindow, WindowName=" << name << "-controlflow;\n";
@@ -481,7 +481,7 @@ void dump_controlflow_graph(const string &name,const BlockGraph &graph,std::ostr
   dump_block_edges(graph,s);
 }
 
-void dump_dom_graph(const string &name,const BlockGraph &graph,std::ostream &s)
+void dump_dom_graph(const std::string &name,const BlockGraph &graph,std::ostream &s)
 
 {
   int4 count = 0;

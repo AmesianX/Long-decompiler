@@ -337,7 +337,7 @@ int4 CircleRange::intersect(const CircleRange &op2)
     case 'a':			// order (l r op2.l op2.r)
     case 'f':			// order (op2.l op2.r l r)
       isempty = true;
-      retval = 0;		// empty set
+      retval = 0;		// empty std::set
       break;
     case 'b':			// order (l op2.l r op2.r)
       left = op2left;
@@ -396,7 +396,7 @@ int4 CircleRange::intersect(const CircleRange &op2)
 }
 
 /// Try to create a range given a value that is not necessarily a valid mask.
-/// If the mask is valid, range is set to all possible values that whose non-zero
+/// If the mask is valid, range is std::set to all possible values that whose non-zero
 /// bits are contained in the mask. If the mask is invalid, \b this range is  not modified.
 /// \param nzmask is the putative mask
 /// \param size is a maximum size (in bytes) for the mask
@@ -462,11 +462,11 @@ void CircleRange::setStride(int4 newshift)
     isempty = true;
 }
 
-/// The pull-back is performed through a given p-code \b op and set \b this
+/// The pull-back is performed through a given p-code \b op and std::set \b this
 /// to the resulting range (if possible).
-/// If there is a single unknown input, and the set of values
+/// If there is a single unknown input, and the std::set of values
 /// for this input that cause the output of \b op to fall
-/// into \b this form a range, then set \b this to the
+/// into \b this form a range, then std::set \b this to the
 /// range (the "pullBack") and return the unknown varnode.
 /// Return null otherwise.
 ///
@@ -508,7 +508,7 @@ Varnode *CircleRange::pullBack(PcodeOp *op,Varnode **constMarkup,bool usenzmask)
   else if ((op->numInput()==2)&&(!constvn->isConstant()))
     return (Varnode *)0;
 
-  // If there is nothing in the output set, no input will map to it
+  // If there is nothing in the output std::set, no input will std::map to it
   if (isempty) return res;
 
   switch(op->code()) {

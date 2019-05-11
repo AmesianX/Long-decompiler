@@ -31,10 +31,10 @@ class IfaceTerm : public IfaceStatus {
   int4 ifd;			// Underlying file descriptor
   struct termios itty;		// Original terminal settings
 #endif
-  int4 doCompletion(string &line,int4 cursor);
-  virtual void readLine(string &line);
+  int4 doCompletion(std::string &line,int4 cursor);
+  virtual void readLine(std::string &line);
 public:
-  IfaceTerm(const string &prmpt,istream &is,ostream &os);
+  IfaceTerm(const std::string &prmpt,istream &is,std::ostream &os);
   virtual ~IfaceTerm(void);
 };
 

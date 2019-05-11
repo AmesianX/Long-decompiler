@@ -63,8 +63,8 @@ SeqNum SeqNum::restoreXml(const Element *el,const AddrSpaceManager *manage)
   Address pc = Address::restoreXml(el,manage); // Recover address
   for(int4 i=0;i<el->getNumAttributes();++i)
     if (el->getAttributeName(i) == "uniq") {
-      istringstream s2(el->getAttributeValue(i)); // Recover unique (if present)
-      s2.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+      std::istringstream s2(el->getAttributeValue(i)); // Recover unique (if present)
+      s2.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
       s2 >> uniq;
       break;
     }
@@ -235,7 +235,7 @@ void Range::printBounds(std::ostream &s) const
 
 {
   s << spc->getName() << ": ";
-  s << hex << first << '-' << last;
+  s << std::dec << first << '-' << last;
 }
 
 /// Write this object to a stream as a \<range> tag.
@@ -266,13 +266,13 @@ void Range::restoreXml(const Element *el,const AddrSpaceManager *manage)
         throw LowlevelError("Undefined space: "+el->getAttributeValue(i));
     }
     else if (el->getAttributeName(i) == "first") {
-      istringstream s(el->getAttributeValue(i));
-      s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+      std::istringstream s(el->getAttributeValue(i));
+      s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
       s >> first;
     }
     else if (el->getAttributeName(i) == "last") {
-      istringstream s(el->getAttributeValue(i));
-      s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+      std::istringstream s(el->getAttributeValue(i));
+      s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
       s >> last;
     }
     else if (el->getAttributeName(i) == "name") {
@@ -502,12 +502,12 @@ void RangeList::printBounds(std::ostream &s) const
 
 {
   if (tree.empty())
-    s << "all" << endl;
+    s << "all" << std::endl;
   else {
     std::set<Range>::const_iterator iter;
     for(iter=tree.begin();iter!=tree.end();++iter) {
       (*iter).printBounds(s);
-      s << endl;
+      s << std::endl;
     }
   }
 }

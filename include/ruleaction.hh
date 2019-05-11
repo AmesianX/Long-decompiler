@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 /// \file ruleaction.hh
-/// \brief This is the basic set of transformation Rule objects.
+/// \brief This is the basic std::set of transformation Rule objects.
 ///
 /// Each Rule triggers on
 /// a specific localized data-flow configuration. They are generally applied

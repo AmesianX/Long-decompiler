@@ -19,7 +19,7 @@
 namespace GhidraDec {
 Sleigh *SleighArchitecture::last_sleigh = (Sleigh *)0;
 int4 SleighArchitecture::last_languageindex;
-vector<LanguageDescription> SleighArchitecture::description;
+std::vector<LanguageDescription> SleighArchitecture::description;
 
 FileManage SleighArchitecture::specpaths; // Global specfile manager
 
@@ -40,8 +40,8 @@ void LanguageDescription::restoreXml(const Element *el)
 {
   processor = el->getAttributeValue("processor");
   isbigendian = (el->getAttributeValue("endian")=="big");
-  istringstream s1(el->getAttributeValue("size"));
-  s1.unsetf(ios::dec | ios::hex | ios::oct);
+  std::istringstream s1(el->getAttributeValue("size"));
+  s1.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
   s1 >> size;
   variant = el->getAttributeValue("variant");
   version = el->getAttributeValue("version");
@@ -70,10 +70,10 @@ void LanguageDescription::restoreXml(const Element *el)
   }
 }
 
-/// Pick out the CompilerTag associated with the desired \e compiler \e id string
-/// \param nm is the desired id string
+/// Pick out the CompilerTag associated with the desired \e compiler \e id std::string
+/// \param nm is the desired id std::string
 /// \return a reference to the matching CompilerTag
-const CompilerTag &LanguageDescription::getCompiler(const string &nm) const
+const CompilerTag &LanguageDescription::getCompiler(const std::string &nm) const
 
 {
   int4 defaultind = -1;
@@ -93,7 +93,7 @@ const CompilerTag &LanguageDescription::getCompiler(const string &nm) const
 /// Any \<language> tags are added to the LanguageDescription array
 /// \param specfile is the filename of the .ldefs file
 /// \param errs is an output stream for printing error messages
-void SleighArchitecture::loadLanguageDescription(const string &specfile,ostream &errs)
+void SleighArchitecture::loadLanguageDescription(const std::string &specfile,std::ostream &errs)
 
 {
   ifstream s(specfile.c_str());
@@ -110,9 +110,9 @@ void SleighArchitecture::loadLanguageDescription(const string &specfile,ostream 
   }
 
   el = doc->getRoot();
-  const List &list(el->getChildren());
+  const List &std::list(el->getChildren());
   List::const_iterator iter;
-  for(iter=list.begin();iter!=list.end();++iter) {
+  for(iter=std::list.begin();iter!=std::list.end();++iter) {
     if ((*iter)->getName() != "language") continue;
     description.push_back(LanguageDescription());
     description.back().restoreXml( *iter );
@@ -126,7 +126,7 @@ SleighArchitecture::~SleighArchitecture(void)
   translate = (const Translate *)0;
 }
 
-string SleighArchitecture::getDescription(void) const
+std::string SleighArchitecture::getDescription(void) const
 
 {
   return description[languageindex].getDescription();
@@ -184,7 +184,7 @@ void SleighArchitecture::resolveArchitecture(void)
     archid.erase(0,8);
   
   archid = normalizeArchitecture(archid);
-  string baseid = archid.substr(0,archid.rfind(':'));
+  std::string baseid = archid.substr(0,archid.rfind(':'));
   int4 i;
   languageindex = -1;
   for(i=0;i<description.size();++i) {
@@ -205,12 +205,12 @@ void SleighArchitecture::buildSpecFile(DocumentStorage &store)
 { // Given a specific language, make sure relevant spec files are loaded
   bool language_reuse = isTranslateReused();
   const LanguageDescription &language(description[languageindex]);
-  string compiler = archid.substr(archid.rfind(':')+1);
+  std::string compiler = archid.substr(archid.rfind(':')+1);
   const CompilerTag &compilertag( language.getCompiler(compiler));
   
-  string processorfile;
-  string compilerfile;
-  string slafile;
+  std::string processorfile;
+  std::string compilerfile;
+  std::string slafile;
   
   specpaths.findFile(processorfile,language.getProcessorSpec());
   specpaths.findFile(compilerfile,compilertag.getSpec());
@@ -222,13 +222,13 @@ void SleighArchitecture::buildSpecFile(DocumentStorage &store)
     store.registerTag(doc->getRoot());
   }
   catch(XmlError &err) {
-    ostringstream serr;
+    std::ostringstream serr;
     serr << "XML error parsing processor specification: " << processorfile;
     serr << "\n " << err.explain;
     throw SleighError(serr.str());
   }
   catch(LowlevelError &err) {
-    ostringstream serr;
+    std::ostringstream serr;
     serr << "Error reading processor specification: " << processorfile;
     serr << "\n " << err.explain;
     throw SleighError(serr.str());
@@ -239,13 +239,13 @@ void SleighArchitecture::buildSpecFile(DocumentStorage &store)
     store.registerTag(doc->getRoot());
   }
   catch(XmlError &err) {
-    ostringstream serr;
+    std::ostringstream serr;
     serr << "XML error parsing compiler specification: " << compilerfile;
     serr << "\n " << err.explain;
     throw SleighError(serr.str());
   }
   catch(LowlevelError &err) {
-    ostringstream serr;
+    std::ostringstream serr;
     serr << "Error reading compiler specification: " << compilerfile;
     serr << "\n " << err.explain;
     throw SleighError(serr.str());
@@ -257,13 +257,13 @@ void SleighArchitecture::buildSpecFile(DocumentStorage &store)
       store.registerTag(doc->getRoot());
     }
     catch(XmlError &err) {
-      ostringstream serr;
+      std::ostringstream serr;
       serr << "XML error parsing SLEIGH file: " << slafile;
       serr << "\n " << err.explain;
       throw SleighError(serr.str());
     }
     catch(LowlevelError &err) {
-      ostringstream serr;
+      std::ostringstream serr;
       serr << "Error reading SLEIGH file: " << slafile;
       serr << "\n " << err.explain;
       throw SleighError(serr.str());
@@ -286,7 +286,7 @@ void SleighArchitecture::modifySpaces(Translate *trans)
 /// \param fname is the filename of the given executable image
 /// \param targ is the optional \e language \e id or other target information
 /// \param estream is a pointer to an output stream for writing error messages
-SleighArchitecture::SleighArchitecture(const string &fname,const string &targ,ostream *estream)
+SleighArchitecture::SleighArchitecture(const std::string &fname,const std::string &targ,std::ostream *estream)
   : Architecture()
 
 {
@@ -297,22 +297,22 @@ SleighArchitecture::SleighArchitecture(const string &fname,const string &targ,os
 
 /// This is run once when spinning up the decompiler.
 /// Look for the root .ldefs files within the normal directories and parse them.
-/// Use these to populate the list of \e language \e ids that are supported.
+/// Use these to populate the std::list of \e language \e ids that are supported.
 /// \param errs is an output stream for writing error messages
-void SleighArchitecture::collectSpecFiles(ostream &errs)
+void SleighArchitecture::collectSpecFiles(std::ostream &errs)
 
 {
   if (!description.empty()) return; // Have we already collected before
 
-  vector<string> testspecs;
-  vector<string>::iterator iter;
+  vectorstd::string testspecs;
+  vectorstd::string::iterator iter;
   specpaths.matchList(testspecs,".ldefs",true);
   for(iter=testspecs.begin();iter!=testspecs.end();++iter)
     loadLanguageDescription(*iter,errs);
 }
 
 /// \param s is the XML output stream
-void SleighArchitecture::saveXmlHeader(ostream &s) const
+void SleighArchitecture::saveXmlHeader(std::ostream &s) const
 
 {
   a_v(s,"name",filename);
@@ -327,75 +327,75 @@ void SleighArchitecture::restoreXmlHeader(const Element *el)
   target = el->getAttributeValue("target");
 }
 
-/// Given an architecture target string try to recover an
+/// Given an architecture target std::string try to recover an
 /// appropriate processor name for use in a normalized \e language \e id.
-/// \param nm is the given target string
+/// \param nm is the given target std::string
 /// \return the processor field
-string SleighArchitecture::normalizeProcessor(const string &nm)
+std::string SleighArchitecture::normalizeProcessor(const std::string &nm)
 
 {
-  if (nm.find("386")!=string::npos)
+  if (nm.find("386")!=std::string::npos)
     return "x86";
   return nm;
 }
 
-/// Given an architecture target string try to recover an
-/// appropriate endianness string for use in a normalized \e language \e id.
-/// \param nm is the given target string
+/// Given an architecture target std::string try to recover an
+/// appropriate endianness std::string for use in a normalized \e language \e id.
+/// \param nm is the given target std::string
 /// \return the endianness field
-string SleighArchitecture::normalizeEndian(const string &nm)
+std::string SleighArchitecture::normalizeEndian(const std::string &nm)
 
 {
-  if (nm.find("big")!=string::npos)
+  if (nm.find("big")!=std::string::npos)
     return "BE";
-  if (nm.find("little")!=string::npos)
+  if (nm.find("little")!=std::string::npos)
     return "LE";
   return nm;
 }
 
-/// Given an architecture target string try to recover an
-/// appropriate size string for use in a normalized \e language \e id.
-/// \param nm is the given target string
+/// Given an architecture target std::string try to recover an
+/// appropriate size std::string for use in a normalized \e language \e id.
+/// \param nm is the given target std::string
 /// \return the size field
-string SleighArchitecture::normalizeSize(const string &nm)
+std::string SleighArchitecture::normalizeSize(const std::string &nm)
 
 {
-  string res = nm;
-  string::size_type pos;
+  std::string res = nm;
+  std::string::size_type pos;
   
   pos = res.find("bit");
-  if (pos != string::npos)
+  if (pos != std::string::npos)
     res.erase(pos,3);
   pos = res.find('-');
-  if (pos != string::npos)
+  if (pos != std::string::npos)
     res.erase(pos,1);
   return res;
 }
 
-/// Try to normalize the target string into a valid \e language \e id.
-/// In general the target string must already look like a \e language \e id,
+/// Try to normalize the target std::string into a valid \e language \e id.
+/// In general the target std::string must already look like a \e language \e id,
 /// but it can drop the compiler field and be a little sloppier in its format.
-/// \param nm is the given target string
+/// \param nm is the given target std::string
 /// \return the normalized \e language \e id
-string SleighArchitecture::normalizeArchitecture(const string &nm)
+std::string SleighArchitecture::normalizeArchitecture(const std::string &nm)
 
 {
-  string processor;
-  string endian;
-  string size;
-  string variant;
-  string compile;
+  std::string processor;
+  std::string endian;
+  std::string size;
+  std::string variant;
+  std::string compile;
   
-  string::size_type pos[4];
+  std::string::size_type pos[4];
   int4 i;
-  string::size_type curpos=0;
+  std::string::size_type curpos=0;
   for(i=0;i<4;++i) {
     curpos = nm.find(':',curpos+1);
-    if (curpos == string::npos) break;
+    if (curpos == std::string::npos) break;
     pos[i] = curpos;
   }
   if ((i!=3)&&(i!=4))
-    throw LowlevelError("Architecture string does not look like sleigh id: "+nm);
+    throw LowlevelError("Architecture std::string does not look like sleigh id: "+nm);
   processor = nm.substr(0,pos[0]);
   endian = nm.substr(pos[0]+1,pos[1]-pos[0]-1);
   size = nm.substr(pos[1]+1,pos[2]-pos[1]-1);
@@ -420,13 +420,13 @@ string SleighArchitecture::normalizeArchitecture(const string &nm)
 /// This assumes a standard "Ghidra/Processors/*/data/languages" layout.  It
 /// scans for all matching directories and prepares for reading .ldefs files.
 /// \param rootpath is the root path of the Ghidra installation
-void SleighArchitecture::scanForSleighDirectories(const string &rootpath)
+void SleighArchitecture::scanForSleighDirectories(const std::string &rootpath)
 
 {
-  vector<string> ghidradir;
-  vector<string> procdir;
-  vector<string> procdir2;
-  vector<string> languagesubdirs;
+  vectorstd::string ghidradir;
+  vectorstd::string procdir;
+  vectorstd::string procdir2;
+  vectorstd::string languagesubdirs;
 
   FileManage::scanDirectoryRecursive(ghidradir,"Ghidra",rootpath,2);
   for(uint4 i=0;i<ghidradir.size();++i) {
@@ -437,11 +437,11 @@ void SleighArchitecture::scanForSleighDirectories(const string &rootpath)
     for(uint4 i=0;i<procdir.size();++i)
       FileManage::directoryList(procdir2,procdir[i]);
 
-    vector<string> datadirs;
+    vectorstd::string datadirs;
     for(uint4 i=0;i<procdir2.size();++i)
       FileManage::scanDirectoryRecursive(datadirs,"data",procdir2[i],1);
     
-    vector<string> languagedirs;
+    vectorstd::string languagedirs;
     for(uint4 i=0;i<datadirs.size();++i)
       FileManage::scanDirectoryRecursive(languagedirs,"languages",datadirs[i],1);
     
@@ -468,6 +468,6 @@ void SleighArchitecture::shutdown(void)
     delete last_sleigh;
     last_sleigh = (Sleigh *)0;
   }
-  // description.clear();  // static vector is destroyed by the normal exit handler
+  // description.clear();  // static std::vector is destroyed by the normal exit handler
 }
 }

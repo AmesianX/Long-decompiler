@@ -44,10 +44,10 @@ SleighSymbol *SymbolScope::findSymbol(const std::string &nm) const
 SymbolTable::~SymbolTable(void)
 
 {
-  vector<SymbolScope *>::iterator iter;
+  std::vector<SymbolScope *>::iterator iter;
   for(iter=table.begin();iter!=table.end();++iter)
     delete *iter;
-  vector<SleighSymbol *>::iterator siter;
+  std::vector<SleighSymbol *>::iterator siter;
   for(siter=symbollist.begin();siter!=symbollist.end();++siter)
     delete *siter;
 }
@@ -141,15 +141,15 @@ void SymbolTable::saveXml(std::ostream &s) const
 
 {
   s << "<symbol_table";
-  s << " scopesize=\"" << dec << table.size() << "\"";
+  s << " scopesize=\"" << std::dec << table.size() << "\"";
   s << " symbolsize=\"" << symbollist.size() << "\">\n";
   for(int4 i=0;i<table.size();++i) {
-    s << "<scope id=\"0x" << hex << table[i]->getId() << "\"";
+    s << "<scope id=\"0x" << std::dec << table[i]->getId() << "\"";
     s << " parent=\"0x";
     if (table[i]->getParent() == (SymbolScope *)0)
       s << "0";
     else
-      s << hex << table[i]->getParent()->getId();
+      s << std::dec << table[i]->getParent()->getId();
     s << "\"/>\n";
   }
 
@@ -168,21 +168,21 @@ void SymbolTable::restoreXml(const Element *el,SleighBase *trans)
 {
   {
     uint4 size;
-    istringstream s(el->getAttributeValue("scopesize"));
-    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+    std::istringstream s(el->getAttributeValue("scopesize"));
+    s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
     s >> size;
     table.resize(size,(SymbolScope *)0);
   }
   {
     uint4 size;
-    istringstream s(el->getAttributeValue("symbolsize"));
-    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+    std::istringstream s(el->getAttributeValue("symbolsize"));
+    s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
     s >> size;
     symbollist.resize(size,(SleighSymbol *)0);
   }
-  const List &list(el->getChildren());
+  const List &std::list(el->getChildren());
   List::const_iterator iter;
-  iter = list.begin();
+  iter = std::list.begin();
   for(int4 i=0;i<table.size();++i) { // Restore the scopes
     Element *subel = *iter;
     if (subel->getName() != "scope")
@@ -190,13 +190,13 @@ void SymbolTable::restoreXml(const Element *el,SleighBase *trans)
     uintm id;
     uintm parent;
     {
-      istringstream s(subel->getAttributeValue("id"));
-      s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+      std::istringstream s(subel->getAttributeValue("id"));
+      s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
       s >> id;
     }
     {
-      istringstream s(subel->getAttributeValue("parent"));
-      s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+      std::istringstream s(subel->getAttributeValue("parent"));
+      s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
       s >> parent;
     }
     SymbolScope *parscope = (parent==id) ? (SymbolScope *)0 : table[parent];
@@ -211,13 +211,13 @@ void SymbolTable::restoreXml(const Element *el,SleighBase *trans)
     ++iter;
   }
 				// Now restore the symbol content
-  while(iter != list.end()) {
+  while(iter != std::list.end()) {
     Element *subel = *iter;
     uintm id;
     SleighSymbol *sym;
     {
-      istringstream s(subel->getAttributeValue("id"));
-      s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+      std::istringstream s(subel->getAttributeValue("id"));
+      s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
       s >> id;
     }
     sym = findSymbol(id);
@@ -330,8 +330,8 @@ void SymbolTable::renumber(void)
 
 {				// Renumber all the scopes and symbols
 				// so that there are no gaps
-  vector<SymbolScope *> newtable;
-  vector<SleighSymbol *> newsymbol;
+  std::vector<SymbolScope *> newtable;
+  std::vector<SleighSymbol *> newsymbol;
 				// First renumber the scopes
   SymbolScope *scope;
   for(int4 i=0;i<table.size();++i) {
@@ -359,7 +359,7 @@ void SleighSymbol::saveXmlHeader(std::ostream &s) const
 
 {				// Save the basic attributes of a symbol
   s << " name=\"" << name << "\"";
-  s << " id=\"0x" << hex << id << "\"";
+  s << " id=\"0x" << std::dec << id << "\"";
   s << " scope=\"0x" << scopeid << "\"";
 }
 
@@ -368,13 +368,13 @@ void SleighSymbol::restoreXmlHeader(const Element *el)
 {
   name = el->getAttributeValue("name");
   {
-    istringstream s(el->getAttributeValue("id"));
-    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+    std::istringstream s(el->getAttributeValue("id"));
+    s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
     s >> id;
   }
   {
-    istringstream s(el->getAttributeValue("scope"));
-    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+    std::istringstream s(el->getAttributeValue("scope"));
+    s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
     s >> scopeid;
   }
 }
@@ -384,7 +384,7 @@ void UserOpSymbol::saveXml(std::ostream &s) const
 {
   s << "<userop";
   SleighSymbol::saveXmlHeader(s);
-  s << " index=\"" << dec << index << "\"";
+  s << " index=\"" << std::dec << index << "\"";
   s << "/>\n";
 }
 
@@ -399,8 +399,8 @@ void UserOpSymbol::saveXmlHeader(std::ostream &s) const
 void UserOpSymbol::restoreXml(const Element *el,SleighBase *trans)
 
 {
-  istringstream s(el->getAttributeValue("index"));
-  s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+  std::istringstream s(el->getAttributeValue("index"));
+  s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
   s >> index;
 }
 
@@ -499,9 +499,9 @@ void ValueSymbol::print(std::ostream &s,ParserWalker &walker) const
 {
   intb val = patval->getValue(walker);
   if (val >= 0)
-    s << "0x" << hex << val;
+    s << "0x" << std::dec << val;
   else
-    s << "-0x" << hex << -val;
+    s << "-0x" << std::dec << -val;
 }
 
 void ValueSymbol::saveXml(std::ostream &s) const
@@ -525,9 +525,9 @@ void ValueSymbol::saveXmlHeader(std::ostream &s) const
 void ValueSymbol::restoreXml(const Element *el,SleighBase *trans)
 
 {
-  const List &list(el->getChildren());
+  const List &std::list(el->getChildren());
   List::const_iterator iter;
-  iter = list.begin();
+  iter = std::list.begin();
   patval = (PatternValue *) PatternExpression::restoreExpression(*iter,trans);
   patval->layClaim();
 }
@@ -550,7 +550,7 @@ Constructor *ValueMapSymbol::resolve(ParserWalker &walker)
   if (!tableisfilled) {
     intb ind = patval->getValue(walker);
     if ((ind >= valuetable.size())||(ind<0)||(valuetable[ind] == 0xBADBEEF)) {
-      ostringstream s;
+      std::ostringstream s;
       s << walker.getAddr().getShortcut();
       walker.getAddr().printRaw(s);
       s << ": No corresponding entry in valuetable";
@@ -578,9 +578,9 @@ void ValueMapSymbol::print(std::ostream &s,ParserWalker &walker) const
   // ind is already checked to be in range by the resolve routine
   intb val = valuetable[ind];
   if (val >= 0)
-    s << "0x" << hex << val;
+    s << "0x" << std::dec << val;
   else
-    s << "-0x" << hex << -val;
+    s << "-0x" << std::dec << -val;
 }
 
 void ValueMapSymbol::saveXml(std::ostream &s) const
@@ -591,7 +591,7 @@ void ValueMapSymbol::saveXml(std::ostream &s) const
   s << ">\n";
   patval->saveXml(s);
   for(uint4 i=0;i<valuetable.size();++i)
-    s << "<valuetab val=\"" << dec << valuetable[i] << "\"/>\n";
+    s << "<valuetab val=\"" << std::dec << valuetable[i] << "\"/>\n";
   s << "</valuemap_sym>\n";
 }
 
@@ -606,15 +606,15 @@ void ValueMapSymbol::saveXmlHeader(std::ostream &s) const
 void ValueMapSymbol::restoreXml(const Element *el,SleighBase *trans)
 
 {
-  const List &list(el->getChildren());
+  const List &std::list(el->getChildren());
   List::const_iterator iter;
-  iter = list.begin();
+  iter = std::list.begin();
   patval = (PatternValue *) PatternExpression::restoreExpression(*iter,trans);
   patval->layClaim();
   ++iter;
-  while(iter != list.end()) {
-    istringstream s((*iter)->getAttributeValue("val"));
-    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+  while(iter != std::list.end()) {
+    std::istringstream s((*iter)->getAttributeValue("val"));
+    s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
     intb val;
     s >> val;
     valuetable.push_back(val);
@@ -643,7 +643,7 @@ Constructor *NameSymbol::resolve(ParserWalker &walker)
   if (!tableisfilled) {
     intb ind = patval->getValue(walker);
     if ((ind >= nametable.size())||(ind<0)||((nametable[ind].size()==1)&&(nametable[ind][0]=='\t'))) {
-      ostringstream s;
+      std::ostringstream s;
       s << walker.getAddr().getShortcut();
       walker.getAddr().printRaw(s);
       s << ": No corresponding entry in nametable";
@@ -688,13 +688,13 @@ void NameSymbol::saveXmlHeader(std::ostream &s) const
 void NameSymbol::restoreXml(const Element *el,SleighBase *trans)
 
 {
-  const List &list(el->getChildren());
+  const List &std::list(el->getChildren());
   List::const_iterator iter;
-  iter = list.begin();
+  iter = std::list.begin();
   patval = (PatternValue *) PatternExpression::restoreExpression(*iter,trans);
   patval->layClaim();
   ++iter;
-  while(iter != list.end()) {
+  while(iter != std::list.end()) {
     const Element *subel = *iter;
     if (subel->getNumAttributes() >= 1)
       nametable.push_back(subel->getAttributeValue("name"));
@@ -735,8 +735,8 @@ void VarnodeSymbol::saveXml(std::ostream &s) const
   s << "<varnode_sym";
   SleighSymbol::saveXmlHeader(s);
   s << " space=\"" << fix.space->getName() << "\"";
-  s << " offset=\"0x" << hex << fix.offset << "\"";
-  s << " size=\"" << dec << fix.size << "\"";
+  s << " offset=\"0x" << std::dec << fix.offset << "\"";
+  s << " size=\"" << std::dec << fix.size << "\"";
   s << ">\n";
   PatternlessSymbol::saveXml(s);
   s << "</varnode_sym>\n";
@@ -755,13 +755,13 @@ void VarnodeSymbol::restoreXml(const Element *el,SleighBase *trans)
 {
   fix.space = trans->getSpaceByName(el->getAttributeValue("space"));
   {
-    istringstream s(el->getAttributeValue("offset"));
-    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+    std::istringstream s(el->getAttributeValue("offset"));
+    s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
     s >> fix.offset;
   }
   {
-    istringstream s(el->getAttributeValue("size"));
-    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+    std::istringstream s(el->getAttributeValue("size"));
+    s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
     s >> fix.size;
   }
 				// PatternlessSymbol does not need restoring
@@ -782,8 +782,8 @@ void ContextSymbol::saveXml(std::ostream &s) const
 {
   s << "<context_sym";
   SleighSymbol::saveXmlHeader(s);
-  s << " varnode=\"0x" << hex << vn->getId() << "\"";
-  s << " low=\"" << dec << low << "\"";
+  s << " varnode=\"0x" << std::dec << vn->getId() << "\"";
+  s << " low=\"" << std::dec << low << "\"";
   s << " high=\"" << high << "\"";
   a_v_b(s,"flow",flow);
   s << ">\n";
@@ -805,19 +805,19 @@ void ContextSymbol::restoreXml(const Element *el,SleighBase *trans)
   ValueSymbol::restoreXml(el,trans);
   {
     uintm id;
-    istringstream s(el->getAttributeValue("varnode"));
-    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+    std::istringstream s(el->getAttributeValue("varnode"));
+    s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
     s >> id;
     vn = (VarnodeSymbol *)trans->findSymbol(id);
   }
   {  
-    istringstream s(el->getAttributeValue("low"));
-    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+    std::istringstream s(el->getAttributeValue("low"));
+    s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
     s >> low;
   }
   {  
-    istringstream s(el->getAttributeValue("high"));
-    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+    std::istringstream s(el->getAttributeValue("high"));
+    s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
     s >> high;
   }
   flow = true;
@@ -829,7 +829,7 @@ void ContextSymbol::restoreXml(const Element *el,SleighBase *trans)
   }
 }
 
-VarnodeListSymbol::VarnodeListSymbol(const std::string &nm,PatternValue *pv,const vector<SleighSymbol *> &vt)
+VarnodeListSymbol::VarnodeListSymbol(const std::string &nm,PatternValue *pv,const std::vector<SleighSymbol *> &vt)
   : ValueSymbol(nm,pv)
 {
   for(int4 i=0;i<vt.size();++i)
@@ -855,10 +855,10 @@ Constructor *VarnodeListSymbol::resolve(ParserWalker &walker)
   if (!tableisfilled) {
     intb ind = patval->getValue(walker);
     if ((ind<0)||(ind>=varnode_table.size())||(varnode_table[ind]==(VarnodeSymbol *)0)) {
-      ostringstream s;
+      std::ostringstream s;
       s << walker.getAddr().getShortcut();
       walker.getAddr().printRaw(s);
-      s << ": No corresponding entry in varnode list";
+      s << ": No corresponding entry in varnode std::list";
       throw BadDataError(s.str());
     }
   }
@@ -908,7 +908,7 @@ void VarnodeListSymbol::saveXml(std::ostream &s) const
     if (varnode_table[i] == (VarnodeSymbol *)0)
       s << "<null/>\n";
     else
-      s << "<var id=\"0x" << hex << varnode_table[i]->getId() << "\"/>\n";
+      s << "<var id=\"0x" << std::dec << varnode_table[i]->getId() << "\"/>\n";
   }
   s << "</varlist_sym>\n";
 }
@@ -924,18 +924,18 @@ void VarnodeListSymbol::saveXmlHeader(std::ostream &s) const
 void VarnodeListSymbol::restoreXml(const Element *el,SleighBase *trans)
 
 {
-  const List &list(el->getChildren());
+  const List &std::list(el->getChildren());
   List::const_iterator iter;
-  iter = list.begin();
+  iter = std::list.begin();
   patval = (PatternValue *) PatternExpression::restoreExpression(*iter,trans);
   patval->layClaim();
   ++iter;
-  while(iter!=list.end()) {
+  while(iter!=std::list.end()) {
     const Element *subel = *iter;
     if (subel->getName() == "var") {
       uintm id;
-      istringstream s(subel->getAttributeValue("id"));
-      s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+      std::istringstream s(subel->getAttributeValue("id"));
+      s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
       s >> id;
       varnode_table.push_back( (VarnodeSymbol *)trans->findSymbol(id) );
     }
@@ -1028,9 +1028,9 @@ void OperandSymbol::print(std::ostream &s,ParserWalker &walker) const
   else {
     intb val = defexp->getValue(walker);
     if (val >= 0)
-      s << "0x" << hex << val;
+      s << "0x" << std::dec << val;
     else
-      s << "-0x" << hex << -val;
+      s << "-0x" << std::dec << -val;
   }
   walker.popOperand();
 }
@@ -1041,13 +1041,13 @@ void OperandSymbol::saveXml(std::ostream &s) const
   s << "<operand_sym";
   SleighSymbol::saveXmlHeader(s);
   if (triple != (TripleSymbol *)0)
-    s << " subsym=\"0x" << hex << triple->getId() << "\"";
-  s << " off=\"" << dec << reloffset << "\"";
+    s << " subsym=\"0x" << std::dec << triple->getId() << "\"";
+  s << " off=\"" << std::dec << reloffset << "\"";
   s << " base=\"" << offsetbase << "\"";
   s << " minlen=\"" << minimumlength << "\"";
   if (isCodeAddress())
     s << " code=\"true\"";
-  s << " index=\"" << dec << hand << "\">\n";
+  s << " index=\"" << std::dec << hand << "\">\n";
   localexp->saveXml(s);
   if (defexp != (PatternExpression *)0)
     defexp->saveXml(s);
@@ -1069,30 +1069,30 @@ void OperandSymbol::restoreXml(const Element *el,SleighBase *trans)
   triple = (TripleSymbol *)0;
   flags = 0;
   {
-    istringstream s(el->getAttributeValue("index"));
-    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+    std::istringstream s(el->getAttributeValue("index"));
+    s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
     s >> hand;
   }
   {
-    istringstream s(el->getAttributeValue("off"));
-    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+    std::istringstream s(el->getAttributeValue("off"));
+    s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
     s >> reloffset;
   }
   {
-    istringstream s(el->getAttributeValue("base"));
-    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+    std::istringstream s(el->getAttributeValue("base"));
+    s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
     s >> offsetbase;
   }
   {
-    istringstream s(el->getAttributeValue("minlen"));
-    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+    std::istringstream s(el->getAttributeValue("minlen"));
+    s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
     s >> minimumlength;
   }
   for(int4 i=0;i<el->getNumAttributes();++i) {
     if (el->getAttributeName(i) == "subsym") {
       uintm id;
-      istringstream s(el->getAttributeValue(i));
-      s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+      std::istringstream s(el->getAttributeValue(i));
+      s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
       s >> id;
       triple = (TripleSymbol *)trans->findSymbol(id);
     }
@@ -1101,13 +1101,13 @@ void OperandSymbol::restoreXml(const Element *el,SleighBase *trans)
 	flags |= code_address;
     }
   }
-  const List &list(el->getChildren());
+  const List &std::list(el->getChildren());
   List::const_iterator iter;
-  iter = list.begin();
+  iter = std::list.begin();
   localexp = (OperandValue *)PatternExpression::restoreExpression(*iter,trans);
   localexp->layClaim();
   ++iter;
-  if (iter != list.end()) {
+  if (iter != std::list.end()) {
     defexp = PatternExpression::restoreExpression(*iter,trans);
     defexp->layClaim();
   }
@@ -1150,7 +1150,7 @@ void StartSymbol::print(std::ostream &s,ParserWalker &walker) const
 
 {
   intb val = (intb) walker.getAddr().getOffset();
-  s << "0x" << hex << val;
+  s << "0x" << std::dec << val;
 }
 
 void StartSymbol::saveXml(std::ostream &s) const
@@ -1214,7 +1214,7 @@ void EndSymbol::print(std::ostream &s,ParserWalker &walker) const
 
 {
   intb val = (intb) walker.getNaddr().getOffset();
-  s << "0x" << hex << val;
+  s << "0x" << std::dec << val;
 }
 
 void EndSymbol::saveXml(std::ostream &s) const
@@ -1270,7 +1270,7 @@ void FlowDestSymbol::print(std::ostream &s,ParserWalker &walker) const
 
 {
   intb val = (intb) walker.getDestAddr().getOffset();
-  s << "0x" << hex << val;
+  s << "0x" << std::dec << val;
 }
 
 void FlowDestSymbol::saveXml(std::ostream &s) const
@@ -1324,7 +1324,7 @@ void FlowRefSymbol::print(std::ostream &s,ParserWalker &walker) const
 
 {
   intb val = (intb) walker.getRefAddr().getOffset();
-  s << "0x" << hex << val;
+  s << "0x" << std::dec << val;
 }
 
 void FlowRefSymbol::saveXml(std::ostream &s) const
@@ -1386,7 +1386,7 @@ Constructor::~Constructor(void)
     if (ntpl != (ConstructTpl *)0)
       delete ntpl;
   }
-  vector<ContextChange *>::iterator iter;
+  std::vector<ContextChange *>::iterator iter;
   for(iter=context.begin();iter!=context.end();++iter)
     delete *iter;
 }
@@ -1462,7 +1462,7 @@ ConstructTpl *Constructor::getNamedTempl(int4 secnum) const
 void Constructor::print(std::ostream &s,ParserWalker &walker) const
 
 {
-  vector<std::string>::const_iterator piter;
+  std::vector<std::string>::const_iterator piter;
 
   for(piter=printpiece.begin();piter!=printpiece.end();++piter) {
     if ((*piter)[0] == '\n') {
@@ -1530,7 +1530,7 @@ void Constructor::removeTrailingSpace(void)
   //    printpiece.pop_back();
 }
 
-void Constructor::markSubtableOperands(vector<int4> &check) const
+void Constructor::markSubtableOperands(std::vector<int4> &check) const
 
 { // Adjust -check- so it has one entry for every operand, a 0 if it is a subtable, a 2 if it is not
   check.resize(operands.size());
@@ -1557,16 +1557,16 @@ void Constructor::saveXml(std::ostream &s) const
 
 {
   s << "<constructor";
-  s << " parent=\"0x" << hex << parent->getId() << "\"";
-  s << " first=\"" << dec << firstwhitespace << "\"";
+  s << " parent=\"0x" << std::dec << parent->getId() << "\"";
+  s << " first=\"" << std::dec << firstwhitespace << "\"";
   s << " length=\"" << minimumlength << "\"";
   s << " line=\"" << lineno << "\">\n";
   for(int4 i=0;i<operands.size();++i)
-    s << "<oper id=\"0x" << hex << operands[i]->getId() << "\"/>\n";
+    s << "<oper id=\"0x" << std::dec << operands[i]->getId() << "\"/>\n";
   for(int4 i=0;i<printpiece.size();++i) {
     if (printpiece[i][0]=='\n') {
       int4 index = printpiece[i][1]-'A';
-      s << "<opprint id=\"" << dec << index << "\"/>\n";
+      s << "<opprint id=\"" << std::dec << index << "\"/>\n";
     }
     else {
       s << "<print piece=\"";
@@ -1591,35 +1591,35 @@ void Constructor::restoreXml(const Element *el,SleighBase *trans)
 {
   uintm id;
   {
-    istringstream s(el->getAttributeValue("parent"));
-    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+    std::istringstream s(el->getAttributeValue("parent"));
+    s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
     s >> id;
     parent = (SubtableSymbol *)trans->findSymbol(id);
   }
   {
-    istringstream s(el->getAttributeValue("first"));
-    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+    std::istringstream s(el->getAttributeValue("first"));
+    s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
     s >> firstwhitespace;
   }
   {
-    istringstream s(el->getAttributeValue("length"));
-    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+    std::istringstream s(el->getAttributeValue("length"));
+    s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
     s >> minimumlength;
   }
   {
-    istringstream s(el->getAttributeValue("line"));
-    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+    std::istringstream s(el->getAttributeValue("line"));
+    s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
     s >> lineno;
   }
-  const List &list(el->getChildren());
+  const List &std::list(el->getChildren());
   List::const_iterator iter;
-  iter = list.begin();
-  while(iter != list.end()) {
+  iter = std::list.begin();
+  while(iter != std::list.end()) {
     if ((*iter)->getName() == "oper") {
       uintm id;
       {
-	istringstream s((*iter)->getAttributeValue("id"));
-	s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+	std::istringstream s((*iter)->getAttributeValue("id"));
+	s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
 	s >> id;
       }
       OperandSymbol *sym = (OperandSymbol *)trans->findSymbol(id);
@@ -1629,8 +1629,8 @@ void Constructor::restoreXml(const Element *el,SleighBase *trans)
       printpiece.push_back( (*iter)->getAttributeValue("piece"));
     else if ((*iter)->getName() == "opprint") {
       int4 index;
-      istringstream s((*iter)->getAttributeValue("id"));
-      s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+      std::istringstream s((*iter)->getAttributeValue("id"));
+      s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
       s >> index;
       std::string operstring = "\n ";
       operstring[1] = ('A' + index);
@@ -1675,8 +1675,8 @@ void Constructor::orderOperands(void)
 
 {
   OperandSymbol *sym;
-  vector<OperandSymbol *> patternorder;
-  vector<OperandSymbol *> newops; // New order of the operands
+  std::vector<OperandSymbol *> patternorder;
+  std::vector<OperandSymbol *> newops; // New order of the operands
   int4 lastsize;
 
   pateq->operandOrder(this,patternorder);
@@ -1715,7 +1715,7 @@ void Constructor::orderOperands(void)
     newops[i]->hand = i;
     newops[i]->localexp->changeIndex(i);
   }
-  vector<int4> handmap;		// Create index translation map
+  std::vector<int4> handmap;		// Create index translation std::map
   for(int4 i=0;i<operands.size();++i)
     handmap.push_back(operands[i]->hand);
 
@@ -1751,7 +1751,7 @@ TokenPattern *Constructor::buildPattern(std::ostream &s)
   if (pattern != (TokenPattern *)0) return pattern; // Already built
 
   pattern = new TokenPattern();
-  vector<TokenPattern> oppattern;
+  std::vector<TokenPattern> oppattern;
   bool recursion = false;
 				// Generate pattern for each operand, store in oppattern
   for(int4 i=0;i<operands.size();++i) {
@@ -1839,7 +1839,7 @@ void Constructor::printInfo(std::ostream &s) const
 {				// Print identifying information about constructor
 				// for use in error messages
   s << "table \"" << parent->getName();
-  s << "\" constructor starting at line " << dec << lineno;
+  s << "\" constructor starting at line " << std::dec << lineno;
 }
 
 SubtableSymbol::SubtableSymbol(const std::string &nm) : TripleSymbol(nm)
@@ -1858,7 +1858,7 @@ SubtableSymbol::~SubtableSymbol(void)
     delete pattern;
   if (decisiontree != (DecisionNode *)0)
     delete decisiontree;
-  vector<Constructor *>::iterator iter;
+  std::vector<Constructor *>::iterator iter;
   for(iter=construct.begin();iter!=construct.end();++iter)
     delete *iter;
 }
@@ -1869,7 +1869,7 @@ void SubtableSymbol::saveXml(std::ostream &s) const
   if (decisiontree == (DecisionNode *)0) return; // Not fully formed
   s << "<subtable_sym";
   SleighSymbol::saveXmlHeader(s);
-  s << " numct=\"" << dec << construct.size() << "\">\n";
+  s << " numct=\"" << std::dec << construct.size() << "\">\n";
   for(int4 i=0;i<construct.size();++i)
     construct[i]->saveXml(s);
   decisiontree->saveXml(s);
@@ -1889,15 +1889,15 @@ void SubtableSymbol::restoreXml(const Element *el,SleighBase *trans)
 {
   {
     int4 numct;
-    istringstream s(el->getAttributeValue("numct"));
-    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+    std::istringstream s(el->getAttributeValue("numct"));
+    s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
     s >> numct;
     construct.reserve(numct);
   }
-  const List &list(el->getChildren());
+  const List &std::list(el->getChildren());
   List::const_iterator iter;
-  iter = list.begin();
-  while(iter != list.end()) {
+  iter = std::list.begin();
+  while(iter != std::list.end()) {
     if ((*iter)->getName() == "constructor") {
       Constructor *ct = new Constructor();
       addConstructor(ct);
@@ -1940,7 +1940,7 @@ TokenPattern *SubtableSymbol::buildPattern(std::ostream &s)
   beingbuilt = true;
   pattern = new TokenPattern();
   if (construct.empty()) {
-    s << "Error: There are no constructors in table: "+getName() << endl;
+    s << "Error: There are no constructors in table: "+getName() << std::endl;
     errors = true;
     return pattern;
   }
@@ -1949,7 +1949,7 @@ TokenPattern *SubtableSymbol::buildPattern(std::ostream &s)
   } catch(SleighError &err) {
     s << "Error: " << err.explain << ": for ";
     construct.front()->printInfo(s);
-    s << endl;
+    s << std::endl;
     errors = true;
   }
   *pattern = *construct.front()->getPattern();
@@ -1959,7 +1959,7 @@ TokenPattern *SubtableSymbol::buildPattern(std::ostream &s)
     } catch(SleighError &err) {
       s << "Error: " << err.explain << ": for ";
       construct[i]->printInfo(s);
-      s << endl;
+      s << std::endl;
       errors = true;
     }
     *pattern = construct[i]->getPattern()->commonSubPattern(*pattern);
@@ -1974,12 +1974,12 @@ void DecisionProperties::identicalPattern(Constructor *a,Constructor *b)
   if ((!a->isError())&&(!b->isError())) {
     a->setError(true);
     b->setError(true);
-    ostringstream s;
+    std::ostringstream s;
     s << "Constructors with identical patterns: \n   ";
     a->printInfo(s);
     s << "\n   ";
     b->printInfo(s);
-    s << endl;
+    s << std::endl;
     identerrors.push_back(s.str());
   }
 }
@@ -1990,12 +1990,12 @@ void DecisionProperties::conflictingPattern(Constructor *a,Constructor *b)
   if ((!a->isError())&&(!b->isError())) {
     a->setError(true);
     b->setError(true);
-    ostringstream s;
+    std::ostringstream s;
     s << "Constructor patterns cannot be distinguished: \n   ";
     a->printInfo(s);
     s << "\n   ";
     b->printInfo(s);
-    s << endl;
+    s << std::endl;
     conflicterrors.push_back(s.str());
   }
 }
@@ -2013,11 +2013,11 @@ DecisionNode::DecisionNode(DecisionNode *p)
 DecisionNode::~DecisionNode(void)
 
 {				// We own sub nodes
-  vector<DecisionNode *>::iterator iter;
+  std::vector<DecisionNode *>::iterator iter;
   for(iter=children.begin();iter!=children.end();++iter)
     delete *iter;
-  vector<pair<DisjointPattern *,Constructor *> >::iterator piter;
-  for(piter=list.begin();piter!=list.end();++piter)
+  std::vector<pair<DisjointPattern *,Constructor *> >::iterator piter;
+  for(piter=std::list.begin();piter!=std::list.end();++piter)
     delete (*piter).first;	// Delete the patterns
 }
 
@@ -2025,7 +2025,7 @@ void DecisionNode::addConstructorPair(const DisjointPattern *pat,Constructor *ct
 
 {
   DisjointPattern *clone = (DisjointPattern *)pat->simplifyClone(); // We need to own pattern
-  list.push_back(pair<DisjointPattern *,Constructor *>(clone,ct));
+  std::list.push_back(pair<DisjointPattern *,Constructor *>(clone,ct));
   num += 1;
 }
 
@@ -2035,8 +2035,8 @@ int4 DecisionNode::getMaximumLength(bool context)
   int4 max = 0;
   int4 val,i;
 
-  for(i=0;i<list.size();++i) {
-    val = list[i].first->getLength(context);
+  for(i=0;i<std::list.size();++i) {
+    val = std::list[i].first->getLength(context);
     if (val > max)
       max = val;
   }
@@ -2052,8 +2052,8 @@ int4 DecisionNode::getNumFixed(int4 low,int4 size,bool context)
   uintm m = (size==8*sizeof(uintm)) ? 0 : (((uintm)1)<<size);
   m = m-1;
 
-  for(int4 i=0;i<list.size();++i) {
-    mask = list[i].first->getMask(low,size,context);
+  for(int4 i=0;i<std::list.size();++i) {
+    mask = std::list[i].first->getMask(low,size,context);
     if ((mask&m)==m)
       count += 1;
   }
@@ -2070,12 +2070,12 @@ double DecisionNode::getScore(int4 low,int4 size,bool context)
   m = m-1;
 
   int4 total = 0;
-  vector<int4> count(numBins,0);
+  std::vector<int4> count(numBins,0);
 
-  for(i=0;i<list.size();++i) {
-    mask = list[i].first->getMask(low,size,context);
+  for(i=0;i<std::list.size();++i) {
+    mask = std::list[i].first->getMask(low,size,context);
     if ((mask&m)!=m) continue;	// Skip if field not fully specified
-    val = list[i].first->getValue(low,size,context);
+    val = std::list[i].first->getValue(low,size,context);
     total += 1;
     count[val] += 1;
   }
@@ -2083,7 +2083,7 @@ double DecisionNode::getScore(int4 low,int4 size,bool context)
   double sc = 0.0;
   for(i=0;i<numBins;++i) {
     if (count[i] <= 0) continue;
-    if (count[i] >= list.size()) return -1.0;
+    if (count[i] >= std::list.size()) return -1.0;
     double p = ((double)count[i])/total;
     sc -= p * log(p);
   }
@@ -2153,7 +2153,7 @@ void DecisionNode::chooseOptimalField(void)
     bitsize = 0;		// treat the node as terminal
 }
 
-void DecisionNode::consistentValues(vector<uint4> &bins,DisjointPattern *pat)
+void DecisionNode::consistentValues(std::vector<uint4> &bins,DisjointPattern *pat)
 
 {				// Produce all possible values of -pat- by
 				// iterating through all possible values of the
@@ -2174,7 +2174,7 @@ void DecisionNode::consistentValues(vector<uint4> &bins,DisjointPattern *pat)
 void DecisionNode::split(DecisionProperties &props)
 
 {
-  if (list.size() <= 1) {
+  if (std::list.size() <= 1) {
     bitsize = 0;		// Only one pattern, terminal node by default
     return;
   }
@@ -2184,7 +2184,7 @@ void DecisionNode::split(DecisionProperties &props)
     orderPatterns(props);
     return;
   }
-  if ((parent != (DecisionNode *)0) && (list.size() >= parent->num))
+  if ((parent != (DecisionNode *)0) && (std::list.size() >= parent->num))
     throw LowlevelError("Child has as many Patterns as parent");
 
   int4 numChildren = 1 << bitsize;
@@ -2193,17 +2193,17 @@ void DecisionNode::split(DecisionProperties &props)
     DecisionNode *nd = new DecisionNode( this );
     children.push_back( nd );
   }
-  for(int4 i=0;i<list.size();++i) {
-    vector<uint4> vals;		// Bins this pattern belongs in
+  for(int4 i=0;i<std::list.size();++i) {
+    std::vector<uint4> vals;		// Bins this pattern belongs in
 				// If the pattern does not care about some
 				// bits in the field we are splitting on, that
 				// pattern will get put into multiple bins
-    consistentValues(vals,list[i].first);
+    consistentValues(vals,std::list[i].first);
     for(int4 j=0;j<vals.size();++j)
-      children[vals[j]]->addConstructorPair(list[i].first,list[i].second);
-    delete list[i].first;	// We no longer need original pattern
+      children[vals[j]]->addConstructorPair(std::list[i].first,std::list[i].second);
+    delete std::list[i].first;	// We no longer need original pattern
   }
-  list.clear();
+  std::list.clear();
 
   for(int4 i=0;i<numChildren;++i)
     children[i]->split(props);
@@ -2215,8 +2215,8 @@ void DecisionNode::orderPatterns(DecisionProperties &props)
   // This is a tricky routine.  When this routine is called, the patterns remaining in the
   // the decision node can no longer be distinguished by examining additional bits. The basic
   // idea here is that the patterns should be ordered so that the most specialized should come
-  // first in the list. Pattern 1 is a specialization of pattern 2, if the set of instructions
-  // matching 1 is contained in the set matching 2.  So in the simplest case, the pattern order
+  // first in the std::list. Pattern 1 is a specialization of pattern 2, if the std::set of instructions
+  // matching 1 is contained in the std::set matching 2.  So in the simplest case, the pattern order
   // should represent a strict nesting.  Unfortunately, there are many potential situations where
   // patterns don't necessarily nest.
   //   1) An "or" of two patterns.  This can be an explicit '|' operator in the Constructor, in
@@ -2233,29 +2233,29 @@ void DecisionNode::orderPatterns(DecisionProperties &props)
   //      the subconstructors.
   // This routine can determine if an intersection results from case 1) or case 2)
   int4 i,j,k;
-  vector<pair<DisjointPattern *,Constructor *> > newlist;
-  vector<pair<DisjointPattern *,Constructor *> > conflictlist;
+  std::vector<pair<DisjointPattern *,Constructor *> > newlist;
+  std::vector<pair<DisjointPattern *,Constructor *> > conflictlist;
 
   // Check for identical patterns
-  for(i=0;i<list.size();++i) {
+  for(i=0;i<std::list.size();++i) {
     for(j=0;j<i;++j) {
-      DisjointPattern *ipat = list[i].first;
-      DisjointPattern *jpat = list[j].first;
+      DisjointPattern *ipat = std::list[i].first;
+      DisjointPattern *jpat = std::list[j].first;
       if (ipat->identical(jpat))
-	props.identicalPattern(list[i].second,list[j].second);
+	props.identicalPattern(std::list[i].second,std::list[j].second);
     }
   }
 
-  newlist = list;
-  for(i=0;i<list.size();++i) {
+  newlist = std::list;
+  for(i=0;i<std::list.size();++i) {
     for(j=0;j<i;++j) {
       DisjointPattern *ipat = newlist[i].first;
-      DisjointPattern *jpat = list[j].first;
+      DisjointPattern *jpat = std::list[j].first;
       if (ipat->specializes(jpat))
 	break;
       if (!jpat->specializes(ipat)) { // We have a potential conflict
 	Constructor *iconst = newlist[i].second;
-	Constructor *jconst = list[j].second;
+	Constructor *jconst = std::list[j].second;
 	if (iconst == jconst) { // This is an OR in the pattern for ONE constructor
 	  // So there is no conflict
 	}
@@ -2266,8 +2266,8 @@ void DecisionNode::orderPatterns(DecisionProperties &props)
       }
     }
     for(k=i-1;k>=j;--k)
-      list[k+1] = list[k];
-    list[j] = newlist[i];
+      std::list[k+1] = std::list[k];
+    std::list[j] = newlist[i];
   }
   
   // Check if intersection patterns are present, which resolve conflicts
@@ -2279,9 +2279,9 @@ void DecisionNode::orderPatterns(DecisionProperties &props)
     pat2 = conflictlist[i+1].first;
     const2 = conflictlist[i+1].second;
     bool resolved = false;
-    for(j=0;j<list.size();++j) {
-      DisjointPattern *tpat = list[j].first;
-      Constructor *tconst = list[j].second;
+    for(j=0;j<std::list.size();++j) {
+      DisjointPattern *tpat = std::list[j].first;
+      Constructor *tconst = std::list[j].second;
       if ((tpat == pat1)&&(tconst==const1)) break; // Ran out of possible specializations
       if ((tpat == pat2)&&(tconst==const2)) break;
       if (tpat->resolvesIntersect(pat1,pat2)) {
@@ -2298,11 +2298,11 @@ Constructor *DecisionNode::resolve(ParserWalker &walker) const
 
 {
   if (bitsize == 0) {		// The node is terminal
-    vector<pair<DisjointPattern *,Constructor *> >::const_iterator iter;
-    for(iter=list.begin();iter!=list.end();++iter)
+    std::vector<pair<DisjointPattern *,Constructor *> >::const_iterator iter;
+    for(iter=std::list.begin();iter!=std::list.end();++iter)
       if ((*iter).first->isMatch(walker))
 	return (*iter).second;
-    ostringstream s;
+    std::ostringstream s;
     s << walker.getAddr().getShortcut();
     walker.getAddr().printRaw(s);
     s << ": Unable to resolve constructor";
@@ -2320,7 +2320,7 @@ void DecisionNode::saveXml(std::ostream &s) const
 
 {
   s << "<decision";
-  s << " number=\"" << dec << num << "\"";
+  s << " number=\"" << std::dec << num << "\"";
   s << " context=\"";
   if (contextdecision)
     s << "true\"";
@@ -2329,9 +2329,9 @@ void DecisionNode::saveXml(std::ostream &s) const
   s << " start=\"" << startbit << "\"";
   s << " size=\"" << bitsize << "\"";
   s << ">\n";
-  for(int4 i=0;i<list.size();++i) {
-    s << "<pair id=\"" << dec << list[i].second->getId() << "\">\n";
-    list[i].first->saveXml(s);
+  for(int4 i=0;i<std::list.size();++i) {
+    s << "<pair id=\"" << std::dec << std::list[i].second->getId() << "\">\n";
+    std::list[i].first->saveXml(s);
     s << "</pair>\n";
   }
   for(int4 i=0;i<children.size();++i)
@@ -2344,19 +2344,19 @@ void DecisionNode::restoreXml(const Element *el,DecisionNode *par,SubtableSymbol
 {
   parent = par;
   {
-    istringstream s(el->getAttributeValue("number"));
-    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+    std::istringstream s(el->getAttributeValue("number"));
+    s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
     s >> num;
   }
   contextdecision = xml_readbool(el->getAttributeValue("context"));
   {
-    istringstream s(el->getAttributeValue("start"));
-    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+    std::istringstream s(el->getAttributeValue("start"));
+    s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
     s >> startbit;
   }
   {
-    istringstream s(el->getAttributeValue("size"));
-    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+    std::istringstream s(el->getAttributeValue("size"));
+    s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
     s >> bitsize;
   }
   const List &childlist(el->getChildren());
@@ -2367,13 +2367,13 @@ void DecisionNode::restoreXml(const Element *el,DecisionNode *par,SubtableSymbol
       Constructor *ct;
       DisjointPattern *pat;
       uintm id;
-      istringstream s((*iter)->getAttributeValue("id"));
-      s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+      std::istringstream s((*iter)->getAttributeValue("id"));
+      s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
       s >> id;
       ct = sub->getConstructor(id);
       pat = DisjointPattern::restoreDisjoint((*iter)->getChildren().front());
       //This increments num      addConstructorPair(pat,ct);
-      list.push_back(pair<DisjointPattern *,Constructor *>(pat,ct));
+      std::list.push_back(pair<DisjointPattern *,Constructor *>(pat,ct));
       //delete pat;		// addConstructorPair makes its own copy
     }
     else if ((*iter)->getName() == "decision") {
@@ -2418,7 +2418,7 @@ void ContextOp::apply(ParserWalkerChange &walker) const
 void ContextOp::validate(void) const
 
 { // Throw an exception if the PatternExpression is not valid
-  vector<const PatternValue *> values;
+  std::vector<const PatternValue *> values;
 
   patexp->listValues(values);	// Get all the expression tokens
   for(int4 i=0;i<values.size();++i) {
@@ -2437,9 +2437,9 @@ void ContextOp::saveXml(std::ostream &s) const
 
 {
   s << "<context_op";
-  s << " i=\"" << dec << num << "\"";
+  s << " i=\"" << std::dec << num << "\"";
   s << " shift=\"" << shift << "\"";
-  s << " mask=\"0x" << hex << mask << "\" >\n";
+  s << " mask=\"0x" << std::dec << mask << "\" >\n";
   patexp->saveXml(s);
   s << "</context_op>\n";
 }
@@ -2448,23 +2448,23 @@ void ContextOp::restoreXml(const Element *el,SleighBase *trans)
 
 {
   {
-    istringstream s(el->getAttributeValue("i"));
-    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+    std::istringstream s(el->getAttributeValue("i"));
+    s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
     s >> num;
   }
   {
-    istringstream s(el->getAttributeValue("shift"));
-    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+    std::istringstream s(el->getAttributeValue("shift"));
+    s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
     s >> shift;
   }
   {
-    istringstream s(el->getAttributeValue("mask"));
-    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+    std::istringstream s(el->getAttributeValue("mask"));
+    s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
     s >> mask;
   }
-  const List &list(el->getChildren());
+  const List &std::list(el->getChildren());
   List::const_iterator iter;
-  iter = list.begin();
+  iter = std::list.begin();
   patexp = (PatternValue *)PatternExpression::restoreExpression(*iter,trans);
   patexp->layClaim();
 }
@@ -2513,18 +2513,18 @@ void ContextCommit::restoreXml(const Element *el,SleighBase *trans)
   uintm id;
   {
 	std::istringstream s(el->getAttributeValue("id"));
-    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+    s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
     s >> id;
     sym = (TripleSymbol *)trans->findSymbol(id);
   }
   {
 	std::istringstream s(el->getAttributeValue("num"));
-    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+    s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
     s >> num;
   }
   {
 	std::istringstream s(el->getAttributeValue("mask"));
-    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+    s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
     s >> mask;
   }
   if (el->getNumAttributes()==4)

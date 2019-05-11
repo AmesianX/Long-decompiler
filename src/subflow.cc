@@ -45,7 +45,7 @@ SubvariableFlow::ReplaceVarnode *SubvariableFlow::setReplacement(Varnode *vn,uin
 { // Mark 
   ReplaceVarnode *res;
   if (vn->isMark()) {		// Already seen before
-    map<Varnode *,ReplaceVarnode>::iterator iter;
+    std::map<Varnode *,ReplaceVarnode>::iterator iter;
     iter = varmap.find(vn);
     res = &(*iter).second;
     inworklist = false;
@@ -204,7 +204,7 @@ bool SubvariableFlow::tryReturnPull(PcodeOp *op,ReplaceVarnode *rvn,int4 slot)
   if (!returnsTraversed) {
     // If we plan to truncate the size of a return variable, we need to propagate the logical size to any other
     // return variables so that there can still be a single return value type for the function
-    list<PcodeOp *>::const_iterator iter,enditer;
+    std::list<PcodeOp *>::const_iterator iter,enditer;
     iter = fd->beginOp(CPUI_RETURN);
     enditer = fd->endOp(CPUI_RETURN);
     while(iter != enditer) {
@@ -254,7 +254,7 @@ bool SubvariableFlow::tryCallReturnPull(PcodeOp *op,ReplaceVarnode *rvn)
 bool SubvariableFlow::traceForward(ReplaceVarnode *rvn)
 
 { // Try to trace logical variable through descendant varnodes
-  // updating list/map of replace_ops and replace_varnodes
+  // updating std::list/std::map of replace_ops and replace_varnodes
   // and the worklist
   ReplaceOp *rop;
   PcodeOp *op;
@@ -266,7 +266,7 @@ bool SubvariableFlow::traceForward(ReplaceVarnode *rvn)
   int4 dcount = 0;
   int4 hcount = 0;
 
-  list<PcodeOp *>::const_iterator iter,enditer;
+  std::list<PcodeOp *>::const_iterator iter,enditer;
   iter = rvn->vn->beginDescend();
   enditer = rvn->vn->endDescend();
   while(iter != enditer) {
@@ -286,7 +286,7 @@ bool SubvariableFlow::traceForward(ReplaceVarnode *rvn)
       hcount += 1;		// Dealt with this descendant
       break;
     case CPUI_INT_OR:
-      if (doesOrSet(op,rvn->mask)!=-1) break; // Subvar set to 1s, truncate flow
+      if (doesOrSet(op,rvn->mask)!=-1) break; // Subvar std::set to 1s, truncate flow
       rop = createOpDown(CPUI_INT_OR,2,op,rvn,slot);
       if (!createLink(rop,rvn->mask,-1,outvn)) return false;
       hcount += 1;		// Dealt with this descendant
@@ -305,7 +305,7 @@ bool SubvariableFlow::traceForward(ReplaceVarnode *rvn)
 	  break;
 	}
       }
-      if (doesAndClear(op,rvn->mask)!=-1) break; // Subvar set to zero, truncate flow
+      if (doesAndClear(op,rvn->mask)!=-1) break; // Subvar std::set to zero, truncate flow
       rop = createOpDown(CPUI_INT_AND,2,op,rvn,slot);
       if (!createLink(rop,rvn->mask,-1,outvn)) return false;
       hcount += 1;		// Dealt with this descendant
@@ -373,7 +373,7 @@ bool SubvariableFlow::traceForward(ReplaceVarnode *rvn)
       sa = (int4)op->getIn(1)->getOffset();
       newmask = rvn->mask >> sa;
       if (newmask == 0) {
-	if (op->code()==CPUI_INT_RIGHT) break; // subvar is set to zero, truncate flow
+	if (op->code()==CPUI_INT_RIGHT) break; // subvar is std::set to zero, truncate flow
 	return false;
       }
       if (rvn->mask != (newmask << sa)) return false;
@@ -397,7 +397,7 @@ bool SubvariableFlow::traceForward(ReplaceVarnode *rvn)
     case CPUI_SUBPIECE:
       sa = (int4)op->getIn(1)->getOffset() * 8;
       newmask = (rvn->mask >> sa) & calc_mask(outvn->getSize());
-      if (newmask == 0) break;	// subvar is set to zero, truncate flow
+      if (newmask == 0) break;	// subvar is std::set to zero, truncate flow
       if (rvn->mask != (newmask << sa)) return false;
       if (((newmask & 1)!=0)&&(outvn->getSize()==flowsize)) {
 	addTerminalPatch(op,rvn);
@@ -685,7 +685,7 @@ bool SubvariableFlow::traceBackward(ReplaceVarnode *rvn)
 
 bool SubvariableFlow::traceForwardSext(ReplaceVarnode *rvn)
 
-{ // Try to trace the logical variable through descendant varnodes, updating map of replacement ops and varnodes
+{ // Try to trace the logical variable through descendant varnodes, updating std::map of replacement ops and varnodes
   // We assume (and check) that the logical variable has always been sign extended (sextstate) into its container
   ReplaceOp *rop;
   PcodeOp *op;
@@ -694,7 +694,7 @@ bool SubvariableFlow::traceForwardSext(ReplaceVarnode *rvn)
   int4 dcount = 0;
   int4 hcount = 0;
 
-  list<PcodeOp *>::const_iterator iter,enditer;
+  std::list<PcodeOp *>::const_iterator iter,enditer;
   iter = rvn->vn->beginDescend();
   enditer = rvn->vn->endDescend();
   while(iter != enditer) {
@@ -770,7 +770,7 @@ bool SubvariableFlow::traceForwardSext(ReplaceVarnode *rvn)
 
 bool SubvariableFlow::traceBackwardSext(ReplaceVarnode *rvn)
 
-{ // Trace backward through defining op, one level, update worklist and map
+{ // Trace backward through defining op, one level, update worklist and std::map
   // We assume (and check) that the logical variable has always been sign extended (sextstate) into its container
   PcodeOp *op = rvn->vn->getDef();
   if (op == (PcodeOp *)0) return true; // If vn is input
@@ -1080,7 +1080,7 @@ bool SubvariableFlow::doTrace(void)
   }
 
   // Clear marks
-  map<Varnode *,ReplaceVarnode>::iterator iter;
+  std::map<Varnode *,ReplaceVarnode>::iterator iter;
   for(iter=varmap.begin();iter!=varmap.end();++iter)
     (*iter).first->clearMark();
 
@@ -1092,7 +1092,7 @@ bool SubvariableFlow::doTrace(void)
 void SubvariableFlow::doReplacement(void)
 
 { // Create the actual replacement data-flow with -fd-
-  list<ReplaceOp>::iterator iter;
+  std::list<ReplaceOp>::iterator iter;
 
   // Define all the outputs first
   for(iter=oplist.begin();iter!=oplist.end();++iter) {
@@ -1124,7 +1124,7 @@ void SubvariableFlow::doReplacement(void)
 
   // These are operations that carry flow from the small variable into an existing
   // variable of the correct size
-  list<PatchRecord>::iterator piter;
+  std::list<PatchRecord>::iterator piter;
   for(piter=patchlist.begin();piter!=patchlist.end();++piter) {
     PcodeOp *pullop = (*piter).pullop;
     int4 type = (*piter).type;
@@ -1145,7 +1145,7 @@ void SubvariableFlow::doReplacement(void)
       // These are operations that flow the small variable into a bigger variable but
       // where all the remaining bits are zero
       int4 sa = (*piter).slot;
-      vector<Varnode *> invec;
+      std::vector<Varnode *> invec;
       if (sa == 0) {
 	invec.push_back( getReplaceVarnode((*piter).in1) );
 	fd->opSetOpcode( pullop, CPUI_INT_ZEXT );
@@ -1299,7 +1299,7 @@ void SplitFlow::replaceOp(ReplaceOp *rop)
 { // Finish splitting -rop- into two separate operations on the logical pieces at the same point in the code
   // Build the logical Varnodes or reuse previously built ones as necessary
   // going through ReplaceVarnodes and -varmap-
-  vector<ReplaceVarnode *> inputs;
+  std::vector<ReplaceVarnode *> inputs;
 
   PcodeOp *op = rop->op;
   int4 numParam = op->numInput();
@@ -1342,7 +1342,7 @@ SplitFlow::ReplaceVarnode *SplitFlow::setReplacement(Varnode *vn,bool &inworklis
   // Return null if this won't work
   ReplaceVarnode *res;
   if (vn->isMark()) {		// Already seen before
-    map<Varnode *,ReplaceVarnode>::iterator iter;
+    std::map<Varnode *,ReplaceVarnode>::iterator iter;
     iter = varmap.find(vn);
     res = &(*iter).second;
     inworklist = false;
@@ -1356,7 +1356,7 @@ SplitFlow::ReplaceVarnode *SplitFlow::setReplacement(Varnode *vn,bool &inworklis
   if (vn->isFree() && (!vn->isConstant()))
     return (ReplaceVarnode *)0;		// Abort
 
-  res = & varmap[ vn ];			// Create new ReplaceVarnode and put it in map
+  res = & varmap[ vn ];			// Create new ReplaceVarnode and put it in std::map
   vn->setMark();
   res->vn = vn;
   inworklist = !vn->isConstant();
@@ -1407,7 +1407,7 @@ bool SplitFlow::traceForward(ReplaceVarnode *rvn)
   Varnode *outvn,*tmpvn;
   uintb val;
 
-  list<PcodeOp *>::const_iterator iter,enditer;
+  std::list<PcodeOp *>::const_iterator iter,enditer;
   iter = rvn->vn->beginDescend();
   enditer = rvn->vn->endDescend();
   while(iter != enditer) {
@@ -1464,7 +1464,7 @@ bool SplitFlow::traceForward(ReplaceVarnode *rvn)
 bool SplitFlow::traceBackward(ReplaceVarnode *rvn)
 
 { // Try to trace the pair of logical values, backward, through the op defining -rvn-
-  // Update list of Varnodes and PcodeOps to replace and the worklist as necessary
+  // Update std::list of Varnodes and PcodeOps to replace and the worklist as necessary
   // Return false if this is not possible
   PcodeOp *op = rvn->vn->getDef();
   if (op == (PcodeOp *)0) return true; // If vn is input
@@ -1550,7 +1550,7 @@ void SplitFlow::doReplacement(void)
 {
   ReplaceVarnode *rvn1;
 
-  list<ReplaceOp>::iterator iter;
+  std::list<ReplaceOp>::iterator iter;
   for(iter=oplist.begin();iter!=oplist.end();++iter) {
     buildReplaceOutputs(&(*iter));		// Build the raw replacement ops for anything needing an output
   }
@@ -1631,7 +1631,7 @@ bool SplitFlow::doTrace(void)
   }
 
   // Clear marks
-  map<Varnode *,ReplaceVarnode>::iterator iter;
+  std::map<Varnode *,ReplaceVarnode>::iterator iter;
   for(iter=varmap.begin();iter!=varmap.end();++iter)
     (*iter).first->clearMark();
 
@@ -1646,7 +1646,7 @@ SubfloatFlow::ReplaceVarnode *SubfloatFlow::setReplacement(Varnode *vn,bool &inw
   // Return NULL if the vn is not suitable for replacement
   ReplaceVarnode *res;
   if (vn->isMark()) {		// Already seen before
-    map<Varnode *,ReplaceVarnode>::iterator iter;
+    std::map<Varnode *,ReplaceVarnode>::iterator iter;
     iter = varmap.find(vn);
     res = &(*iter).second;
     inworklist = false;
@@ -1694,7 +1694,7 @@ SubfloatFlow::ReplaceVarnode *SubfloatFlow::setReplacementNoFlow(Varnode *vn)
   // and there will be no further logical flow through -vn-
   ReplaceVarnode *res;
   if (vn->isMark()) {		// Already seen before
-    map<Varnode *,ReplaceVarnode>::iterator iter;
+    std::map<Varnode *,ReplaceVarnode>::iterator iter;
     iter = varmap.find(vn);
     res = &(*iter).second;
     return res;
@@ -1708,7 +1708,7 @@ SubfloatFlow::ReplaceVarnode *SubfloatFlow::setReplacementNoFlow(Varnode *vn)
   res = &varmap[ vn ];
   vn->setMark();
   res->vn = vn;
-  res->replacement = vn;	// NOTE: we set replacement as itself, even if it is a constant
+  res->replacement = vn;	// NOTE: we std::set replacement as itself, even if it is a constant
   res->def = (ReplaceOp *)0;
   return res;
 }
@@ -1747,7 +1747,7 @@ SubfloatFlow::ReplaceOp *SubfloatFlow::createOpDown(OpCode opc,int4 numparam,Pco
 bool SubfloatFlow::traceForward(ReplaceVarnode *rvn)
 
 { // Try to trace logical variable through descendant varnodes
-  // updating list/map of replace_ops and replace_varnodes
+  // updating std::list/std::map of replace_ops and replace_varnodes
   // and the worklist
   ReplaceVarnode *rvn2;
   ReplaceOp *rop;
@@ -1758,7 +1758,7 @@ bool SubfloatFlow::traceForward(ReplaceVarnode *rvn)
   int4 dcount = 0;
   int4 hcount = 0;
 
-  list<PcodeOp *>::const_iterator iter,enditer;
+  std::list<PcodeOp *>::const_iterator iter,enditer;
   iter = rvn->vn->beginDescend();
   enditer = rvn->vn->endDescend();
   while(iter != enditer) {
@@ -2033,7 +2033,7 @@ bool SubfloatFlow::doTrace(void)
   }
 
   // Clear marks
-  map<Varnode *,ReplaceVarnode>::iterator iter;
+  std::map<Varnode *,ReplaceVarnode>::iterator iter;
   for(iter=varmap.begin();iter!=varmap.end();++iter)
     (*iter).first->clearMark();
 
@@ -2045,7 +2045,7 @@ bool SubfloatFlow::doTrace(void)
 void SubfloatFlow::doReplacement(void)
 
 { // Create the actual replacement data-flow with -fd-
-  list<ReplaceOp>::iterator iter;
+  std::list<ReplaceOp>::iterator iter;
 
   // Define all the outputs first
   for(iter=oplist.begin();iter!=oplist.end();++iter) {
@@ -2071,7 +2071,7 @@ void SubfloatFlow::doReplacement(void)
 
   // These are operations that carry flow from the small variable into an existing
   // variable of the correct size
-  list<PulloutRecord>::iterator piter;
+  std::list<PulloutRecord>::iterator piter;
   for(piter=pulllist.begin();piter!=pulllist.end();++piter) {
     PcodeOp *pullop = (*piter).pullop;
     while(pullop->numInput() > 1)
@@ -2081,7 +2081,7 @@ void SubfloatFlow::doReplacement(void)
       fd->opSetOpcode(pullop,(*piter).opc);
   }
 
-  list<CompareRecord>::iterator citer;
+  std::list<CompareRecord>::iterator citer;
   for(citer=complist.begin();citer!=complist.end();++citer) {
     PcodeOp *op = (*citer).compop;
     fd->opSetInput(op,getReplaceVarnode((*citer).in1),0);

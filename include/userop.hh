@@ -157,13 +157,13 @@ public:
   ///
   /// \param data is the function being analyzed
   /// \param op is the root operation
-  /// \param bindlist will hold the ordered list of input Varnodes
+  /// \param bindlist will hold the ordered std::list of input Varnodes
   /// \return \b true if the requisite inputs were found
   virtual bool unify(Funcdata &data,PcodeOp *op,std::vector<Varnode *> &bindlist) const=0;
 
   /// \brief Compute the output value of \b this operation, given constant inputs
   ///
-  /// \param input is the ordered list of constant inputs
+  /// \param input is the ordered std::list of constant inputs
   /// \return the resulting value as a constant
   virtual uintb execute(const std::vector<uintb> &input) const=0;
 };
@@ -184,7 +184,7 @@ struct OpFollow {
 /// \brief The \e segmented \e address operator
 ///
 /// This op is a placeholder for address mappings involving \b segments.
-///The map goes between a \b high-level view of a pointer, consisting of multiple pieces,
+///The std::map goes between a \b high-level view of a pointer, consisting of multiple pieces,
 /// and a \b low-level view, where there is only a single absolute pointer.
 /// The mapping could be
 ///    - a virtual to physical mapping for instance  or
@@ -261,11 +261,11 @@ public:
 /// on of \b this class's parse* methods.
 class UserOpManage {
   std::vector<UserPcodeOp *> useroplist;	///< Description objects indexed by CALLOTHER constant id
-  std::map<std::string,UserPcodeOp *> useropmap;	///< A map from the name of the user defined operation to a description object
+  std::map<std::string,UserPcodeOp *> useropmap;	///< A std::map from the name of the user defined operation to a description object
   std::vector<SegmentOp *> segmentop;	///< Segment operations supported by this Architecture
   VolatileReadOp *vol_read;		///< (Single) volatile read operation
   VolatileWriteOp *vol_write;		///< (Single) volatile write operation
-  void registerOp(UserPcodeOp *op);	///< Insert a new UserPcodeOp description object in the map(s)
+  void registerOp(UserPcodeOp *op);	///< Insert a new UserPcodeOp description object in the std::map(s)
 public:
   UserOpManage(void);			///< Construct an empty manager
   ~UserOpManage(void);			///< Destructor

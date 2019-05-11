@@ -93,7 +93,7 @@ bool SplitVarnode::inHandHi(Varnode *h)
     if (op->code() == CPUI_SUBPIECE) {
       Varnode *w = op->getIn(0);
       if (op->getIn(1)->getOffset() != (uintb)(w->getSize()-h->getSize())) return false;
-      list<PcodeOp *>::const_iterator iter,enditer;
+      std::list<PcodeOp *>::const_iterator iter,enditer;
       iter = w->beginDescend();
       enditer = w->endDescend();
       while(iter != enditer) {
@@ -125,7 +125,7 @@ bool SplitVarnode::inHandLo(Varnode *l)
     if (op->code() == CPUI_SUBPIECE) {
       Varnode *w = op->getIn(0);
       if (op->getIn(1)->getOffset() != 0) return false;
-      list<PcodeOp *>::const_iterator iter,enditer;
+      std::list<PcodeOp *>::const_iterator iter,enditer;
       iter = w->beginDescend();
       enditer = w->endDescend();
       while(iter != enditer) {
@@ -156,7 +156,7 @@ bool SplitVarnode::inHandLoNoHi(Varnode *l)
   if (op->getIn(1)->getOffset() != 0) return false;
   Varnode *w = op->getIn(0);
 
-  list<PcodeOp *>::const_iterator iter,enditer;
+  std::list<PcodeOp *>::const_iterator iter,enditer;
   iter = w->beginDescend();
   enditer = w->endDescend();
   while(iter != enditer) {
@@ -178,7 +178,7 @@ bool SplitVarnode::inHandLoNoHi(Varnode *l)
 bool SplitVarnode::inHandHiOut(Varnode *h)
 
 { // Return true (and initialize -this-) if -h- is combined with a -lo- into an existing whole
-  list<PcodeOp *>::const_iterator iter,enditer;
+  std::list<PcodeOp *>::const_iterator iter,enditer;
   iter = h->beginDescend();
   enditer = h->endDescend();
   Varnode *lo = (Varnode *)0;
@@ -204,7 +204,7 @@ bool SplitVarnode::inHandHiOut(Varnode *h)
 bool SplitVarnode::inHandLoOut(Varnode *l)
 
 { // Return true (and initialize -this-) if -l- is combined with a -hi- into an existing whole
-  list<PcodeOp *>::const_iterator iter,enditer;
+  std::list<PcodeOp *>::const_iterator iter,enditer;
   iter = l->beginDescend();
   enditer = l->endDescend();
   Varnode *hi = (Varnode *)0;
@@ -276,7 +276,7 @@ bool SplitVarnode::findWholeSplitToPieces(void)
 
 bool SplitVarnode::findDefinitionPoint(void)
 
-{ // Set basic block, where both -lo- and -hi- are defined, set the PcodeOp within block if possible
+{ // Set basic block, where both -lo- and -hi- are defined, std::set the PcodeOp within block if possible
   if (lo == (Varnode *)0) return false;
   if (hi == (Varnode *)0) return false;
   defblock = (BlockBasic *)0;
@@ -347,7 +347,7 @@ bool SplitVarnode::findWholeBuiltFromPieces(void)
   // AFTER we need it.  We assume hi and lo are defined in the same basic block (or both inputs)
   if (hi==(Varnode *)0) return false;
   if (lo==(Varnode *)0) return false;
-  list<PcodeOp *>::const_iterator iter,enditer;
+  std::list<PcodeOp *>::const_iterator iter,enditer;
   iter = lo->beginDescend();
   enditer = lo->endDescend();
   PcodeOp *res = (PcodeOp *)0;
@@ -507,7 +507,7 @@ void SplitVarnode::buildLoFromWhole(Funcdata &data)
   if (loop == (PcodeOp *)0)
     throw LowlevelError("Building low piece that was originally undefined");
 
-  vector<Varnode *> inlist;
+  std::vector<Varnode *> inlist;
   inlist.push_back(whole);
   inlist.push_back(data.newConstant(4,0));
   if (loop->code() == CPUI_MULTIEQUAL) {
@@ -541,7 +541,7 @@ void SplitVarnode::buildHiFromWhole(Funcdata &data)
   if (hiop == (PcodeOp *)0)
     throw LowlevelError("Building low piece that was originally undefined");
 
-  vector<Varnode *> inlist;
+  std::vector<Varnode *> inlist;
   inlist.push_back(whole);
   inlist.push_back(data.newConstant(4,lo->getSize()));
   if (hiop->code() == CPUI_MULTIEQUAL) {
@@ -580,7 +580,7 @@ void SplitVarnode::buildHiFromWhole(Funcdata &data)
 //   data.opInsertAfter(newhiop,newwholeop);
 
 //   Varnode *oldhi = oldin.getHi();
-//   list<PcodeOp *>::const_iterator iter,enditer;
+//   std::list<PcodeOp *>::const_iterator iter,enditer;
 //   iter = oldhi->beginDescend();
 //   enditer = oldhi->endDescend();
 //   while(iter != enditer) {
@@ -690,16 +690,16 @@ bool SplitVarnode::isAddrTiedContiguous(Varnode *lo,Varnode *hi,Address &res)
   return true;
 }
 
-void SplitVarnode::wholeList(Varnode *w,vector<SplitVarnode> &splitvec)
+void SplitVarnode::wholeList(Varnode *w,std::vector<SplitVarnode> &splitvec)
 
-{ // Create a list of all the possible pairs that contain the same logical value as -w-
+{ // Create a std::list of all the possible pairs that contain the same logical value as -w-
   SplitVarnode basic;
 
   basic.whole = w;
   basic.hi = (Varnode *)0;
   basic.lo = (Varnode *)0;
   basic.wholesize = w->getSize();
-  list<PcodeOp *>::const_iterator iter,enditer;
+  std::list<PcodeOp *>::const_iterator iter,enditer;
 
   iter = basic.whole->beginDescend();
   enditer = basic.whole->endDescend();
@@ -726,11 +726,11 @@ void SplitVarnode::wholeList(Varnode *w,vector<SplitVarnode> &splitvec)
   findCopies(basic,splitvec);
 }
 
-void SplitVarnode::findCopies(const SplitVarnode &in,vector<SplitVarnode> &splitvec)
+void SplitVarnode::findCopies(const SplitVarnode &in,std::vector<SplitVarnode> &splitvec)
 
 { // Find copies from -in- pieces into another logical pair
   if (!in.hasBothPieces()) return;
-  list<PcodeOp *>::const_iterator iter,enditer;
+  std::list<PcodeOp *>::const_iterator iter,enditer;
 
   iter = in.getLo()->beginDescend();
   enditer = in.getLo()->endDescend();
@@ -744,7 +744,7 @@ void SplitVarnode::findCopies(const SplitVarnode &in,vector<SplitVarnode> &split
       addr = addr - (in.getHi()->getSize());
     else
       addr = addr + locpy->getSize();
-    list<PcodeOp *>::const_iterator iter2,enditer2;
+    std::list<PcodeOp *>::const_iterator iter2,enditer2;
     iter2 = in.getHi()->beginDescend();
     enditer2 = in.getHi()->endDescend();
     while(iter2 != enditer2) {
@@ -786,7 +786,7 @@ bool SplitVarnode::otherwiseEmpty(PcodeOp *branchop)
   Varnode *vn = branchop->getIn(1);
   if (vn->isWritten())
     otherop = vn->getDef();
-  list<PcodeOp *>::const_iterator iter,enditer;
+  std::list<PcodeOp *>::const_iterator iter,enditer;
   iter = bl->beginOp();
   enditer = bl->endOp();
   while(iter != enditer) {
@@ -886,7 +886,7 @@ int4 SplitVarnode::applyRuleIn(SplitVarnode &in,Funcdata &data)
     vn = (i==0) ? in.getHi() : in.getLo();
     if (vn == (Varnode *)0) continue;
     bool workishi = (i==0);
-    list<PcodeOp *>::const_iterator iter,enditer;
+    std::list<PcodeOp *>::const_iterator iter,enditer;
     iter = vn->beginDescend();
     enditer = vn->endDescend();
     while(iter != enditer) {
@@ -1059,7 +1059,7 @@ void SplitVarnode::createBoolOp(Funcdata &data,PcodeOp *cbranch,SplitVarnode &in
   data.opSetInput(cbranch,newbool,1); // CBRANCH now determined by new compare
 }
 
-PcodeOp *SplitVarnode::preparePhiOp(SplitVarnode &out,vector<SplitVarnode> &inlist)
+PcodeOp *SplitVarnode::preparePhiOp(SplitVarnode &out,std::vector<SplitVarnode> &inlist)
 
 {
   PcodeOp *existop = out.findEarliestSplitPoint(); // Point where output whole needs to exist
@@ -1075,7 +1075,7 @@ PcodeOp *SplitVarnode::preparePhiOp(SplitVarnode &out,vector<SplitVarnode> &inli
   return existop;
 }
 
-void SplitVarnode::createPhiOp(Funcdata &data,SplitVarnode &out,vector<SplitVarnode> &inlist,
+void SplitVarnode::createPhiOp(Funcdata &data,SplitVarnode &out,std::vector<SplitVarnode> &inlist,
 			       PcodeOp  *existop)
 
 {
@@ -1124,7 +1124,7 @@ void SplitVarnode::replaceIndirectOp(Funcdata &data,SplitVarnode &out,SplitVarno
 bool AddForm::checkForCarry(PcodeOp *op)
 
 { // If -op- matches a CARRY construction based on lo1 (i.e. CARRY(x,lo1) )
-  //    set lo1 (and negconst if lo1 is a constant) to be the corresponding part of the carry
+  //    std::set lo1 (and negconst if lo1 is a constant) to be the corresponding part of the carry
   //    and return true
   if (op->code() != CPUI_INT_ZEXT) return false;
   if (!op->getIn(0)->isWritten()) return false;
@@ -1250,7 +1250,7 @@ bool AddForm::verify(Varnode *h,Varnode *l,PcodeOp *op)
       }
       if (!checkForCarry(zextop)) continue; // Calculate lo2 and negconst
 
-      list<PcodeOp *>::const_iterator iter2,enditer2;
+      std::list<PcodeOp *>::const_iterator iter2,enditer2;
       iter2 = lo1->beginDescend();
       enditer2 = lo1->endDescend();
       while(iter2 != enditer2) {
@@ -1305,7 +1305,7 @@ bool AddForm::applyRule(SplitVarnode &i,PcodeOp *op,bool workishi,Funcdata &data
 bool SubForm::verify(Varnode *h,Varnode *l,PcodeOp *op)
 
 {
-  list<PcodeOp *>::const_iterator iter2,enditer2;
+  std::list<PcodeOp *>::const_iterator iter2,enditer2;
   hi1 = h;
   lo1 = l;
   slot1 = op->getSlot(hi1);
@@ -1422,7 +1422,7 @@ int4 LogicalForm::findHiMatch(void)
   if (!vn2->isConstant()) {
     SplitVarnode in2;
     if (in2.inHandLo(vn2)) {	// If we already know what the other double precision input looks like
-      list<PcodeOp *>::const_iterator iter,enditer;
+      std::list<PcodeOp *>::const_iterator iter,enditer;
       iter = in2.getHi()->beginDescend();
       enditer = in2.getHi()->endDescend();
       while(iter != enditer) {
@@ -1439,7 +1439,7 @@ int4 LogicalForm::findHiMatch(void)
     return -1;
   }
   else {
-    list<PcodeOp *>::const_iterator iter,enditer;
+    std::list<PcodeOp *>::const_iterator iter,enditer;
     iter = hi1->beginDescend();
     enditer = hi1->endDescend();
     int4 count = 0;
@@ -1532,9 +1532,9 @@ bool Equal1Form::applyRule(SplitVarnode &i,PcodeOp *hop,bool workishi,Funcdata &
   hi2 = hiop->getIn(1-hi1slot);
   notequalformhi = (hiop->code() == CPUI_INT_NOTEQUAL);
 
-  list<PcodeOp *>::const_iterator iter,enditer;
-  list<PcodeOp *>::const_iterator iter2,enditer2;
-  list<PcodeOp *>::const_iterator iter3,enditer3;
+  std::list<PcodeOp *>::const_iterator iter,enditer;
+  std::list<PcodeOp *>::const_iterator iter2,enditer2;
+  std::list<PcodeOp *>::const_iterator iter3,enditer3;
   iter = lo1->beginDescend();
   enditer = lo1->endDescend();
   while(iter != enditer) {
@@ -1626,7 +1626,7 @@ bool Equal2Form::fillOutFromOr(Funcdata &data)
 { // We have filled in either or <- xor <- hi1,  OR,  or <- hi1
   // Now try to fill in the rest of the form
   Varnode *outvn = orop->getOut();
-  list<PcodeOp *>::const_iterator iter,enditer;
+  std::list<PcodeOp *>::const_iterator iter,enditer;
   iter = outvn->beginDescend();
   enditer = outvn->endDescend();
   while(iter != enditer) {
@@ -1711,7 +1711,7 @@ bool Equal2Form::applyRule(SplitVarnode &i,PcodeOp *op,bool workishi,Funcdata &d
     xorhislot = hixor->getSlot(hi1);
     hi2 = hixor->getIn(1-xorhislot);
     Varnode *vn = op->getOut();
-    list<PcodeOp *>::const_iterator iter,enditer;
+    std::list<PcodeOp *>::const_iterator iter,enditer;
     iter = vn->beginDescend();
     enditer = vn->endDescend();
     while(iter != enditer) {
@@ -2174,7 +2174,7 @@ bool LessThreeWay::setBoolOp(void)
 bool LessThreeWay::mapFromLow(PcodeOp *op)
 
 { // Given the less than comparison for the lo piece and an input varnode explicitly marked as isPrecisLo
-  // try to map out the threeway lessthan form
+  // try to std::map out the threeway lessthan form
   PcodeOp *loop = op->getOut()->loneDescend();
   if (loop == (PcodeOp *)0) return false;
   if (!mapBlocksFromLow(loop->getParent())) return false;
@@ -2378,7 +2378,7 @@ bool ShiftForm::verifyLeft(Varnode *h,Varnode *l,PcodeOp *loop)
   loshift = loop;
   reslo = loshift->getOut();
   
-  list<PcodeOp *>::const_iterator iter,enditer;
+  std::list<PcodeOp *>::const_iterator iter,enditer;
   iter = hi->beginDescend();
   enditer = hi->endDescend();
   while(iter != enditer) {
@@ -2386,7 +2386,7 @@ bool ShiftForm::verifyLeft(Varnode *h,Varnode *l,PcodeOp *loop)
     ++iter;
     if (hishift->code() != CPUI_INT_LEFT) continue;
     Varnode *outvn = hishift->getOut();
-    list<PcodeOp *>::const_iterator iter2,enditer2;
+    std::list<PcodeOp *>::const_iterator iter2,enditer2;
     iter2 = outvn->beginDescend();
     enditer2 = outvn->endDescend();
     while(iter2 != enditer2) {
@@ -2411,7 +2411,7 @@ bool ShiftForm::verifyRight(Varnode *h,Varnode *l,PcodeOp *hiop)
   hishift = hiop;
   reshi = hiop->getOut();
   
-  list<PcodeOp *>::const_iterator iter,enditer;
+  std::list<PcodeOp *>::const_iterator iter,enditer;
   iter = lo->beginDescend();
   enditer = lo->endDescend();
   while(iter != enditer) {
@@ -2419,7 +2419,7 @@ bool ShiftForm::verifyRight(Varnode *h,Varnode *l,PcodeOp *hiop)
     ++iter;
     if (loshift->code() != CPUI_INT_RIGHT) continue;
     Varnode *outvn = loshift->getOut();
-    list<PcodeOp *>::const_iterator iter2,enditer2;
+    std::list<PcodeOp *>::const_iterator iter2,enditer2;
     iter2 = outvn->beginDescend();
     enditer2 = outvn->endDescend();
     while(iter2 != enditer2) {
@@ -2651,7 +2651,7 @@ bool MultForm::verifyLo(void)
 bool MultForm::findResLo(void)
 
 { // Assuming we found -midtmp-, find potential reslo
-  list<PcodeOp *>::const_iterator iter,enditer;
+  std::list<PcodeOp *>::const_iterator iter,enditer;
   iter = midtmp->beginDescend();
   enditer = midtmp->endDescend();
   while(iter != enditer) {
@@ -2722,14 +2722,14 @@ bool MultForm::verify(Varnode *h,Varnode *l,PcodeOp *hop)
 {
   hi1 = h;
   lo1 = l;
-  list<PcodeOp *>::const_iterator iter,enditer;
+  std::list<PcodeOp *>::const_iterator iter,enditer;
   iter = hop->getOut()->beginDescend();
   enditer = hop->getOut()->endDescend();
   while(iter != enditer) {
     add1 = *iter;
     ++iter;
     if (add1->code() != CPUI_INT_ADD) continue;
-    list<PcodeOp *>::const_iterator iter2,enditer2;
+    std::list<PcodeOp *>::const_iterator iter2,enditer2;
     iter2 = add1->getOut()->beginDescend();
     enditer2 = add1->getOut()->endDescend();
     while(iter2 != enditer2) {
@@ -2775,7 +2775,7 @@ bool PhiForm::verify(Varnode *h,Varnode *l,PcodeOp *hphi)
   if (hiphi->getOut()->hasNoDescend()) return false;
   blbase = hiphi->getParent();
 
-  list<PcodeOp *>::const_iterator iter,enditer;
+  std::list<PcodeOp *>::const_iterator iter,enditer;
   iter = lobase->beginDescend();
   enditer = lobase->endDescend();
   while(iter != enditer) {
@@ -2800,7 +2800,7 @@ bool PhiForm::applyRule(SplitVarnode &i,PcodeOp *hphi,bool workishi,Funcdata &da
     return false;
 
   int4 numin = hiphi->numInput();
-  vector<SplitVarnode> inlist;
+  std::vector<SplitVarnode> inlist;
   for(int4 i=0;i<numin;++i) {
     Varnode *vhi = hiphi->getIn(i);
     Varnode *vlo = lophi->getIn(i);
@@ -2826,7 +2826,7 @@ bool IndirectForm::verify(Varnode *h,Varnode *l,PcodeOp *ind)
   reshi = indhi->getOut();
   if (reshi->getSpace()->getType() == IPTR_INTERNAL) return false;		// Indirect must not be through a temporary
 
-  list<PcodeOp *>::const_iterator iter,enditer;
+  std::list<PcodeOp *>::const_iterator iter,enditer;
   iter = lo->beginDescend();
   enditer = lo->endDescend();
   while(iter != enditer) {
@@ -2865,7 +2865,7 @@ void RuleDoubleIn::reset(Funcdata &data)
   data.setDoublePrecisRecovery(true); // Mark that we are doing double precision recovery
 }
 
-void RuleDoubleIn::getOpList(vector<uint4> &oplist) const
+void RuleDoubleIn::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_SUBPIECE);
@@ -2878,7 +2878,7 @@ int4 RuleDoubleIn::applyOp(PcodeOp *op,Funcdata &data)
   if (!outvn->isPrecisLo()) return 0;
   if (data.hasUnreachableBlocks()) return 0;
 
-  vector<SplitVarnode> splitvec;
+  std::vector<SplitVarnode> splitvec;
   SplitVarnode::wholeList(op->getIn(0),splitvec);
   if (splitvec.empty()) return 0;
   for(int4 i=0;i<splitvec.size();++i) {
@@ -2903,8 +2903,8 @@ PcodeOp *RuleDoubleLoad::noWriteConflict(PcodeOp *op1,PcodeOp *op2,AddrSpace *sp
     op2 = op1;
     op1 = tmp;
   }
-  list<PcodeOp *>::iterator iter = op1->getBasicIter();
-  list<PcodeOp *>::iterator enditer = op2->getBasicIter();
+  std::list<PcodeOp *>::iterator iter = op1->getBasicIter();
+  std::list<PcodeOp *>::iterator enditer = op2->getBasicIter();
 
   ++iter;
   while(iter != enditer) {
@@ -2936,7 +2936,7 @@ PcodeOp *RuleDoubleLoad::noWriteConflict(PcodeOp *op1,PcodeOp *op2,AddrSpace *sp
   return op2;
 }
 
-void RuleDoubleLoad::getOpList(vector<uint4> &oplist) const
+void RuleDoubleLoad::getOpList(std::vector<uint4> &oplist) const
 
 {
   oplist.push_back(CPUI_PIECE);

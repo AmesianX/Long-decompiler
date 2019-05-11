@@ -57,7 +57,7 @@ AddrSpace::AddrSpace(AddrSpaceManager *m,const Translate *t,spacetype tp,const s
   delay = dl;
   deadcodedelay = dl;		// Deadcode delay initially starts the same as heritage delay
 
-  // These are the flags we allow to be set from constructor
+  // These are the flags we allow to be std::set from constructor
   flags = (fl & hasphysical);
   if (t->isBigEndian())
     flags |= big_endian;
@@ -81,7 +81,7 @@ AddrSpace::AddrSpace(AddrSpaceManager *m,const Translate *t,spacetype tp)
   type = tp;
   flags = (heritaged | does_deadcode);		// Always on unless explicitly turned off in derived constructor
   wordsize = 1;
-  // We let big_endian get set by attribute
+  // We let big_endian get std::set by attribute
 }
 
 /// Save the \e name, \e index, \e bigendian, \e delay,
@@ -200,13 +200,13 @@ uintb AddrSpace::restoreXmlAttributes(const Element *el,uint4 &size) const
   for(int4 i=0;i<num;++i) {
     if (el->getAttributeName(i)=="offset") {
       foundoffset = true;
-      istringstream s1(el->getAttributeValue(i));
-      s1.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+      std::istringstream s1(el->getAttributeValue(i));
+      s1.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
       s1 >> offset;
     }
     else if (el->getAttributeName(i)=="size") {
-      istringstream s2(el->getAttributeValue(i));
-      s2.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+      std::istringstream s2(el->getAttributeValue(i));
+      s2.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
       s2 >> size;
     }
   }
@@ -222,7 +222,7 @@ uintb AddrSpace::restoreXmlAttributes(const Element *el,uint4 &size) const
 void AddrSpace::printOffset(std::ostream &s,uintb offset) const
 
 {
-  s << "0x" << hex << offset;
+  s << "0x" << std::dec << offset;
 }
 
 /// This is a printing method for the debugging routines. It
@@ -241,11 +241,11 @@ void AddrSpace::printRaw(std::ostream &s,uintb offset) const
     else if ((offset>>48) == 0)
       sz = 6;
   }
-  s << "0x" << setfill('0') << setw(2*sz) << hex << byteToAddress(offset,wordsize);
+  s << "0x" << std::setfill('0') << std::setw(2*sz) << std::dec << byteToAddress(offset,wordsize);
   if (wordsize>1) {
     int4 cut = offset % wordsize;
     if (cut != 0)
-      s << '+' << dec << cut;
+      s << '+' << std::dec << cut;
   }
 }
 
@@ -273,7 +273,7 @@ static int4 get_offset_size(const char *ptr,uintb &offset)
 /// For the console mode, an address space can tailor how it
 /// converts user strings into offsets within the space. The
 /// base routine can read and convert register names as well
-/// as absolute hex addresses.  A size can be indicated by
+/// as absolute std::dec addresses.  A size can be indicated by
 /// appending a ':' and integer, .i.e.  0x1000:2.  Offsets within
 /// a register can be indicated by appending a '+' and integer,
 /// i.e. eax+2
@@ -354,20 +354,20 @@ void AddrSpace::restoreXml(const Element *el)
     }
     if (attrName == "index")
       {
-	istringstream s1(attrValue);
-	s1.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+	std::istringstream s1(attrValue);
+	s1.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
 	s1 >> index;
       }
     if (attrName == "size")
       {
-	istringstream s1(attrValue);
-	s1.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+	std::istringstream s1(attrValue);
+	s1.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
 	s1 >> addressSize;
       }
     if (attrName == "wordsize")
       {
-	istringstream s1(attrValue);
-	s1.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+	std::istringstream s1(attrValue);
+	s1.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
 	s1 >> wordsize;
       }
     if (attrName == "bigendian") {
@@ -375,13 +375,13 @@ void AddrSpace::restoreXml(const Element *el)
 	flags |= big_endian;
     }
     if (attrName == "delay") {
-      istringstream s1(attrValue);
-      s1.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+      std::istringstream s1(attrValue);
+      s1.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
       s1 >> delay;
     }
     if (attrName == "deadcodedelay") {
-      istringstream s1(attrValue);
-      s1.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+      std::istringstream s1(attrValue);
+      s1.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
       s1 >> deadcodedelay;
     }      
     if (attrName == "physical") {
@@ -391,7 +391,7 @@ void AddrSpace::restoreXml(const Element *el)
     
   }
   if (deadcodedelay == -1)
-    deadcodedelay = delay;	// If deadcodedelay attribute not present, set it to delay
+    deadcodedelay = delay;	// If deadcodedelay attribute not present, std::set it to delay
   calcScaleMask();
   assignShortcut();
 }
@@ -417,7 +417,7 @@ ConstantSpace::ConstantSpace(AddrSpaceManager *m,const Translate *t,
 void ConstantSpace::printRaw(std::ostream &s,uintb offset) const
 
 {
-  s << "0x" << hex << offset;
+  s << "0x" << std::dec << offset;
 }
 
 /// The ConstantSpace should never be explicitly saved as it is
@@ -492,10 +492,10 @@ void JoinSpace::saveXmlAttributes(std::ostream &s,uintb offset) const
   int4 num = rec->numPieces();
   for(int4 i=0;i<num;++i) {
     const VarnodeData &vdata( rec->getPiece(i) );
-    ostringstream t;
-    t << " piece" << dec << (i+1) << "=\"";
+    std::ostringstream t;
+    t << " piece" << std::dec << (i+1) << "=\"";
     t << vdata.space->getName() << ":0x";
-    t << hex << vdata.offset << ':' << dec << vdata.size << '\"';
+    t << std::dec << vdata.offset << ':' << std::dec << vdata.size << '\"';
     s << t.str();
   }
   if (num == 1)
@@ -518,10 +518,10 @@ void JoinSpace::saveXmlAttributes(std::ostream &s,uintb offset,int4 size) const
   int4 count = 0;
   for(int4 i=0;i<num;++i) {
     const VarnodeData &vdata( rec->getPiece(i) );
-    ostringstream t;
-    t << " piece" << dec << (i+1) << "=\"";
+    std::ostringstream t;
+    t << " piece" << std::dec << (i+1) << "=\"";
     t << vdata.space->getName() << ":0x";
-    t << hex << vdata.offset << ':' << dec << vdata.size << '\"';
+    t << std::dec << vdata.offset << ':' << std::dec << vdata.size << '\"';
     count += vdata.size;
     s << t.str();
   }
@@ -540,7 +540,7 @@ void JoinSpace::saveXmlAttributes(std::ostream &s,uintb offset,int4 size) const
 uintb JoinSpace::restoreXmlAttributes(const Element *el,uint4 &size) const
 
 {
-  vector<VarnodeData> pieces;
+  std::vector<VarnodeData> pieces;
   int4 numAttribs = el->getNumAttributes();
   uint4 sizesum = 0;
   uint4 logicalsize = 0;
@@ -548,8 +548,8 @@ uintb JoinSpace::restoreXmlAttributes(const Element *el,uint4 &size) const
     std::string attrName = el->getAttributeName(i);
     if (0!=attrName.compare(0,5,"piece")) {
       if (attrName == "logicalsize") {
-	istringstream s3(el->getAttributeValue(i));
-	s3.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+	std::istringstream s3(el->getAttributeValue(i));
+	s3.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
 	s3 >> logicalsize;
       }
       continue;
@@ -572,11 +572,11 @@ uintb JoinSpace::restoreXmlAttributes(const Element *el,uint4 &size) const
 	throw LowlevelError("join address piece attribute is malformed");
       std::string spcname = attrVal.substr(0,offpos);
       vdat.space = getManager()->getSpaceByName(spcname);
-      istringstream s1(attrVal.substr(offpos+1,szpos));
-      s1.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+      std::istringstream s1(attrVal.substr(offpos+1,szpos));
+      s1.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
       s1 >> vdat.offset;
-      istringstream s2(attrVal.substr(szpos+1));
-      s2.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+      std::istringstream s2(attrVal.substr(szpos+1));
+      s2.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
       s2 >> vdat.size;
     }
     sizesum += vdat.size;
@@ -610,7 +610,7 @@ void JoinSpace::printRaw(std::ostream &s,uintb offset) const
 uintb JoinSpace::read(const std::string &s,int4 &size) const
 
 {
-  vector<VarnodeData> pieces;
+  std::vector<VarnodeData> pieces;
   int4 szsum = 0;
   int4 i=0;
   while(i < s.size()) {
@@ -684,8 +684,8 @@ void OverlaySpace::restoreXml(const Element *el)
 
 {
   name = el->getAttributeValue("name");
-  istringstream s1(el->getAttributeValue("index"));
-  s1.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+  std::istringstream s1(el->getAttributeValue("index"));
+  s1.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
   s1 >> index;
   
   std::string basename = el->getAttributeValue("base");

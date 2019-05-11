@@ -27,7 +27,7 @@ class JoinRecord;
 
 /// \brief Exception thrown when a prototype can't be modeled properly
 struct ParamUnassignedError : public LowlevelError {
-  ParamUnassignedError(const string &s) : LowlevelError(s) {}	///< Constructor
+  ParamUnassignedError(const std::string &s) : LowlevelError(s) {}	///< Constructor
 };
 
 /// \brief A contiguous range of memory that can be used to pass parameters
@@ -95,7 +95,7 @@ public:
   uintb getBase(void) const { return addressbase; }	///< Get the starting offset of \b this entry
   Address getAddrBySlot(int4 &slot,int4 sz) const;
   void restoreXml(const Element *el,const AddrSpaceManager *manage,bool normalstack);
-  void extraChecks(vector<ParamEntry> &entry);
+  void extraChecks(std::vector<ParamEntry> &entry);
   bool isParamCheckHigh(void) const { return ((flags & extracheck_high)!=0); }	///< Return \b true if there is a high overlap
   bool isParamCheckLow(void) const { return ((flags & extracheck_low)!=0); }	///< Return \b true if there is a low overlap
 };
@@ -104,14 +104,14 @@ public:
 ///
 /// The parameter recovery utilities (see ParamActive) use this to denote a putative
 /// parameter passing storage location. It is made up of the address and size of the memory range,
-/// a set of properties about the use of the range (as a parameter) in context, and a link to
+/// a std::set of properties about the use of the range (as a parameter) in context, and a link to
 /// the matching part of the PrototypeModel.
 ///
-/// Data-flow for the putative parameter is held directly by a Varnode.  To quickly map to the
+/// Data-flow for the putative parameter is held directly by a Varnode.  To quickly std::map to the
 /// Varnode (which may or may not exist at points during the ParamTrial lifetime), the concept
 /// of \b slot is used.  ParamTrials are assigned a \e slot, starting at 1.  For sub-function parameters,
 /// this represents the actual input index of the Varnode in the corresponding CALL or CALLIND op.
-/// For parameters, this gives the position within the list of possible input Varnodes in address order.
+/// For parameters, this gives the position within the std::list of possible input Varnodes in address order.
 /// The \e slot ordering varies over the course of analysis and is unlikely to match
 /// the final parameter ordering.  The ParamTrial comparator sorts the trials in final parameter ordering.
 class ParamTrial {
@@ -181,7 +181,7 @@ public:
 /// they are in address order for input Varnodes to the active function.
 /// After, the trials are put into formal parameter order, as dictated by the PrototypeModel.
 class ParamActive {
-  vector<ParamTrial> trial;	///< The list of parameter trials
+  std::vector<ParamTrial> trial;	///< The std::list of parameter trials
   int4 slotbase;		///< Slot where next parameter will go
   int4 stackplaceholder;	///< Which call input slot holds the stack placeholder
   int4 numpasses;		///< Number of attempts at evaluating parameters
@@ -242,11 +242,11 @@ public:
 /// value of the pointer
 class FspecSpace : public AddrSpace {
 public:
-  FspecSpace(AddrSpaceManager *m,const Translate *t,const string &nm,int4 ind);	///< Constructor
-  virtual void saveXmlAttributes(ostream &s,uintb offset) const;
-  virtual void saveXmlAttributes(ostream &s,uintb offset,int4 size) const;
-  virtual void printRaw(ostream &s,uintb offset) const;
-  virtual void saveXml(ostream &s) const;
+  FspecSpace(AddrSpaceManager *m,const Translate *t,const std::string &nm,int4 ind);	///< Constructor
+  virtual void saveXmlAttributes(std::ostream &s,uintb offset) const;
+  virtual void saveXmlAttributes(std::ostream &s,uintb offset,int4 size) const;
+  virtual void printRaw(std::ostream &s,uintb offset) const;
+  virtual void saveXml(std::ostream &s) const;
   virtual void restoreXml(const Element *el);
 };
 
@@ -285,16 +285,16 @@ public:
   bool operator<(const EffectRecord &op2) const;	///< Comparator for EffectRecords
   bool operator==(const EffectRecord &op2) const;	///< Equality operator
   bool operator!=(const EffectRecord &op2) const;	///< Inequality operator
-  void saveXml(ostream &s) const;			///< Save the record to an XML stream
+  void saveXml(std::ostream &s) const;			///< Save the record to an XML stream
   void restoreXml(uint4 grouptype,const Element *el,const AddrSpaceManager *manage);	///< Restore the record from an XML stream
 };
 
-/// A group of ParamEntry objects that form a complete set for passing
+/// A group of ParamEntry objects that form a complete std::set for passing
 /// parameters in one direction (either input or output). The main tasks this class must
 /// perform are:
 ///   - possibleParam() Quick test if a Varnode could ever be a parameter with this prototype
 ///   - fillinMap()   Select trials completing prototype, given analysis info
-///   - assignMap()   Derive slot->address map, given a list of types
+///   - assignMap()   Derive slot->address std::map, given a std::list of types
 ///   - checkJoin()   Can two parameters be considered/converted into a single logical parameter
 class ParamList {
 public:
@@ -305,24 +305,24 @@ public:
     p_merged		///< A merged model (multiple models merged together)
   };
   virtual ~ParamList(void) {}			///< Destructor
-  virtual uint4 getType(void) const=0;		///< Get the type of parameter list
+  virtual uint4 getType(void) const=0;		///< Get the type of parameter std::list
 
-  /// \brief Given list of data-types, map the list positions to storage locations
+  /// \brief Given std::list of data-types, std::map the std::list positions to storage locations
   ///
   /// If we know the function prototype, recover how parameters are actually stored using the model.
-  /// \param proto is the ordered list of data-types
+  /// \param proto is the ordered std::list of data-types
   /// \param isinput is \b true for the input prototype, \b false for output prototype
   /// \param typefactory is the TypeFactory (for constructing pointers)
   /// \param res will contain the storage locations corresponding to the datatypes
-  virtual void assignMap(const vector<Datatype *> &proto,bool isinput,
-			 TypeFactory &typefactory,vector<ParameterPieces> &res) const=0;
+  virtual void assignMap(const std::vector<Datatype *> &proto,bool isinput,
+			 TypeFactory &typefactory,std::vector<ParameterPieces> &res) const=0;
 
-  /// \brief Given an unordered list of storage locations, calculate a function prototype
+  /// \brief Given an unordered std::list of storage locations, calculate a function prototype
   ///
-  /// A list of input (or output) trials is given, which may have holes, invalid inputs etc.  Decide
-  /// on the formal ordered parameter list. Trials within the ParamActive are added, removed, or
+  /// A std::list of input (or output) trials is given, which may have holes, invalid inputs etc.  Decide
+  /// on the formal ordered parameter std::list. Trials within the ParamActive are added, removed, or
   /// reordered as needed.
-  /// \param active is the given list of trials
+  /// \param active is the given std::list of trials
   virtual void fillinMap(ParamActive *active) const=0;
 
   /// \brief Check if the given two storage locations can represent a single logical parameter
@@ -388,7 +388,7 @@ public:
   /// INT_PIECE indicates the extension is determined by the specific prototype.
   virtual OpCode assumedExtension(const Address &addr,int4 size,VarnodeData &res) const=0;
 
-  /// \brief Get the address space associated with any stack based parameters in \b this list.
+  /// \brief Get the address space associated with any stack based parameters in \b this std::list.
   ///
   /// \return the stack address space, if \b this models parameters passed on the stack, NULL otherwise
   virtual AddrSpace *getSpacebase(void) const=0;
@@ -397,7 +397,7 @@ public:
   ///
   /// Pass back the memory ranges for any parameter that is stored in the given address space.
   /// \param spc is the given address space
-  /// \param res will hold the set of matching memory ranges
+  /// \param res will hold the std::set of matching memory ranges
   virtual void getRangeList(AddrSpace *spc,RangeList &res) const=0;
 
   /// \brief Return the maximum heritage delay across all possible parameters
@@ -414,20 +414,20 @@ public:
   /// \param manage is used to resolve references to address spaces
   /// \param effectlist is a container collecting EffectRecords across all parameters
   /// \param normalstack is \b true if parameters are pushed on the stack in the normal order
-  virtual void restoreXml(const Element *el,const AddrSpaceManager *manage,vector<EffectRecord> &effectlist,bool normalstack)=0;
+  virtual void restoreXml(const Element *el,const AddrSpaceManager *manage,std::vector<EffectRecord> &effectlist,bool normalstack)=0;
 
-  virtual ParamList *clone(void) const=0;	///< Clone this parameter list model
+  virtual ParamList *clone(void) const=0;	///< Clone this parameter std::list model
 };
 
-/// \brief A standard model for parameters as an ordered list of storage resources
+/// \brief A standard model for parameters as an ordered std::list of storage resources
 ///
-/// This is a configurable model for passing (input) parameters as a list to a function.
+/// This is a configurable model for passing (input) parameters as a std::list to a function.
 /// The model allows 1 or more resource lists based on data-type, either TYPE_UNKNOWN for
-/// general purpose or TYPE_FLOAT for floating-point registers. Within a resource list,
+/// general purpose or TYPE_FLOAT for floating-point registers. Within a resource std::list,
 /// any number of parameters can be used but they must come starting at the beginning of
-/// the list with no \e holes (skipped resources). A resource list can include (at the end)
+/// the std::list with no \e holes (skipped resources). A resource std::list can include (at the end)
 /// \e stack parameters that are allocated based on an alignment.  Optionally, the model supports
-/// converting data-types larger than a specified size to pointers within the parameter list.
+/// converting data-types larger than a specified size to pointers within the parameter std::list.
 class ParamListStandard : public ParamList {
 protected:
   int4 numgroup;			///< Number of \e groups in this parameter convention
@@ -435,23 +435,23 @@ protected:
   int4 pointermax; 			///< If non-zero, maximum size of a data-type before converting to a pointer
   bool thisbeforeret;			///< Does a \b this parameter come before a hidden return parameter
   int4 nonfloatgroup;			///< Group of first entry which is not marked float
-  vector<ParamEntry> entry;		///< The ordered list of parameter entries
+  std::vector<ParamEntry> entry;		///< The ordered std::list of parameter entries
   AddrSpace *spacebase;			///< Address space containing relative offset parameters
   int4 findEntry(const Address &loc,int4 size) const;	///< Given storage location find matching ParamEntry
-  Address assignAddress(const Datatype *tp,vector<int4> &status) const;	///< Assign storage for given parameter data-type
-  void buildTrialMap(ParamActive *active) const;	///< Build map from parameter trials to model ParamEntrys
+  Address assignAddress(const Datatype *tp,std::vector<int4> &status) const;	///< Assign storage for given parameter data-type
+  void buildTrialMap(ParamActive *active) const;	///< Build std::map from parameter trials to model ParamEntrys
   void separateFloat(ParamActive *active,int4 &floatstart,int4 &floatstop,int4 &start,int4 &stop) const;
   void forceExclusionGroup(ParamActive *active) const;
   void forceNoUse(ParamActive *active,int4 start,int4 stop) const;
   void forceInactiveChain(ParamActive *active,int4 maxchain,int4 start,int4 stop) const;
-  void calcDelay(void);		///< Calculate the maximum heritage delay for any potential parameter in this list
+  void calcDelay(void);		///< Calculate the maximum heritage delay for any potential parameter in this std::list
 public:
   ParamListStandard(void) {}						///< Construct for use with restoreXml()
   ParamListStandard(const ParamListStandard &op2);			///< Copy constructor
-  const vector<ParamEntry> &getEntry(void) const { return entry; }	///< Get the list of parameter entries
+  const std::vector<ParamEntry> &getEntry(void) const { return entry; }	///< Get the std::list of parameter entries
   virtual uint4 getType(void) const { return p_standard; }
-  virtual void assignMap(const vector<Datatype *> &proto,bool isinput,
-			 TypeFactory &typefactory,vector<ParameterPieces> &res) const;
+  virtual void assignMap(const std::vector<Datatype *> &proto,bool isinput,
+			 TypeFactory &typefactory,std::vector<ParameterPieces> &res) const;
   virtual void fillinMap(ParamActive *active) const;
   virtual bool checkJoin(const Address &hiaddr,int4 hisize,const Address &loaddr,int4 losize) const;
   virtual bool checkSplit(const Address &loc,int4 size,int4 splitpoint) const;
@@ -462,13 +462,13 @@ public:
   virtual AddrSpace *getSpacebase(void) const { return spacebase; }
   virtual void getRangeList(AddrSpace *spc,RangeList &res) const;
   virtual int4 getMaxDelay(void) const { return maxdelay; }
-  virtual void restoreXml(const Element *el,const AddrSpaceManager *manage,vector<EffectRecord> &effectlist,bool normalstack);
+  virtual void restoreXml(const Element *el,const AddrSpaceManager *manage,std::vector<EffectRecord> &effectlist,bool normalstack);
   virtual ParamList *clone(void) const;
 };
 
 /// \brief A standard model for passing back return values from a function
 ///
-/// This models a resource list of potential storage locations for a return value,
+/// This models a resource std::list of potential storage locations for a return value,
 /// at most 1 of which will be chosen for a given function. Order only matters in that the
 /// first ParamEntry that fits is used. If no entry fits, the return value is
 /// converted to a pointer data-type, storage allocation is attempted again, and the
@@ -478,11 +478,11 @@ public:
   ParamListStandardOut(void) : ParamListStandard() {}		///< Constructor
   ParamListStandardOut(const ParamListStandardOut &op2) : ParamListStandard(op2) {}	///< Copy constructor
   virtual uint4 getType(void) const { return p_standard_out; }
-  virtual void assignMap(const vector<Datatype *> &proto,bool isinput,
-			 TypeFactory &typefactory,vector<ParameterPieces> &res) const;
+  virtual void assignMap(const std::vector<Datatype *> &proto,bool isinput,
+			 TypeFactory &typefactory,std::vector<ParameterPieces> &res) const;
   virtual void fillinMap(ParamActive *active) const;
   virtual bool possibleParam(const Address &loc,int4 size) const;
-  virtual void restoreXml(const Element *el,const AddrSpaceManager *manage,vector<EffectRecord> &effectlist,bool normalstack);
+  virtual void restoreXml(const Element *el,const AddrSpaceManager *manage,std::vector<EffectRecord> &effectlist,bool normalstack);
   virtual ParamList *clone(void) const;
 };
 
@@ -490,7 +490,7 @@ public:
 ///
 /// This is the \b register model, meaning a collection of registers, any of which
 /// can be used to pass a parameter.  This is nearly identical to ParamListStandard, but
-/// rules banning \e holes are not enforced, any subset of the resource list can be used.
+/// rules banning \e holes are not enforced, any subset of the resource std::list can be used.
 /// This makes sense for executables where parameters follow no conventions or only loose
 /// conventions. The assignMap() method may make less sense in this scenario.
 class ParamListRegister : public ParamListStandard {
@@ -504,7 +504,7 @@ public:
 
 /// \brief A union of other input parameter passing models
 ///
-/// This model is viewed as a union of a constituent set of resource lists.
+/// This model is viewed as a union of a constituent std::set of resource lists.
 /// This allows initial data-flow analysis to proceed when the exact model
 /// isn't known.  The assignMap() and fillinMap() methods are disabled for
 /// instances of this class. The controlling prototype model (ProtoModelMerged)
@@ -516,8 +516,8 @@ public:
   ParamListMerged(const ParamListMerged &op2) : ParamListStandard(op2) {}	///< Copy constructor
   void foldIn(const ParamListStandard &op2);				///< Add another model to the union
   virtual uint4 getType(void) const { return p_merged; }
-  virtual void assignMap(const vector<Datatype *> &proto,bool isinput,
-			 TypeFactory &typefactory,vector<ParameterPieces> &res) const {
+  virtual void assignMap(const std::vector<Datatype *> &proto,bool isinput,
+			 TypeFactory &typefactory,std::vector<ParameterPieces> &res) const {
     throw LowlevelError("Cannot assign prototype before model has been resolved"); }
   virtual void fillinMap(ParamActive *active) const {
     throw LowlevelError("Cannot determine prototype before model has been resolved"); }
@@ -529,7 +529,7 @@ public:
 /// This encompasses both input parameters and return values. It attempts to
 /// describe the ABI, Application Binary Interface, of the processor or compiler.
 /// Any number of function prototypes (FuncProto) can be implemented under a
-/// \b prototype \b model, which represents a static rule set the compiler uses
+/// \b prototype \b model, which represents a static rule std::set the compiler uses
 /// to decide:
 ///   - Storage locations for input parameters
 ///   - Storage locations for return values
@@ -549,12 +549,12 @@ public:
 class ProtoModel {
   friend class ProtoModelMerged;
   Architecture *glb;		///< The Architecture owning this prototype model
-  string name;			///< Name of the model
+  std::string name;			///< Name of the model
   int4 extrapop;		///< Extra bytes popped from stack
   ParamList *input;		///< Resource model for input parameters
   ParamList *output;		///< Resource model for output parameters
-  vector<EffectRecord> effectlist; ///< List of side-effects
-  vector<VarnodeData> likelytrash;	///< Storage locations potentially carrying \e trash values
+  std::vector<EffectRecord> effectlist; ///< List of side-effects
+  std::vector<VarnodeData> likelytrash;	///< Storage locations potentially carrying \e trash values
   int4 injectUponEntry;		///< Id of injection to perform at beginning of function (-1 means not used)
   int4 injectUponReturn;	///< Id of injection to perform after a call to this function (-1 means not used)
   RangeList localrange;		///< Memory range(s) of space-based locals
@@ -564,15 +564,15 @@ class ProtoModel {
   bool isConstruct;		///< True if this model is a constructor for a particular object
   void defaultLocalRange(void);	///< Set the default stack range used for local variables
   void defaultParamRange(void);	///< Set the default stack range used for input parameters
-  void buildParamList(const string &strategy);	 ///< Establish the main resource lists for input and output parameters.
+  void buildParamList(const std::string &strategy);	 ///< Establish the main resource lists for input and output parameters.
 public:
   enum {
     extrapop_unknown = 0x8000	///< Reserved extrapop value meaning the function's \e extrapop is unknown
   };
   ProtoModel(Architecture *g);	///< Constructor for use with restoreXml()
-  ProtoModel(const string &nm,const ProtoModel &op2);	///< Copy constructor changing the name
+  ProtoModel(const std::string &nm,const ProtoModel &op2);	///< Copy constructor changing the name
   virtual ~ProtoModel(void);				///< Destructor
-  const string &getName(void) const { return name; }	///< Get the name of the prototype model
+  const std::string &getName(void) const { return name; }	///< Get the name of the prototype model
   Architecture *getArch(void) const { return glb; }	///< Get the owning Architecture
   uint4 hasEffect(const Address &addr,int4 size) const;	///< Determine side-effect of \b this on the given memory range
   int4 getExtraPop(void) const { return extrapop; }	///< Get the stack-pointer \e extrapop for \b this model
@@ -580,21 +580,21 @@ public:
   int4 getInjectUponEntry(void) const { return injectUponEntry; }	///< Get the inject \e uponentry id
   int4 getInjectUponReturn(void) const { return injectUponReturn; }	///< Get the inject \e uponreturn id
 
-  /// \brief Given a list of input \e trials, derive the most likely input prototype
+  /// \brief Given a std::list of input \e trials, derive the most likely input prototype
   ///
   /// Trials are sorted and marked as \e used or not.
   /// \param active is the collection of Varnode input trials
   void deriveInputMap(ParamActive *active) const {
     input->fillinMap(active); }
 
-  /// \brief Given a list of output \e trials, derive the most likely output prototype
+  /// \brief Given a std::list of output \e trials, derive the most likely output prototype
   ///
-  /// One trial (at most) is marked \e used and moved to the front of the list
+  /// One trial (at most) is marked \e used and moved to the front of the std::list
   /// \param active is the collection of output trials
   void deriveOutputMap(ParamActive *active) const {
     output->fillinMap(active); }
 
-  void assignParameterStorage(const vector<Datatype *> &typelist,vector<ParameterPieces> &res,bool ignoreOutputError);
+  void assignParameterStorage(const std::vector<Datatype *> &typelist,std::vector<ParameterPieces> &res,bool ignoreOutputError);
 
   /// \brief Check if the given two input storage locations can represent a single logical parameter
   ///
@@ -633,8 +633,8 @@ public:
 
   const RangeList &getLocalRange(void) const { return localrange; }	///< Get the range of (possible) local stack variables
   const RangeList &getParamRange(void) const { return paramrange; }	///< Get the range of (possible) stack parameters
-  vector<EffectRecord>::const_iterator effectBegin(void) const { return effectlist.begin(); }	///< Get an iterator to the first EffectRecord
-  vector<EffectRecord>::const_iterator effectEnd(void) const { return effectlist.end(); }	///< Get an iterator to the last EffectRecord
+  std::vector<EffectRecord>::const_iterator effectBegin(void) const { return effectlist.begin(); }	///< Get an iterator to the first EffectRecord
+  std::vector<EffectRecord>::const_iterator effectEnd(void) const { return effectlist.end(); }	///< Get an iterator to the last EffectRecord
   int4 numLikelyTrash(void) const { return likelytrash.size(); }	///< Get the number of \e likelytrash locations
   const VarnodeData &getLikelyTrash(int4 i) const { return likelytrash[i]; }	///< Get the i-th \e likelytrashh location
 
@@ -741,21 +741,21 @@ public:
 
   virtual bool isMerged(void) const { return false; }	///< Is \b this a merged prototype model
   virtual void restoreXml(const Element *el);		///< Restore \b this model from an XML stream
-  static uint4 lookupEffect(const vector<EffectRecord> &efflist,const Address &addr,int4 size);
+  static uint4 lookupEffect(const std::vector<EffectRecord> &efflist,const Address &addr,int4 size);
 };
 
 /// \brief Class for calculating "goodness of fit" of parameter trials against a prototype model
 ///
-/// The class is instantiated with a prototype model (ProtoModel). A set of Varnode parameter trials
+/// The class is instantiated with a prototype model (ProtoModel). A std::set of Varnode parameter trials
 /// are registered by calling addParameter() for each trial.  Then calling doScore() computes a score
-/// that evaluates how well the set of registered trials fit the prototype model.  A lower score
+/// that evaluates how well the std::set of registered trials fit the prototype model.  A lower score
 /// indicates a better fit.
 class ScoreProtoModel {
   /// \brief A record mapping trials to parameter entries in the prototype model
   class PEntry {
   public:
     int4 origIndex;		///< Original index of trial
-    int4 slot;			///< Matching slot within the resource list
+    int4 slot;			///< Matching slot within the resource std::list
     int4 size;			///< Number of slots occupied
     /// \brief Compare PEntry objects by slot
     ///
@@ -764,7 +764,7 @@ class ScoreProtoModel {
     bool operator<(const PEntry &op2) const { return (slot < op2.slot); }
   };
   bool isinputscore;		///< True if scoring against input parameters, \b false for outputs
-  vector<PEntry> entry;		///< Map of parameter entries corresponding to trials
+  std::vector<PEntry> entry;		///< std::map of parameter entries corresponding to trials
   const ProtoModel *model;	///< Prototype model to score against
   int4 finalscore;		///< The final fitness score
   int4 mismatch;		///< Number of trials that don't fit the prototype model at all
@@ -780,7 +780,7 @@ public:
 ///
 /// This model serves as a placeholder for multiple models, when the exact model
 /// hasn't been immediately determined. At the time of active parameter recovery
-/// the correct model is selected for the given set of trials
+/// the correct model is selected for the given std::set of trials
 /// from among the constituent prototype models used to build \b this,
 /// by calling the method selectModel().
 /// Up to this time, \b this serves as a merged form of the models
@@ -788,16 +788,16 @@ public:
 /// for the output part of the model is currently limited, so the constituent models must all share
 /// the same output model, and this part is \e not currently merged.
 class ProtoModelMerged : public ProtoModel {
-  vector<ProtoModel *> modellist;					///< Constituent models being merged
-  void intersectEffects(const vector<EffectRecord> &efflist);		///< Fold EffectRecords into \b this model
-  void intersectLikelyTrash(const vector<VarnodeData> &trashlist);	///< Fold \e likelytrash locations into \b this model
+  std::vector<ProtoModel *> modellist;					///< Constituent models being merged
+  void intersectEffects(const std::vector<EffectRecord> &efflist);		///< Fold EffectRecords into \b this model
+  void intersectLikelyTrash(const std::vector<VarnodeData> &trashlist);	///< Fold \e likelytrash locations into \b this model
 public:
   ProtoModelMerged(Architecture *g) : ProtoModel(g) {}			///< Constructor
   virtual ~ProtoModelMerged(void) {}					///< Destructor
   int4 numModels(void) const { return modellist.size(); }		///< Get the number of constituent models
   ProtoModel *getModel(int4 i) const { return modellist[i]; }		///< Get the i-th model
   void foldIn(ProtoModel *model);					///< Fold-in an additional prototype model
-  ProtoModel *selectModel(ParamActive *active) const;			///< Select the best model given a set of trials
+  ProtoModel *selectModel(ParamActive *active) const;			///< Select the best model given a std::set of trials
   virtual bool isMerged(void) const { return true; }
   virtual void restoreXml(const Element *el);
 };
@@ -814,7 +814,7 @@ class ProtoParameter {
 public:
   ProtoParameter(void) {}				///< Constructor
   virtual ~ProtoParameter(void) {}			///< Destructor
-  virtual const string &getName(void) const=0;		///< Get the name of the parameter ("" for return value)
+  virtual const std::string &getName(void) const=0;		///< Get the name of the parameter ("" for return value)
   virtual Datatype *getType(void) const=0;		///< Get the data-type associate with \b this
   virtual Address getAddress(void) const=0;		///< Get the storage address for \b this parameter
   virtual int4 getSize(void) const=0;			///< Get the number of bytes occupied by \b this parameter
@@ -872,14 +872,14 @@ public:
 /// This is suitable for return values, function pointer prototypes, or functions
 /// that haven't been fully analyzed.
 class ParameterBasic : public ProtoParameter {
-  string name;			///< The name of the parameter, "" for undefined or return value parameters
+  std::string name;			///< The name of the parameter, "" for undefined or return value parameters
   Address addr;			///< Storage address of the parameter
   Datatype *type;		///< Data-type of the parameter
   uint4 flags;			///< Lock properties. Varnode::mark is co-opted to hold the \e size-lock flag
 public:
-  ParameterBasic(const string &nm,const Address &ad,Datatype *tp,uint4 fl) {
+  ParameterBasic(const std::string &nm,const Address &ad,Datatype *tp,uint4 fl) {
     name = nm; addr = ad; type = tp; flags=fl; }		///< Construct from components
-  virtual const string &getName(void) const { return name; }
+  virtual const std::string &getName(void) const { return name; }
   virtual Datatype *getType(void) const { return type; }
   virtual Address getAddress(void) const { return addr; }
   virtual int4 getSize(void) const { return type->getSize(); }
@@ -913,9 +913,9 @@ public:
   /// created or modified.
   /// \param i is the specified input slot
   /// \param nm is the (optional) name of the parameter
-  /// \param pieces holds the raw storage address and data-type to set
+  /// \param pieces holds the raw storage address and data-type to std::set
   /// \return the new/modified ProtoParameter
-  virtual ProtoParameter *setInput(int4 i,const string &nm,const ParameterPieces &pieces)=0;
+  virtual ProtoParameter *setInput(int4 i,const std::string &nm,const ParameterPieces &pieces)=0;
 
   /// \brief Clear the input parameter at the specified slot
   ///
@@ -932,7 +932,7 @@ public:
   ///
   /// This either allocates a new parameter or replaces the existing one.
   /// A \e void return value can be specified with an \e invalid address and TYPE_VOID data-type.
-  /// \param piece holds the raw storage address and data-type to set
+  /// \param piece holds the raw storage address and data-type to std::set
   /// \return the new/modified ProtoParameter
   virtual ProtoParameter *setOutput(const ParameterPieces &piece)=0;
 
@@ -945,7 +945,7 @@ public:
   /// Symbols are stored elsewhere, so symbol backed parameters are not serialized.
   /// If there are any internal parameters an \<internallist> tag is emitted.
   /// \param s is the output stream
-  virtual void saveXml(ostream &s) const=0;
+  virtual void saveXml(std::ostream &s) const=0;
 
   /// \brief Restore any internal parameter descriptions from an XML stream
   ///
@@ -964,7 +964,7 @@ class ParameterSymbol : public ProtoParameter {
   Symbol *sym;		///< Backing Symbol for \b this parameter
 public:
   ParameterSymbol(void) { sym = (Symbol *)0; }		///< Constructor
-  virtual const string &getName(void) const;
+  virtual const std::string &getName(void) const;
   virtual Datatype *getType(void) const;
   virtual Address getAddress(void) const;
   virtual int4 getSize(void) const;
@@ -990,13 +990,13 @@ public:
 class ProtoStoreSymbol : public ProtoStore {
   Scope *scope;				///< Backing Scope for input parameters
   Address restricted_usepoint;		///< A usepoint reference for storage locations (usually function entry -1)
-  vector<ProtoParameter *> inparam;	///< Cache of allocated input parameters
+  std::vector<ProtoParameter *> inparam;	///< Cache of allocated input parameters
   ProtoParameter *outparam;		///< The return-value parameter
   ParameterSymbol *getSymbolBacked(int4 i);	///< Fetch or allocate the parameter for the indicated slot
 public:
   ProtoStoreSymbol(Scope *sc,const Address &usepoint);	///< Constructor
   virtual ~ProtoStoreSymbol(void);
-  virtual ProtoParameter *setInput(int4 i,const string &nm,const ParameterPieces &pieces);
+  virtual ProtoParameter *setInput(int4 i,const std::string &nm,const ParameterPieces &pieces);
   virtual void clearInput(int4 i);
   virtual void clearAllInputs(void);
   virtual int4 getNumInputs(void) const;
@@ -1005,7 +1005,7 @@ public:
   virtual void clearOutput(void);
   virtual ProtoParameter *getOutput(void);
   virtual ProtoStore *clone(void) const;
-  virtual void saveXml(ostream &s) const;
+  virtual void saveXml(std::ostream &s) const;
   virtual void restoreXml(const Element *el,ProtoModel *model);
 };
 
@@ -1015,12 +1015,12 @@ public:
 /// mirrored by a symbol table.
 class ProtoStoreInternal : public ProtoStore {
   Datatype *voidtype;			///< Cached reference to the \b void data-type
-  vector<ProtoParameter *> inparam;	///< Descriptions of input parameters
+  std::vector<ProtoParameter *> inparam;	///< Descriptions of input parameters
   ProtoParameter *outparam;		///< Description of the return value
 public:
   ProtoStoreInternal(Datatype *vt);	///< Constructor
   virtual ~ProtoStoreInternal(void);
-  virtual ProtoParameter *setInput(int4 i,const string &nm,const ParameterPieces &pieces);
+  virtual ProtoParameter *setInput(int4 i,const std::string &nm,const ParameterPieces &pieces);
   virtual void clearInput(int4 i);
   virtual void clearAllInputs(void);
   virtual int4 getNumInputs(void) const;
@@ -1029,17 +1029,17 @@ public:
   virtual void clearOutput(void);
   virtual ProtoParameter *getOutput(void);
   virtual ProtoStore *clone(void) const;
-  virtual void saveXml(ostream &s) const;
+  virtual void saveXml(std::ostream &s) const;
   virtual void restoreXml(const Element *el,ProtoModel *model);
 };
 
 /// \brief Raw components of a function prototype (obtained from parsing source code)
 struct PrototypePieces {
   ProtoModel *model;		///< (Optional) model on which prototype is based
-  string name;			///< Identifier (function name) associated with prototype
+  std::string name;			///< Identifier (function name) associated with prototype
   Datatype *outtype;		///< Return data-type
-  vector<Datatype *> intypes;	///< Input data-types
-  vector<string> innames;	///< Identifiers for input types
+  std::vector<Datatype *> intypes;	///< Input data-types
+  std::vector<std::string> innames;	///< Identifiers for input types
   bool dotdotdot;		///< True if prototype takes variable arguments
 };
 
@@ -1074,11 +1074,11 @@ class FuncProto {
   ProtoStore *store;		///< Storage interface for parameters
   int4 extrapop;		///< Extra bytes popped from stack
   uint4 flags;			///< Boolean properties of the function prototype
-  vector<EffectRecord> effectlist;	///< Side-effects associated with non-parameter storage locations
-  vector<VarnodeData> likelytrash;	///< Locations that may contain \e trash values
+  std::vector<EffectRecord> effectlist;	///< Side-effects associated with non-parameter storage locations
+  std::vector<VarnodeData> likelytrash;	///< Locations that may contain \e trash values
   int4 injectid;		///< (If non-negative) id of p-code snippet that should replace this function
 protected:
-  void paramShift(int4 paramshift);	///< Add parameters to the front of the input parameter list
+  void paramShift(int4 paramshift);	///< Add parameters to the front of the input parameter std::list
   bool isParamshiftApplied(void) const { return ((flags&paramshift_applied)!=0); }	///< Has a parameter shift been applied
   /// \brief Toggle whether a parameter shift has been applied
   void setParamshiftApplied(bool val) { flags = val ? (flags|paramshift_applied) : (flags & ~((uint4)paramshift_applied)); }
@@ -1097,7 +1097,7 @@ public:
 
   bool hasMatchingModel(const FuncProto *op2) const { return (model == op2->model); }	///< Does \b this have a matching model
   bool hasMatchingModel(const ProtoModel *op2) const { return (model == op2); }	///< Does \b this use the given model
-  const string &getModelName(void) const { return model->getName(); }	///< Get the prototype model name
+  const std::string &getModelName(void) const { return model->getName(); }	///< Get the prototype model name
   int4 getModelExtraPop(void) const { return model->getExtraPop(); }	///< Get the \e extrapop of the prototype model
 
   bool isInputLocked(void) const;					///< Are input data-types locked
@@ -1190,16 +1190,16 @@ public:
 
   void resolveModel(ParamActive *active);
 
-  /// \brief Given a list of input \e trials, derive the most likely inputs for \b this prototype
+  /// \brief Given a std::list of input \e trials, derive the most likely inputs for \b this prototype
   ///
   /// Trials are sorted and marked as \e used or not.
   /// \param active is the collection of Varnode input trials
   void deriveInputMap(ParamActive *active) const {
     model->deriveInputMap(active); }
 
-  /// \brief Given a list of output \e trials, derive the most likely return value for \b this prototype
+  /// \brief Given a std::list of output \e trials, derive the most likely return value for \b this prototype
   ///
-  /// One trial (at most) is marked \e used and moved to the front of the list
+  /// One trial (at most) is marked \e used and moved to the front of the std::list
   /// \param active is the collection of output trials
   void deriveOutputMap(ParamActive *active) const {
     model->deriveOutputMap(active); }
@@ -1227,11 +1227,11 @@ public:
   bool checkInputSplit(const Address &loc,int4 size,int4 splitpoint) const {
     return model->checkInputSplit(loc,size,splitpoint); }
 
-  void updateInputTypes(const vector<Varnode *> &triallist,ParamActive *activeinput);
-  void updateInputNoTypes(const vector<Varnode *> &triallist,ParamActive *activeinput,TypeFactory *factory);
-  void updateOutputTypes(const vector<Varnode *> &triallist);
-  void updateOutputNoTypes(const vector<Varnode *> &triallist,TypeFactory *factory);
-  void updateAllTypes(const vector<string> &namelist,const vector<Datatype *> &typelist,bool dtdtdt);
+  void updateInputTypes(const std::vector<Varnode *> &triallist,ParamActive *activeinput);
+  void updateInputNoTypes(const std::vector<Varnode *> &triallist,ParamActive *activeinput,TypeFactory *factory);
+  void updateOutputTypes(const std::vector<Varnode *> &triallist);
+  void updateOutputNoTypes(const std::vector<Varnode *> &triallist,TypeFactory *factory);
+  void updateAllTypes(const std::vector<std::string> &namelist,const std::vector<Datatype *> &typelist,bool dtdtdt);
   ProtoParameter *getParam(int4 i) const { return store->getInput(i); }	///< Get the i-th input parameter
   void removeParam(int4 i) { store->clearInput(i); }		///< Remove the i-th input parameter
   int4 numParams(void) const { return store->getNumInputs(); }	///< Get the number of input parameters
@@ -1243,8 +1243,8 @@ public:
   bool isDotdotdot(void) const { return ((flags&dotdotdot)!=0); }	///< Return \b true if \b this takes a variable number of arguments
   void setDotdotdot(bool val) { flags = val ? (flags|dotdotdot) : (flags & ~((uint4)dotdotdot)); }	///< Toggle whether \b this takes variable arguments
   uint4 hasEffect(const Address &addr,int4 size) const;
-  vector<EffectRecord>::const_iterator effectBegin(void) const;	///< Get iterator to front of EffectRecord list
-  vector<EffectRecord>::const_iterator effectEnd(void) const;	///< Get iterator to end of EffectRecord list
+  std::vector<EffectRecord>::const_iterator effectBegin(void) const;	///< Get iterator to front of EffectRecord std::list
+  std::vector<EffectRecord>::const_iterator effectEnd(void) const;	///< Get iterator to end of EffectRecord std::list
   int4 numLikelyTrash(void) const;				///< Get the number of \e likely-trash locations
   const VarnodeData &getLikelyTrash(int4 i) const;		///< Get the i-th \e likely-trash location
   bool possibleInputParam(const Address &addr,int4 size) const;
@@ -1296,15 +1296,15 @@ public:
 
   bool isCompatible(const FuncProto &op2) const;
   AddrSpace *getSpacebase(void) const { return model->getSpacebase(); }		///< Get the \e stack address space
-  void printRaw(const string &funcname,ostream &s) const;
+  void printRaw(const std::string &funcname,std::ostream &s) const;
 
   /// \brief Get the comparable properties of \b this prototype
   ///
   /// Get properties not including locking, error, and inlining flags.
-  /// \return the active set of flags for \b this prototype
+  /// \return the active std::set of flags for \b this prototype
   uint4 getComparableFlags(void) const { return (flags & (dotdotdot | is_constructor | is_destructor | has_thisptr )); }
 
-  void saveXml(ostream &s) const;
+  void saveXml(std::ostream &s) const;
   void restoreXml(const Element *el,Architecture *glb);
 };
 
@@ -1329,7 +1329,7 @@ class Funcdata;
 /// and the placeholder is removed.
 class FuncCallSpecs : public FuncProto {
   PcodeOp *op;			///< Pointer to CALL or CALLIND instruction
-  string name;			///< Name of function if present
+  std::string name;			///< Name of function if present
   Address entryaddress;		///< First executing address of function
   Funcdata *fd;			///< The Funcdata object for the called functon (if known)
   int4 effective_extrapop;	///< Working extrapop for the CALL
@@ -1346,11 +1346,11 @@ class FuncCallSpecs : public FuncProto {
   Varnode *buildParam(Funcdata &data,Varnode *vn,ProtoParameter *param,Varnode *stackref);
   int4 transferLockedInputParam(ProtoParameter *param);
   PcodeOp *transferLockedOutputParam(ProtoParameter *param);
-  bool transferLockedInput(vector<Varnode *> &newinput);
+  bool transferLockedInput(std::vector<Varnode *> &newinput);
   bool transferLockedOutput(Varnode *&newoutput);
-  void commitNewInputs(Funcdata &data,vector<Varnode *> &newinput);
+  void commitNewInputs(Funcdata &data,std::vector<Varnode *> &newinput);
   void commitNewOutputs(Funcdata &data,Varnode *newout);
-  void collectOutputTrialVarnodes(vector<Varnode *> &trialvn);
+  void collectOutputTrialVarnodes(std::vector<Varnode *> &trialvn);
 public:
   enum {
     offset_unknown = 0xBADBEEF					///< "Magic" stack offset indicating the offset is unknown
@@ -1361,7 +1361,7 @@ public:
   Funcdata *getFuncdata(void) const { return fd; }		///< Get the Funcdata object associated with the called function
   void setFuncdata(Funcdata *f);				///< Set the Funcdata object associated with the called function
   FuncCallSpecs *clone(PcodeOp *newop) const;			///< Clone \b this given the mirrored p-code CALL
-  const string &getName(void) const { return name; }		///< Get the function name associated with the callee
+  const std::string &getName(void) const { return name; }		///< Get the function name associated with the callee
   const Address &getEntryAddress(void) const { return entryaddress; }	///< Get the entry address of the callee
   void setEffectiveExtraPop(int4 epop) { effective_extrapop = epop; }	///< Set the specific \e extrapop associate with \b this call site
   int4 getEffectiveExtraPop(void) const { return effective_extrapop; }	///< Get the specific \e extrapop associate with \b this call site
@@ -1388,7 +1388,7 @@ public:
 
   bool checkInputJoin(int4 slot1,bool ishislot,Varnode *vn1,Varnode *vn2) const;
   void doInputJoin(int4 slot1,bool ishislot);
-  bool lateRestriction(const FuncProto &restrictedProto,vector<Varnode *> &newinput,Varnode *&newoutput);
+  bool lateRestriction(const FuncProto &restrictedProto,std::vector<Varnode *> &newinput,Varnode *&newoutput);
   void deindirect(Funcdata &data,Funcdata *newfd);
   void forceSet(Funcdata &data,const FuncProto &fp);
   void insertPcode(Funcdata &data);
@@ -1396,9 +1396,9 @@ public:
   void abortSpacebaseRelative(Funcdata &data);
   void finalInputCheck(void);
   void checkInputTrialUse(Funcdata &data,AliasChecker &aliascheck);
-  void checkOutputTrialUse(Funcdata &data,vector<Varnode *> &trialvn);
+  void checkOutputTrialUse(Funcdata &data,std::vector<Varnode *> &trialvn);
   void buildInputFromTrials(Funcdata &data);
-  void buildOutputFromTrials(Funcdata &data,vector<Varnode *> &trialvn);
+  void buildOutputFromTrials(Funcdata &data,std::vector<Varnode *> &trialvn);
   void paramshiftModifyStart(void);
   bool paramshiftModifyStop(Funcdata &data);
   uint4 hasEffectTranslate(const Address &addr,int4 size) const;
@@ -1416,7 +1416,7 @@ public:
   /// \param b is the second to compare
   /// \return \b true if the first should be ordered before the second
   static bool compareByEntryAddress(const FuncCallSpecs *a,const FuncCallSpecs *b) { return a->entryaddress < b->entryaddress; }
-  static void countMatchingCalls(const vector<FuncCallSpecs *> &qlst);
+  static void countMatchingCalls(const std::vector<FuncCallSpecs *> &qlst);
 };
 
 /// Return the trial associated with the input Varnode to the associated p-code CALL or CALLIND.

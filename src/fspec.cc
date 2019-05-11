@@ -297,35 +297,35 @@ void ParamEntry::restoreXml(const Element *el,const AddrSpaceManager *manage,boo
   for(int4 i=0;i<num;++i) {
     const std::string &attrname( el->getAttributeName(i) );
     if (attrname=="minsize") {
-      istringstream i1(el->getAttributeValue(i));
-      i1.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+      std::istringstream i1(el->getAttributeValue(i));
+      i1.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
       i1 >> minsize;
     }
     else if (attrname == "size") { // old style
-      istringstream i2(el->getAttributeValue(i));
-      i2.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+      std::istringstream i2(el->getAttributeValue(i));
+      i2.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
       i2 >> alignment;
     }
     else if (attrname == "align") { // new style
-      istringstream i4(el->getAttributeValue(i));
-      i4.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+      std::istringstream i4(el->getAttributeValue(i));
+      i4.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
       i4 >> alignment;
     }
     else if (attrname == "maxsize") {
-      istringstream i3(el->getAttributeValue(i));
-      i3.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+      std::istringstream i3(el->getAttributeValue(i));
+      i3.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
       i3 >> size;
     }
     else if (attrname == "metatype")
       type = string2metatype(el->getAttributeValue(i));
     else if (attrname == "group") { // Override the group
-      istringstream i5(el->getAttributeValue(i));
-      i5.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+      std::istringstream i5(el->getAttributeValue(i));
+      i5.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
       i5 >> group;
     }
     else if (attrname == "groupsize") {
-      istringstream i6(el->getAttributeValue(i));
-      i6.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+      std::istringstream i6(el->getAttributeValue(i));
+      i6.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
       i6 >> groupsize;
     }
     else if (attrname == "extension") {
@@ -379,8 +379,8 @@ void ParamEntry::restoreXml(const Element *el,const AddrSpaceManager *manage,boo
 /// is a \e joined parameter.  In this case the return value recovery logic needs to know
 /// what portion(s) of the joined parameter are overlapped. This method sets flags on \b this
 /// to indicate the overlap.
-/// \param entry is the full parameter list to check for overlaps with \b this
-void ParamEntry::extraChecks(vector<ParamEntry> &entry)
+/// \param entry is the full parameter std::list to check for overlaps with \b this
+void ParamEntry::extraChecks(std::vector<ParamEntry> &entry)
 
 {
   if (joinrec == (JoinRecord *)0) return;		// Nothing to do if not multiprecision
@@ -435,7 +435,7 @@ int4 ParamListStandard::findEntry(const Address &loc,int4 size) const
 /// \param tp is the data-type of the next parameter
 /// \param status is an array marking how many \e slots have already been consumed in a group
 /// \return the newly assigned address for the parameter
-Address ParamListStandard::assignAddress(const Datatype *tp,vector<int4> &status) const
+Address ParamListStandard::assignAddress(const Datatype *tp,std::vector<int4> &status) const
 
 {
   for(int4 i=0;i<entry.size();++i) {
@@ -457,14 +457,14 @@ Address ParamListStandard::assignAddress(const Datatype *tp,vector<int4> &status
   return Address();		// Return invalid address to indicated we could not assign anything
 }
 
-void ParamListStandard::assignMap(const vector<Datatype *> &proto,bool isinput,TypeFactory &typefactory,
-				  vector<ParameterPieces> &res) const
+void ParamListStandard::assignMap(const std::vector<Datatype *> &proto,bool isinput,TypeFactory &typefactory,
+				  std::vector<ParameterPieces> &res) const
 
 {
-  vector<int4> status(numgroup,0);
+  std::vector<int4> status(numgroup,0);
 
   if (isinput) {
-    if (res.size()==2) { // Check for hidden parameters defined by the output list
+    if (res.size()==2) { // Check for hidden parameters defined by the output std::list
       res.back().addr = assignAddress(res.back().type,status); // Reserve first param for hidden ret value
       res.back().flags |= Varnode::hiddenretparm;
       if (res.back().addr.isInvalid())
@@ -504,15 +504,15 @@ void ParamListStandard::assignMap(const vector<Datatype *> &proto,bool isinput,T
   }
 }
 
-/// Given a set of \b trials (putative Varnode parameters) as ParamTrial objects,
-/// associate each trial with a model ParamEntry within \b this list. Trials for
+/// Given a std::set of \b trials (putative Varnode parameters) as ParamTrial objects,
+/// associate each trial with a model ParamEntry within \b this std::list. Trials for
 /// for which there are no matching entries are marked as unused. Any holes
-/// in the resource list are filled with \e unreferenced trials. The trial list is sorted.
-/// \param active is the set of \b trials to map and organize
+/// in the resource std::list are filled with \e unreferenced trials. The trial std::list is sorted.
+/// \param active is the std::set of \b trials to std::map and organize
 void ParamListStandard::buildTrialMap(ParamActive *active) const
 
 {
-  vector<const ParamEntry *> hitlist; // List of groups for which we have a representative
+  std::vector<const ParamEntry *> hitlist; // List of groups for which we have a representative
   bool seenfloattrial = false;
   bool seeninttrial = false;
 
@@ -520,7 +520,7 @@ void ParamListStandard::buildTrialMap(ParamActive *active) const
     ParamTrial &paramtrial(active->getTrial(i));
     int4 entslot = findEntry(paramtrial.getAddress(),paramtrial.getSize());
     // Note: if a trial is "definitely not used" but there is a matching entry,
-    // we still include it in the map
+    // we still include it in the std::map
     if (entslot == -1)
       paramtrial.markNoUse();
     else {
@@ -532,7 +532,7 @@ void ParamListStandard::buildTrialMap(ParamActive *active) const
       else
 	seeninttrial = true;
 
-      // Make sure we list that the entries group is marked
+      // Make sure we std::list that the entries group is marked
       int4 grp = curentry->getGroup();
       while(hitlist.size() <= grp)
 	hitlist.push_back((const ParamEntry *)0);
@@ -568,7 +568,7 @@ void ParamListStandard::buildTrialMap(ParamActive *active) const
     }
     else if (!curentry->isExclusion()) {
       // For non-exclusion groups, we need to create a secondary hitlist to find holes within the group
-      vector<int4> slotlist;
+      std::vector<int4> slotlist;
       for(int4 j=0;j<active->getNumTrials();++j) {
 	ParamTrial &paramtrial(active->getTrial(j));
 	if (paramtrial.getEntry() != curentry) continue;
@@ -603,12 +603,12 @@ void ParamListStandard::buildTrialMap(ParamActive *active) const
   active->sortTrials();
 }
 
-/// \brief Calculate the range of floating-point entries within a given set of parameter \e trials
+/// \brief Calculate the range of floating-point entries within a given std::set of parameter \e trials
 ///
 /// The trials must already be mapped, which should put floating-point entries first.
 /// This method calculates the range of floating-point entries and the range of general purpose
 /// entries and passes them back.
-/// \param active is the given set of parameter trials
+/// \param active is the given std::set of parameter trials
 /// \param floatstart will pass back the index of the first floating-point trial
 /// \param floatstop will pass back the index (+1) of the last floating-point trial
 /// \param start will pass back the index of the first general purpose trial
@@ -629,11 +629,11 @@ void ParamListStandard::separateFloat(ParamActive *active,int4 &floatstart,int4 
   stop = numtrials;
 }
 
-/// \brief Enforce exclusion rules for the given set of parameter trials
+/// \brief Enforce exclusion rules for the given std::set of parameter trials
 ///
 /// If there are more than one active trials in a single group,
 /// and if that group is an exclusion group, mark all but the first trial to \e inactive.
-/// \param active is the set of trials
+/// \param active is the std::set of trials
 void ParamListStandard::forceExclusionGroup(ParamActive *active) const
 
 {
@@ -659,7 +659,7 @@ void ParamListStandard::forceExclusionGroup(ParamActive *active) const
 ///
 /// Inspection and marking only occurs within an indicated range of trials,
 /// allowing floating-point and general purpose resources to be treated separately.
-/// \param active is the set of trials, which must already be ordered
+/// \param active is the std::set of trials, which must already be ordered
 /// \param start is the index of the first trial in the range to consider
 /// \param stop is the index (+1) of the last trial in the range to consider
 void ParamListStandard::forceNoUse(ParamActive *active, int4 start, int4 stop) const
@@ -697,7 +697,7 @@ void ParamListStandard::forceNoUse(ParamActive *active, int4 start, int4 stop) c
 /// Mark any \e inactive trials before this (that aren't in a maximal chain)
 /// as active.  Inspection and marking is restricted to a given range of trials
 /// to facilitate separate analysis of floating-point and general-purpose resources.
-/// \param active is the set of trials, which must be sorted
+/// \param active is the std::set of trials, which must be sorted
 /// \param maxchain is the maximum number of \e inactive trials to allow in a chain
 /// \param start is the first index in the range of trials to consider
 /// \param stop is the last index (+1) in the range of trials to consider
@@ -762,7 +762,7 @@ void ParamListStandard::fillinMap(ParamActive *active) const
 {
   if (active->getNumTrials() == 0) return; // No trials to check
 
-  buildTrialMap(active); // Associate varnodes with sorted list of parameter locations
+  buildTrialMap(active); // Associate varnodes with sorted std::list of parameter locations
 
   forceExclusionGroup(active);
   int4 floatstart,floatstop,start,stop;
@@ -881,7 +881,7 @@ void ParamListStandard::getRangeList(AddrSpace *spc,RangeList &res) const
 }
 
 void ParamListStandard::restoreXml(const Element *el,const AddrSpaceManager *manage,
-				   vector<EffectRecord> &effectlist,bool normalstack)
+				   std::vector<EffectRecord> &effectlist,bool normalstack)
 
 {
   int4 lastgroup = -1;
@@ -893,8 +893,8 @@ void ParamListStandard::restoreXml(const Element *el,const AddrSpaceManager *man
   for(int4 i=0;i<el->getNumAttributes();++i) {
     const std::string &attrname( el->getAttributeName(i) );
     if (attrname == "pointermax") {
-      istringstream i1(el->getAttributeValue(i));
-      i1.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+      std::istringstream i1(el->getAttributeValue(i));
+      i1.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
       i1 >> pointermax;
     }
     else if (attrname == "thisbeforeretpointer") {
@@ -914,7 +914,7 @@ void ParamListStandard::restoreXml(const Element *el,const AddrSpaceManager *man
       entry.back().restoreXml(subel,manage,normalstack);
       if (entry.back().getType()==TYPE_FLOAT) {
 	  if (nonfloatgroup >= 0)
-	    throw LowlevelError("parameter list floating-point entries must come first");
+	    throw LowlevelError("parameter std::list floating-point entries must come first");
       }
       else if (nonfloatgroup < 0)
 	nonfloatgroup = numgroup; // First time we have seen an integer slot
@@ -942,12 +942,12 @@ ParamList *ParamListStandard::clone(void) const
   return res;
 }
 
-void ParamListStandardOut::assignMap(const vector<Datatype *> &proto,bool isinput,
-				     TypeFactory &typefactory,vector<ParameterPieces> &res) const
+void ParamListStandardOut::assignMap(const std::vector<Datatype *> &proto,bool isinput,
+				     TypeFactory &typefactory,std::vector<ParameterPieces> &res) const
 {
-  vector<int4> status(numgroup,0);
+  std::vector<int4> status(numgroup,0);
 
-  // This is always an output list so we ignore -isinput-
+  // This is always an output std::list so we ignore -isinput-
   res.push_back(ParameterPieces());
   res.back().type = proto[0];
   res.back().flags = 0;
@@ -970,7 +970,7 @@ void ParamListStandardOut::assignMap(const vector<Datatype *> &proto,bool isinpu
 
     res.push_back(ParameterPieces()); // Add extra storage location in the input params
     res.back().type = pointertp;      // that holds a pointer to where the return value should be stored
-    // leave its address invalid, to be filled in by the input list assignMap
+    // leave its address invalid, to be filled in by the input std::list assignMap
     res.back().flags = Varnode::hiddenretparm; // Mark it as special 
   }
 }
@@ -1066,7 +1066,7 @@ bool ParamListStandardOut::possibleParam(const Address &loc,int4 size) const
   return false;
 }
 
-void ParamListStandardOut::restoreXml(const Element *el,const AddrSpaceManager *manage,vector<EffectRecord> &effectlist,bool normalstack)
+void ParamListStandardOut::restoreXml(const Element *el,const AddrSpaceManager *manage,std::vector<EffectRecord> &effectlist,bool normalstack)
 
 {
   ParamListStandard::restoreXml(el,manage,effectlist,normalstack);
@@ -1110,10 +1110,10 @@ ParamList *ParamListRegister::clone(void) const
   return res;
 }
 
-/// The given set of parameter entries are folded into \b this set.
+/// The given std::set of parameter entries are folded into \b this std::set.
 /// Duplicate entries are eliminated. Containing entries subsume what
 /// they contain.
-/// \param op2 is the list model to fold into \b this
+/// \param op2 is the std::list model to fold into \b this
 void ParamListMerged::foldIn(const ParamListStandard &op2)
 
 {
@@ -1314,7 +1314,7 @@ void ParamActive::freePlaceholderSlot(void)
 void ParamActive::deleteUnusedTrials(void)
 
 {
-  vector<ParamTrial> newtrials;
+  std::vector<ParamTrial> newtrials;
   int4 slot = 1;
   
   for(int4 i=0;i<trial.size();++i) {
@@ -1336,7 +1336,7 @@ void ParamActive::splitTrial(int4 i,int4 sz)
 {
   if (stackplaceholder >= 0)
     throw LowlevelError("Cannot split parameter when the placeholder has not been recovered");
-  vector<ParamTrial> newtrials;
+  std::vector<ParamTrial> newtrials;
   int4 slot = trial[i].getSlot();
   
   for(int4 j=0;j<i;++j) {
@@ -1366,7 +1366,7 @@ void ParamActive::joinTrial(int4 slot,const Address &addr,int4 sz)
 {
   if (stackplaceholder >= 0)
     throw LowlevelError("Cannot join parameters when the placeholder has not been removed");
-  vector<ParamTrial> newtrials;
+  std::vector<ParamTrial> newtrials;
   int4 sizecheck = 0;
   for(int4 i=0;i<trial.size();++i) {
     ParamTrial &curtrial( trial[i] );
@@ -1417,7 +1417,7 @@ FspecSpace::FspecSpace(AddrSpaceManager *m,const Translate *t,const std::string 
   : AddrSpace(m,t,IPTR_FSPEC,nm,sizeof(void *),1,ind,0,1)
 {
   clearFlags(heritaged|does_deadcode|big_endian);
-  if (HOST_ENDIAN==1)		// Endianness always set by host
+  if (HOST_ENDIAN==1)		// Endianness always std::set by host
     setFlags(big_endian);
 }
 
@@ -1479,7 +1479,7 @@ void FspecSpace::restoreXml(const Element *el)
   throw LowlevelError("Should never restore fspec space from XML");
 }
 
-/// The type is set to \e unknown_effect
+/// The type is std::set to \e unknown_effect
 /// \param addr is the start of the memory range
 /// \param size is the number of bytes in the memory range
 EffectRecord::EffectRecord(const Address &addr,int4 size)
@@ -1667,7 +1667,7 @@ ProtoModel::~ProtoModel(void)
 
 /// \brief Calculate input and output storage locations given a function prototype
 ///
-/// The data-types of the function prototype are passed in as an ordered list, with the
+/// The data-types of the function prototype are passed in as an ordered std::list, with the
 /// first data-type corresponding to the \e return \e value and all remaining
 /// data-types corresponding to the input parameters.  Based on \b this model, a storage location
 /// is selected for each (input and output) parameter and passed back to the caller.
@@ -1675,14 +1675,14 @@ ProtoModel::~ProtoModel(void)
 /// as the first entry.  The model has the option of inserting a \e hidden return value
 /// pointer in the input storage locations.
 ///
-/// A \b void return type is indicated by the formal TYPE_VOID in the (either) list.
-/// If the model can't map the specific output prototype, the caller has the option of whether
+/// A \b void return type is indicated by the formal TYPE_VOID in the (either) std::list.
+/// If the model can't std::map the specific output prototype, the caller has the option of whether
 /// an exception (ParamUnassignedError) is thrown.  If they choose not to throw,
 /// the unmapped return value is assumed to be \e void.
-/// \param typelist is the list of data-types from the function prototype
+/// \param typelist is the std::list of data-types from the function prototype
 /// \param res will hold the storage locations for each parameter
 /// \param ignoreOutputError is \b true if problems assigning the output parameter are ignored
-void ProtoModel::assignParameterStorage(const vector<Datatype *> &typelist,vector<ParameterPieces> &res,bool ignoreOutputError)
+void ProtoModel::assignParameterStorage(const std::vector<Datatype *> &typelist,std::vector<ParameterPieces> &res,bool ignoreOutputError)
 
 {
   if (ignoreOutputError) {
@@ -1703,15 +1703,15 @@ void ProtoModel::assignParameterStorage(const vector<Datatype *> &typelist,vecto
   input->assignMap(typelist,true,*glb->types,res);
 }
 
-/// \brief Look up an effect from the given EffectRecord list
+/// \brief Look up an effect from the given EffectRecord std::list
 ///
 /// If a given memory range matches an EffectRecord, return the effect type.
 /// Otherwise return EffectRecord::unknown_effect
-/// \param efflist is the list of EffectRecords which must be sorted
+/// \param efflist is the std::list of EffectRecords which must be sorted
 /// \param addr is the starting address of the given memory range
 /// \param size is the number of bytes in the memory range
 /// \return the EffectRecord type
-uint4 ProtoModel::lookupEffect(const vector<EffectRecord> &efflist,const Address &addr,int4 size)
+uint4 ProtoModel::lookupEffect(const std::vector<EffectRecord> &efflist,const Address &addr,int4 size)
 
 {
   // Unique is always local to function
@@ -1719,7 +1719,7 @@ uint4 ProtoModel::lookupEffect(const vector<EffectRecord> &efflist,const Address
 
   EffectRecord cur(addr,size);
 
-  vector<EffectRecord>::const_iterator iter;
+  std::vector<EffectRecord>::const_iterator iter;
 
   iter = upper_bound(efflist.begin(),efflist.end(),cur);
   // First element greater than cur  (address must be greater)
@@ -1779,8 +1779,8 @@ void ProtoModel::restoreXml(const Element *el)
       if (el->getAttributeValue(i) == "unknown")
 	extrapop = extrapop_unknown;
       else {
-	istringstream s(el->getAttributeValue(i));
-	s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+	std::istringstream s(el->getAttributeValue(i));
+	s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
 	s >> extrapop;
       }
     }
@@ -1805,9 +1805,9 @@ void ProtoModel::restoreXml(const Element *el)
     throw LowlevelError("Missing prototype attributes");
 
   buildParamList(strategystring); // Allocate input and output ParamLists
-  const List &list(el->getChildren());
+  const List &std::list(el->getChildren());
   List::const_iterator iter;
-  for(iter=list.begin();iter!=list.end();++iter) {
+  for(iter=std::list.begin();iter!=std::list.end();++iter) {
     const Element *subnode = *iter;
     if (subnode->getName() == "input") {
       input->restoreXml(subnode,glb,effectlist,stackgrowsnegative);
@@ -1902,7 +1902,7 @@ void ProtoModel::restoreXml(const Element *el)
     defaultParamRange();
 }
 
-/// \param isinput is set to \b true to compute scores against the input part of the model
+/// \param isinput is std::set to \b true to compute scores against the input part of the model
 /// \param mod is the prototype model to score against
 /// \param numparam is the presumed number of trials that will constitute the score
 ScoreProtoModel::ScoreProtoModel(bool isinput,const ProtoModel *mod,int4 numparam)
@@ -1978,12 +1978,12 @@ void ScoreProtoModel::doScore(void)
 }
 
 /// The EffectRecord lists are intersected. Anything in \b this that is not also in the
-/// given EffectRecord list is removed.
-/// \param efflist is the given EffectRecord list
-void ProtoModelMerged::intersectEffects(const vector<EffectRecord> &efflist)
+/// given EffectRecord std::list is removed.
+/// \param efflist is the given EffectRecord std::list
+void ProtoModelMerged::intersectEffects(const std::vector<EffectRecord> &efflist)
 
 {
-  vector<EffectRecord> newlist;
+  std::vector<EffectRecord> newlist;
 
   int4 i = 0;
   int4 j = 0;
@@ -2005,12 +2005,12 @@ void ProtoModelMerged::intersectEffects(const vector<EffectRecord> &efflist)
 }
 
 /// The \e likely-trash locations are intersected. Anything in \b this that is not also in the
-/// given \e likely-trash list is removed.
-/// \param trashlist is the given \e likely-trash list
-void ProtoModelMerged::intersectLikelyTrash(const vector<VarnodeData> &trashlist)
+/// given \e likely-trash std::list is removed.
+/// \param trashlist is the given \e likely-trash std::list
+void ProtoModelMerged::intersectLikelyTrash(const std::vector<VarnodeData> &trashlist)
 
 {
-  vector<VarnodeData> newlist;
+  std::vector<VarnodeData> newlist;
 
   int4 i=0;
   int4 j=0;
@@ -2061,7 +2061,7 @@ void ProtoModelMerged::foldIn(ProtoModel *model)
     intersectEffects(model->effectlist);
     intersectLikelyTrash(model->likelytrash);
     // Take the union of the localrange and paramrange
-    set<Range>::const_iterator iter;
+    std::set<Range>::const_iterator iter;
     for(iter=model->localrange.begin();iter!=model->localrange.end();++iter)
       localrange.insertRange((*iter).getSpace(),(*iter).getFirst(),(*iter).getLast());
     for(iter=model->paramrange.begin();iter!=model->paramrange.end();++iter)
@@ -2069,10 +2069,10 @@ void ProtoModelMerged::foldIn(ProtoModel *model)
   }
 }
 
-/// The model that best matches the given set of input parameter trials is
+/// The model that best matches the given std::set of input parameter trials is
 /// returned. This method currently uses the ScoreProtoModel object to
 /// score the different prototype models.
-/// \param active is the set of parameter trials
+/// \param active is the std::set of parameter trials
 /// \return the prototype model that scores the best
 ProtoModel *ProtoModelMerged::selectModel(ParamActive *active) const
 
@@ -2105,9 +2105,9 @@ void ProtoModelMerged::restoreXml(const Element *el)
 
 {
   name = el->getAttributeValue("name");
-  const List &list(el->getChildren());
+  const List &std::list(el->getChildren());
   List::const_iterator iter;
-  for(iter=list.begin();iter!=list.end();++iter) { // A tag for each merged prototype
+  for(iter=std::list.begin();iter!=std::list.end();++iter) { // A tag for each merged prototype
     const Element *subel = *iter;
     ProtoModel *mymodel = glb->getModel( subel->getAttributeValue("name"));
     if (mymodel == (ProtoModel *)0)
@@ -2123,7 +2123,7 @@ void ParameterBasic::setTypeLock(bool val)
   if (val) {
     flags |= Varnode::typelock;
     if (type->getMetatype() == TYPE_UNKNOWN) // Check if we are locking TYPE_UNKNOWN
-      flags |= Varnode::mark;	// If so, set Varnode::mark to indicate the sizelock
+      flags |= Varnode::mark;	// If so, std::set Varnode::mark to indicate the sizelock
   }
   else
     flags &= ~((uint4)(Varnode::typelock|Varnode::mark));
@@ -2373,7 +2373,7 @@ void ProtoStoreSymbol::clearInput(int4 i)
 {
   Symbol *sym = scope->getCategorySymbol(0,i);
   if (sym != (Symbol *)0) {
-    scope->setCategory(sym,-1,0); // Remove it from category list
+    scope->setCategory(sym,-1,0); // Remove it from category std::list
     scope->removeSymbol(sym);	// Remove it altogether
   }
   // Renumber any category 0 symbol with index greater than i
@@ -2617,12 +2617,12 @@ void ProtoStoreInternal::restoreXml(const Element *el,ProtoModel *model)
   if (el->getName() != "internallist")
     throw LowlevelError("Mismatched ProtoStore tag: ProtoStoreInternal did not get <internallist>");
   Architecture *glb = model->getArch();
-  const List &list(el->getChildren());
+  const List &std::list(el->getChildren());
   List::const_iterator iter;
-  vector<ParameterPieces> pieces;
-  vector<std::string> namelist;
-  vector<bool> typelocklist;
-  vector<bool> namelocklist;
+  std::vector<ParameterPieces> pieces;
+  std::vector<std::string> namelist;
+  std::vector<bool> typelocklist;
+  std::vector<bool> namelocklist;
   bool addressesdetermined = true;
 
   pieces.push_back( ParameterPieces() ); // Push on placeholder for output pieces
@@ -2636,7 +2636,7 @@ void ProtoStoreInternal::restoreXml(const Element *el,ProtoModel *model)
   if (outparam->getAddress().isInvalid())
     addressesdetermined = false;
 
-  for(iter=list.begin();iter!=list.end();++iter) { // This is only the input params
+  for(iter=std::list.begin();iter!=std::list.end();++iter) { // This is only the input params
     const Element *subel = *iter;
     std::string name;
     bool typelock = false;
@@ -2680,7 +2680,7 @@ void ProtoStoreInternal::restoreXml(const Element *el,ProtoModel *model)
   if (!addressesdetermined) {
     // If addresses for parameters are not provided, use
     // the model to derive them from type info
-    vector<Datatype *> typelist;
+    std::vector<Datatype *> typelist;
     for(int4 i=0;i<pieces.size();++i) // Save off the restored types
       typelist.push_back( pieces[i].type );
     pieces.clear();		// throw out any other piece information
@@ -2715,8 +2715,8 @@ void FuncProto::paramShift(int4 paramshift)
   if ((model == (ProtoModel *)0)||(store == (ProtoStore *)0))
     throw LowlevelError("Cannot parameter shift without a model");
 
-  vector<std::string> nmlist;
-  vector<Datatype *> typelist;
+  std::vector<std::string> nmlist;
+  std::vector<Datatype *> typelist;
   bool isdotdotdot = false;
   TypeFactory *typefactory = model->getArch()->types;
 
@@ -2743,8 +2743,8 @@ void FuncProto::paramShift(int4 paramshift)
   else
     isdotdotdot = true;
 
-  // Reassign the storage locations for this new parameter list
-  vector<ParameterPieces> pieces;
+  // Reassign the storage locations for this new parameter std::list
+  std::vector<ParameterPieces> pieces;
   model->assignParameterStorage(typelist,pieces,false);
 
   delete store;
@@ -2766,11 +2766,11 @@ void FuncProto::paramShift(int4 paramshift)
   setDotdotdot(isdotdotdot);
 }
 
-/// \brief If \b this has a \e merged model, pick the most likely model (from the merged set)
+/// \brief If \b this has a \e merged model, pick the most likely model (from the merged std::set)
 ///
 /// The given parameter trials are used to pick from among the merged ProtoModels and
 /// \b this prototype is changed (specialized) to the pick
-/// \param active is the set of parameter trials to evaluate with
+/// \param active is the std::set of parameter trials to evaluate with
 void FuncProto::resolveModel(ParamActive *active)
 
 {
@@ -2820,7 +2820,7 @@ void FuncProto::copyFlowEffects(const FuncProto &op2)
 /// Establish a specific prototype model for \b this function prototype.
 /// Some basic properties are inherited from the model, otherwise parameters
 /// are unchanged.
-/// \param m is the new prototype model to set
+/// \param m is the new prototype model to std::set
 void FuncProto::setModel(ProtoModel *m)
 
 {
@@ -2842,7 +2842,7 @@ void FuncProto::setModel(ProtoModel *m)
   flags &= ~((uint4)unknown_model);	// Model is not "unknown" (even if null pointer is passed in)
 }
 
-/// The full function prototype is (re)set from a model, names, and data-types
+/// The full function prototype is (re)std::set from a model, names, and data-types
 /// The new input and output parameters are both assumed to be locked.
 /// \param pieces is the raw collection of names and data-types
 void FuncProto::setPieces(const PrototypePieces &pieces)
@@ -2850,8 +2850,8 @@ void FuncProto::setPieces(const PrototypePieces &pieces)
 {
   if (pieces.model != (ProtoModel *)0)
     setModel(pieces.model);
-  vector<Datatype *> typelist;
-  vector<std::string> nmlist;
+  std::vector<Datatype *> typelist;
+  std::vector<std::string> nmlist;
   typelist.push_back(pieces.outtype);
   nmlist.push_back("");
   for(int4 i=0;i<pieces.intypes.size();++i) {
@@ -2882,12 +2882,12 @@ void FuncProto::getPieces(PrototypePieces &pieces) const
   pieces.dotdotdot = isDotdotdot();
 }
 
-/// Input parameters are set based on an existing function Scope
-/// and if there is no prototype model the default model is set.
+/// Input parameters are std::set based on an existing function Scope
+/// and if there is no prototype model the default model is std::set.
 /// Parameters that are added to \b this during analysis will automatically
 /// be reflected in the symbol table.
 /// This should only be called during initialization of \b this prototype.
-/// \param s is the Scope to set
+/// \param s is the Scope to std::set
 /// \param startpoint is a usepoint to associate with the parameters
 void FuncProto::setScope(Scope *s,const Address &startpoint)
 
@@ -2897,9 +2897,9 @@ void FuncProto::setScope(Scope *s,const Address &startpoint)
     setModel(s->getArch()->defaultfp);
 }
 
-/// A prototype model is set, and any parameters added to \b this during analysis
+/// A prototype model is std::set, and any parameters added to \b this during analysis
 /// will be backed internally.
-/// \param m is the prototype model to set
+/// \param m is the prototype model to std::set
 /// \param vt is the default \e void data-type to use if the return-value remains unassigned
 void FuncProto::setInternal(ProtoModel *m,Datatype *vt)
 
@@ -2926,7 +2926,7 @@ bool FuncProto::isInputLocked(void) const
   return false;
 }
 
-/// The lock on the data-type of input parameters is set as specified.
+/// The lock on the data-type of input parameters is std::set as specified.
 /// A \b true value indicates that future analysis will not change the
 /// number of input parameters or their data-type.  Zero parameters
 /// or \e void can be locked.
@@ -2947,7 +2947,7 @@ void FuncProto::setInputLock(bool val)
   }
 }
 
-/// The lock of the data-type of the return value is set as specified.
+/// The lock of the data-type of the return value is std::set as specified.
 /// A \b true value indicates that future analysis will not change the
 /// presence of or the data-type of the return value. A \e void return
 /// value can be locked.
@@ -3026,12 +3026,12 @@ void FuncProto::cancelInjectId(void)
 /// \brief Update input parameters based on Varnode trials
 ///
 /// If the input parameters are locked, don't do anything. Otherwise,
-/// given a list of Varnodes and their associated trial information,
+/// given a std::list of Varnodes and their associated trial information,
 /// create an input parameter for each trial in order, grabbing data-type
 /// information from the Varnode.  Any old input parameters are cleared.
-/// \param triallist is the list of Varnodes
+/// \param triallist is the std::list of Varnodes
 /// \param activeinput is the trial container
-void FuncProto::updateInputTypes(const vector<Varnode *> &triallist,ParamActive *activeinput)
+void FuncProto::updateInputTypes(const std::vector<Varnode *> &triallist,ParamActive *activeinput)
 
 {
   if (isInputLocked()) return;	// Input is locked, do no updating
@@ -3062,10 +3062,10 @@ void FuncProto::updateInputTypes(const vector<Varnode *> &triallist,ParamActive 
 /// This is accomplished in the same way as if there were data-types but instead of
 /// pulling a data-type from the Varnode, only the size is used.
 /// Undefined data-types are pulled from the given TypeFactory
-/// \param triallist is the list of Varnodes
+/// \param triallist is the std::list of Varnodes
 /// \param activeinput is the trial container
 /// \param factory is the given TypeFactory
-void FuncProto::updateInputNoTypes(const vector<Varnode *> &triallist,ParamActive *activeinput,
+void FuncProto::updateInputNoTypes(const std::vector<Varnode *> &triallist,ParamActive *activeinput,
 				   TypeFactory *factory)
 {
   if (isInputLocked()) return;	// Input is locked, do no updating
@@ -3094,10 +3094,10 @@ void FuncProto::updateInputNoTypes(const vector<Varnode *> &triallist,ParamActiv
 /// \brief Update the return value based on Varnode trials
 ///
 /// If the output parameter is locked, don't do anything. Otherwise,
-/// given a list of (at most 1) Varnode, create a return value, grabbing
+/// given a std::list of (at most 1) Varnode, create a return value, grabbing
 /// data-type information from the Varnode. Any old return value is removed.
-/// \param triallist is the list of Varnodes
-void FuncProto::updateOutputTypes(const vector<Varnode *> &triallist)
+/// \param triallist is the std::list of Varnodes
+void FuncProto::updateOutputTypes(const std::vector<Varnode *> &triallist)
 
 {
   ProtoParameter *outparm = getOutput();
@@ -3128,12 +3128,12 @@ void FuncProto::updateOutputTypes(const vector<Varnode *> &triallist)
 /// \brief Update the return value based on Varnode trials, but don't store the data-type
 ///
 /// If the output parameter is locked, don't do anything. Otherwise,
-/// given a list of (at most 1) Varnode, create a return value, grabbing
+/// given a std::list of (at most 1) Varnode, create a return value, grabbing
 /// size information from the Varnode. An undefined data-type is created from the
 /// given TypeFactory. Any old return value is removed.
-/// \param triallist is the list of Varnodes
+/// \param triallist is the std::list of Varnodes
 /// \param factory is the given TypeFactory
-void FuncProto::updateOutputNoTypes(const vector<Varnode *> &triallist,TypeFactory *factory)
+void FuncProto::updateOutputNoTypes(const std::vector<Varnode *> &triallist,TypeFactory *factory)
 
 {
   if (isOutputLocked()) return;
@@ -3148,16 +3148,16 @@ void FuncProto::updateOutputNoTypes(const vector<Varnode *> &triallist,TypeFacto
   store->setOutput(pieces);
 }
 
-/// \brief Set \b this entire function prototype based on a list of names and data-types.
+/// \brief Set \b this entire function prototype based on a std::list of names and data-types.
 ///
 /// Prototype information is provided as separate lists of names and data-types, where
 /// the first entry corresponds to the output parameter (return value) and the remaining
 /// entries correspond to input parameters. Storage locations and hidden return parameters are
 /// calculated, creating a complete function protototype. Existing locks are overridden.
-/// \param namelist is the list of parameter names
-/// \param typelist is the list of data-types
+/// \param namelist is the std::list of parameter names
+/// \param typelist is the std::list of data-types
 /// \param dtdtdt is \b true if the new prototype accepts variable argument lists
-void FuncProto::updateAllTypes(const vector<std::string> &namelist,const vector<Datatype *> &typelist,
+void FuncProto::updateAllTypes(const std::vector<std::string> &namelist,const std::vector<Datatype *> &typelist,
 			       bool dtdtdt)
 
 {
@@ -3167,7 +3167,7 @@ void FuncProto::updateAllTypes(const vector<std::string> &namelist,const vector<
   flags &= ~((uint4)voidinputlock);
   setDotdotdot(dtdtdt);
   
-  vector<ParameterPieces> pieces;
+  std::vector<ParameterPieces> pieces;
 
   // Calculate what memory locations hold each type
   try {
@@ -3205,7 +3205,7 @@ uint4 FuncProto::hasEffect(const Address &addr,int4 size) const
   return ProtoModel::lookupEffect(effectlist,addr,size);
 }
 
-vector<EffectRecord>::const_iterator FuncProto::effectBegin(void) const
+std::vector<EffectRecord>::const_iterator FuncProto::effectBegin(void) const
 
 {
   if (effectlist.empty())
@@ -3213,7 +3213,7 @@ vector<EffectRecord>::const_iterator FuncProto::effectBegin(void) const
   return effectlist.begin();
 }
 
-vector<EffectRecord>::const_iterator FuncProto::effectEnd(void) const
+std::vector<EffectRecord>::const_iterator FuncProto::effectEnd(void) const
 
 {
   if (effectlist.empty())
@@ -3302,7 +3302,7 @@ bool FuncProto::possibleOutputParam(const Address &addr,int4 size) const
 /// The storage for a value may be contained in a normal parameter location but be
 /// unjustified within that container, i.e. the least significant bytes are not being used.
 /// If this is the case, pass back the full parameter location and return \b true.
-/// If the input is locked, checking is againt the set parameters, otherwise the
+/// If the input is locked, checking is againt the std::set parameters, otherwise the
 /// check is against the prototype model.
 /// \param addr is the starting address of the given storage
 /// \param size is the number of bytes in the given storage
@@ -3405,7 +3405,7 @@ void FuncProto::printRaw(const std::string &funcname,std::ostream &s) const
       s << ',';
     s << "...";
   }
-  s << ") extrapop=" << dec << extrapop;
+  s << ") extrapop=" << std::dec << extrapop;
 }
 
 /// \brief Save \b this to an XML stream as a \<prototype> tag.
@@ -3518,9 +3518,9 @@ void FuncProto::saveXml(std::ostream &s) const
 void FuncProto::restoreXml(const Element *el,Architecture *glb)
 
 {
-  // Model must be set first
+  // Model must be std::set first
   if (store == (ProtoStore *)0)
-    throw LowlevelError("Prototype storage must be set before restoring FuncProto");
+    throw LowlevelError("Prototype storage must be std::set before restoring FuncProto");
   ProtoModel *mod = (ProtoModel *)0;
   bool seenextrapop = false;
   bool seenunknownmod = false;
@@ -3547,8 +3547,8 @@ void FuncProto::restoreXml(const Element *el,Architecture *glb)
       if (expopval == "unknown")
 	readextrapop = ProtoModel::extrapop_unknown;
       else {
-	istringstream i1(expopval);
-	i1.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+	std::istringstream i1(expopval);
+	i1.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
 	i1 >> readextrapop;
       }
     }
@@ -3591,16 +3591,16 @@ void FuncProto::restoreXml(const Element *el,Architecture *glb)
   }
   if (mod != (ProtoModel *)0) // If a model was specified
     setModel(mod);		// This sets extrapop to model default
-  if (seenextrapop)		// If explicitly set
+  if (seenextrapop)		// If explicitly std::set
     extrapop = readextrapop;
   if (seenunknownmod)
     flags |= unknown_model;
 
-  const List &list(el->getChildren());
-  List::const_iterator iter = list.begin();
+  const List &std::list(el->getChildren());
+  List::const_iterator iter = std::list.begin();
 
   const Element *subel = (const Element *)0;
-  if (iter != list.end()) {
+  if (iter != std::list.end()) {
     subel = *iter;
     ++iter;
   }
@@ -3643,7 +3643,7 @@ void FuncProto::restoreXml(const Element *el,Architecture *glb)
   if (((flags&voidinputlock)!=0)||(isOutputLocked()))
     flags |= modellock;
 
-  for(;iter!=list.end();++iter) {
+  for(;iter!=std::list.end();++iter) {
     if ((*iter)->getName() == "unaffected") {
       const List &list2((*iter)->getChildren());
       List::const_iterator iter2 = list2.begin();
@@ -3721,7 +3721,7 @@ void FuncCallSpecs::resolveSpacebaseRelative(Funcdata &data,Varnode *phvn)
   Varnode *refvn = phvn->getDef()->getIn(0);
   AddrSpace *spacebase = refvn->getSpace();
   if (spacebase->getType() != IPTR_SPACEBASE) {
-    data.warningHeader("This function may have set the stack pointer");
+    data.warningHeader("This function may have std::set the stack pointer");
   }
   stackoffset = refvn->getOffset();
 
@@ -3937,9 +3937,9 @@ PcodeOp *FuncCallSpecs::transferLockedOutputParam(ProtoParameter *param)
 /// Varnodes will be passed back in order that match current input parameters.
 /// A NULL Varnode indicates a stack parameter. Varnode dimensions may not match
 /// parameter dimensions exactly.
-/// \param newinput will hold the resulting list of Varnodes
-/// \return \b false only if the list needs to indicate stack variables and there is no stack-pointer placeholder
-bool FuncCallSpecs::transferLockedInput(vector<Varnode *> &newinput)
+/// \param newinput will hold the resulting std::list of Varnodes
+/// \return \b false only if the std::list needs to indicate stack variables and there is no stack-pointer placeholder
+bool FuncCallSpecs::transferLockedInput(std::vector<Varnode *> &newinput)
 
 {
   newinput.push_back(op->getIn(0)); // Always keep the call destination address
@@ -3988,12 +3988,12 @@ bool FuncCallSpecs::transferLockedOutput(Varnode *&newoutput)
 ///
 /// The current input parameters must be locked and are presumably out of date
 /// with the current state of the CALL Varnodes. These existing input Varnodes must
-/// already be gathered in a list. Each Varnode is updated to reflect the parameters,
+/// already be gathered in a std::list. Each Varnode is updated to reflect the parameters,
 /// which may involve truncating or extending. Any active trials and stack-pointer
-/// placeholder is updated, and the new Varnodes are set as the CALL input.
+/// placeholder is updated, and the new Varnodes are std::set as the CALL input.
 /// \param data is the calling function
 /// \param newinput holds old input Varnodes and will hold new input Varnodes
-void FuncCallSpecs::commitNewInputs(Funcdata &data,vector<Varnode *> &newinput)
+void FuncCallSpecs::commitNewInputs(Funcdata &data,std::vector<Varnode *> &newinput)
 
 {
   if (!isInputLocked()) return;
@@ -4018,7 +4018,7 @@ void FuncCallSpecs::commitNewInputs(Funcdata &data,vector<Varnode *> &newinput)
     if (noplacehold&&(param->getAddress().getSpace()->getType() == IPTR_SPACEBASE)) {
       // We have a locked stack parameter, use it to recover the stack offset
       vn->setSpacebasePlaceholder();
-      noplacehold = false;	// Only set this on the first parameter
+      noplacehold = false;	// Only std::set this on the first parameter
       placeholder = (Varnode *)0;	// With a locked stack param, we don't need a placeholder
     }
   }
@@ -4042,7 +4042,7 @@ void FuncCallSpecs::commitNewInputs(Funcdata &data,vector<Varnode *> &newinput)
 /// output Varnode must exist and must be provided.
 /// The Varnode is updated to reflect the return value,
 /// which may involve truncating or extending. Any active trials are updated,
-/// and the new Varnode is set as the CALL output.
+/// and the new Varnode is std::set as the CALL output.
 /// \param data is the calling function
 /// \param newout is the provided old output Varnode (or NULL)
 void FuncCallSpecs::commitNewOutputs(Funcdata &data,Varnode *newout)
@@ -4213,10 +4213,10 @@ void FuncCallSpecs::doInputJoin(int4 slot1,bool ishislot)
 /// new prototype without missing any data-flow.  If so, \b this is updated, and new input
 /// and output Varnodes for the CALL are passed back.
 /// \param restrictedProto is the new definitive function prototype
-/// \param newinput will hold the new list of input Varnodes for the CALL
+/// \param newinput will hold the new std::list of input Varnodes for the CALL
 /// \param newoutput will hold the new output Varnode or NULL
 /// \return \b true if \b this can be fully converted
-bool FuncCallSpecs::lateRestriction(const FuncProto &restrictedProto,vector<Varnode *> &newinput,Varnode *&newoutput)
+bool FuncCallSpecs::lateRestriction(const FuncProto &restrictedProto,std::vector<Varnode *> &newinput,Varnode *&newoutput)
 
 {
   if (!hasModel()) {
@@ -4262,7 +4262,7 @@ void FuncCallSpecs::deindirect(Funcdata &data,Funcdata *newfd)
 
   // Try our best to merge existing prototype
   // with the one we have just been handed
-  vector<Varnode *> newinput;
+  std::vector<Varnode *> newinput;
   Varnode *newoutput;
   FuncProto &newproto( newfd->getFuncProto() );
   if ((!newproto.isNoReturn())&&(!newproto.isInline())&&
@@ -4290,7 +4290,7 @@ void FuncCallSpecs::deindirect(Funcdata &data,Funcdata *newfd)
 void FuncCallSpecs::forceSet(Funcdata &data,const FuncProto &fp)
 
 {
-  vector<Varnode *> newinput;
+  std::vector<Varnode *> newinput;
   Varnode *newoutput;
   if (lateRestriction(fp,newinput,newoutput)) {
     commitNewInputs(data,newinput);
@@ -4324,7 +4324,7 @@ void FuncCallSpecs::insertPcode(Funcdata &data)
   InjectPayload *payload = data.getArch()->pcodeinjectlib->getPayload(injectid);
 
   // do the insertion right after the callpoint
-  list<PcodeOp *>::iterator iter = op->getBasicIter();
+  std::list<PcodeOp *>::iterator iter = op->getBasicIter();
   ++iter;
   data.doLiveInject(payload,op->getAddr(),op->getParent(),iter);
 }
@@ -4332,10 +4332,10 @@ void FuncCallSpecs::insertPcode(Funcdata &data)
 /// Collect Varnode objects associated with each output trial
 ///
 /// Varnodes can be attached to the CALL or CALLIND or one of the
-/// preceding INDIRECTs. They are passed back in a list matching the
+/// preceding INDIRECTs. They are passed back in a std::list matching the
 /// order of the trials.
-/// \param trialvn holds the resulting list of Varnodes
-void FuncCallSpecs::collectOutputTrialVarnodes(vector<Varnode *> &trialvn)
+/// \param trialvn holds the resulting std::list of Varnodes
+void FuncCallSpecs::collectOutputTrialVarnodes(std::vector<Varnode *> &trialvn)
 
 {
   if (op->getOut() != (Varnode *)0)
@@ -4460,7 +4460,7 @@ void FuncCallSpecs::checkInputTrialUse(Funcdata &data,AliasChecker &aliascheck)
 /// meaning basically that the first occurrence of a trial after the call is a read.
 /// \param data is the calling function
 /// \param trialvn will hold Varnodes corresponding to the trials
-void FuncCallSpecs::checkOutputTrialUse(Funcdata &data,vector<Varnode *> &trialvn)
+void FuncCallSpecs::checkOutputTrialUse(Funcdata &data,std::vector<Varnode *> &trialvn)
 
 {
   collectOutputTrialVarnodes(trialvn);
@@ -4492,7 +4492,7 @@ void FuncCallSpecs::buildInputFromTrials(Funcdata &data)
   int4 sz;
   bool isspacebase;
   Varnode *vn;
-  vector<Varnode *> newparam;
+  std::vector<Varnode *> newparam;
   
   newparam.push_back(op->getIn(0)); // Preserve the fspec parameter
 
@@ -4532,7 +4532,7 @@ void FuncCallSpecs::buildInputFromTrials(Funcdata &data)
     if (isspacebase)
       data.getScopeLocal()->markNotMapped(spc,off,sz,true);
   }
-  data.opSetAllInput(op,newparam); // Set final parameter list
+  data.opSetAllInput(op,newparam); // Set final parameter std::list
   activeinput.deleteUnusedTrials();
 }
 
@@ -4562,12 +4562,12 @@ Varnode *FuncCallSpecs::findPreexistingWhole(Varnode *vn1,Varnode *vn2)
 /// Any INDIRECT ops that were holding the active trials are removed.
 /// This prototype itself is unchanged.
 /// \param data is the calling function
-/// \param trialvn is the list of Varnodes associated with trials
-void FuncCallSpecs::buildOutputFromTrials(Funcdata &data,vector<Varnode *> &trialvn)
+/// \param trialvn is the std::list of Varnodes associated with trials
+void FuncCallSpecs::buildOutputFromTrials(Funcdata &data,std::vector<Varnode *> &trialvn)
 
 {
   Varnode *finaloutvn;
-  vector<Varnode *> finalvn;
+  std::vector<Varnode *> finalvn;
 
   for(int4 i=0;i<activeoutput.getNumTrials();++i) { // Reorder the varnodes
     ParamTrial &curtrial(activeoutput.getTrial(i));
@@ -4578,7 +4578,7 @@ void FuncCallSpecs::buildOutputFromTrials(Funcdata &data,vector<Varnode *> &tria
   activeoutput.deleteUnusedTrials(); // This deletes unused, and renumbers used  (matches finalvn)
   if (activeoutput.getNumTrials()==0) return; // Nothing is a formal output
 
-  vector<PcodeOp *> deletedops;
+  std::vector<PcodeOp *> deletedops;
 
   if (activeoutput.getNumTrials()==1) {		// We have a single, properly justified output
     finaloutvn = finalvn[0];
@@ -4695,13 +4695,13 @@ uint4 FuncCallSpecs::hasEffectTranslate(const Address &addr,int4 size) const
 
 /// \brief Calculate the number of times an individual sub-function is called.
 ///
-/// Provided a list of all call sites for a calling function, tally the number of calls
+/// Provided a std::list of all call sites for a calling function, tally the number of calls
 /// to the same sub-function.  Update the \b matchCallCount field of each FuncCallSpecs
-/// \param qlst is the list of call sites (FuncCallSpecs) for the calling function
-void FuncCallSpecs::countMatchingCalls(const vector<FuncCallSpecs *> &qlst)
+/// \param qlst is the std::list of call sites (FuncCallSpecs) for the calling function
+void FuncCallSpecs::countMatchingCalls(const std::vector<FuncCallSpecs *> &qlst)
 
 {
-  vector<FuncCallSpecs *> copyList(qlst);
+  std::vector<FuncCallSpecs *> copyList(qlst);
   sort(copyList.begin(),copyList.end(),compareByEntryAddress);
   int4 i;
   for(i=0;i<copyList.size();++i) {

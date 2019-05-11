@@ -110,7 +110,7 @@ void TypeOp::registerInstructions(std::vector<TypeOp *> &inst,TypeFactory *tlst,
 /// Change basic data-type info (signed vs unsigned) and operator names ( '>>' vs '>>>' )
 /// depending on the specific language.
 /// \param inst is the array of TypeOp information objects
-/// \param val is set to \b true for Java operators, \b false for C operators
+/// \param val is std::set to \b true for Java operators, \b false for C operators
 void TypeOp::selectJavaOperators(std::vector<TypeOp *> &inst,bool val)
 
 {
@@ -149,7 +149,7 @@ void TypeOp::selectJavaOperators(std::vector<TypeOp *> &inst,bool val)
 /// \param t is the TypeFactory used to construct data-types
 /// \param opc is the op-code value the new object will represent
 /// \param n is the display name that will represent the op-code
-TypeOp::TypeOp(TypeFactory *t,OpCode opc,const string &n)
+TypeOp::TypeOp(TypeFactory *t,OpCode opc,const std::string &n)
 
 {
   tlst = t;
@@ -681,7 +681,7 @@ void TypeOpCallother::printRaw(std::ostream &s,const PcodeOp *op)
   }
 }
 
-string TypeOpCallother::getOperatorName(const PcodeOp *op) const
+std::string TypeOpCallother::getOperatorName(const PcodeOp *op) const
 
 {
   const BlockBasic *bb = op->getParent();
@@ -692,7 +692,7 @@ string TypeOpCallother::getOperatorName(const PcodeOp *op) const
     if (userop != (UserPcodeOp *)0)
       return userop->getOperatorName(op);
   }
-  ostringstream res;
+  std::ostringstream res;
   res << TypeOp::getOperatorName(op) << '[';
   op->getIn(0)->printRaw(res);
   res << ']';
@@ -910,12 +910,12 @@ TypeOpIntZext::TypeOpIntZext(TypeFactory *t)
   behave = new OpBehaviorIntZext();
 }
 
-string TypeOpIntZext::getOperatorName(const PcodeOp *op) const
+std::string TypeOpIntZext::getOperatorName(const PcodeOp *op) const
 
 {
-  ostringstream s;
+  std::ostringstream s;
   
-  s << name << dec << op->getIn(0)->getSize() << op->getOut()->getSize();
+  s << name << std::dec << op->getIn(0)->getSize() << op->getOut()->getSize();
   return s.str();
 }
 
@@ -936,12 +936,12 @@ TypeOpIntSext::TypeOpIntSext(TypeFactory *t)
   behave = new OpBehaviorIntSext();
 }
 
-string TypeOpIntSext::getOperatorName(const PcodeOp *op) const
+std::string TypeOpIntSext::getOperatorName(const PcodeOp *op) const
 
 {
-  ostringstream s;
+  std::ostringstream s;
   
-  s << name << dec << op->getIn(0)->getSize() << op->getOut()->getSize();
+  s << name << std::dec << op->getIn(0)->getSize() << op->getOut()->getSize();
   return s.str();
 }
 
@@ -990,11 +990,11 @@ TypeOpIntCarry::TypeOpIntCarry(TypeFactory *t)
   behave = new OpBehaviorIntCarry();
 }
 
-string TypeOpIntCarry::getOperatorName(const PcodeOp *op) const
+std::string TypeOpIntCarry::getOperatorName(const PcodeOp *op) const
 
 {
-  ostringstream s;
-  s << name << dec << op->getIn(0)->getSize();
+  std::ostringstream s;
+  s << name << std::dec << op->getIn(0)->getSize();
   return s.str();
 }
 
@@ -1005,11 +1005,11 @@ TypeOpIntScarry::TypeOpIntScarry(TypeFactory *t)
   behave = new OpBehaviorIntScarry();
 }
 
-string TypeOpIntScarry::getOperatorName(const PcodeOp *op) const
+std::string TypeOpIntScarry::getOperatorName(const PcodeOp *op) const
 
 {
-  ostringstream s;
-  s << name << dec << op->getIn(0)->getSize();
+  std::ostringstream s;
+  s << name << std::dec << op->getIn(0)->getSize();
   return s.str();
 }
 
@@ -1020,11 +1020,11 @@ TypeOpIntSborrow::TypeOpIntSborrow(TypeFactory *t)
   behave = new OpBehaviorIntSborrow();
 }
 
-string TypeOpIntSborrow::getOperatorName(const PcodeOp *op) const
+std::string TypeOpIntSborrow::getOperatorName(const PcodeOp *op) const
 
 {
-  ostringstream s;
-  s << name << dec << op->getIn(0)->getSize();
+  std::ostringstream s;
+  s << name << std::dec << op->getIn(0)->getSize();
   return s.str();
 }
 
@@ -1510,12 +1510,12 @@ TypeOpPiece::TypeOpPiece(TypeFactory *t)
   behave = new OpBehaviorPiece();
 }
 
-string TypeOpPiece::getOperatorName(const PcodeOp *op) const
+std::string TypeOpPiece::getOperatorName(const PcodeOp *op) const
 
 {
-  ostringstream s;
+  std::ostringstream s;
 
-  s << name << dec << op->getIn(0)->getSize() << op->getIn(1)->getSize();
+  s << name << std::dec << op->getIn(0)->getSize() << op->getIn(1)->getSize();
   return s.str();
 }
 
@@ -1537,12 +1537,12 @@ TypeOpSubpiece::TypeOpSubpiece(TypeFactory *t)
   behave = new OpBehaviorSubpiece();
 }
 
-string TypeOpSubpiece::getOperatorName(const PcodeOp *op) const
+std::string TypeOpSubpiece::getOperatorName(const PcodeOp *op) const
 
 {
-  ostringstream s;
+  std::ostringstream s;
 
-  s << name << dec << op->getIn(0)->getSize() << op->getOut()->getSize();
+  s << name << std::dec << op->getIn(0)->getSize() << op->getOut()->getSize();
   return s.str();
 }
 

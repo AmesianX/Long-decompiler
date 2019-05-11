@@ -38,7 +38,7 @@ ScopeGhidra::~ScopeGhidra(void)
 /// \param nm is the name of the new \e namespace
 /// \param par is the parent Scope
 /// \return the new \e namespace Scope
-Scope *ScopeGhidra::createNewScope(const string &nm,Scope *par) const
+Scope *ScopeGhidra::createNewScope(const std::string &nm,Scope *par) const
 
 {
   Scope *newscope = new ScopeGhidraNamespace(nm,ghidra);
@@ -61,7 +61,7 @@ Scope *ScopeGhidra::createNewScope(const string &nm,Scope *par) const
 /// it if it isn't. This may mean creating a new \e namespace Scope.
 /// \param path is absolute path to the desired Scope
 /// \return the Scope matching the path.
-Scope *ScopeGhidra::reresolveScope(const vector<string> &path) const
+Scope *ScopeGhidra::reresolveScope(const vectorstd::string &path) const
 
 {
   if (path.size()==1) return cache;
@@ -83,7 +83,7 @@ Scope *ScopeGhidra::reresolveScope(const vector<string> &path) const
 /// The Ghidra client can respond to a query negatively by sending a
 /// \<hole> tag, which describes the (largest) range of addresses containing
 /// the query address that do not have any Symbol mapped to them. This object
-/// stores this information in the \b holes map, which it consults to avoid
+/// stores this information in the \b holes std::map, which it consults to avoid
 /// sending queries for the same unmapped address repeatedly. The tag may
 /// also contain boolean property information about the memory range, which
 /// also gets stored.
@@ -129,7 +129,7 @@ Symbol *ScopeGhidra::dump2Cache(Document *doc) const
   List::const_iterator iter = el->getChildren().begin();
   // The first subnode must be scope information
   el = *iter;
-  vector<string> path;
+  vectorstd::string path;
   const List &list2(el->getChildren());
   List::const_iterator iter2;
   for(iter2=list2.begin();iter2!=list2.end();++iter2)
@@ -152,7 +152,7 @@ Symbol *ScopeGhidra::dump2Cache(Document *doc) const
     if (symel->getName() == "function") {	// Make sure new record is for a function
       const Element *baseAddrEl = *symel->getChildren().begin();
       Address baseaddr = Address::restoreXml( baseAddrEl, glb );	// Decode address from record
-      vector<Symbol *> symList;
+      std::vector<Symbol *> symList;
       scope->queryByName(symel->getAttributeValue("name"),symList);	// Lookup symbols with duplicate name
       for(int4 i=0;i<symList.size();++i) {
 	FunctionSymbol *funcSym = dynamic_cast<FunctionSymbol *>(symList[i]);
@@ -165,7 +165,7 @@ Symbol *ScopeGhidra::dump2Cache(Document *doc) const
       }
     }
     if (sym == (Symbol *)0) {
-      ostringstream s;
+      std::ostringstream s;
       s << err.explain << ": entry didn't cache";
       throw LowlevelError(s.str());
     }
@@ -203,7 +203,7 @@ Symbol *ScopeGhidra::dump2Cache(Document *doc) const
 }
 
 /// Determine if the given address should be sent to the Ghidra client
-/// at all, by checking the hole map and other factors.
+/// at all, by checking the hole std::map and other factors.
 /// If it passes, send the query to the client, process the result,
 /// and update the cache. If a Symbol is ultimately recovered, return it.
 /// \param addr is the address to potentially query
@@ -348,7 +348,7 @@ LabSymbol *ScopeGhidra::findCodeLabel(const Address &addr) const
     SymbolEntry *entry;
     entry = cache->findAddr(addr,Address());
     if (entry == (SymbolEntry *)0) {
-      string symname = ghidra->getCodeLabel(addr);	// Do the remote query
+      std::string symname = ghidra->getCodeLabel(addr);	// Do the remote query
       if (!symname.empty())
 	sym = cache->addCodeLabel(addr,symname);
     }
@@ -386,7 +386,7 @@ Funcdata *ScopeGhidra::resolveExternalRefFunction(ExternRefSymbol *sym) const
   return fd;
 }
 
-SymbolEntry *ScopeGhidra::addSymbol(const string &name,Datatype *ct,
+SymbolEntry *ScopeGhidra::addSymbol(const std::string &name,Datatype *ct,
 					      const Address &addr,const Address &usepoint)
 {
   // We do not inform Ghidra of the new symbol, we just

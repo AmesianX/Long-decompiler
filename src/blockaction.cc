@@ -39,10 +39,10 @@ FlowBlock *FloatingEdge::getCurrentEdge(int4 &outedge,FlowBlock *graph)
 /// \brief Find blocks in containing loop that aren't in \b this
 ///
 /// Assuming \b this has all of its nodes marked, find all additional nodes that create the
-/// body of the \b container loop. Mark these and put them in \b body list.
+/// body of the \b container loop. Mark these and put them in \b body std::list.
 /// \param container is a loop that contains \b this
 /// \param body will hold blocks in the body of the container that aren't in \b this
-void LoopBody::extendToContainer(const LoopBody &container,vector<FlowBlock *> &body) const
+void LoopBody::extendToContainer(const LoopBody &container,std::vector<FlowBlock *> &body) const
 
 {
   int4 i = 0;
@@ -64,7 +64,7 @@ void LoopBody::extendToContainer(const LoopBody &container,vector<FlowBlock *> &
     for(int4 k=0;k<sizein;++k) {
       if (head->isGotoIn(k)) continue; // Don't trace back through irreducible edges
       FlowBlock *bl = head->getIn(k);
-      if (bl->isMark()) continue; // Already in list
+      if (bl->isMark()) continue; // Already in std::list
       bl->setMark();
       body.push_back(bl);
     }
@@ -76,7 +76,7 @@ void LoopBody::extendToContainer(const LoopBody &container,vector<FlowBlock *> &
     for(int4 k=0;k<sizein;++k) {
       if (curblock->isGotoIn(k)) continue; // Don't trace back through irreducible edges
       FlowBlock *bl = curblock->getIn(k);
-      if (bl->isMark()) continue; // Already in list
+      if (bl->isMark()) continue; // Already in std::list
       bl->setMark();
       body.push_back(bl);
     }
@@ -108,9 +108,9 @@ FlowBlock *LoopBody::getCurrentBounds(FlowBlock **top,FlowBlock *graph)
 }
 
 /// Collect all FlowBlock nodes that reach a \b tail of the loop without going through \b head.
-/// Put them in a list and mark them.
+/// Put them in a std::list and mark them.
 /// \param body will contain the body nodes
-void LoopBody::findBase(vector<FlowBlock *> &body)
+void LoopBody::findBase(std::vector<FlowBlock *> &body)
 
 {
   head->setMark();
@@ -130,7 +130,7 @@ void LoopBody::findBase(vector<FlowBlock *> &body)
     for(int4 k=0;k<sizein;++k) {
       if (curblock->isGotoIn(k)) continue; // Don't trace back through irreducible edges
       FlowBlock *bl = curblock->getIn(k);
-      if (bl->isMark()) continue; // Already in list
+      if (bl->isMark()) continue; // Already in std::list
       bl->setMark();
       body.push_back(bl);
     }
@@ -139,12 +139,12 @@ void LoopBody::findBase(vector<FlowBlock *> &body)
 
 /// Extend the \b body of this loop to every FlowBlock that can be reached
 /// \b only from \b head without hitting the \b exitblock.
-/// Assume \b body has been filled out by findBase() and that all these blocks have their mark set.
+/// Assume \b body has been filled out by findBase() and that all these blocks have their mark std::set.
 /// \param body contains the current loop body and will be extended
-void LoopBody::extend(vector<FlowBlock *> &body) const
+void LoopBody::extend(std::vector<FlowBlock *> &body) const
 
 {
-  vector<FlowBlock *> trial;
+  std::vector<FlowBlock *> trial;
   int4 i=0;
   while(i<body.size()) {
     FlowBlock *bl = body[i++];
@@ -170,13 +170,13 @@ void LoopBody::extend(vector<FlowBlock *> &body) const
 }
 
 /// A structured loop is allowed at most one exit block: pick this block.
-/// First build a set of trial exits, preferring from a \b tail, then from  \b head,
+/// First build a std::set of trial exits, preferring from a \b tail, then from  \b head,
 /// then from the middle. If there is no containing loop, just return the first such exit we find.
-/// \param body is the list FlowBlock objects in the loop body, which we assume are marked.
-void LoopBody::findExit(const vector<FlowBlock *> &body)
+/// \param body is the std::list FlowBlock objects in the loop body, which we assume are marked.
+void LoopBody::findExit(const std::vector<FlowBlock *> &body)
 
 {
-  vector<FlowBlock *> trialexit;
+  std::vector<FlowBlock *> trialexit;
   FlowBlock *tail;
 
   for(int4 j=0;j<tails.size();++j) {
@@ -219,7 +219,7 @@ void LoopBody::findExit(const vector<FlowBlock *> &body)
 
   // If there is a containing loop, force exitblock to be in the containing loop
   if (immed_container != (LoopBody *)0) {
-    vector<FlowBlock *> extension;
+    std::vector<FlowBlock *> extension;
     extendToContainer(*immed_container,extension);
     for(int4 i=0;i<trialexit.size();++i) {
       FlowBlock *bl = trialexit[i];
@@ -257,14 +257,14 @@ void LoopBody::orderTails(void)
   tails[0] = trial;
 }
 
-/// Label any edge that leaves the set of nodes in \b body.
+/// Label any edge that leaves the std::set of nodes in \b body.
 /// Put the edges in priority for removal,  middle exit at front, \e head exit, then \e tail exit.
 /// We assume all the FlowBlock nodes in \b body have been marked.
-/// \param body is list of nodes in \b this loop body
-void LoopBody::labelExitEdges(const vector<FlowBlock *> &body)
+/// \param body is std::list of nodes in \b this loop body
+void LoopBody::labelExitEdges(const std::vector<FlowBlock *> &body)
 
 {
-  vector<FlowBlock *> toexitblock;
+  std::vector<FlowBlock *> toexitblock;
   for(int4 i=uniquecount;i<body.size();++i) { // For non-head/tail nodes of graph
     FlowBlock *curblock = body[i];
     int4 sizeout = curblock->sizeOut();
@@ -316,12 +316,12 @@ void LoopBody::labelExitEdges(const vector<FlowBlock *> &body)
 /// \brief Record any loops that \b body contains.
 ///
 /// Search for any loop contained by \b this and update is \b depth and \b immed_container field.
-/// \param body is the set of FlowBlock nodes making up this loop
-/// \param looporder is the list of known loops
-void LoopBody::labelContainments(const vector<FlowBlock *> &body,const vector<LoopBody *> &looporder)
+/// \param body is the std::set of FlowBlock nodes making up this loop
+/// \param looporder is the std::list of known loops
+void LoopBody::labelContainments(const std::vector<FlowBlock *> &body,const std::vector<LoopBody *> &looporder)
 
 {
-  vector<LoopBody *> containlist;
+  std::vector<LoopBody *> containlist;
 
   for(int4 i=0;i<body.size();++i) {
     FlowBlock *curblock = body[i];
@@ -351,11 +351,11 @@ void LoopBody::labelContainments(const vector<FlowBlock *> &body,const vector<Lo
   }
 }
 
-/// Add edges that exit from \b this loop body to the list of likely \e gotos,
+/// Add edges that exit from \b this loop body to the std::list of likely \e gotos,
 /// giving them the proper priority.
 /// \param likely will hold the exit edges in (reverse) priority order
 /// \param graph is the containing control-flow graph
-void LoopBody::emitLikelyEdges(list<FloatingEdge> &likely,FlowBlock *graph)
+void LoopBody::emitLikelyEdges(std::list<FloatingEdge> &likely,FlowBlock *graph)
 
 {
   while(head->getParent() != graph)
@@ -372,7 +372,7 @@ void LoopBody::emitLikelyEdges(list<FloatingEdge> &likely,FlowBlock *graph)
     if (tail == exitblock)	// If the exitblock was collapsed into the tail, we no longer really have an exit
       exitblock = (FlowBlock *)0;
   }
-  list<FloatingEdge>::iterator iter,enditer;
+  std::list<FloatingEdge>::iterator iter,enditer;
   iter = exitedges.begin();;
   enditer = exitedges.end();
   FlowBlock *holdin = (FlowBlock *)0;
@@ -385,7 +385,7 @@ void LoopBody::emitLikelyEdges(list<FloatingEdge> &likely,FlowBlock *graph)
     FlowBlock *outbl = inbl->getOut(outedge);
     if (iter==enditer) {
       if (outbl == exitblock) {	// If this is the official exit edge
-	holdin = inbl;		// Hold off putting the edge in list
+	holdin = inbl;		// Hold off putting the edge in std::list
 	holdout = outbl;
 	break;
       }
@@ -405,12 +405,12 @@ void LoopBody::emitLikelyEdges(list<FloatingEdge> &likely,FlowBlock *graph)
   }
 }
 
-/// Exit edges have their f_loop_exit_edge property set.
+/// Exit edges have their f_loop_exit_edge property std::set.
 /// \param graph is the containing control-flow structure
 void LoopBody::setExitMarks(FlowBlock *graph)
 
 {
-  list<FloatingEdge>::iterator iter;
+  std::list<FloatingEdge>::iterator iter;
   for(iter=exitedges.begin();iter!=exitedges.end();++iter) {
     int4 outedge;
     FlowBlock *inloop = (*iter).getCurrentEdge(outedge,graph);
@@ -424,7 +424,7 @@ void LoopBody::setExitMarks(FlowBlock *graph)
 void LoopBody::clearExitMarks(FlowBlock *graph)
 
 {
-  list<FloatingEdge>::iterator iter;
+  std::list<FloatingEdge>::iterator iter;
   for(iter=exitedges.begin();iter!=exitedges.end();++iter) {
     int4 outedge;
     FlowBlock *inloop = (*iter).getCurrentEdge(outedge,graph);
@@ -436,8 +436,8 @@ void LoopBody::clearExitMarks(FlowBlock *graph)
 /// Look for LoopBody records that share a \b head. Merge each \b tail
 /// from one into the other. Set the merged LoopBody \b head to NULL,
 /// for later clean up.
-/// \param looporder is the list of LoopBody records
-void LoopBody::mergeIdenticalHeads(vector<LoopBody *> &looporder)
+/// \param looporder is the std::list of LoopBody records
+void LoopBody::mergeIdenticalHeads(std::vector<LoopBody *> &looporder)
 
 {
   int4 i=0;
@@ -644,7 +644,7 @@ bool TraceDAG::BadEdgeScore::operator<(const BadEdgeScore &op2) const
   return (thisind < op2ind);
 }
 
-/// This adds the BlockTrace to the list of potential unstructured edges.
+/// This adds the BlockTrace to the std::list of potential unstructured edges.
 /// Then patch up the BranchPoint/BlockTrace/pathout hierarchy.
 /// \param trace is the indicated BlockTrace to remove
 void TraceDAG::removeTrace(BlockTrace *trace)
@@ -661,7 +661,7 @@ void TraceDAG::removeTrace(BlockTrace *trace)
     trace->bottom = (FlowBlock *)0;
     trace->destnode = (FlowBlock *)0;
     trace->edgelump = 0;
-    // Do NOT remove from active list
+    // Do NOT remove from active std::list
     return;
   }
   // Otherwise we need to actually remove the path from the BranchPoint as the root branch will be marked as a goto
@@ -680,15 +680,15 @@ void TraceDAG::removeTrace(BlockTrace *trace)
   delete trace;			// Delete the record
 }
 
-/// \brief Process a set of conflicting BlockTrace objects that go to the same exit point.
+/// \brief Process a std::set of conflicting BlockTrace objects that go to the same exit point.
 ///
 /// For each conflicting BlockTrace, calculate the minimum distance between it and any other BlockTrace.
-/// \param start is the beginning of the list of conflicting BlockTraces (annotated as BadEdgeScore)
-/// \param end is the end of the list of conflicting BlockTraces
-void TraceDAG::processExitConflict(list<BadEdgeScore>::iterator start,list<BadEdgeScore>::iterator end)
+/// \param start is the beginning of the std::list of conflicting BlockTraces (annotated as BadEdgeScore)
+/// \param end is the end of the std::list of conflicting BlockTraces
+void TraceDAG::processExitConflict(std::list<BadEdgeScore>::iterator start,std::list<BadEdgeScore>::iterator end)
 
 {
-  list<BadEdgeScore>::iterator iter;
+  std::list<BadEdgeScore>::iterator iter;
   BranchPoint *startbp;
 
   while(start != end) {
@@ -717,15 +717,15 @@ void TraceDAG::processExitConflict(list<BadEdgeScore>::iterator start,list<BadEd
   }
 }
 
-/// Run through the list of active BlockTrace objects, annotate them using
+/// Run through the std::list of active BlockTrace objects, annotate them using
 /// the BadEdgeScore class, then select the BlockTrace which is the most likely
 /// candidate for an unstructured edge.
 /// \return the BlockTrace corresponding to the unstructured edge
 TraceDAG::BlockTrace *TraceDAG::selectBadEdge(void)
 
 {
-  list<BadEdgeScore> badedgelist;
-  list<BlockTrace *>::const_iterator aiter;
+  std::list<BadEdgeScore> badedgelist;
+  std::list<BlockTrace *>::const_iterator aiter;
   for(aiter=activetrace.begin();aiter!=activetrace.end();++aiter) {
     if ((*aiter)->isTerminal()) continue;
     if (((*aiter)->top->top == (FlowBlock *)0)&&((*aiter)->bottom==(FlowBlock *)0))
@@ -740,8 +740,8 @@ TraceDAG::BlockTrace *TraceDAG::selectBadEdge(void)
   }
   badedgelist.sort();
   
-  list<BadEdgeScore>::iterator iter=badedgelist.begin();
-  list<BadEdgeScore>::iterator startiter = iter;
+  std::list<BadEdgeScore>::iterator iter=badedgelist.begin();
+  std::list<BadEdgeScore>::iterator startiter = iter;
   FlowBlock *curbl = (*iter).exitproto;
   int4 samenodecount = 1;
   ++iter;
@@ -765,7 +765,7 @@ TraceDAG::BlockTrace *TraceDAG::selectBadEdge(void)
 
   iter = badedgelist.begin();
 
-  list<BadEdgeScore>::iterator maxiter = iter;
+  std::list<BadEdgeScore>::iterator maxiter = iter;
   ++iter;
   while(iter != badedgelist.end()) {
     if ((*maxiter).compareFinal( *iter )) {
@@ -781,7 +781,7 @@ void TraceDAG::insertActive(BlockTrace *trace)
 
 {
   activetrace.push_back(trace);
-  list<BlockTrace *>::iterator iter = activetrace.end();
+  std::list<BlockTrace *>::iterator iter = activetrace.end();
   --iter;
   trace->activeiter = iter;
   trace->flags |= BlockTrace::f_active;
@@ -827,10 +827,10 @@ bool TraceDAG::checkOpen(BlockTrace *trace)
 }
 
 /// Given that a BlockTrace can be opened into its next FlowBlock node,
-/// create a new BranchPoint at that node, and set up new sub-traces.
+/// create a new BranchPoint at that node, and std::set up new sub-traces.
 /// \param parent is the given BlockTrace to split
-/// \return an iterator (within the \e active list) to the new BlockTrace objects
-list<TraceDAG::BlockTrace *>::iterator TraceDAG::openBranch(BlockTrace *parent)
+/// \return an iterator (within the \e active std::list) to the new BlockTrace objects
+std::list<TraceDAG::BlockTrace *>::iterator TraceDAG::openBranch(BlockTrace *parent)
 
 {
   BranchPoint *newbranch = new BranchPoint( parent );
@@ -886,12 +886,12 @@ bool TraceDAG::checkRetirement(BlockTrace *trace,FlowBlock *&exitblock)
 /// \brief Retire a BranchPoint, updating its parent BlockTrace
 ///
 /// Knowing a given BranchPoint can be retired, remove all its BlockTraces
-/// from the \e active list, and update the BranchPoint's parent BlockTrace
+/// from the \e active std::list, and update the BranchPoint's parent BlockTrace
 /// as having reached the BlockTrace exit point.
 /// \param bp is the given BranchPoint
 /// \param exitblock is unique exit FlowBlock (calculated by checkRetirement())
 /// \return an iterator to the next \e active BlockTrace to examine
-list<TraceDAG::BlockTrace *>::iterator TraceDAG::retireBranch(BranchPoint *bp,FlowBlock *exitblock)
+std::list<TraceDAG::BlockTrace *>::iterator TraceDAG::retireBranch(BranchPoint *bp,FlowBlock *exitblock)
 
 {
   FlowBlock *edgeout_bl = (FlowBlock *)0;
@@ -930,11 +930,11 @@ list<TraceDAG::BlockTrace *>::iterator TraceDAG::retireBranch(BranchPoint *bp,Fl
 }
 
 /// The \b visitcount field is only modified in removeTrace() whenever we put an edge
-/// in the \b likelygoto list.
+/// in the \b likelygoto std::list.
 void TraceDAG::clearVisitCount(void)
 
 {
-  list<FloatingEdge>::const_iterator iter;
+  std::list<FloatingEdge>::const_iterator iter;
   for(iter=likelygoto.begin();iter!=likelygoto.end();++iter)
     (*iter).getBottom()->setVisitCount(0);
 }
@@ -942,7 +942,7 @@ void TraceDAG::clearVisitCount(void)
 /// Prepare for a new trace using the provided storage for the likely unstructured
 /// edges that will be discovered.
 /// \param lg is the container for likely unstructured edges
-TraceDAG::TraceDAG(list<FloatingEdge> &lg)
+TraceDAG::TraceDAG(std::list<FloatingEdge> &lg)
   : likelygoto(lg)
 {
   activecount = 0;
@@ -973,7 +973,7 @@ void TraceDAG::initialize(void)
 
 /// From the root BranchPoint, recursively push the trace. At any point where pushing
 /// is no longer possible, select an appropriate edge to remove and add it to the
-/// list of likely unstructured edges.  Then continue pushing the trace.
+/// std::list of likely unstructured edges.  Then continue pushing the trace.
 void TraceDAG::pushBranches(void)
 
 {
@@ -1007,12 +1007,12 @@ void TraceDAG::pushBranches(void)
   clearVisitCount();
 }
 
-/// Given the top FlowBlock of a loop, find corresponding LoopBody record from an ordered list.
+/// Given the top FlowBlock of a loop, find corresponding LoopBody record from an ordered std::list.
 /// This assumes mergeIdenticalHeads() has been run so that the head is uniquely identifying.
 /// \param looptop is the top of the loop
-/// \param looporder is the ordered list of LoopBody records
+/// \param looporder is the ordered std::list of LoopBody records
 /// \return the LoopBody or NULL if none found
-LoopBody *LoopBody::find(FlowBlock *looptop,const vector<LoopBody *> &looporder)
+LoopBody *LoopBody::find(FlowBlock *looptop,const std::vector<LoopBody *> &looporder)
 
 {
   int4 min=0;
@@ -1029,8 +1029,8 @@ LoopBody *LoopBody::find(FlowBlock *looptop,const vector<LoopBody *> &looporder)
   return (LoopBody *)0;
 }
 
-/// \param body is the list of FlowBlock nodes that have been marked
-void LoopBody::clearMarks(vector<FlowBlock *> &body)
+/// \param body is the std::list of FlowBlock nodes that have been marked
+void LoopBody::clearMarks(std::vector<FlowBlock *> &body)
 
 {
   for(int4 i=0;i<body.size();++i)
@@ -1040,13 +1040,13 @@ void LoopBody::clearMarks(vector<FlowBlock *> &body)
 /// \brief Mark FlowBlocks \b only reachable from a given root
 ///
 /// For a given root FlowBlock, find all the FlowBlocks that can only be reached from it,
-/// mark them and put them in a list/
+/// mark them and put them in a std::list/
 /// \param root is the given FlowBlock root
-/// \param body is the container to hold the list of reachable nodes
-void CollapseStructure::onlyReachableFromRoot(FlowBlock *root,vector<FlowBlock *> &body)
+/// \param body is the container to hold the std::list of reachable nodes
+void CollapseStructure::onlyReachableFromRoot(FlowBlock *root,std::vector<FlowBlock *> &body)
 
 {
-  vector<FlowBlock *> trial;
+  std::vector<FlowBlock *> trial;
   int4 i=0;
   root->setMark();
   body.push_back(root);
@@ -1072,9 +1072,9 @@ void CollapseStructure::onlyReachableFromRoot(FlowBlock *root,vector<FlowBlock *
 }
 
 /// The FlowBlock objects in the \b body must all be marked.
-/// \param body is the list of FlowBlock objects in the body
+/// \param body is the std::list of FlowBlock objects in the body
 /// \return the number of edges that were marked as \e unstructured
-int4 CollapseStructure::markExitsAsGotos(vector<FlowBlock *> &body)
+int4 CollapseStructure::markExitsAsGotos(std::vector<FlowBlock *> &body)
 
 {
   int4 changecount = 0;
@@ -1105,7 +1105,7 @@ bool CollapseStructure::clipExtraRoots(void)
   for(int4 i=1;i<graph.getSize();++i) {	// Skip the canonical root
     FlowBlock *bl = graph.getBlock(i);
     if (bl->sizeIn() != 0) continue;
-    vector<FlowBlock *> body;
+    std::vector<FlowBlock *> body;
     onlyReachableFromRoot(bl,body);
     int4 count = markExitsAsGotos(body);
     LoopBody::clearMarks(body);
@@ -1117,7 +1117,7 @@ bool CollapseStructure::clipExtraRoots(void)
 
 /// Identify all the distinct loops in the graph (via their back-edge) and create a LoopBody record.
 /// \param looporder is the container that will hold the LoopBody record for each loop
-void CollapseStructure::labelLoops(vector<LoopBody *> &looporder)
+void CollapseStructure::labelLoops(std::vector<LoopBody *> &looporder)
 
 {
   for(int4 i=0;i<graph.getSize();++i) {
@@ -1142,17 +1142,17 @@ void CollapseStructure::labelLoops(vector<LoopBody *> &looporder)
 void CollapseStructure::orderLoopBodies(void)
 
 {
-  vector<LoopBody *> looporder;
+  std::vector<LoopBody *> looporder;
   labelLoops(looporder);
   if (!loopbody.empty()) {
     int4 oldsize = looporder.size();
     LoopBody::mergeIdenticalHeads(looporder);
-    list<LoopBody>::iterator iter;
+    std::list<LoopBody>::iterator iter;
     if (oldsize != looporder.size()) { // If there was merging
       iter = loopbody.begin();
       while(iter != loopbody.end()) {
 	if ((*iter).getHead() == (FlowBlock *)0) {
-	  list<LoopBody>::iterator deliter = iter;
+	  std::list<LoopBody>::iterator deliter = iter;
 	  ++iter;
 	  loopbody.erase(deliter); // Delete the subsumed loopbody
 	}
@@ -1161,14 +1161,14 @@ void CollapseStructure::orderLoopBodies(void)
       }
     }
     for(iter=loopbody.begin();iter!=loopbody.end();++iter) {
-      vector<FlowBlock *> body;
+      std::vector<FlowBlock *> body;
       (*iter).findBase(body);
       (*iter).labelContainments(body,looporder);
       LoopBody::clearMarks(body);
     }
     loopbody.sort(); // Sort based on nesting depth (deepest come first) (sorting is stable)
     for(iter=loopbody.begin();iter!=loopbody.end();++iter) {
-      vector<FlowBlock *> body;
+      std::vector<FlowBlock *> body;
       (*iter).findBase(body);
       (*iter).findExit(body);
       (*iter).orderTails();
@@ -1202,7 +1202,7 @@ bool CollapseStructure::updateLoopBody(void)
 	break; // Loop still exists
     }
     ++loopbodyiter;
-    likelylistfull = false;	// Need to generate likely list for new loopbody (or no loopbody)
+    likelylistfull = false;	// Need to generate likely std::list for new loopbody (or no loopbody)
     loopbottom = (FlowBlock *)0;
   }
   if (likelylistfull) return true;
@@ -1233,7 +1233,7 @@ bool CollapseStructure::updateLoopBody(void)
   return true;
 }
 
-/// Pick an edge from among the \e likely \e goto list generated by a
+/// Pick an edge from among the \e likely \e goto std::list generated by a
 /// trace of the current innermost loop.  Given ongoing collapsing, this
 /// may involve updating which loop is currently innermost and throwing
 /// out potential edges whose endpoints have already been collapsed.
@@ -1276,7 +1276,7 @@ bool CollapseStructure::ruleBlockCat(FlowBlock *bl)
   if (!bl->isDecisionOut(0)) return false; // Not a goto or a loopbottom
   if (outblock->isSwitchOut()) return false; // Switch must be resolved first
 
-  vector<FlowBlock *> nodes;
+  std::vector<FlowBlock *> nodes;
   nodes.push_back(bl);		// The first two blocks being concatenated
   nodes.push_back(outblock);
 
@@ -1690,7 +1690,7 @@ bool CollapseStructure::ruleBlockSwitch(FlowBlock *bl)
   if (!checkSwitchSkips(bl,exitblock))
     return true;		// We match, but have special condition that adds gotos
 
-  vector<FlowBlock *> cases;
+  std::vector<FlowBlock *> cases;
   cases.push_back(bl);
   for(int4 i=0;i<sizeout;++i) {
     FlowBlock *curbl = bl->getOut(i);
@@ -1711,7 +1711,7 @@ bool CollapseStructure::ruleCaseFallthru(FlowBlock *bl)
   if (!bl->isSwitchOut()) return false;
   int4 sizeout = bl->sizeOut();
   int4 nonfallthru = 0;		// Count of exits that are not fallthru
-  vector<FlowBlock *> fallthru;
+  std::vector<FlowBlock *> fallthru;
   
   for(int4 i=0;i<sizeout;++i) {
     FlowBlock *curbl = bl->getOut(i);
@@ -1886,7 +1886,7 @@ bool ConditionalJoin::MergePair::operator<(const MergePair &op2) const
 
 /// Given two conditional blocks, determine if the corresponding conditional
 /// expressions are equivalent, up to Varnodes that need to be merged.
-/// Any Varnode pairs that need to be merged are put in the \b mergeneed map.
+/// Any Varnode pairs that need to be merged are put in the \b mergeneed std::map.
 /// \return \b true if there are matching conditions
 bool ConditionalJoin::findDups(void)
 
@@ -1926,14 +1926,14 @@ bool ConditionalJoin::findDups(void)
 /// \brief Look for additional Varnode pairs in an exit block that need to be merged.
 ///
 /// Varnodes that are merged in the exit block flowing from \b block1 and \b block2
-/// will need to merged in the new joined block.  Add these pairs to the \b mergeneed map.
+/// will need to merged in the new joined block.  Add these pairs to the \b mergeneed std::map.
 /// \param exit is the exit block
 /// \param in1 is the index of the edge coming from \b block1
 /// \param in2 is the index of the edge coming from \b block2
 void ConditionalJoin::checkExitBlock(BlockBasic *exit,int4 in1,int4 in2)
 
 {
-  list<PcodeOp *>::const_iterator iter,enditer;
+  std::list<PcodeOp *>::const_iterator iter,enditer;
 
   iter = exit->beginOp();
   enditer = exit->endOp();
@@ -1953,14 +1953,14 @@ void ConditionalJoin::checkExitBlock(BlockBasic *exit,int4 in1,int4 in2)
 /// \brief Substitute new joined Varnode in the given exit block
 ///
 /// For any MULTIEQUAL in the \b exit, given two input slots, remove one Varnode,
-/// and substitute the other Varnode from the corresponding Varnode in the \b mergeneed map.
+/// and substitute the other Varnode from the corresponding Varnode in the \b mergeneed std::map.
 /// \param exit is the exit block
 /// \param in1 is the index of the incoming edge from \b block1
 /// \param in2 is the index of the incoming edge from \b block2
 void ConditionalJoin::cutDownMultiequals(BlockBasic *exit,int4 in1,int4 in2)
 
 {
-  list<PcodeOp *>::const_iterator iter,enditer;
+  std::list<PcodeOp *>::const_iterator iter,enditer;
 
   int4 lo,hi;
   if (in1 > in2) {
@@ -1998,11 +1998,11 @@ void ConditionalJoin::cutDownMultiequals(BlockBasic *exit,int4 in1,int4 in2)
 }
 
 /// Create a new Varnode and its defining MULTIEQUAL operation
-/// for each MergePair in the map.
+/// for each MergePair in the std::map.
 void ConditionalJoin::setupMultiequals(void)
 
 {
-  map<MergePair,Varnode *>::iterator iter;
+  std::map<MergePair,Varnode *>::iterator iter;
 
   for(iter=mergeneed.begin();iter!=mergeneed.end();++iter) {
     if ((*iter).second != (Varnode *)0) continue;
@@ -2036,7 +2036,7 @@ void ConditionalJoin::moveCbranch(void)
 }
 
 /// Given a pair of conditional blocks, make sure that they match the \e split conditions
-/// necessary for merging and set up to do the merge.
+/// necessary for merging and std::set up to do the merge.
 /// If the conditions are not met, this method cleans up so that additional calls can be made.
 /// \param b1 is the BlockBasic exhibiting one side of the split
 /// \param b2 is the BlockBasic on the other side of the split
@@ -2098,7 +2098,7 @@ int4 ActionNormalizeBranches::apply(Funcdata &data)
 
 {
   const BlockGraph &graph(data.getBasicBlocks());
-  vector<PcodeOp *> fliplist;
+  std::vector<PcodeOp *> fliplist;
 
   for(int4 i=0;i<graph.getSize();++i) {
     BlockBasic *bb = (BlockBasic *)graph.getBlock(i);
@@ -2123,7 +2123,7 @@ int4 ActionPreferComplement::apply(Funcdata &data)
   BlockGraph &graph(data.getStructure());
   
   if (graph.getSize() == 0) return 0;
-  vector<BlockGraph *> vec;
+  std::vector<BlockGraph *> vec;
   vec.push_back(&graph);
   int4 pos = 0;
   
@@ -2182,7 +2182,7 @@ int4 ActionFinalStructure::apply(Funcdata &data)
 /// edge to a RETURN block.
 /// \param parent is a FlowBlock that ends in a RETURN operation
 /// \param vec will hold the \e goto blocks
-void ActionReturnSplit::gatherReturnGotos(FlowBlock *parent,vector<FlowBlock *> &vec)
+void ActionReturnSplit::gatherReturnGotos(FlowBlock *parent,std::vector<FlowBlock *> &vec)
 
 {
   FlowBlock *bl,*ret;
@@ -2221,7 +2221,7 @@ void ActionReturnSplit::gatherReturnGotos(FlowBlock *parent,vector<FlowBlock *> 
 bool ActionReturnSplit::isSplittable(BlockBasic *b)
 
 {
-  list<PcodeOp *>::const_iterator iter;
+  std::list<PcodeOp *>::const_iterator iter;
   PcodeOp *op;
 
   for(iter=b->beginOp();iter!=b->endOp();++iter) {
@@ -2247,9 +2247,9 @@ int4 ActionReturnSplit::apply(Funcdata &data)
   PcodeOp *op;
   BlockBasic *parent;
   FlowBlock *bl;
-  list<PcodeOp *>::const_iterator iter,iterend;
-  vector<int4> splitedge;
-  vector<BlockBasic *> retnode;
+  std::list<PcodeOp *>::const_iterator iter,iterend;
+  std::vector<int4> splitedge;
+  std::vector<BlockBasic *> retnode;
 
   if (data.getStructure().getSize() == 0)
     return 0;			// Some other restructuring happened first
@@ -2260,7 +2260,7 @@ int4 ActionReturnSplit::apply(Funcdata &data)
     parent = op->getParent();
     if (parent->sizeIn() <= 1) continue;
     if (!isSplittable(parent)) continue;
-    vector<FlowBlock *> gotoblocks;
+    std::vector<FlowBlock *> gotoblocks;
     gatherReturnGotos(parent,gotoblocks);
     if (gotoblocks.empty()) continue;
 

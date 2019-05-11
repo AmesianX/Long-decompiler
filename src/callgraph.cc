@@ -17,7 +17,7 @@
 #include "funcdata.hh"
 
 namespace GhidraDec {
-void CallGraphEdge::saveXml(ostream &s) const
+void CallGraphEdge::saveXml(std::ostream &s) const
 
 {
   s << "  <edge>\n";
@@ -36,10 +36,10 @@ void CallGraphEdge::restoreXml(const Element *el,CallGraph *graph)
   const AddrSpaceManager *manage = graph->getArch();
   Address fromaddr,toaddr,siteaddr;
   
-  const List &list(el->getChildren());
+  const List &std::list(el->getChildren());
   List::const_iterator iter;
 
-  iter = list.begin();
+  iter = std::list.begin();
   fromaddr = Address::restoreXml(*iter,manage);
   ++iter;
   toaddr = Address::restoreXml(*iter,manage);
@@ -67,7 +67,7 @@ void CallGraphNode::setFuncdata(Funcdata *f)
   fd = f;
 }
 
-void CallGraphNode::saveXml(ostream &s) const
+void CallGraphNode::saveXml(std::ostream &s) const
 
 {
   s << "  <node";
@@ -82,7 +82,7 @@ void CallGraphNode::restoreXml(const Element *el,CallGraph *graph)
 
 {
   int4 num = el->getNumAttributes();
-  string name;
+  std::string name;
   for(int4 i=0;i<num;++i) {
     if (el->getAttributeName(i) == "name")
       name = el->getAttributeValue(i);
@@ -92,12 +92,12 @@ void CallGraphNode::restoreXml(const Element *el,CallGraph *graph)
   graph->addNode(addr,name);
 }
 
-bool CallGraph::findNoEntry(vector<CallGraphNode *> &seeds)
+bool CallGraph::findNoEntry(std::vector<CallGraphNode *> &seeds)
 
 { // Find all functions (that are not already marked) that either have no in edges at all,
   // or have no in edges that haven't been snipped as part of cycles
 
-  map<Address,CallGraphNode>::iterator iter;
+  std::map<Address,CallGraphNode>::iterator iter;
   CallGraphNode *lownode = (CallGraphNode *)0;
   bool allcovered = true;
   bool newseeds = false;
@@ -133,7 +133,7 @@ void CallGraph::snipCycles(CallGraphNode *node)
 
 { // Snip any cycles starting from root -node-
   CallGraphNode *next;
-  vector<LeafIterator> stack;
+  std::vector<LeafIterator> stack;
 
   node->flags |= CallGraphNode::currentcycle;
   stack.push_back(LeafIterator(node));
@@ -185,7 +185,7 @@ void CallGraph::snipEdge(CallGraphNode *node,int4 i)
 void CallGraph::clearMarks(void)
 
 {
-  map<Address,CallGraphNode>::iterator iter;
+  std::map<Address,CallGraphNode>::iterator iter;
 
   for(iter=graph.begin();iter!=graph.end();++iter)
     (*iter).second.clearMark();
@@ -221,7 +221,7 @@ CallGraphNode *CallGraph::addNode(Funcdata *f)
   return &node;
 }
 
-CallGraphNode *CallGraph::addNode(const Address &addr,const string &nm)
+CallGraphNode *CallGraph::addNode(const Address &addr,const std::string &nm)
 
 {
   CallGraphNode &node( graph[addr] );
@@ -235,7 +235,7 @@ CallGraphNode *CallGraph::addNode(const Address &addr,const string &nm)
 CallGraphNode *CallGraph::findNode(const Address &addr)
 
 {				// Find function at given address, or return null
-  map<Address,CallGraphNode>::iterator iter;
+  std::map<Address,CallGraphNode>::iterator iter;
 
   iter = graph.find(addr);
   if (iter != graph.end())
@@ -354,7 +354,7 @@ CallGraphNode *CallGraph::nextLeaf(CallGraphNode *node)
 
 void CallGraph::cycleStructure(void)
 
-{ // Generate list of seeds nodes (from which we can get to everything)
+{ // Generate std::list of seeds nodes (from which we can get to everything)
   if (!seeds.empty())
     return;
   uint4 walked = 0;
@@ -423,7 +423,7 @@ void CallGraph::buildEdges(Funcdata *fd)
     if (!addr.isInvalid()) {
       tonode = findNode(addr);
       if (tonode == (CallGraphNode *)0) {
-	string name;
+	std::string name;
 	glb->nameFunction(addr,name);
 	tonode = addNode(addr,name);
       }
@@ -432,10 +432,10 @@ void CallGraph::buildEdges(Funcdata *fd)
   }
 }
 
-void CallGraph::saveXml(ostream &s) const
+void CallGraph::saveXml(std::ostream &s) const
 
 {
-  map<Address,CallGraphNode>::const_iterator iter;
+  std::map<Address,CallGraphNode>::const_iterator iter;
 
   s << "<callgraph>\n";
 
@@ -456,11 +456,11 @@ void CallGraph::saveXml(ostream &s) const
 void CallGraph::restoreXml(const Element *el)
 
 {
-  const List &list(el->getChildren());
+  const List &std::list(el->getChildren());
   List::const_iterator iter;
 
-  iter = list.begin();
-  while(iter != list.end()) {
+  iter = std::list.begin();
+  while(iter != std::list.end()) {
     const Element *subel = *iter;
     ++iter;
     if (subel->getName() == "edge")

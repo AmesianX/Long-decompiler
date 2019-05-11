@@ -120,14 +120,14 @@ void ParserContext::addCommit(TripleSymbol *sym,int4 num,uintm mask,bool flow,Co
 
 {
   contextcommit.push_back(ContextSet());
-  ContextSet &set(contextcommit.back());
+  ContextSet &std::set(contextcommit.back());
 
-  set.sym = sym;
-  set.point = point;		// This is the current state
-  set.num = num;
-  set.mask = mask;
-  set.value = context[num] & mask;
-  set.flow = flow;
+  std::set.sym = sym;
+  std::set.point = point;		// This is the current state
+  std::set.num = num;
+  std::set.mask = mask;
+  std::set.value = context[num] & mask;
+  std::set.flow = flow;
 }
 
 void ParserContext::applyCommits(void)
@@ -137,7 +137,7 @@ void ParserContext::applyCommits(void)
   ParserWalker walker(this);
   walker.baseState();
 
-  vector<ContextSet>::iterator iter;
+  std::vector<ContextSet>::iterator iter;
 
   for(iter=contextcommit.begin();iter!=contextcommit.end();++iter) {
     TripleSymbol *sym = (*iter).sym;

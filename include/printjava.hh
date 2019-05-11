@@ -25,7 +25,7 @@ namespace GhidraDec {
 
 /// \brief Factory and static initializer for the "java-language" back-end to the decompiler
 ///
-/// The singleton adds itself to the list of possible back-end languages for the decompiler
+/// The singleton adds itself to the std::list of possible back-end languages for the decompiler
 /// and it acts as a factory for producing the PrintJava object for emitting java-language tokens.
 class PrintJavaCapability : public PrintLanguageCapability {
   static PrintJavaCapability printJavaCapability;		///< The singleton instance
@@ -43,7 +43,7 @@ public:
 /// through the overloaded opCpoolRefOp().
 ///
 /// Java data-types are mapped into the decompiler's data-type system in a specific way. The primitives
-/// \b int, \b long, \b short, \b byte, \b boolean, \b float, and \b double all map directly. The
+/// \b int, \b long, \b short, \b byte, \b boolean, \b float, and \b double all std::map directly. The
 /// \b char primitive is treated as a 2 byte unsigned integer. A TypeStruct object holds the field
 /// layout for a java class, then java objects get mapped as follows:
 ///   - Class reference = pointer to TYPE_UINT
@@ -58,9 +58,9 @@ class PrintJava : public PrintC {
   static OpToken instanceof;				///< The \b instanceof keyword
   static bool isArrayType(const Datatype *ct);		///< Does the given data-type reference a java array
   static bool needZeroArray(const Varnode *vn);		///< Do we need '[0]' syntax.
-  virtual void printUnicode(ostream &s,int4 onechar) const;
+  virtual void printUnicode(std::ostream &s,int4 onechar) const;
 public:
-  PrintJava(Architecture *g,const string &nm="java-language");	///< Constructor
+  PrintJava(Architecture *g,const std::string &nm="java-language");	///< Constructor
   virtual void pushTypeStart(const Datatype *ct,bool noident);
   virtual void pushTypeEnd(const Datatype *ct);
   virtual bool doEmitWideCharPrefix(void) const { return false; }

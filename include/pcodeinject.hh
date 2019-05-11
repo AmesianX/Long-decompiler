@@ -34,17 +34,17 @@ class Architecture;
 /// to the user-defined op.
 class InjectParameter {
   friend class InjectPayload;
-  string name;		///< Name of the parameter (for use in parsing p-code \e source)
+  std::string name;		///< Name of the parameter (for use in parsing p-code \e source)
   int4 index;		///< Unique index assigned (for cross referencing associated Varnode in the InjectContext)
   uint4 size;		///< Size of the parameter Varnode in bytes
 public:
-  InjectParameter(const string &nm,uint4 sz) :name(nm) { index = 0; size = sz; }	///< Constructor
-  const string &getName(void) const { return name; }	///< Get the parameter name
+  InjectParameter(const std::string &nm,uint4 sz) :name(nm) { index = 0; size = sz; }	///< Constructor
+  const std::string &getName(void) const { return name; }	///< Get the parameter name
   int4 getIndex(void) const { return index; }		///< Get the assigned index
   uint4 getSize(void) const { return size; }		///< Get the size of the parameter in bytes
 };
 
-/// \brief Context needed to emit a p-code injection as a full set of p-code operations
+/// \brief Context needed to emit a p-code injection as a full std::set of p-code operations
 ///
 /// P-code injection works by passing a pre-built template of p-code operations (ConstructTpl)
 /// to an emitter (PcodeEmit), which makes the final resolution SLEIGH concepts like \e inst_next to
@@ -61,18 +61,18 @@ public:
   Address baseaddr;			///< Address of instruction causing inject
   Address nextaddr;			///< Address of following instruction
   Address calladdr;			///< If the instruction being injected is a call, this is the address being called
-  vector<VarnodeData> inputlist;	///< Storage location for input parameters
-  vector<VarnodeData> output;		///< Storage location for output
+  std::vector<VarnodeData> inputlist;	///< Storage location for input parameters
+  std::vector<VarnodeData> output;		///< Storage location for output
   virtual ~InjectContext(void) {}	///< Destructor
   virtual void clear(void) { inputlist.clear(); output.clear(); }	///< Release resources (from last injection)
 
   /// \brief Save \b this context to an XML stream as a \<context> tag
   ///
   /// \param s is the output stream
-  virtual void saveXml(ostream &s) const=0;
+  virtual void saveXml(std::ostream &s) const=0;
 };
 
-/// \brief An active container for a set of p-code operations that can be injected into data-flow
+/// \brief An active container for a std::set of p-code operations that can be injected into data-flow
 ///
 /// This is an abstract base class. Derived classes manage details of how the p-code
 /// is stored.  The methods provide access to the input/output parameter information,
@@ -86,16 +86,16 @@ public:
     EXECUTABLEPCODE_TYPE = 4	///< Injection running as a stand-alone p-code script
   };
 protected:
-  string name;			///< Formal name of the payload
+  std::string name;			///< Formal name of the payload
   int4 type;			///< Type of this payload: CALLFIXUP_TYPE, CALLOTHERFIXUP_TYPE, etc.
   bool dynamic;			///< True if the injection is generated dynamically
   int4 paramshift;		///< Number of parameters shifted in the original call
-  vector<InjectParameter> inputlist;		///< List of input parameters to this payload
-  vector<InjectParameter> output;		///< List of output parameters
-  static void readParameter(const Element *el,string &name,uint4 &size);
+  std::vector<InjectParameter> inputlist;		///< List of input parameters to this payload
+  std::vector<InjectParameter> output;		///< List of output parameters
+  static void readParameter(const Element *el,std::string &name,uint4 &size);
   void orderParameters(void);			///< Assign an index to parameters
 public:
-  InjectPayload(const string &nm,int4 tp) { name=nm; type=tp; paramshift=0; dynamic = false; }	///< Construct for use with restoreXml
+  InjectPayload(const std::string &nm,int4 tp) { name=nm; type=tp; paramshift=0; dynamic = false; }	///< Construct for use with restoreXml
   int4 getParamShift(void) const { return paramshift; }	///< Get the number of parameters shifted
   bool isDynamic(void) const { return dynamic; }	///< Return \b true if p-code in the injection is generated dynamically
   int4 sizeInput(void) const { return inputlist.size(); }	///< Return the number of input parameters
@@ -116,10 +116,10 @@ public:
   virtual void inject(InjectContext &context,PcodeEmit &emit) const=0;
 
   virtual void restoreXml(const Element *el);		///< Restore \b this payload from an XML stream
-  virtual void printTemplate(ostream &s) const=0;	///< Print the p-code ops of the injection to a stream (for debugging)
-  string getName(void) const { return name; }		///< Return the name of the injection
+  virtual void printTemplate(std::ostream &s) const=0;	///< Print the p-code ops of the injection to a stream (for debugging)
+  std::string getName(void) const { return name; }		///< Return the name of the injection
   int4 getType(void) const { return type; }		///< Return the type of injection (CALLFIXUP_TYPE, CALLOTHERFIXUP_TYPE, etc.)
-  virtual string getSource(void) const=0;		///< Return a string describing the \e source of the injection (.cspec, prototype model, etc.)
+  virtual std::string getSource(void) const=0;		///< Return a std::string describing the \e source of the injection (.cspec, prototype model, etc.)
 };
 
 /// \brief A snippet of p-code that can be executed outside of normal analysis
@@ -133,18 +133,18 @@ public:
 /// and return a value from a single output parameter.
 class ExecutablePcode : public InjectPayload {
   Architecture *glb;			///< The Architecture owning \b this snippet
-  string source;			///< Description of the source of \b this snippet
+  std::string source;			///< Description of the source of \b this snippet
   bool built;				///< Whether build() method has run, setting up the emulator
   EmulateSnippet emulator;		///< The emulator
-  vector<uintb> inputList;		///< Temporary ids of input varnodes
-  vector<uintb> outputList;		///< Temporary ids of output varnodes
+  std::vector<uintb> inputList;		///< Temporary ids of input varnodes
+  std::vector<uintb> outputList;		///< Temporary ids of output varnodes
   PcodeEmit *emitter;			///< Emitter (allocated temporarily) for initializing the emulator
   void build(void);			///< Initialize the Emulate object with the snippet p-code
 public:
-  ExecutablePcode(Architecture *g,const string &src,const string &nm);	///< Constructor
+  ExecutablePcode(Architecture *g,const std::string &src,const std::string &nm);	///< Constructor
   virtual ~ExecutablePcode(void) { if (emitter != (PcodeEmit *)0) delete emitter; }
-  virtual string getSource(void) const { return source; }
-  uintb evaluate(const vector<uintb> &input);		///< Evaluate the snippet on the given inputs
+  virtual std::string getSource(void) const { return source; }
+  uintb evaluate(const std::vector<uintb> &input);		///< Evaluate the snippet on the given inputs
 };
 
 /// \brief A collection of p-code injection payloads
@@ -163,29 +163,29 @@ class PcodeInjectLibrary {
 protected:
   Architecture *glb;			///< The Architecture to which the injection payloads apply
   uintb tempbase;			///< Offset within \e unique space for allocating temporaries within a payload
-  vector<InjectPayload *> injection;	///< Registered injections
-  map<string,int4> callFixupMap;	///< Map of registered call-fixup names to injection id
-  map<string,int4> callOtherFixupMap;	///< Map of registered callother-fixup names to injection id
-  map<string,int4> callMechFixupMap;	///< Map of registered mechanism names to injection id
-  map<string,int4> scriptMap;		///< Map of registered script names to ExecutablePcode id
-  vector<string> callFixupNames;	///< Map from injectid to call-fixup name
-  vector<string> callOtherTarget;	///< Map from injectid to callother-fixup target-op name
-  vector<string> callMechTarget;	///< Map from injectid to call-mech name
-  vector<string> scriptNames;		///< Map from injectid to script name
-  void registerCallFixup(const string &fixupName,int4 injectid/* , vector<string> targets */);
-  void registerCallOtherFixup(const string &fixupName,int4 injectid);
-  void registerCallMechanism(const string &fixupName,int4 injectid);
-  void registerExeScript(const string &scriptName,int4 injectid);
+  std::vector<InjectPayload *> injection;	///< Registered injections
+  std::map<std::string,int4> callFixupMap;	///< std::map of registered call-fixup names to injection id
+  std::map<std::string,int4> callOtherFixupMap;	///< std::map of registered callother-fixup names to injection id
+  std::map<std::string,int4> callMechFixupMap;	///< std::map of registered mechanism names to injection id
+  std::map<std::string,int4> scriptMap;		///< std::map of registered script names to ExecutablePcode id
+  std::vector<std::string> callFixupNames;	///< std::map from injectid to call-fixup name
+  std::vector<std::string> callOtherTarget;	///< std::map from injectid to callother-fixup target-op name
+  std::vector<std::string> callMechTarget;	///< std::map from injectid to call-mech name
+  std::vector<std::string> scriptNames;		///< std::map from injectid to script name
+  void registerCallFixup(const std::string &fixupName,int4 injectid/* , std::vector<std::string> targets */);
+  void registerCallOtherFixup(const std::string &fixupName,int4 injectid);
+  void registerCallMechanism(const std::string &fixupName,int4 injectid);
+  void registerExeScript(const std::string &scriptName,int4 injectid);
 
   /// \brief Allocate a new InjectPayload object
   ///
   /// This acts as an InjectPayload factory. The formal name and type of the payload are given,
   /// \b this library allocates a new object that fits with its storage scheme and returns the id.
-  /// \param sourceName is a string describing the source of the new payload
+  /// \param sourceName is a std::string describing the source of the new payload
   /// \param name is the formal name of the payload
   /// \param type is the formal type (CALLFIXUP_TYPE, CALLOTHERFIXUP_TYPE, etc.) of the payload
   /// \return the id associated with the new InjectPayload object
-  virtual int4 allocateInject(const string &sourceName,const string &name,int4 type)=0;
+  virtual int4 allocateInject(const std::string &sourceName,const std::string &name,int4 type)=0;
 
   ///\brief Finalize a payload within the library, once the payload is initialized
   ///
@@ -198,12 +198,12 @@ public:
   PcodeInjectLibrary(Architecture *g,uintb tmpbase) { glb = g; tempbase = tmpbase; }	///< Constructor
   virtual ~PcodeInjectLibrary(void);				///< Destructor
   uintb getUniqueBase(void) const { return tempbase; }		///< Get the (current) offset for building temporary registers
-  int4 getPayloadId(int4 type,const string &nm) const;		///< Map name and type to the payload id
+  int4 getPayloadId(int4 type,const std::string &nm) const;		///< std::map name and type to the payload id
   InjectPayload *getPayload(int4 id) const { return injection[id]; }	///< Get the InjectPayload by id
-  string getCallFixupName(int4 injectid) const;			///< Get the call-fixup name associated with an id
-  string getCallOtherTarget(int4 injectid) const;		///< Get the callother-fixup name associated with an id
-  string getCallMechanismName(int4 injectid) const;		///< Get the call mechanism name associated with an id
-  int4 restoreXmlInject(const string &src,const string &nm,int4 tp,const Element *el);
+  std::string getCallFixupName(int4 injectid) const;			///< Get the call-fixup name associated with an id
+  std::string getCallOtherTarget(int4 injectid) const;		///< Get the callother-fixup name associated with an id
+  std::string getCallMechanismName(int4 injectid) const;		///< Get the call mechanism name associated with an id
+  int4 restoreXmlInject(const std::string &src,const std::string &nm,int4 tp,const Element *el);
 
   /// \brief A method for reading in p-code generated externally for use in debugging
   ///
@@ -219,7 +219,7 @@ public:
   /// \param name is the formal name of the new payload
   /// \param snippetstring is the compilable snippet of p-code \e source
   /// \return the id of the new payload
-  virtual int4 manualCallFixup(const string &name,const string &snippetstring)=0;
+  virtual int4 manualCallFixup(const std::string &name,const std::string &snippetstring)=0;
 
   /// \brief Manually add a callother-fixup payload given a compilable snippet of p-code \e source
   ///
@@ -227,11 +227,11 @@ public:
   /// input and output parameters must be provided to the compiler.
   /// \param name is the formal name of the new payload
   /// \param outname is the name of the output symbol
-  /// \param inname is the ordered list of input symbol names
+  /// \param inname is the ordered std::list of input symbol names
   /// \param snippet is the compilable snippet of p-code \e source
   /// \return the id of the new payload
-  virtual int4 manualCallOtherFixup(const string &name,const string &outname,const vector<string> &inname,
-				    const string &snippet)=0;
+  virtual int4 manualCallOtherFixup(const std::string &name,const std::string &outname,const std::vector<std::string> &inname,
+				    const std::string &snippet)=0;
 
   /// \brief Retrieve a reusable context object for \b this library
   ///
@@ -245,7 +245,7 @@ public:
   /// Behaviors are pulled from the underlying architecture in order to initialize
   /// the Emulate object which services the \e p-code \e script payloads.
   /// \return the array of OpBehavior objects indexed by op-code
-  virtual const vector<OpBehavior *> &getBehaviors(void)=0;
+  virtual const std::vector<OpBehavior *> &getBehaviors(void)=0;
 };
 
 } // GhidraDec

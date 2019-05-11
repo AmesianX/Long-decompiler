@@ -18,7 +18,7 @@
 
 namespace GhidraDec {
 
-Datatype *TypeFactoryGhidra::findById(const string &n,uint8 id)
+Datatype *TypeFactoryGhidra::findById(const std::string &n,uint8 id)
 
 {
   Datatype *ct = TypeFactory::findById(n,id); // Try internal find

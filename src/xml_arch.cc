@@ -25,13 +25,13 @@ XmlArchitectureCapability::XmlArchitectureCapability(void)
   name = "xml";
 }
 
-Architecture *XmlArchitectureCapability::buildArchitecture(const string &filename,const string &target,std::ostream *estream)
+Architecture *XmlArchitectureCapability::buildArchitecture(const std::string &filename,const std::string &target,std::ostream *estream)
 
 {
   return new XmlArchitecture(filename,target,estream);
 }
 
-bool XmlArchitectureCapability::isFileMatch(const string &filename) const
+bool XmlArchitectureCapability::isFileMatch(const std::string &filename) const
 
 {
   ifstream s(filename.c_str());
@@ -82,7 +82,7 @@ void XmlArchitecture::postSpecFile(void)
 /// \param fname is the path to the executable file (containing XML)
 /// \param targ is the (optional) language id
 /// \param estream is the stream to use for the error console
-XmlArchitecture::XmlArchitecture(const string &fname,const string &targ,std::ostream *estream)
+XmlArchitecture::XmlArchitecture(const std::string &fname,const std::string &targ,std::ostream *estream)
   : SleighArchitecture(fname,targ,estream)
 
 {
@@ -113,21 +113,21 @@ void XmlArchitecture::restoreXml(DocumentStorage &store)
 
   restoreXmlHeader(el);
   {
-    istringstream s( el->getAttributeValue("adjustvma"));
-    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+    std::istringstream s( el->getAttributeValue("adjustvma"));
+    s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
     s >> adjustvma;
   }    
-  const List &list(el->getChildren());
+  const List &std::list(el->getChildren());
   List::const_iterator iter;
 
-  iter = list.begin();
-  if (iter!=list.end()) {
+  iter = std::list.begin();
+  if (iter!=std::list.end()) {
     if ((*iter)->getName() == "binaryimage") {
       store.registerTag(*iter);
       ++iter;
     }
   }
-  if (iter!=list.end()) {
+  if (iter!=std::list.end()) {
     if ((*iter)->getName() == "coretypes") {
       store.registerTag(*iter);
       ++iter;
@@ -135,7 +135,7 @@ void XmlArchitecture::restoreXml(DocumentStorage &store)
   }
   init(store);			// Load the image and configure
 
-  if (iter != list.end()) {
+  if (iter != std::list.end()) {
     store.registerTag(*iter);
     SleighArchitecture::restoreXml(store);
   }

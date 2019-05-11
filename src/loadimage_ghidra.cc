@@ -39,7 +39,7 @@ void LoadImageGhidra::loadFill(uint1 *ptr,int4 size,const Address &inaddr)
   glb->getBytes(ptr,size,inaddr);
 }
 
-string LoadImageGhidra::getArchType(void) const
+std::string LoadImageGhidra::getArchType(void) const
 
 {
   return "ghidra";

@@ -23,7 +23,7 @@ namespace GhidraDec {
 /// Any other value causes an exception.
 /// \param p is the parameter
 /// \return the parsed boolean value
-bool ArchOption::onOrOff(const string &p)
+bool ArchOption::onOrOff(const std::string &p)
 
 {
   if (p.size()==0)
@@ -36,7 +36,7 @@ bool ArchOption::onOrOff(const string &p)
 }
 
 /// To facilitate command parsing, enter the new ArchOption instance into
-/// the map based on its name
+/// the std::map based on its name
 /// \param option is the new ArchOption instance
 void OptionDatabase::registerOption(ArchOption *option)
 
@@ -44,7 +44,7 @@ void OptionDatabase::registerOption(ArchOption *option)
   optionmap[option->getName()] = option;
 }
 
-/// Register all possible ArchOption objects with this database and set-up the parsing map.
+/// Register all possible ArchOption objects with this database and std::set-up the parsing std::map.
 /// \param g is the Architecture owning \b this database
 OptionDatabase::OptionDatabase(Architecture *g)
 
@@ -85,7 +85,7 @@ OptionDatabase::OptionDatabase(Architecture *g)
 OptionDatabase::~OptionDatabase(void)
 
 {
-  map<string,ArchOption *>::iterator iter;
+  std::map<std::string,ArchOption *>::iterator iter;
   for(iter=optionmap.begin();iter!=optionmap.end();++iter)
     delete (*iter).second;
 }
@@ -96,10 +96,10 @@ OptionDatabase::~OptionDatabase(void)
 /// \param p2 is the second optional parameter
 /// \param p3 is the third optional parameter
 /// \return the confirmation/failure method after trying to apply the option
-string OptionDatabase::set(const string &nm,const string &p1,const string &p2,const string &p3)
+std::string OptionDatabase::std::set(const std::string &nm,const std::string &p1,const std::string &p2,const std::string &p3)
 
 {
-  map<string,ArchOption *>::const_iterator iter;
+  std::map<std::string,ArchOption *>::const_iterator iter;
   iter = optionmap.find(nm);
   if (iter == optionmap.end())
     throw ParseError("Unknown option: "+nm);
@@ -107,35 +107,35 @@ string OptionDatabase::set(const string &nm,const string &p1,const string &p2,co
   return opt->apply(glb,p1,p2,p3);
 }
 
-/// Unwrap the name and optional parameters and call method set()
+/// Unwrap the name and optional parameters and call method std::set()
 /// \param el is the command XML tag
 void OptionDatabase::parseOne(const Element *el)
 
 {
-  const string &optname( el->getName() );
-  const List &list(el->getChildren());
+  const std::string &optname( el->getName() );
+  const List &std::list(el->getChildren());
   List::const_iterator iter;
   
-  string p1,p2,p3;
+  std::string p1,p2,p3;
 
-  iter = list.begin();
-  if (iter != list.end()) {
+  iter = std::list.begin();
+  if (iter != std::list.end()) {
     p1 = (*iter)->getContent();
     ++iter;
-    if (iter != list.end()) {
+    if (iter != std::list.end()) {
       p2 = (*iter)->getContent();
       ++iter;
-      if (iter != list.end()) {
+      if (iter != std::list.end()) {
 	p3 = (*iter)->getContent();
 	++iter;
-	if (iter != list.end())
+	if (iter != std::list.end())
 	  throw LowlevelError("Too many parameters to option: "+optname);
       }
     }
   }
   else
     p1 = el->getContent();	// If no children, content is param 1
-  set(optname,p1,p2,p3);
+  std::set(optname,p1,p2,p3);
 }
 
 /// Parse the \<optionslist> tag, treating each sub-tag as an \e option \e command.
@@ -143,10 +143,10 @@ void OptionDatabase::parseOne(const Element *el)
 void OptionDatabase::restoreXml(const Element *el)
 
 {
-  const List &list(el->getChildren());
+  const List &std::list(el->getChildren());
   List::const_iterator iter;
 
-  for(iter=list.begin();iter!=list.end();++iter)
+  for(iter=std::list.begin();iter!=std::list.end();++iter)
     parseOne(*iter);
 }
 
@@ -161,16 +161,16 @@ void OptionDatabase::restoreXml(const Element *el)
 ///
 /// The second parameter, if present, indicates a specific function to modify. Otherwise,
 /// the default prototype model is modified.
-string OptionExtraPop::apply(Architecture *glb,const string &p1,const string &p2,const string &p3) const
+std::string OptionExtraPop::apply(Architecture *glb,const std::string &p1,const std::string &p2,const std::string &p3) const
 
 {
   int4 expop = -300;
-  string res;
+  std::string res;
   if (p1 == "unknown")
     expop = ProtoModel::extrapop_unknown;
   else {
-    istringstream s1(p1);
-    s1.unsetf(ios::dec | ios::hex | ios::oct); // Let user specify base
+    std::istringstream s1(p1);
+    s1.unsetf(std::ios::stddec | std::ios::dec | std::ios::oct); // Let user specify base
     s1 >> expop;
   }
   if (expop == -300)
@@ -181,7 +181,7 @@ string OptionExtraPop::apply(Architecture *glb,const string &p1,const string &p2
     if (fd == (Funcdata *)0)
       throw RecovError("Unknown function name: "+p2);
     fd->getFuncProto().setExtraPop(expop);
-    res = "ExtraPop set for function "+p2;
+    res = "ExtraPop std::set for function "+p2;
   }
   else {
     glb->defaultfp->setExtraPop(expop);
@@ -189,7 +189,7 @@ string OptionExtraPop::apply(Architecture *glb,const string &p1,const string &p2
       glb->evalfp_current->setExtraPop(expop);
     if (glb->evalfp_called != (ProtoModel *)0)
       glb->evalfp_called->setExtraPop(expop);
-    res = "Global extrapop set";
+    res = "Global extrapop std::set";
   }
   return res;
 }
@@ -199,11 +199,11 @@ string OptionExtraPop::apply(Architecture *glb,const string &p1,const string &p2
 ///
 /// Setting this to "on", causes the decompiler to treat read-only memory locations as
 /// constants that can be propagated.
-string OptionReadOnly::apply(Architecture *glb,const string &p1,const string &p2,const string &p3) const
+std::string OptionReadOnly::apply(Architecture *glb,const std::string &p1,const std::string &p2,const std::string &p3) const
 
 {
   if (p1.size()==0)
-    throw ParseError("Read-only option must be set \"on\" or \"off\"");
+    throw ParseError("Read-only option must be std::set \"on\" or \"off\"");
   glb->readonlypropagate = onOrOff(p1);
   if (glb->readonlypropagate)
     return "Read-only memory locations now propagate as constants";
@@ -214,7 +214,7 @@ string OptionReadOnly::apply(Architecture *glb,const string &p1,const string &p2
 /// \brief Set the default prototype model for analyzing unknown functions
 ///
 /// The first parameter must give the name of a registered prototype model.
-string OptionDefaultPrototype::apply(Architecture *glb,const string &p1,const string &p2,const string &p3) const
+std::string OptionDefaultPrototype::apply(Architecture *glb,const std::string &p1,const std::string &p2,const std::string &p3) const
 
 {
   glb->setDefaultModel(p1);
@@ -226,18 +226,18 @@ string OptionDefaultPrototype::apply(Architecture *glb,const string &p1,const st
 ///
 /// Setting the first parameter to "on" causes the decompiler to check if unknown
 /// constants look like a reference to a known symbol's location.
-string OptionInferConstPtr::apply(Architecture *glb,const string &p1,const string &p2,const string &p3) const
+std::string OptionInferConstPtr::apply(Architecture *glb,const std::string &p1,const std::string &p2,const std::string &p3) const
 
 {
   bool val = onOrOff(p1);
 
-  string res;
+  std::string res;
   if (val) {
     res = "Constant pointers are now inferred";
     glb->infer_pointers = true;
   }
   else {
-    res = "Constant pointers must now be set explicitly";
+    res = "Constant pointers must now be std::set explicitly";
     glb->infer_pointers = false;
   }
   return res;
@@ -247,8 +247,8 @@ string OptionInferConstPtr::apply(Architecture *glb,const string &p1,const strin
 /// \brief Mark/unmark a specific function as \e inline
 ///
 /// The first parameter gives the symbol name of a function. The second parameter is
-/// true" to set the \e inline property, "false" to clear.
-string OptionInline::apply(Architecture *glb,const string &p1,const string &p2,const string &p3) const
+/// true" to std::set the \e inline property, "false" to clear.
+std::string OptionInline::apply(Architecture *glb,const std::string &p1,const std::string &p2,const std::string &p3) const
 
 {
   Funcdata *infd = glb->symboltab->getGlobalScope()->queryFunction( p1 );
@@ -260,12 +260,12 @@ string OptionInline::apply(Architecture *glb,const string &p1,const string &p2,c
   else
     val = (p2 == "true");
   infd->getFuncProto().setInline(val);
-  string prop;
+  std::string prop;
   if (val)
     prop = "true";
   else
     prop = "false";
-  string res = "Inline property for function "+p1+" = "+prop;
+  std::string res = "Inline property for function "+p1+" = "+prop;
   return res;
 }
 
@@ -274,7 +274,7 @@ string OptionInline::apply(Architecture *glb,const string &p1,const string &p2,c
 ///
 /// The first parameter is the symbol name of the function. The second parameter
 /// is "true" to enable the \e noreturn property, "false" to disable.
-string OptionNoReturn::apply(Architecture *glb,const string &p1,const string &p2,const string &p3) const
+std::string OptionNoReturn::apply(Architecture *glb,const std::string &p1,const std::string &p2,const std::string &p3) const
 
 {
   Funcdata *infd = glb->symboltab->getGlobalScope()->queryFunction( p1 );
@@ -286,12 +286,12 @@ string OptionNoReturn::apply(Architecture *glb,const string &p1,const string &p2
   else
     val = (p2 == "true");
   infd->getFuncProto().setNoReturn(val);
-  string prop;
+  std::string prop;
   if (val)
     prop = "true";
   else
     prop = "false";
-  string res = "No return property for function "+p1+" = "+prop;
+  std::string res = "No return property for function "+p1+" = "+prop;
   return res;
 }
 
@@ -299,17 +299,17 @@ string OptionNoReturn::apply(Architecture *glb,const string &p1,const string &p2
 /// \brief Alter the "structure alignment" data organization setting
 ///
 /// The first parameter must an integer value indicating the desired alignment
-string OptionStructAlign::apply(Architecture *glb,const string &p1,const string &p2,const string &p3) const
+std::string OptionStructAlign::apply(Architecture *glb,const std::string &p1,const std::string &p2,const std::string &p3) const
 
 {
   int4 val  = -1;
-  istringstream s(p1);
-  s >> dec >> val;
+  std::istringstream s(p1);
+  s >> stddec >> val;
   if (val == -1)
     throw ParseError("Missing alignment value");
 
   glb->types->setStructAlign(val);
-  return "Structure alignment set";
+  return "Structure alignment std::set";
 }
 
 /// \class OptionWarning
@@ -317,7 +317,7 @@ string OptionStructAlign::apply(Architecture *glb,const string &p1,const string 
 ///
 /// The first parameter gives the name of the Action or RuleAction.  The second parameter
 /// is "on" to turn on warnings, "off" to turn them off.
-string OptionWarning::apply(Architecture *glb,const string &p1,const string &p2,const string &p3) const
+std::string OptionWarning::apply(Architecture *glb,const std::string &p1,const std::string &p2,const std::string &p3) const
 
 {
   if (p1.size()==0)
@@ -330,14 +330,14 @@ string OptionWarning::apply(Architecture *glb,const string &p1,const string &p2,
   bool res = glb->allacts.getCurrent()->setWarning(val,p1);
   if (!res)
     throw RecovError("Bad action/rule specifier: "+p1);
-  string prop;
+  std::string prop;
   prop = val ? "on" : "off";
   return "Warnings for "+p1+" turned "+prop;
 }
 
 /// \class OptionNullPrinting
-/// \brief Toggle whether null pointers should be printed as the string "NULL"
-string OptionNullPrinting::apply(Architecture *glb,const string &p1,const string &p2,const string &p3) const
+/// \brief Toggle whether null pointers should be printed as the std::string "NULL"
+std::string OptionNullPrinting::apply(Architecture *glb,const std::string &p1,const std::string &p2,const std::string &p3) const
 
 {
   bool val = onOrOff(p1);
@@ -345,52 +345,52 @@ string OptionNullPrinting::apply(Architecture *glb,const string &p1,const string
     return "Only c-language accepts the null printing option";
   PrintC *lng = (PrintC *)glb->print;
   lng->setNULLPrinting(val);
-  string prop;
+  std::string prop;
   prop = val ? "on" : "off";
   return "Null printing turned "+prop;
 }
 
 /// \class OptionInPlaceOps
 /// \brief Toggle whether \e in-place operators (+=, *=, &=, etc.) are emitted by the decompiler
-string OptionInPlaceOps::apply(Architecture *glb,const string &p1,const string &p2,const string &p3) const
+std::string OptionInPlaceOps::apply(Architecture *glb,const std::string &p1,const std::string &p2,const std::string &p3) const
 
 {
   bool val = onOrOff(p1);
   if (glb->print->getName() != "c-language")
-    return "Can only set inplace operators for C language";
+    return "Can only std::set inplace operators for C language";
   PrintC *lng = (PrintC *)glb->print;
   lng->setInplaceOps(val);
-  string prop;
+  std::string prop;
   prop = val ? "on" : "off";
   return "Inplace operators turned "+prop;
 }
 
 /// \class OptionConventionPrinting
 /// \brief Toggle whether the \e calling \e convention is printed when emitting function prototypes
-string OptionConventionPrinting::apply(Architecture *glb,const string &p1,const string &p2,const string &p3) const
+std::string OptionConventionPrinting::apply(Architecture *glb,const std::string &p1,const std::string &p2,const std::string &p3) const
 
 {
   bool val = onOrOff(p1);
   if (glb->print->getName() != "c-language")
-    return "Can only set convention printing for C language";
+    return "Can only std::set convention printing for C language";
   PrintC *lng = (PrintC *)glb->print;
   lng->setConvention(val);
-  string prop;
+  std::string prop;
   prop = val ? "on" : "off";
   return "Convention printing turned "+prop;
 }
 
 /// \class OptionNoCastPrinting
 /// \brief Toggle whether \e cast syntax is emitted by the decompiler or stripped
-string OptionNoCastPrinting::apply(Architecture *glb,const string &p1,const string &p2,const string &p3) const
+std::string OptionNoCastPrinting::apply(Architecture *glb,const std::string &p1,const std::string &p2,const std::string &p3) const
 
 {
   bool val = onOrOff(p1);
   PrintC *lng = dynamic_cast<PrintC *>(glb->print);
   if (lng == (PrintC *)0)
-    return "Can only set no cast printing for C language";
+    return "Can only std::set no cast printing for C language";
   lng->setNoCastPrinting(val);
-  string prop;
+  std::string prop;
   prop = val ? "on" : "off";
   return "No cast printing turned "+prop;
 }
@@ -400,34 +400,34 @@ string OptionNoCastPrinting::apply(Architecture *glb,const string &p1,const stri
 ///
 /// The first parameter is an integer value passed to the pretty printer as the maximum
 /// number of characters to emit in a single line before wrapping.
-string OptionMaxLineWidth::apply(Architecture *glb,const string &p1,const string &p2,const string &p3) const
+std::string OptionMaxLineWidth::apply(Architecture *glb,const std::string &p1,const std::string &p2,const std::string &p3) const
 
 {
-  istringstream s(p1);
-  s.unsetf(ios::dec | ios::hex | ios::oct);
+  std::istringstream s(p1);
+  s.unsetf(std::ios::stddec | std::ios::dec | std::ios::oct);
   int4 val = -1;
   s >> val;
   if (val==-1)
     throw ParseError("Must specify integer linewidth");
   glb->print->setMaxLineSize(val);
-  return "Maximum line width set to "+p1;
+  return "Maximum line width std::set to "+p1;
 }
 
 /// \class OptionIndentIncrement
 /// \brief Set the number of characters to indent per nested scope.
 ///
 /// The first parameter is the integer value specifying how many characters to indent.
-string OptionIndentIncrement::apply(Architecture *glb,const string &p1,const string &p2,const string &p3) const
+std::string OptionIndentIncrement::apply(Architecture *glb,const std::string &p1,const std::string &p2,const std::string &p3) const
 
 {
-  istringstream s(p1);
-  s.unsetf(ios::dec | ios::hex | ios::oct);
+  std::istringstream s(p1);
+  s.unsetf(std::ios::stddec | std::ios::dec | std::ios::oct);
   int4 val = -1;
   s >> val;
   if (val==-1)
     throw ParseError("Must specify integer increment");
   glb->print->setIndentIncrement(val);
-  return "Characters per indent level set to "+p1;
+  return "Characters per indent level std::set to "+p1;
 }
 
 /// \class OptionCommentIndent
@@ -435,28 +435,28 @@ string OptionIndentIncrement::apply(Architecture *glb,const string &p1,const str
 ///
 /// The first parameter gives the integer value.  Comment lines are indented this much independent
 /// of the associated code's nesting depth.
-string OptionCommentIndent::apply(Architecture *glb,const string &p1,const string &p2,const string &p3) const
+std::string OptionCommentIndent::apply(Architecture *glb,const std::string &p1,const std::string &p2,const std::string &p3) const
 
 {
-  istringstream s(p1);
-  s.unsetf(ios::dec | ios::hex | ios::oct);
+  std::istringstream s(p1);
+  s.unsetf(std::ios::stddec | std::ios::dec | std::ios::oct);
   int4 val = -1;
   s >> val;
   if (val==-1)
     throw ParseError("Must specify integer comment indent");
   glb->print->setLineCommentIndent(val);
-  return "Comment indent set to "+p1;
+  return "Comment indent std::set to "+p1;
 }
 
 /// \class OptionCommentStyle
 /// \brief Set the style of comment emitted by the decompiler
 ///
-/// The first parameter is either "c", "cplusplus", a string starting with "/*", or a string starting with "//"
-string OptionCommentStyle::apply(Architecture *glb,const string &p1,const string &p2,const string &p3) const
+/// The first parameter is either "c", "cplusplus", a std::string starting with "/*", or a std::string starting with "//"
+std::string OptionCommentStyle::apply(Architecture *glb,const std::string &p1,const std::string &p2,const std::string &p3) const
 
 {
   glb->print->setCommentStyle(p1);
-  return "Comment style set to "+p1;
+  return "Comment style std::set to "+p1;
 }
 
 /// \class OptionCommentHeader
@@ -464,7 +464,7 @@ string OptionCommentStyle::apply(Architecture *glb,const string &p1,const string
 ///
 /// The first parameter specifies the comment type: "header" and "warningheader"
 /// The second parameter is the toggle value "on" or "off".
-string OptionCommentHeader::apply(Architecture *glb,const string &p1,const string &p2,const string &p3) const
+std::string OptionCommentHeader::apply(Architecture *glb,const std::string &p1,const std::string &p2,const std::string &p3) const
 
 {
   bool toggle = onOrOff(p2);
@@ -475,7 +475,7 @@ string OptionCommentHeader::apply(Architecture *glb,const string &p1,const strin
   else
     flags &= ~val;
   glb->print->setHeaderComment(flags);
-  string prop;
+  std::string prop;
   prop = toggle ? "on" : "off";
   return "Header comment type "+p1+" turned "+prop;
 }
@@ -485,7 +485,7 @@ string OptionCommentHeader::apply(Architecture *glb,const string &p1,const strin
 ///
 /// The first parameter specifies the comment type: "warning", "user1", "user2", etc.
 /// The second parameter is the toggle value "on" or "off".
-string OptionCommentInstruction::apply(Architecture *glb,const string &p1,const string &p2,const string &p3) const
+std::string OptionCommentInstruction::apply(Architecture *glb,const std::string &p1,const std::string &p2,const std::string &p3) const
 
 {
   bool toggle = onOrOff(p2);
@@ -496,7 +496,7 @@ string OptionCommentInstruction::apply(Architecture *glb,const string &p1,const 
   else
     flags &= ~val;
   glb->print->setInstructionComment(flags);
-  string prop;
+  std::string prop;
   prop = toggle ? "on" : "off";
   return "Instruction comment type "+p1+" turned "+prop;
 }
@@ -504,12 +504,12 @@ string OptionCommentInstruction::apply(Architecture *glb,const string &p1,const 
 /// \class OptionIntegerFormat
 /// \brief Set the formatting strategy used by the decompiler to emit integers
 ///
-/// The first parameter is the strategy name: "hex", "dec", or "best"
-string OptionIntegerFormat::apply(Architecture *glb,const string &p1,const string &p2,const string &p3) const
+/// The first parameter is the strategy name: "std::dec", "stddec", or "best"
+std::string OptionIntegerFormat::apply(Architecture *glb,const std::string &p1,const std::string &p2,const std::string &p3) const
 
 {
   glb->print->setIntegerFormat(p1);
-  return "Integer format set to "+p1;
+  return "Integer format std::set to "+p1;
 }
 
 /// \class OptionSetAction
@@ -518,8 +518,8 @@ string OptionIntegerFormat::apply(Architecture *glb,const string &p1,const strin
 /// The first parameter specifies the name of the root Action. If a second parameter
 /// is given, it specifies the name of a new root Action, which  is created by copying the
 /// Action specified with the first parameter.  In this case, the current root Action is
-/// set to the new copy, which can then by modified
-string OptionSetAction::apply(Architecture *glb,const string &p1,const string &p2,const string &p3) const
+/// std::set to the new copy, which can then by modified
+std::string OptionSetAction::apply(Architecture *glb,const std::string &p1,const std::string &p2,const std::string &p3) const
 
 {
   if (p1.size()==0)
@@ -540,15 +540,15 @@ string OptionSetAction::apply(Architecture *glb,const string &p1,const string &p
 /// If two parameters are given, the first indicates the name of the sub-group, and the second is
 /// the toggle value, "on" or "off". The change is applied to the current root Action.
 ///
-/// If three parameters are given, the first indicates the root Action (which will be set as current)
+/// If three parameters are given, the first indicates the root Action (which will be std::set as current)
 /// to modify. The second and third parameters give the name of the sub-group and the toggle value.
-string OptionCurrentAction::apply(Architecture *glb,const string &p1,const string &p2,const string &p3) const
+std::string OptionCurrentAction::apply(Architecture *glb,const std::string &p1,const std::string &p2,const std::string &p3) const
 
 {
   if ((p1.size()==0)||(p2.size()==0))
     throw ParseError("Must specify subaction, on/off");
   bool val;
-  string res = "Toggled ";
+  std::string res = "Toggled ";
 
   if (p3.size() != 0) {
     glb->allacts.setCurrent(p1);
@@ -569,13 +569,13 @@ string OptionCurrentAction::apply(Architecture *glb,const string &p1,const strin
 /// \brief Toggle whether the disassembly engine is allowed to modify context
 ///
 /// If the first parameter is "on", disassembly can make changes to context
-string OptionAllowContextSet::apply(Architecture *glb,const string &p1,const string &p2,const string &p3) const
+std::string OptionAllowContextSet::apply(Architecture *glb,const std::string &p1,const std::string &p2,const std::string &p3) const
 
 {
   bool val = onOrOff(p1);
 
-  string prop = val ? "on" : "off";
-  string res = "Toggled allowcontextset to "+prop;
+  std::string prop = val ? "on" : "off";
+  std::string res = "Toggled allowcontextset to "+prop;
   glb->translate->allowContextSet(val);
 
   return res;
@@ -586,12 +586,12 @@ string OptionAllowContextSet::apply(Architecture *glb,const string &p1,const str
 ///
 /// If the first parameter is "on", unimplemented instructions are ignored, otherwise
 /// they are treated as an artificial \e halt in the control flow.
-string OptionIgnoreUnimplemented::apply(Architecture *glb,const string &p1,const string &p2,const string &p3) const
+std::string OptionIgnoreUnimplemented::apply(Architecture *glb,const std::string &p1,const std::string &p2,const std::string &p3) const
 
 {
   bool val = onOrOff(p1);
 
-  string res;
+  std::string res;
   if (val) {
     res = "Unimplemented instructions are now ignored (treated as nop)";
     glb->flowoptions |= FlowInfo::ignore_unimplemented;
@@ -609,12 +609,12 @@ string OptionIgnoreUnimplemented::apply(Architecture *glb,const string &p1,const
 ///
 /// If the first parameter is "on", decompilation of functions with unimplemented instructions
 /// will terminate with a fatal error message. Otherwise, warning comments will be generated.
-string OptionErrorUnimplemented::apply(Architecture *glb,const string &p1,const string &p2,const string &p3) const
+std::string OptionErrorUnimplemented::apply(Architecture *glb,const std::string &p1,const std::string &p2,const std::string &p3) const
 
 {
   bool val = onOrOff(p1);
 
-  string res;
+  std::string res;
   if (val) {
     res = "Unimplemented instructions are now a fatal error";
     glb->flowoptions |= FlowInfo::error_unimplemented;
@@ -632,12 +632,12 @@ string OptionErrorUnimplemented::apply(Architecture *glb,const string &p1,const 
 ///
 /// If the first parameter is "on", interpreting the same code bytes at two or more different
 /// \e cuts, during disassembly, is considered a fatal error.
-string OptionErrorReinterpreted::apply(Architecture *glb,const string &p1,const string &p2,const string &p3) const
+std::string OptionErrorReinterpreted::apply(Architecture *glb,const std::string &p1,const std::string &p2,const std::string &p3) const
 
 {
   bool val = onOrOff(p1);
 
-  string res;
+  std::string res;
   if (val) {
     res = "Instruction reinterpretation is now a fatal error";
     glb->flowoptions |= FlowInfo::error_reinterpreted;
@@ -655,12 +655,12 @@ string OptionErrorReinterpreted::apply(Architecture *glb,const string &p1,const 
 /// If the first parameter is "on" and the number of instructions in a single function body exceeds
 /// the threshold, then decompilation will halt for that function with a fatal error. Otherwise,
 /// artificial halts are generated to prevent control-flow into further instructions.
-string OptionErrorTooManyInstructions::apply(Architecture *glb,const string &p1,const string &p2,const string &p3) const
+std::string OptionErrorTooManyInstructions::apply(Architecture *glb,const std::string &p1,const std::string &p2,const std::string &p3) const
 
 {
   bool val = onOrOff(p1);
 
-  string res;
+  std::string res;
   if (val) {
     res = "Too many instructions are now a fatal error";
     glb->flowoptions |= FlowInfo::error_toomanyinstructions;
@@ -676,11 +676,11 @@ string OptionErrorTooManyInstructions::apply(Architecture *glb,const string &p1,
 /// \class OptionProtoEval
 /// \brief Set the prototype model to use when evaluating the parameters of the \e current function
 ///
-/// The first parameter gives the name of the prototype model. The string "default" can be given
+/// The first parameter gives the name of the prototype model. The std::string "default" can be given
 /// to refer to the format \e default model for the architecture. The specified model is used to
 /// evaluate parameters of the function actively being decompiled, which may be distinct from the
 /// model used to evaluate sub-functions.
-string OptionProtoEval::apply(Architecture *glb,const string &p1,const string &p2,const string &p3) const
+std::string OptionProtoEval::apply(Architecture *glb,const std::string &p1,const std::string &p2,const std::string &p3) const
 
 {
   ProtoModel *model = (ProtoModel *)0;
@@ -695,7 +695,7 @@ string OptionProtoEval::apply(Architecture *glb,const string &p1,const string &p
     if (model == (ProtoModel *)0)
       throw ParseError("Unknown prototype model: "+p1);
   }
-  string res = "Set current evaluation to " + p1;
+  std::string res = "Set current evaluation to " + p1;
   glb->evalfp_current = model;
   return res;
 }
@@ -704,10 +704,10 @@ string OptionProtoEval::apply(Architecture *glb,const string &p1,const string &p
 /// \brief Set the current language emitted by the decompiler
 ///
 /// The first specifies the name of the language to emit: "c-language", "java-language", etc.
-string OptionSetLanguage::apply(Architecture *glb,const string &p1,const string &p2,const string &p3) const
+std::string OptionSetLanguage::apply(Architecture *glb,const std::string &p1,const std::string &p2,const std::string &p3) const
 
 {
-  string res;
+  std::string res;
 
   glb->setPrintLanguage(p1);
   res = "Decompiler produces "+p1;
@@ -719,12 +719,12 @@ string OptionSetLanguage::apply(Architecture *glb,const string &p1,const string 
 ///
 /// If the first parameter is "on", the decompiler will record the memory locations with constant values
 /// that were accessed as part of the jump-table so that they can be formally labeled.
-string OptionJumpLoad::apply(Architecture *glb,const string &p1,const string &p2,const string &p3) const
+std::string OptionJumpLoad::apply(Architecture *glb,const std::string &p1,const std::string &p2,const std::string &p3) const
 
 {
   bool val = onOrOff(p1);
 
-  string res;
+  std::string res;
   if (val) {
     res = "Jumptable analysis will record loads required to calculate jump address";
     glb->flowoptions |= FlowInfo::record_jumploads;
@@ -741,7 +741,7 @@ string OptionJumpLoad::apply(Architecture *glb,const string &p1,const string &p2
 ///
 /// The first parameter must be a name \e path describing the unique Rule instance
 /// to be toggled.  The second parameter is "on" to \e enable the Rule, "off" to \e disable.
-string OptionToggleRule::apply(Architecture *glb,const string &p1,const string &p2,const string &p3) const
+std::string OptionToggleRule::apply(Architecture *glb,const std::string &p1,const std::string &p2,const std::string &p3) const
 
 {
   if (p1.size() == 0)
@@ -753,7 +753,7 @@ string OptionToggleRule::apply(Architecture *glb,const string &p1,const string &
   Action *root = glb->allacts.getCurrent();
   if (root == (Action *)0)
     throw LowlevelError("Missing current action");
-  string res;
+  std::string res;
   if (!val) {
     if (root->disableRule(p1))
       res = "Successfully disabled";

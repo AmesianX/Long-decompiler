@@ -81,7 +81,7 @@ public:
   void setCurrentOp(PcodeOp *op) { currentOp = op; currentBehave = op->getOpcode()->getBehavior(); }
   virtual Address getExecuteAddress(void) const { return currentOp->getAddr(); }
 
-  /// \brief Given a specific Varnode, set the given value for it in the current machine state
+  /// \brief Given a specific Varnode, std::set the given value for it in the current machine state
   ///
   /// This is the placeholder internal operation for setting a Varnode value during emulation.
   /// The value is \e stored using the Varnode as the \e address and \e storage \e size.
@@ -107,14 +107,14 @@ public:
 /// ops is treated as illegal and an exception is thrown.
 /// Expressions can only use temporary registers or read from the LoadImage.
 ///
-/// The set of PcodeOpRaw objects in the snippet is provided by emitting p-code to the object
+/// The std::set of PcodeOpRaw objects in the snippet is provided by emitting p-code to the object
 /// returned by buildEmitter().  This is designed for one-time initialization of this
 /// class, which can be repeatedly used by calling resetMemory() between executions.
 class EmulateSnippet : public Emulate {
   Architecture *glb;			///< The underlying Architecture for the program being emulated
-  vector<PcodeOpRaw *> opList;		///< Sequence of p-code ops to be executed
-  vector<VarnodeData *> varList;	///< Varnodes allocated for ops
-  map<uintb,uintb> tempValues;		///< Values stored in temporary registers
+  std::vector<PcodeOpRaw *> opList;		///< Sequence of p-code ops to be executed
+  std::vector<VarnodeData *> varList;	///< Varnodes allocated for ops
+  std::map<uintb,uintb> tempValues;		///< Values stored in temporary registers
   PcodeOpRaw *currentOp;		///< Current p-code op being executed
   int4 pos;				///< Index of current p-code op being executed
 
@@ -152,21 +152,21 @@ public:
 
   /// \brief Reset the emulation snippet
   ///
-  /// Reset the memory state, and set the first p-code op as current.
+  /// Reset the memory state, and std::set the first p-code op as current.
   void resetMemory(void) { tempValues.clear(); setCurrentOp(0); emu_halted = false; }
 
-  PcodeEmit *buildEmitter(const vector<OpBehavior *> &inst,uintb uniqReserve);
+  PcodeEmit *buildEmitter(const std::vector<OpBehavior *> &inst,uintb uniqReserve);
   bool checkForLegalCode(void) const;
 
   /// \brief Set the current executing p-code op by index
   ///
-  /// The i-th p-code op in the snippet sequence is set as the currently executing op.
+  /// The i-th p-code op in the snippet sequence is std::set as the currently executing op.
   /// \param i is the index
   void setCurrentOp(int4 i) { pos = i; currentOp = opList[i]; currentBehave = currentOp->getBehavior(); }
 
   /// \brief Set a temporary register value in the machine state
   ///
-  /// The temporary Varnode's storage offset is used as key into the machine state map.
+  /// The temporary Varnode's storage offset is used as key into the machine state std::map.
   /// \param offset is the temporary storage offset
   /// \param val is the value to put into the machine state
   void setVarnodeValue(uintb offset,uintb val) { tempValues[offset] = val; }

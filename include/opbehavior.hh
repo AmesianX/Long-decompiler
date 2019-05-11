@@ -27,12 +27,12 @@ class Translate;		// Forward declaration
 /// This exception is thrown when emulation evaluation of an operator fails for some reason.
 /// This can be thrown for either forward or reverse emulation
 struct EvaluationError : public LowlevelError {
-  EvaluationError(const string &s) : LowlevelError(s) {} ///< Initialize the error with an explanatory string
+  EvaluationError(const std::string &s) : LowlevelError(s) {} ///< Initialize the error with an explanatory std::string
 };
 
 /// \brief Class encapsulating the action/behavior of specific pcode opcodes
 ///
-/// At the lowest level, a pcode op is one of a small set of opcodes that
+/// At the lowest level, a pcode op is one of a small std::set of opcodes that
 /// operate on varnodes (address space, offset, size). Classes derived from
 /// this base class encapsulate this basic behavior for each possible opcode.
 /// These classes describe the most basic behaviors and include:
@@ -72,7 +72,7 @@ public:
   /// \brief Reverse the unary op-code operation, recovering the input value
   virtual uintb recoverInputUnary(int4 sizeout,uintb out,int4 sizein) const;
 
-  static void registerInstructions(vector<OpBehavior *> &inst,const Translate *trans); ///< Build all pcode behaviors
+  static void registerInstructions(std::vector<OpBehavior *> &inst,const Translate *trans); ///< Build all pcode behaviors
 };
 
 /// This kind of OpBehavior is associated with a particular opcode and is either unary or binary
@@ -86,7 +86,7 @@ inline OpBehavior::OpBehavior(OpCode opc,bool isun)
   isspecial = false;
 }
 
-/// This kind of OpBehavior can be set to \b special, if it neither unary or binary.
+/// This kind of OpBehavior can be std::set to \b special, if it neither unary or binary.
 /// \param opc is the opcode of the behavior
 /// \param isun is \b true if the behavior is unary
 /// \param isspec is \b true if the behavior is neither unary or binary

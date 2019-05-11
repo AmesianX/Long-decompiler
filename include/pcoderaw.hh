@@ -94,7 +94,7 @@ class PcodeOpRaw {
   OpBehavior *behave;		///< The opcode for this operation
   SeqNum seq;	                ///< Identifying address and index of this operation
   VarnodeData *out;		///< Output varnode triple
-  vector<VarnodeData *> in;	///< Raw varnode inputs to this op
+  std::vector<VarnodeData *> in;	///< Raw varnode inputs to this op
 public:
   void setBehavior(OpBehavior *be); ///< Set the opcode for this op
   OpBehavior *getBehavior(void) const; ///< Retrieve the behavior for this op
@@ -169,7 +169,7 @@ inline const Address &PcodeOpRaw::getAddr(void) const
 }
 
 /// Most pcode operations output to a varnode.  This routine sets what that varnode is.
-/// \param o is the varnode to set as output
+/// \param o is the varnode to std::set as output
 inline void PcodeOpRaw::setOutput(VarnodeData *o)
 
 {

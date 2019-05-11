@@ -30,11 +30,11 @@ namespace GhidraDec {
 /// and register extension point. Code for an extension should provide
 /// a class that derives from CapabilityPoint and overrides the initialize() method.
 /// Additionally there should be a singleton static instantiation of this extension class.
-/// The extensions are accumulated in a list automatically, then the decompiler engine
+/// The extensions are accumulated in a std::list automatically, then the decompiler engine
 /// will ensure that the initialize() method is called on each extension, allowing it
 /// to complete its integration.
 class CapabilityPoint {
-  static std::vector<CapabilityPoint *> &getList(void);	///< Retrieve the list of extension point singletons
+  static std::vector<CapabilityPoint *> &getList(void);	///< Retrieve the std::list of extension point singletons
 protected:
   CapabilityPoint(void);		///< Construct extension capability exactly once
 public:

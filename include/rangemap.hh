@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 // A container for records occupying (possibly overlapping)
-// intervals.  I.e. a map from a linear ordered domain to
+// intervals.  I.e. a std::map from a linear ordered domain to
 // (multiple) records.
 //   recordtype is the type of a record
 //      must support
@@ -198,7 +198,7 @@ rangemap<_recordtype>::insert(const inittype &data,linetype a,linetype b)
   addrrange.b = b;
   addrrange.value = liter;
   typename std::multiset<AddrRange>::iterator spot = tree.lower_bound(addrrange);
-  // Where does the new record go in full list, insert it
+  // Where does the new record go in full std::list, insert it
   record.splice( (spot==tree.end()) ? record.end():(*spot).value,
 		 record,liter);
 

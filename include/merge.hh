@@ -25,9 +25,9 @@ namespace GhidraDec {
 
 /// \brief A record for caching a Cover intersection test between two HighVariable objects
 ///
-/// This is just a pair of HighVariable objects that can be used as a map key. The main
+/// This is just a pair of HighVariable objects that can be used as a std::map key. The main
 /// Merge class uses it to cache intersection test results between the two variables in
-/// a map.
+/// a std::map.
 class HighEdge {
   friend class Merge;
   HighVariable *a;		///< First HighVariable of the pair
@@ -47,11 +47,11 @@ class BlockVarnode {
   int4 index;		///< Index of BlockBasic defining Varnode
   Varnode *vn;		///< The Varnode itself
 public:
-  void set(Varnode *v);		///< Set \b this as representing the given Varnode
+  void std::set(Varnode *v);		///< Set \b this as representing the given Varnode
   bool operator<(const BlockVarnode &op2) const { return (index < op2.index); } ///< Comparator
   Varnode *getVarnode(void) const { return vn; } ///< Get the Varnode represented by \b this
   int4 getIndex(void) const { return index; }	 ///< Get the Varnode's defining block index
-  static int4 findFront(int4 blocknum,const vector<BlockVarnode> &list);
+  static int4 findFront(int4 blocknum,const std::vector<BlockVarnode> &std::list);
 };
 
 class Funcdata;
@@ -81,7 +81,7 @@ class Funcdata;
 ///   - Merging Varnodes that hold the same data-type
 class Merge {
   Funcdata &data;		///< The function containing the Varnodes to be merged
-  map<HighEdge,bool> highedgemap; ///< A cache of intersection tests, sorted by HighVariable pair
+  std::map<HighEdge,bool> highedgemap; ///< A cache of intersection tests, sorted by HighVariable pair
   bool updateHigh(HighVariable *a); ///< Make sure given HighVariable's Cover is up-to-date
   void purgeHigh(HighVariable *high); ///< Remove cached intersection tests for a given HighVariable
   bool blockIntersection(HighVariable *a,HighVariable *b,int4 blk);
@@ -89,28 +89,28 @@ class Merge {
   static bool mergeTestAdjacent(HighVariable *high_out,HighVariable *high_in);
   static bool mergeTestSpeculative(HighVariable *high_out,HighVariable *high_in);
   static bool mergeTestBasic(Varnode *vn);
-  static void findSingleCopy(HighVariable *high,vector<Varnode *> &singlelist);
+  static void findSingleCopy(HighVariable *high,std::vector<Varnode *> &singlelist);
   static bool compareHighByBlock(const HighVariable *a,const HighVariable *b);
-  void collectCovering(vector<Varnode *> &vlist,HighVariable *high,PcodeOp *op);
-  bool collectCorrectable(const vector<Varnode *> &vlist,list<PcodeOp *> &oplist,vector<int4> &slotlist,
+  void collectCovering(std::vector<Varnode *> &vlist,HighVariable *high,PcodeOp *op);
+  bool collectCorrectable(const std::vector<Varnode *> &vlist,std::list<PcodeOp *> &oplist,std::vector<int4> &slotlist,
 			   PcodeOp *op);
-  void snipReads(Varnode *vn,list<PcodeOp *> &markedop);
+  void snipReads(Varnode *vn,std::list<PcodeOp *> &markedop);
   void snipIndirect(PcodeOp *indop);
-  void eliminateIntersect(Varnode *vn,const vector<BlockVarnode> &blocksort);
+  void eliminateIntersect(Varnode *vn,const std::vector<BlockVarnode> &blocksort);
   void unifyAddress(VarnodeLocSet::const_iterator startiter,VarnodeLocSet::const_iterator enditer);
   void trimOpOutput(PcodeOp *op);
   void trimOpInput(PcodeOp *op,int4 slot);
   void mergeRangeMust(VarnodeLocSet::const_iterator startiter,VarnodeLocSet::const_iterator enditer);
   void mergeOp(PcodeOp *op);
   void mergeIndirect(PcodeOp *indop);
-  void mergeLinear(vector<HighVariable *> &highvec);
+  void mergeLinear(std::vector<HighVariable *> &highvec);
   bool merge(HighVariable *high1,HighVariable *high2,bool isspeculative);
 public:
   Merge(Funcdata &fd) : data(fd) {} ///< Construct given a specific function
   bool intersection(HighVariable *a,HighVariable *b);
   bool inflateTest(Varnode *a,HighVariable *high);
   void inflate(Varnode *a,HighVariable *high);
-  bool mergeTest(HighVariable *high,vector<HighVariable *> &tmplist);
+  bool mergeTest(HighVariable *high,std::vector<HighVariable *> &tmplist);
 
   void mergeOpcode(OpCode opc);
   void mergeByDatatype(VarnodeLocSet::const_iterator startiter,VarnodeLocSet::const_iterator enditer);

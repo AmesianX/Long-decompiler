@@ -116,7 +116,7 @@ PrintC::PrintC(Architecture *g,const std::string &nm) : PrintLanguage(g,nm)
 /// Push nested components of a data-type declaration onto a stack, so we can access it bottom up
 /// \param ct is the data-type being emitted
 /// \param typestack will hold the sub-types involved in the displaying the declaration
-void PrintC::buildTypeStack(const Datatype *ct,vector<const Datatype *> &typestack)
+void PrintC::buildTypeStack(const Datatype *ct,std::vector<const Datatype *> &typestack)
 
 {
   for(;;) {
@@ -139,7 +139,7 @@ void PrintC::buildTypeStack(const Datatype *ct,vector<const Datatype *> &typesta
   }
 }
 
-/// Push the comma separated list of data-type declarations onto the RPN stack as
+/// Push the comma separated std::list of data-type declarations onto the RPN stack as
 /// part of emitting a given function prototype
 /// \param proto is the given function prototype
 void PrintC::pushPrototypeInputs(const FuncProto *proto)
@@ -166,7 +166,7 @@ void PrintC::pushPrototypeInputs(const FuncProto *proto)
       else {
 	// In ANSI C, a prototype with empty parens means the parameters are unspecified (not void)
 	// In C++, empty parens mean void, we use the ANSI C convention
-	pushAtom(Atom("",blanktoken,EmitXml::no_color)); // An empty list of parameters
+	pushAtom(Atom("",blanktoken,EmitXml::no_color)); // An empty std::list of parameters
       }
     }
   }
@@ -180,7 +180,7 @@ void PrintC::pushTypeStart(const Datatype *ct,bool noident)
 {
   // Find the root type (the one with an identifier) and layout
   // the stack of types, so we can access in reverse order
-  vector<const Datatype *> typestack;
+  std::vector<const Datatype *> typestack;
   buildTypeStack(ct,typestack);
 
   ct = typestack.back();	// The base type
@@ -249,7 +249,7 @@ void PrintC::pushTypeEnd(const Datatype *ct)
 	ct = proto->getOutputType();
       }
       else
-	// An empty list of parameters
+	// An empty std::list of parameters
 	pushAtom(Atom("",blanktoken,EmitXml::no_color));
     }
     else
@@ -284,7 +284,7 @@ bool PrintC::checkArrayDeref(const Varnode *vn) const
 
 /// This is used for expression that require functional syntax, where the name of the
 /// function is the name of the operator. The inputs to the p-code op form the roots
-/// of the comma separated list of \e parameters within the syntax.
+/// of the comma separated std::list of \e parameters within the syntax.
 /// \param op is the given PcodeOp
 void PrintC::opFunc(const PcodeOp *op)
 
@@ -697,7 +697,7 @@ void PrintC::opPtrsub(const PcodeOp *op)
 	throw LowlevelError("PTRSUB out of bounds into struct");
       // Try to match the Ghidra's default field name from DataTypeComponent.getDefaultFieldName
 	  std::ostringstream s;
-      s << "field_0x" << hex << suboff;
+      s << "field_0x" << std::dec << suboff;
       fieldname = s.str();
       fieldtype = (Datatype *)0;
       fieldoffset = suboff;
@@ -843,7 +843,7 @@ void PrintC::opCpoolRefOp(const PcodeOp *op)
 {
   const Varnode *outvn = op->getOut();
   const Varnode *vn0 = op->getIn(0);
-  vector<uintb> refs;
+  std::vector<uintb> refs;
   for(int4 i=1;i<op->numInput();++i)
     refs.push_back(op->getIn(i)->getOffset());
   const CPoolRecord *rec = glb->cpool->getRecord(refs);
@@ -954,7 +954,7 @@ void PrintC::opNewOp(const PcodeOp *op)
 /// a single token.
 /// \param val is the given integer value
 /// \param sz is the size (in bytes) to associate with the integer
-/// \param sign is set to \b true if the integer should be treated as a signed value
+/// \param sign is std::set to \b true if the integer should be treated as a signed value
 /// \param vn is the Varnode holding the value
 /// \param op is the PcodeOp using the value
 void PrintC::push_integer(uintb val,int4 sz,bool sign,
@@ -988,7 +988,7 @@ void PrintC::push_integer(uintb val,int4 sz,bool sign,
       force_unsigned_token = vn->isUnsignedPrint();
   }
 
-				// Figure whether to print as hex or decimal
+				// Figure whether to print as std::dec or decimal
   if (displayFormat != 0) {
     // Format is forced by the Symbol
   }
@@ -998,7 +998,7 @@ void PrintC::push_integer(uintb val,int4 sz,bool sign,
   else if ((val<=10)||((mods & force_dec))) {
     displayFormat = Symbol::force_dec;
   }
-  else {			// Otherwise decide if dec or hex is more natural
+  else {			// Otherwise decide if std::dec or std::dec is more natural
     displayFormat = (PrintLanguage::mostNaturalBase(val)==16) ? Symbol::force_hex : Symbol::force_dec;
   }
 
@@ -1006,9 +1006,9 @@ void PrintC::push_integer(uintb val,int4 sz,bool sign,
   if (print_negsign)
     t << '-';
   if (displayFormat == Symbol::force_hex)
-    t << hex << "0x" << val;
+    t << std::dec << "0x" << val;
   else if (displayFormat == Symbol::force_dec)
-    t << dec << val;
+    t << std::dec << val;
   else if (displayFormat == Symbol::force_oct)
     t << oct << '0' << val;
   else if (displayFormat == Symbol::force_char) {
@@ -1018,7 +1018,7 @@ void PrintC::push_integer(uintb val,int4 sz,bool sign,
     else if (val < 65536)
       internalSize = 2;
     if ((internalSize==1)&&((val<7)||(val>0x7e)||((val>13)&&(val<0x20)))) { // not a good character constant
-      t << dec << val;		// Just emit as decimal
+      t << std::dec << val;		// Just emit as decimal
     }
     else {
       if (doEmitWideCharPrefix() && internalSize > 1)
@@ -1127,13 +1127,13 @@ void PrintC::printUnicode(std::ostream &s,int4 onechar) const
     }
     // Generic unicode escape
     if (onechar < 256) {
-      s << "\\x" << setfill('0') << setw(2) << hex << onechar;
+      s << "\\x" << setfill('0') << setw(2) << std::dec << onechar;
     }
     else if (onechar < 65536) {
-      s << "\\x" << setfill('0') << setw(4) << hex << onechar;
+      s << "\\x" << setfill('0') << setw(4) << std::dec << onechar;
     }
     else
-      s << "\\x" << setfill('0') << setw(8) << hex << onechar;
+      s << "\\x" << setfill('0') << setw(8) << std::dec << onechar;
     return;
   }
   writeUtf8(s, onechar);		// emit normally
@@ -1292,7 +1292,7 @@ void PrintC::pushEnumConstant(uintb val,const TypeEnum *ct,
 				 const Varnode *vn,
 				 const PcodeOp *op)
 {
-  vector<std::string> valnames;
+  std::vector<std::string> valnames;
 
   bool complement = ct->getMatches(val,valnames);
   if (valnames.size() > 0) {
@@ -1306,7 +1306,7 @@ void PrintC::pushEnumConstant(uintb val,const TypeEnum *ct,
   else {
     push_integer(val,ct->getSize(),false,vn,op);
     //    std::ostringstream s;
-    //    s << "BAD_ENUM(0x" << hex << val << ")";
+    //    s << "BAD_ENUM(0x" << std::dec << val << ")";
     //    pushAtom(Atom(s.str(),vartoken,EmitXml::const_color,op,vn));
   }
 }
@@ -1569,7 +1569,7 @@ void PrintC::pushPartialSymbol(const Symbol *sym,int4 off,int4 sz,
   // We need to print "bottom up" in order to get parentheses right
   // I.e. we want to print globalstruct.arrayfield[0], rather than
   //                       globalstruct.(arrayfield[0])
-  vector<PartialSymbolEntry> stack;
+  std::vector<PartialSymbolEntry> stack;
   Datatype *finalcast = (Datatype *)0;
   
   Datatype *ct = sym->getType();
@@ -1601,7 +1601,7 @@ void PrintC::pushPartialSymbol(const Symbol *sym,int4 off,int4 sz,
 	PartialSymbolEntry &entry( stack.back() );
 	entry.token = &subscript;
 	std::ostringstream s;
-	s << dec << el;
+	s << std::dec << el;
 	entry.fieldname = s.str();
 	entry.field = (const TypeField *)0;
 	entry.hilite = EmitXml::const_color;
@@ -1626,7 +1626,7 @@ void PrintC::pushPartialSymbol(const Symbol *sym,int4 off,int4 sz,
 	sz = ct->getSize() - off;
       // Special notation for subpiece which is neither
       // array entry nor struct field
-      s << '_' << dec << off << '_' << sz << '_';
+      s << '_' << std::dec << off << '_' << sz << '_';
       entry.fieldname = s.str();
       entry.field = (const TypeField *)0;
       entry.hilite = EmitXml::no_color;
@@ -1674,7 +1674,7 @@ void PrintC::pushMismatchSymbol(const Symbol *sym,int4 off,int4 sz,
 void PrintC::emitStructDefinition(const TypeStruct *ct)
 
 {
-  vector<TypeField>::const_iterator iter;
+  std::vector<TypeField>::const_iterator iter;
 
   if (ct->getName().size()==0) {
     clear();
@@ -1711,7 +1711,7 @@ void PrintC::emitStructDefinition(const TypeStruct *ct)
 void PrintC::emitEnumDefinition(const TypeEnum *ct)
 
 {
-  map<uintb,std::string>::const_iterator iter;
+  std::map<uintb,std::string>::const_iterator iter;
 
   if (ct->getName().size()==0) {
     clear();
@@ -1777,7 +1777,7 @@ void PrintC::emitPrototypeOutput(const FuncProto *proto,
 }
 
 /// This emits the individual type declarations of the input parameters to the function as a
-/// comma separated list.
+/// comma separated std::list.
 /// \param proto is the given prototype of the function
 void PrintC::emitPrototypeInputs(const FuncProto *proto)
 
@@ -1948,7 +1948,7 @@ bool PrintC::checkPrintNegation(const Varnode *vn)
   if (!vn->isWritten()) return false;
   const PcodeOp *op = vn->getDef();
   bool reorder = false;
-  OpCode opc = get_booleanflip(op->code(),reorder); // This is the set of ops that can be negated as a token
+  OpCode opc = get_booleanflip(op->code(),reorder); // This is the std::set of ops that can be negated as a token
   if (opc == CPUI_MAX)
     return false;
   return true;
@@ -1957,8 +1957,8 @@ bool PrintC::checkPrintNegation(const Varnode *vn)
 void PrintC::docTypeDefinitions(const TypeFactory *typegrp)
 
 {
-  vector<Datatype *> deporder;
-  vector<Datatype *>::iterator iter;
+  std::vector<Datatype *> deporder;
+  std::vector<Datatype *>::iterator iter;
 
   typegrp->dependentOrder(deporder); // Put things in resolvable order
   for(iter=deporder.begin();iter!=deporder.end();++iter) {
@@ -2102,8 +2102,8 @@ bool PrintC::emitScopeVarDecls(const Scope *scope,int4 cat)
     notempty = true;
     emitVarDeclStatement(sym);
   }
-  list<SymbolEntry>::const_iterator iter_d = scope->beginDynamic();
-  list<SymbolEntry>::const_iterator enditer_d = scope->endDynamic();
+  std::list<SymbolEntry>::const_iterator iter_d = scope->beginDynamic();
+  std::list<SymbolEntry>::const_iterator enditer_d = scope->endDynamic();
   for(;iter_d!=enditer_d;++iter_d) {
     if ((*iter_d).isPiece()) continue; // Don't do a partial entry
     Symbol *sym = (*iter_d).getSymbol();
@@ -2240,7 +2240,7 @@ void PrintC::emitBlockBasic(const BlockBasic *bb)
   }
   else {
     separator = false;
-    list<PcodeOp *>::const_iterator iter;
+    std::list<PcodeOp *>::const_iterator iter;
     for(iter=bb->beginOp();iter!=bb->endOp();++iter) {
       inst = *iter;
       if (inst->notPrinted()) continue;
@@ -2296,10 +2296,10 @@ void PrintC::emitBlockBasic(const BlockBasic *bb)
 void PrintC::emitBlockGraph(const BlockGraph *bl)
 
 {
-  const vector<FlowBlock *> &list(bl->getList());
-  vector<FlowBlock *>::const_iterator iter;
+  const std::vector<FlowBlock *> &std::list(bl->getList());
+  std::vector<FlowBlock *>::const_iterator iter;
 
-  for(iter=list.begin();iter!=list.end();++iter) {
+  for(iter=std::list.begin();iter!=std::list.end();++iter) {
     int4 id = emit->beginBlock(*iter);
     (*iter)->emit(this);
     emit->endBlock(id);
@@ -2846,7 +2846,7 @@ std::string PrintC::genericTypeName(const Datatype *ct)
     s << "BADTYPE";
     return s.str();
   }
-  s << dec << ct->getSize();
+  s << std::dec << ct->getSize();
   return s.str();
 }
 }

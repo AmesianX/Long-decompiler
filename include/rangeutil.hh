@@ -31,7 +31,7 @@ namespace GhidraDec {
 /// (determined by a half-open interval [left,right)), over
 /// the integers mod 2^n,  where mask = 2^n-1.
 /// The range can support a step, if some of the
-/// least significant bits of the mask are set to zero.
+/// least significant bits of the mask are std::set to zero.
 ///
 /// The class then can
 ///   - Generate ranges based on a pcode condition:
@@ -51,7 +51,7 @@ class CircleRange {
   uintb left;			///< Left boundary of the open range [left,right)
   uintb right;			///< Right boundary of the open range [left,right)
   uintb mask;			///< Bit mask defining the size (modulus) and stop of the range
-  bool isempty;			///< \b true if set is empty
+  bool isempty;			///< \b true if std::set is empty
   int4 step;			///< Explicit step size
   int4 shift;			///< Number of bits in step.  Equal to log2(step)
   static const char arrange[];	///< Map from raw overlaps to normalized overlap code
@@ -85,8 +85,8 @@ public:
 /// If two ranges are labeled [l , r) and  [op2.l, op2.r), the
 /// overlap of the ranges can be characterized by listing the four boundary
 /// values  in order, as the circle is traversed in a clock-wise direction.  This characterization can be
-/// further normalized by starting the list at op2.l, unless op2.l is contained in the range [l, r).
-/// In which case, the list should start with l.  You get the following 6 categories
+/// further normalized by starting the std::list at op2.l, unless op2.l is contained in the range [l, r).
+/// In which case, the std::list should start with l.  You get the following 6 categories
 ///    - a  = (l r op2.l op2.r)
 ///    - b  = (l op2.l r op2.r)
 ///    - c  = (l op2.l op2.r r)

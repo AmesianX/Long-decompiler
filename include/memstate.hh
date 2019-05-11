@@ -22,11 +22,14 @@
 #include "pcoderaw.hh"
 #include "loadimage.hh"
 
+#include <map>
+#include <vector>
+
 namespace GhidraDec {
 /// \brief Memory storage/state for a single AddressSpace
 ///
 /// Class for setting and getting memory values within a space
-/// The basic API is to get/set arrays of byte values via offset within the space.
+/// The basic API is to get/std::set arrays of byte values via offset within the space.
 /// Helper functions getValue and setValue easily retrieve/store integers
 /// of various sizes from memory, using the endianness encoding specified by the space.
 /// Accesses through the public interface, are automatically broken down into
@@ -110,7 +113,7 @@ public:
 /// in which case, this memory bank behaves as if it were initially filled with zeros.
 class MemoryPageOverlay : public MemoryBank {
   MemoryBank *underlie;		///< Underlying memory object
-  map<uintb,uint1 *> page;	///< Overlayed pages
+  std::map<uintb,uint1 *> page;	///< Overlayed pages
 protected:
   virtual void insert(uintb addr,uintb val); ///< Overridden aligned word insert
   virtual uintb find(uintb addr) const;	///< Overridden aligned word find
@@ -130,8 +133,8 @@ class MemoryHashOverlay : public MemoryBank {
   MemoryBank *underlie;		///< Underlying memory bank
   int4 alignshift;		///< How many LSBs are thrown away from address when doing hash table lookup
   uintb collideskip;		///< How many slots to skip after a hashtable collision
-  vector<uintb> address;	///< The hashtable addresses
-  vector<uintb> value;		///< The hashtable values
+  std::vector<uintb> address;	///< The hashtable addresses
+  std::vector<uintb> value;		///< The hashtable values
 protected:
   virtual void insert(uintb addr,uintb val); ///< Overridden aligned word insert
   virtual uintb find(uintb addr) const;	///< Overridden aligned word find
@@ -149,17 +152,17 @@ class Translate;		// Forward declaration
 class MemoryState {
 protected:
   Translate *trans;		///< Architecture information about memory spaces
-  vector<MemoryBank *> memspace; ///< Memory banks associated with each address space
+  std::vector<MemoryBank *> memspace; ///< Memory banks associated with each address space
 public:
   MemoryState(Translate *t);	///< A constructor for MemoryState
   ~MemoryState(void) {}
   Translate *getTranslate(void) const; ///< Get the Translate object
-  void setMemoryBank(MemoryBank *bank);	///< Map a memory bank into the state
+  void setMemoryBank(MemoryBank *bank);	///< std::map a memory bank into the state
   MemoryBank *getMemoryBank(AddrSpace *spc) const; ///< Get a memory bank associated with a particular space
   void setValue(AddrSpace *spc,uintb off,int4 size,uintb cval); ///< Set a value on the memory state
   uintb getValue(AddrSpace *spc,uintb off,int4 size) const; ///< Retrieve a memory value from the memory state
-  void setValue(const string &nm,uintb cval); ///< Set a value on a named register in the memory state
-  uintb getValue(const string &nm) const; ///< Retrieve a value from a named register in the memory state
+  void setValue(const std::string &nm,uintb cval); ///< Set a value on a named register in the memory state
+  uintb getValue(const std::string &nm) const; ///< Retrieve a value from a named register in the memory state
   void setValue(const VarnodeData *vn,uintb cval); ///< Set value on a given \b varnode
   uintb getValue(const VarnodeData *vn) const; ///< Get a value from a \b varnode
   void getChunk(uint1 *res,AddrSpace *spc,uintb off,int4 size) const; ///< Get a chunk of data from memory state

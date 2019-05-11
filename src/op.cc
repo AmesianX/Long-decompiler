@@ -25,15 +25,15 @@ namespace GhidraDec {
 /// \param t is the associated processor translator
 /// \param nm is the name of the space (always \b iop)
 /// \param ind is the associated index
-IopSpace::IopSpace(AddrSpaceManager *m,const Translate *t,const string &nm,int4 ind)
+IopSpace::IopSpace(AddrSpaceManager *m,const Translate *t,const std::string &nm,int4 ind)
   : AddrSpace(m,t,IPTR_IOP,nm,sizeof(void *),1,ind,0,1)
 {
   clearFlags(heritaged|does_deadcode|big_endian);
-  if (HOST_ENDIAN==1)		// Endianness always set to host
+  if (HOST_ENDIAN==1)		// Endianness always std::set to host
     setFlags(big_endian);
 }
 
-void IopSpace::printRaw(ostream &s,uintb offset) const
+void IopSpace::printRaw(std::ostream &s,uintb offset) const
 
 {				// Print info about op this address refers to
   BlockBasic *bs;
@@ -53,7 +53,7 @@ void IopSpace::printRaw(ostream &s,uintb offset) const
   bl->getStart().printRaw(s);
 }
 
-void IopSpace::saveXml(ostream &s) const
+void IopSpace::saveXml(std::ostream &s) const
 
 {
   throw LowlevelError("Should never save iop space to XML");
@@ -66,7 +66,7 @@ void IopSpace::restoreXml(const Element *el)
 }
 
 /// Construct a completely unattached PcodeOp.  Space is reserved for input and output Varnodes
-/// but all are set initially to null.
+/// but all are std::set initially to null.
 /// \param s indicates the number of input slots reserved
 /// \param sq is the sequence number to associate with the new PcodeOp
 PcodeOp::PcodeOp(int4 s,const SeqNum &sq) : start(sq),inrefs(s)
@@ -145,7 +145,7 @@ bool PcodeOp::isCseMatch(const PcodeOp *op) const
 
 /// Set the behavioral class (opcode) of this operation. For most applications this should only be called
 /// by the PcodeOpBank.  This is fairly low-level but does cache various boolean flags associated with the opcode
-/// \param t_op is the behavioural class to set
+/// \param t_op is the behavioural class to std::set
 void PcodeOp::setOpcode(TypeOp *t_op)
 
 {
@@ -157,8 +157,8 @@ void PcodeOp::setOpcode(TypeOp *t_op)
 }
 
 /// Make sure there are exactly \e num input slots for this op.
-/// All slots, regardless of the total being increased or decreased, are set to \e null.
-/// \param num is the number of inputs to set
+/// All slots, regardless of the total being increased or decreased, are std::set to \e null.
+/// \param num is the number of inputs to std::set
 void PcodeOp::setNumInputs(int4 num)
 
 {
@@ -195,7 +195,7 @@ void PcodeOp::insertInput(int4 slot)
 PcodeOp *PcodeOp::nextOp(void) const
 
 {
-  list<PcodeOp *>::iterator iter;
+  std::list<PcodeOp *>::iterator iter;
   BlockBasic *p;
 
   p = parent;			// Current parent
@@ -216,7 +216,7 @@ PcodeOp *PcodeOp::nextOp(void) const
 PcodeOp *PcodeOp::previousOp(void) const
 
 {
-  list<PcodeOp *>::iterator iter;
+  std::list<PcodeOp *>::iterator iter;
 
   if (basiciter == parent->beginOp()) return (PcodeOp *) 0;
   iter = basiciter;
@@ -226,14 +226,14 @@ PcodeOp *PcodeOp::previousOp(void) const
   
 /// Scan backward within the basic block containing this op and find the first op marked as the
 /// start of an instruction.  This also works if basic blocks haven't been calculated yet, and all
-/// the ops are still in the dead list.  The starting op may be from a different instruction if
+/// the ops are still in the dead std::list.  The starting op may be from a different instruction if
 /// this op was from an instruction in a delay slot
 /// \return the starting PcodeOp
 PcodeOp *PcodeOp::target(void) const
 
 {
   PcodeOp *retop;
-  list<PcodeOp *>::iterator iter;
+  std::list<PcodeOp *>::iterator iter;
   iter = isDead() ? insertiter : basiciter;
   retop = *iter;
   while((retop->flags&PcodeOp::startmark)==0) {
@@ -245,7 +245,7 @@ PcodeOp *PcodeOp::target(void) const
 
 /// Print an address and a raw representation of this op to the stream, suitable for console debugging apps
 /// \param s is the stream to print to
-void PcodeOp::printDebug(ostream &s) const
+void PcodeOp::printDebug(std::ostream &s) const
 
 {
   s << start << ": ";
@@ -258,7 +258,7 @@ void PcodeOp::printDebug(ostream &s) const
 /// Write a description including: the opcode name, the sequence number, and separate xml tags
 /// providing a reference number for each input and output Varnode
 /// \param s is the stream to write to
-void PcodeOp::saveXml(ostream &s) const
+void PcodeOp::saveXml(std::ostream &s) const
 
 {
   s << "<op";
@@ -269,7 +269,7 @@ void PcodeOp::saveXml(ostream &s) const
   if (output==(Varnode *)0)
     s << "<void/>\n";
   else
-    s << "<addr ref=\"0x" << hex << output->getCreateIndex() << "\"/>\n";
+    s << "<addr ref=\"0x" << std::dec << output->getCreateIndex() << "\"/>\n";
   for(int4 i=0;i<inrefs.size();++i) {
     const Varnode *vn = getIn(i);
     if (vn == (const Varnode *)0)
@@ -291,10 +291,10 @@ void PcodeOp::saveXml(ostream &s) const
 	s << spc->getName() << "\"/>\n";
       }
       else
-	s << "<addr ref=\"0x" << hex << vn->getCreateIndex() << "\"/>\n";
+	s << "<addr ref=\"0x" << std::dec << vn->getCreateIndex() << "\"/>\n";
     }
     else {
-      s << "<addr ref=\"0x" << hex << vn->getCreateIndex() << "\"/>\n";
+      s << "<addr ref=\"0x" << std::dec << vn->getCreateIndex() << "\"/>\n";
     }
   }
   s << "</op>\n";
@@ -584,8 +584,8 @@ int4 PcodeOp::compareOrder(const PcodeOp *bop) const
   return 0;
 }
 
-/// Add the PcodeOp to the list of ops with the same op-code. Currently only certain
-/// op-codes have a dedicated list.
+/// Add the PcodeOp to the std::list of ops with the same op-code. Currently only certain
+/// op-codes have a dedicated std::list.
 /// \param op is the given PcodeOp
 void PcodeOpBank::addToCodeList(PcodeOp *op)
 
@@ -605,8 +605,8 @@ void PcodeOpBank::addToCodeList(PcodeOp *op)
   }
 }
 
-/// Remove the PcodeOp from its list of ops with the same op-code. Currently only certain
-/// op-codes have a dedicated list.
+/// Remove the PcodeOp from its std::list of ops with the same op-code. Currently only certain
+/// op-codes have a dedicated std::list.
 /// \param op is the given PcodeOp
 void PcodeOpBank::removeFromCodeList(PcodeOp *op)
 
@@ -636,7 +636,7 @@ void PcodeOpBank::clearCodeLists(void)
 
 /// A new PcodeOp is allocated with the indicated number of input slots, which
 /// start out empty.  A sequence number is assigned, and the op is added to the
-/// end of the \e dead list.
+/// end of the \e dead std::list.
 /// \param inputs is the number of input slots
 /// \param pc is the Address to associate with the PcodeOp
 /// \return the newly allocated PcodeOp
@@ -652,7 +652,7 @@ PcodeOp *PcodeOpBank::create(int4 inputs,const Address &pc)
 
 /// A new PcodeOp is allocated with the indicated number of input slots and the
 /// specific sequence number, suitable for cloning and restoring from XML.
-/// The op is added to the end of the \e dead list.
+/// The op is added to the end of the \e dead std::list.
 /// \param inputs is the number of input slots
 /// \param sq is the specified sequence number
 /// \return the newly allocated PcodeOp
@@ -673,7 +673,7 @@ PcodeOp *PcodeOpBank::create(int4 inputs,const SeqNum &sq)
 void PcodeOpBank::destroyDead(void)
 
 {
-  list<PcodeOp *>::iterator iter;
+  std::list<PcodeOp *>::iterator iter;
   PcodeOp *op;
 
   iter = deadlist.begin();
@@ -684,7 +684,7 @@ void PcodeOpBank::destroyDead(void)
 }
 
 /// The given PcodeOp is removed from all internal lists and added to a final
-/// \e deadandgone list. The memory is not reclaimed until the whole container is
+/// \e deadandgone std::list. The memory is not reclaimed until the whole container is
 /// destroyed, in case pointer references still exist.  These will all still
 /// be marked as \e dead.
 /// \param op is the given PcodeOp to destroy
@@ -713,7 +713,7 @@ void PcodeOpBank::changeOpcode(PcodeOp *op,TypeOp *newopc)
   addToCodeList(op);
 }
 
-/// The PcodeOp is moved out of the \e dead list into the \e alive list.  The
+/// The PcodeOp is moved out of the \e dead std::list into the \e alive std::list.  The
 /// PcodeOp::isDead() method will now return \b false.
 /// \param op is the given PcodeOp to mark
 void PcodeOpBank::markAlive(PcodeOp *op)
@@ -724,7 +724,7 @@ void PcodeOpBank::markAlive(PcodeOp *op)
   op->insertiter = alivelist.insert(alivelist.end(),op);
 }
 
-/// The PcodeOp is moved out of the \e alive list into the \e dead list. The
+/// The PcodeOp is moved out of the \e alive std::list into the \e dead std::list. The
 /// PcodeOp::isDead() method will now return \b true.
 /// \param op is the given PcodeOp to mark
 void PcodeOpBank::markDead(PcodeOp *op)
@@ -735,32 +735,32 @@ void PcodeOpBank::markDead(PcodeOp *op)
   op->insertiter = deadlist.insert(deadlist.end(),op);
 }
 
-/// The op is moved to right after a specified op in the \e dead list.
+/// The op is moved to right after a specified op in the \e dead std::list.
 /// \param op is the given PcodeOp to move
-/// \param prev is the specified op in the \e dead list
+/// \param prev is the specified op in the \e dead std::list
 void PcodeOpBank::insertAfterDead(PcodeOp *op,PcodeOp *prev)
 
 {
   if ((!op->isDead())||(!prev->isDead()))
     throw LowlevelError("Dead move called on ops which aren't dead");
   deadlist.erase(op->insertiter);
-  list<PcodeOp *>::iterator iter = prev->insertiter;
+  std::list<PcodeOp *>::iterator iter = prev->insertiter;
   ++iter;
   op->insertiter = deadlist.insert(iter,op);
 }
 
-/// \brief Move a sequence of PcodeOps to a point in the \e dead list.
+/// \brief Move a sequence of PcodeOps to a point in the \e dead std::list.
 ///
-/// The point is right after a provided op. All ops must be in the \e dead list.
+/// The point is right after a provided op. All ops must be in the \e dead std::list.
 /// \param firstop is the first PcodeOp in the sequence to be moved
 /// \param lastop is the last PcodeOp in the sequence to be moved
 /// \param prev is the provided point to move to
 void PcodeOpBank::moveSequenceDead(PcodeOp *firstop,PcodeOp *lastop,PcodeOp *prev)
 
 {
-  list<PcodeOp *>::iterator enditer = lastop->insertiter;
+  std::list<PcodeOp *>::iterator enditer = lastop->insertiter;
   ++enditer;
-  list<PcodeOp *>::iterator previter = prev->insertiter;
+  std::list<PcodeOp *>::iterator previter = prev->insertiter;
   ++previter;
   if (previter != firstop->insertiter) // Check for degenerate move
     deadlist.splice(previter,deadlist,firstop->insertiter,enditer);
@@ -797,12 +797,12 @@ PcodeOp *PcodeOpBank::fallthru(const PcodeOp *op) const
   PcodeOp *retop;
   if (op->isDead()) {
 				// In this case we know an instruction is contiguous
-				// in the dead list
-    list<PcodeOp *>::const_iterator iter = op->insertiter;
+				// in the dead std::list
+    std::list<PcodeOp *>::const_iterator iter = op->insertiter;
     ++iter;
     if (iter != deadlist.end()) {
       retop = *iter;
-      if (!retop->isInstructionStart()) // If the next in dead list is not marked
+      if (!retop->isInstructionStart()) // If the next in dead std::list is not marked
 	return retop;		// It is in the same instruction, and is the fallthru
     }
     --iter;
@@ -839,7 +839,7 @@ PcodeOpTree::const_iterator PcodeOpBank::end(const Address &addr) const
   return optree.upper_bound(SeqNum(addr,~((uintm)0)));
 }
 
-list<PcodeOp *>::const_iterator PcodeOpBank::begin(OpCode opc) const
+std::list<PcodeOp *>::const_iterator PcodeOpBank::begin(OpCode opc) const
 
 {
   switch(opc) {
@@ -855,7 +855,7 @@ list<PcodeOp *>::const_iterator PcodeOpBank::begin(OpCode opc) const
   return alivelist.end();
 }
 
-list<PcodeOp *>::const_iterator PcodeOpBank::end(OpCode opc) const
+std::list<PcodeOp *>::const_iterator PcodeOpBank::end(OpCode opc) const
 
 {
   switch(opc) {
@@ -874,7 +874,7 @@ list<PcodeOp *>::const_iterator PcodeOpBank::end(OpCode opc) const
 void PcodeOpBank::clear(void)
 
 {
-  list<PcodeOp *>::iterator iter;
+  std::list<PcodeOp *>::iterator iter;
 
   for(iter=alivelist.begin();iter!=alivelist.end();++iter)
     delete *iter;

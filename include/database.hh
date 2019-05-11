@@ -129,14 +129,14 @@ public:
   uint8 getHash(void) const { return hash; }				///< Get the hash used to identify \b this storage
   int4 getSize(void) const { return size; }				///< Get the number of bytes consumed by \b this storage
   bool inUse(const Address &usepoint) const;				///< Is \b this storage valid for the given code address
-  const RangeList &getUseLimit(void) const { return uselimit; }		///< Get the set of valid code addresses for \b this storage
+  const RangeList &getUseLimit(void) const { return uselimit; }		///< Get the std::set of valid code addresses for \b this storage
   Address getFirstUseAddress(void) const;				///< Get the first code address where \b this storage is valid
   void setUseLimit(const RangeList &uselim) { uselimit = uselim; }	///< Set the range of code addresses where \b this is valid
   bool isAddrTied(void) const;						///< Is \b this storage address tied
   bool updateType(Varnode *vn) const;					///< Update a Varnode data-type from \b this
   Datatype *getSizedType(const Address &addr,int4 sz) const;		///< Get the data-type associated with (a piece of) \b this
-  void printEntry(ostream &s) const;					///< Dump a description of \b this to a stream
-  void saveXml(ostream &s) const;					///< Save \b this to an XML stream
+  void printEntry(std::ostream &s) const;					///< Dump a description of \b this to a stream
+  void saveXml(std::ostream &s) const;					///< Save \b this to an XML stream
   List::const_iterator restoreXml(List::const_iterator iter,const AddrSpaceManager *manage);	///< Restore \b this from an XML stream
 };
 typedef rangemap<SymbolEntry> EntryMap;			///< A rangemap of SymbolEntry
@@ -157,7 +157,7 @@ class Symbol {
   friend class SymbolCompareName;
 protected:
   Scope *scope;			///< The scope that owns this symbol
-  string name;			///< The local name of the symbol
+  std::string name;			///< The local name of the symbol
   uint4 nameDedup;		///< id to distinguish symbols with the same name
   Datatype *type;		///< The symbol's data-type
   uint4 flags;			///< Varnode-like properties of the symbol
@@ -166,7 +166,7 @@ protected:
   uint4 dispflags;		///< Flags affecting the display of this symbol
   int2 category;		///< Special category (-1==none 0=parameter 1=equate)
   uint2 catindex;		///< Index within category
-  vector<list<SymbolEntry>::iterator> mapentry;	///< List of storage locations labeled with \b this Symbol
+  std::vector<std::list<SymbolEntry>::iterator> mapentry;	///< List of storage locations labeled with \b this Symbol
   virtual ~Symbol(void) {}	///< Destructor
   void setDisplayFormat(uint4 val);	///< Set the display format for \b this Symbol
   void checkSizeTypeLock(void);	///< Calculate if \b size_typelock property is on
@@ -181,13 +181,13 @@ public:
     size_typelock = 8	        ///< Only the size of the symbol is typelocked
   };
   /// \brief Construct given a name and data-type
-  Symbol(Scope *sc,const string &nm,Datatype *ct)
+  Symbol(Scope *sc,const std::string &nm,Datatype *ct)
   { scope=sc; name=nm; nameDedup=0; type=ct; flags=0; dispflags=0; category=-1; }
 
   /// \brief Construct for use with restoreXml()
   Symbol(Scope *sc) { scope=sc; nameDedup=0; flags=0; dispflags=0; category=-1; }
 
-  const string &getName(void) const { return name; }		///< Get the local name of the symbol
+  const std::string &getName(void) const { return name; }		///< Get the local name of the symbol
   Datatype *getType(void) const { return type; }		///< Get the data-type
   uint4 getId(void) const { return (uint4)(uintp)this; }	///< Get a unique id for the symbol
   uint4 getFlags(void) const { return flags; }			///< Get the boolean properties of the Symbol
@@ -203,11 +203,11 @@ public:
   Scope *getScope(void) const { return scope; }			///< Get the scope owning \b this Symbol
   SymbolEntry *getFirstWholeMap(void) const;	 		///< Get the first entire mapping of the symbol
   SymbolEntry *getMapEntry(const Address &addr) const;	 	///< Get first mapping of the symbol that contains the given Address
-  void saveXmlHeader(ostream &s) const;				///< Save basic Symbol properties as XML attributes
+  void saveXmlHeader(std::ostream &s) const;				///< Save basic Symbol properties as XML attributes
   void restoreXmlHeader(const Element *el);			///< Restore basic Symbol properties from XML
-  void saveXmlBody(ostream &s) const;				///< Save details of the Symbol to XML
+  void saveXmlBody(std::ostream &s) const;				///< Save details of the Symbol to XML
   void restoreXmlBody(List::const_iterator iter);		///< Restore details of the Symbol from XML
-  virtual void saveXml(ostream &s) const;			///< Save \b this Symbol to an XML stream
+  virtual void saveXml(std::ostream &s) const;			///< Save \b this Symbol to an XML stream
   virtual void restoreXml(const Element *el);			///< Restore \b this Symbol from an XML stream
 };
 
@@ -239,10 +239,10 @@ class FunctionSymbol : public Symbol {
   virtual ~FunctionSymbol(void);
   void buildType(int4 size);		///< Build the data-type associated with \b this Symbol
 public:
-  FunctionSymbol(Scope *sc,const string &nm,int4 size);	///< Construct given the name
+  FunctionSymbol(Scope *sc,const std::string &nm,int4 size);	///< Construct given the name
   FunctionSymbol(Scope *sc,int4 size);			///< Constructor for use with restoreXml
   Funcdata *getFunction(void);				///< Get the underlying Funcdata object
-  virtual void saveXml(ostream &s) const;
+  virtual void saveXml(std::ostream &s) const;
   virtual void restoreXml(const Element *el);
 };
 
@@ -257,7 +257,7 @@ public:
   EquateSymbol(Scope *sc) : Symbol(sc) { value = 0; category = 1; }	///< Constructor for use with restoreXml
   uintb getValue(void) const { return value; }				///< Get the constant value
   bool isValueClose(uintb op2Value,int4 size) const;			///< Is the given value similar to \b this equate
-  virtual void saveXml(ostream &s) const;
+  virtual void saveXml(std::ostream &s) const;
   virtual void restoreXml(const Element *el);
 };
 
@@ -265,9 +265,9 @@ public:
 class LabSymbol : public Symbol {
   void buildType(void);		///< Build placeholder data-type
 public:
-  LabSymbol(Scope *sc,const string &nm);	///< Construct given name
+  LabSymbol(Scope *sc,const std::string &nm);	///< Construct given name
   LabSymbol(Scope *sc);				///< Constructor for use with restoreXml
-  virtual void saveXml(ostream &s) const;
+  virtual void saveXml(std::ostream &s) const;
   virtual void restoreXml(const Element *el);
 };
 
@@ -282,10 +282,10 @@ class ExternRefSymbol : public Symbol {
   void buildNameType(void);		///< Create a name and data-type for the Symbol
   virtual ~ExternRefSymbol(void) {}
 public:
-  ExternRefSymbol(Scope *sc,const Address &ref,const string &nm);	///< Construct given a \e placeholder address
+  ExternRefSymbol(Scope *sc,const Address &ref,const std::string &nm);	///< Construct given a \e placeholder address
   ExternRefSymbol(Scope *sc) : Symbol(sc) {} 				///< For use with restoreXml
   const Address &getRefAddr(void) const { return refaddr; }		///< Return the \e placeholder address
-  virtual void saveXml(ostream &s) const;
+  virtual void saveXml(std::ostream &s) const;
   virtual void restoreXml(const Element *el);
 };
 
@@ -305,27 +305,27 @@ public:
     return (sym1->nameDedup < sym2->nameDedup);
   }
 };
-typedef set<Symbol *,SymbolCompareName> SymbolNameTree;		///< A set of Symbol objects sorted by name
+typedef std::set<Symbol *,SymbolCompareName> SymbolNameTree;		///< A std::set of Symbol objects sorted by name
 
 /// \brief An iterator over SymbolEntry objects in multiple address spaces
 ///
 /// Given an EntryMap (a rangemap of SymbolEntry objects in a single address space)
 /// for each address space, iterator over all the SymbolEntry objects
 class MapIterator {
-  const vector<EntryMap *> *map;		///< The list of EntryMaps, one per address space
-  vector<EntryMap *>::const_iterator curmap;	///< Current EntryMap being iterated
-  list<SymbolEntry>::const_iterator curiter;	///< Current SymbolEntry being iterated
+  const std::vector<EntryMap *> *map;		///< The std::list of EntryMaps, one per address space
+  std::vector<EntryMap *>::const_iterator curmap;	///< Current EntryMap being iterated
+  std::list<SymbolEntry>::const_iterator curiter;	///< Current SymbolEntry being iterated
 public:
-  MapIterator(void) { map = (const vector<EntryMap *> *)0; }	///< Construct an uninitialized iterator
+  MapIterator(void) { map = (const std::vector<EntryMap *> *)0; }	///< Construct an uninitialized iterator
 
   /// \brief Construct iterator at a specific position
   ///
-  /// \param m is the list of EntryMaps
-  /// \param cm is the position of the iterator within the EntryMap list
+  /// \param m is the std::list of EntryMaps
+  /// \param cm is the position of the iterator within the EntryMap std::list
   /// \param ci is the position of the iterator within the specific EntryMap
-  MapIterator(const vector<EntryMap *> *m,
-	       vector<EntryMap *>::const_iterator cm,
-	       list<SymbolEntry>::const_iterator ci) {
+  MapIterator(const std::vector<EntryMap *> *m,
+	       std::vector<EntryMap *>::const_iterator cm,
+	       std::list<SymbolEntry>::const_iterator ci) {
     map = m; curmap = cm; curiter = ci;
   }
 
@@ -365,13 +365,13 @@ public:
 /// A key for mapping from name to Scope.  The class includes a deduplication component
 /// if Scopes with the same name are allowed.
 class ScopeKey {
-  string name;			///< The name of the Scope
+  std::string name;			///< The name of the Scope
   uintb dedupId;		///< A duplication id for the Scope
 public:
-  ScopeKey(const string &nm,uint4 id) { name = nm; dedupId = id; }	///< Construct given a name and id
+  ScopeKey(const std::string &nm,uint4 id) { name = nm; dedupId = id; }	///< Construct given a name and id
   bool operator<(const ScopeKey &op2) const;				///< Comparison operator
 };
-typedef map<ScopeKey,Scope *> ScopeMap;		///< A map from ScopeKey to Scope
+typedef std::map<ScopeKey,Scope *> ScopeMap;		///< A std::map from ScopeKey to Scope
 
 /// \brief A collection of Symbol objects within a single (namespace or functional) scope
 ///
@@ -399,13 +399,13 @@ class Scope {
   friend class ScopeCompare;
   RangeList rangetree;				///< Range of data addresses \e owned by \b this scope
   Scope *parent;				///< The parent scope
-  ScopeMap children;				///< Sorted list of child scopes
+  ScopeMap children;				///< Sorted std::list of child scopes
   void attachScope(Scope *child);		///< Attach a new child Scope to \b this
   void detachScope(ScopeMap::iterator iter);	///< Detach a child Scope from \b this
 
 protected:
   Architecture *glb;				///< Architecture of \b this scope
-  string name;					///< Name of \b this scope
+  std::string name;					///< Name of \b this scope
   Funcdata *fd;					///< (If non-null) the function which \b this is the local Scope for
   uint4 dedupId;				///< Id to dedup scopes with same name (when allowed)
   static const Scope *stackAddr(const Scope *scope1,
@@ -444,7 +444,7 @@ protected:
   virtual void addRange(AddrSpace *spc,uintb first,uintb last);		///< Add a memory range to the ownership of \b this Scope
   virtual void removeRange(AddrSpace *spc,uintb first,uintb last);	///< Remove a memory range from the ownership of \b this Scope
 
-  /// \brief Put a Symbol into the name map
+  /// \brief Put a Symbol into the name std::map
   ///
   /// \param sym is the preconstructed Symbol
   virtual void addSymbolInternal(Symbol *sym)=0;
@@ -484,7 +484,7 @@ public:
   void turnOffDebug(void) const { debugon = false; }
 #endif
   /// \brief Construct an empty scope, given a name and Architecture
-  Scope(const string &nm,Architecture *g) {
+  Scope(const std::string &nm,Architecture *g) {
     name = nm; glb = g; parent = (Scope *)0; fd = (Funcdata *)0; dedupId = 0;
 #ifdef OPACTION_DEBUG
     debugon = false;
@@ -493,10 +493,10 @@ public:
   virtual ~Scope(void);						///< Destructor
   virtual MapIterator begin(void) const=0;			///< Beginning iterator to mapped SymbolEntrys
   virtual MapIterator end(void) const=0;			///< Ending iterator to mapped SymbolEntrys
-  virtual list<SymbolEntry>::const_iterator beginDynamic(void) const=0;	///< Beginning iterator to dynamic SymbolEntrys
-  virtual list<SymbolEntry>::const_iterator endDynamic(void) const=0;	///< Ending iterator to dynamic SymbolEntrys
-  virtual list<SymbolEntry>::iterator beginDynamic(void)=0;	///< Beginning iterator to dynamic SymbolEntrys
-  virtual list<SymbolEntry>::iterator endDynamic(void)=0;	///< Ending iterator to dynamic SymbolEntrys
+  virtual std::list<SymbolEntry>::const_iterator beginDynamic(void) const=0;	///< Beginning iterator to dynamic SymbolEntrys
+  virtual std::list<SymbolEntry>::const_iterator endDynamic(void) const=0;	///< Ending iterator to dynamic SymbolEntrys
+  virtual std::list<SymbolEntry>::iterator beginDynamic(void)=0;	///< Beginning iterator to dynamic SymbolEntrys
+  virtual std::list<SymbolEntry>::iterator endDynamic(void)=0;	///< Ending iterator to dynamic SymbolEntrys
   virtual void clear(void)=0;					///< Clear all symbols from \b this scope
   virtual void clearCategory(int4 cat)=0;			///< Clear all symbols of the given category from \b this scope
   virtual void clearUnlocked(void)=0;				///< Clear all unlocked symbols from \b this scope
@@ -514,7 +514,7 @@ public:
     return rangetree.inRange(addr,size); }
 
   virtual void removeSymbol(Symbol *symbol)=0;		///< Remove the given Symbol from \b this Scope
-  virtual void renameSymbol(Symbol *sym,const string &newname)=0;	///< Rename a Symbol within \b this Scope
+  virtual void renameSymbol(Symbol *sym,const std::string &newname)=0;	///< Rename a Symbol within \b this Scope
 
   /// \brief Change the data-type of a Symbol within \b this Scope
   ///
@@ -595,7 +595,7 @@ public:
   /// If there are multiple Symbols with the same name, all are passed back.
   /// \param name is the name to search for
   /// \param res will contain any matching Symbols
-  virtual void findByName(const string &name,vector<Symbol *> &res) const=0;
+  virtual void findByName(const std::string &name,std::vector<Symbol *> &res) const=0;
 
   /// \brief Convert an \e external \e reference to the referenced function
   ///
@@ -611,24 +611,24 @@ public:
   /// \param index is a reference to an index used to make the name unique, which will be updated
   /// \param flags are boolean properties of the variable we need the name for
   /// \return the new variable name
-  virtual string buildVariableName(const Address &addr,
+  virtual std::string buildVariableName(const Address &addr,
 				   const Address &pc,
 				   Datatype *ct,int4 &index,uint4 flags) const=0;
 
   /// \brief Build a formal \b undefined name, used internally when a Symbol is not given a name
   ///
   /// \return a special internal name that won't collide with other names in \b this Scope
-  virtual string buildUndefinedName(void) const=0;
+  virtual std::string buildUndefinedName(void) const=0;
 
   /// \brief Produce a version of the given symbol name that won't collide with other names in \b this Scope
   ///
   /// \param nm is the given name
   /// \return return a unique version of the name
-  virtual string makeNameUnique(const string &nm) const=0;
+  virtual std::string makeNameUnique(const std::string &nm) const=0;
 
-  virtual void saveXml(ostream &s) const=0;		///< Write out \b this as a \<scope> XML tag
+  virtual void saveXml(std::ostream &s) const=0;		///< Write out \b this as a \<scope> XML tag
   virtual void restoreXml(const Element *el)=0;		///< Restore \b this Scope from a \<scope> XML tag
-  virtual void printEntries(ostream &s) const=0;	///< Dump a description of all SymbolEntry objects to a stream
+  virtual void printEntries(std::ostream &s) const=0;	///< Dump a description of all SymbolEntry objects to a stream
 
   /// \brief Get the number of Symbols in the given category
   ///
@@ -646,19 +646,19 @@ public:
   /// \brief Set the \e category and index for the given Symbol
   ///
   /// \param sym is the given Symbol
-  /// \param cat is the \e category to set for the Symbol
-  /// \param ind is the index position to set (within the category)
+  /// \param cat is the \e category to std::set for the Symbol
+  /// \param ind is the index position to std::set (within the category)
   virtual void setCategory(Symbol *sym,int4 cat,int4 ind)=0;
 
-  virtual SymbolEntry *addSymbol(const string &name,Datatype *ct,
+  virtual SymbolEntry *addSymbol(const std::string &name,Datatype *ct,
 				 const Address &addr,const Address &usepoint);
 
-  const string &getName(void) const { return name; }		///< Get the name of the Scope
+  const std::string &getName(void) const { return name; }		///< Get the name of the Scope
   bool isGlobal(void) const { return (fd == (Funcdata *)0); }	///< Return \b true if \b this scope is global
 
   // The main global querying routines
-  void queryByName(const string &name,vector<Symbol *> &res) const;	///< Look-up symbols by name
-  Funcdata *queryFunction(const string &name) const;			///< Look-up a function by name
+  void queryByName(const std::string &name,std::vector<Symbol *> &res) const;	///< Look-up symbols by name
+  Funcdata *queryFunction(const std::string &name) const;			///< Look-up a function by name
   SymbolEntry *queryByAddr(const Address &addr,
 			   const Address &usepoint) const;	  	///< Get Symbol with matching address
   SymbolEntry *queryContainer(const Address &addr,int4 size,
@@ -669,51 +669,51 @@ public:
   Funcdata *queryExternalRefFunction(const Address &addr) const;	///< Look-up a function thru an \e external \e reference
   LabSymbol *queryCodeLabel(const Address &addr) const;			///< Look-up a code label by address
 
-  Scope *resolveScope(const string &name) const;			///< Find a child Scope of \b this
+  Scope *resolveScope(const std::string &name) const;			///< Find a child Scope of \b this
   Scope *discoverScope(const Address &addr,int4 sz,const Address &usepoint);	///< Find the owning Scope of a given memory range
   ScopeMap::const_iterator childrenBegin() const { return children.begin(); }	///< Beginning iterator of child scopes
   ScopeMap::const_iterator childrenEnd() const { return children.end(); }	///< Ending iterator of child scopes
-  void saveXmlRecursive(ostream &s,bool onlyGlobal) const;		///< Save all contained scopes as an XML stream
+  void saveXmlRecursive(std::ostream &s,bool onlyGlobal) const;		///< Save all contained scopes as an XML stream
   void overrideSizeLockType(Symbol *sym,Datatype *ct);			///< Change the data-type of a Symbol that is \e sizelocked
   void resetSizeLockType(Symbol *sym);				///< Clear a Symbol's \e size-locked data-type
   bool isSubScope(const Scope *scp) const;			///< Is this a sub-scope of the given Scope
-  string getFullName(void) const;				///< Get the full name of \b this Scope
-  void getNameSegments(vector<string> &vec) const;		///< Get the fullname of \b this in segments
+  std::string getFullName(void) const;				///< Get the full name of \b this Scope
+  void getNameSegments(std::vector<std::string> &vec) const;		///< Get the fullname of \b this in segments
   Architecture *getArch(void) const { return glb; }		///< Get the Architecture associated with \b this
   Scope *getParent(void) const { return parent; }		///< Get the parent Scope (or NULL if \b this is the global Scope)
-  Symbol *addSymbol(const string &name,Datatype *ct);		///< Add a new Symbol \e without mapping it to an address
+  Symbol *addSymbol(const std::string &name,Datatype *ct);		///< Add a new Symbol \e without mapping it to an address
   SymbolEntry *addMapPoint(Symbol *sym,const Address &addr,
 			   const Address &usepoint);		///< Map a Symbol to a specific address
   Symbol *addMapSym(const Element *el);				///< Add a mapped Symbol from a \<mapsym> XML tag
-  FunctionSymbol *addFunction(const Address &addr,const string &nm);
-  ExternRefSymbol *addExternalRef(const Address &addr,const Address &refaddr,const string &nm);
-  LabSymbol *addCodeLabel(const Address &addr,const string &nm);
-  Symbol *addDynamicSymbol(const string &nm,Datatype *ct,const Address &caddr,uint8 hash);
+  FunctionSymbol *addFunction(const Address &addr,const std::string &nm);
+  ExternRefSymbol *addExternalRef(const Address &addr,const Address &refaddr,const std::string &nm);
+  LabSymbol *addCodeLabel(const Address &addr,const std::string &nm);
+  Symbol *addDynamicSymbol(const std::string &nm,Datatype *ct,const Address &caddr,uint8 hash);
   bool isReadOnly(const Address &addr,int4 size,const Address &usepoint) const;
-  void printBounds(ostream &s) const { rangetree.printBounds(s); }	///< Print a description of \b this Scope's \e owned memory ranges
+  void printBounds(std::ostream &s) const { rangetree.printBounds(s); }	///< Print a description of \b this Scope's \e owned memory ranges
 };
 
 /// \brief An in-memory implementation of the Scope interface.
 ///
 /// This can act as a stand-alone Scope object or serve as an in-memory cache for
 /// another implementation.  This implements a \b nametree, which is a
-/// a set of Symbol objects (the set owns the Symbol objects). It also implements
-/// a \b maptable, which is a list of rangemaps that own the SymbolEntry objects.
+/// a std::set of Symbol objects (the std::set owns the Symbol objects). It also implements
+/// a \b maptable, which is a std::list of rangemaps that own the SymbolEntry objects.
 class ScopeInternal : public Scope {
   void processHole(const Element *el);
   void insertNameTree(Symbol *sym);
-  SymbolNameTree::const_iterator findFirstByName(const string &name) const;
+  SymbolNameTree::const_iterator findFirstByName(const std::string &name) const;
 protected:
   virtual void addSymbolInternal(Symbol *sym);
   virtual SymbolEntry *addMapInternal(Symbol *sym,uint4 exfl,const Address &addr,int4 off,int4 sz,const RangeList &uselim);
   virtual SymbolEntry *addDynamicMapInternal(Symbol *sym,uint4 exfl,uint8 hash,int4 off,int4 sz,
 					     const RangeList &uselim);
-  SymbolNameTree nametree;			///< The set of Symbol objects, sorted by name
-  vector<EntryMap *> maptable;			///< Rangemaps of SymbolEntry, one map for each address space
-  vector<vector<Symbol *> > category;		///< References to Symbol objects organized by category
-  list<SymbolEntry> dynamicentry;		///< Dynamic symbol entries
+  SymbolNameTree nametree;			///< The std::set of Symbol objects, sorted by name
+  std::vector<EntryMap *> maptable;			///< Rangemaps of SymbolEntry, one std::map for each address space
+  std::vector<std::vector<Symbol *> > category;		///< References to Symbol objects organized by category
+  std::list<SymbolEntry> dynamicentry;		///< Dynamic symbol entries
 public:
-  ScopeInternal(const string &nm,Architecture *g);	///< Construct the Scope
+  ScopeInternal(const std::string &nm,Architecture *g);	///< Construct the Scope
   virtual void clear(void);
   virtual void categorySanity(void);			///< Make sure Symbol categories are sane
   virtual void clearCategory(int4 cat);
@@ -722,12 +722,12 @@ public:
   virtual ~ScopeInternal(void);
   virtual MapIterator begin(void) const;
   virtual MapIterator end(void) const;
-  virtual list<SymbolEntry>::const_iterator beginDynamic(void) const;
-  virtual list<SymbolEntry>::const_iterator endDynamic(void) const;
-  virtual list<SymbolEntry>::iterator beginDynamic(void);
-  virtual list<SymbolEntry>::iterator endDynamic(void);
+  virtual std::list<SymbolEntry>::const_iterator beginDynamic(void) const;
+  virtual std::list<SymbolEntry>::const_iterator endDynamic(void) const;
+  virtual std::list<SymbolEntry>::iterator beginDynamic(void);
+  virtual std::list<SymbolEntry>::iterator endDynamic(void);
   virtual void removeSymbol(Symbol *symbol);
-  virtual void renameSymbol(Symbol *sym,const string &newname);
+  virtual void renameSymbol(Symbol *sym,const std::string &newname);
   virtual void retypeSymbol(Symbol *sym,Datatype *ct);
   virtual void setAttribute(Symbol *sym,uint4 attr);
   virtual void clearAttribute(Symbol *sym,uint4 attr);
@@ -745,27 +745,27 @@ public:
   virtual SymbolEntry *findBefore(const Address &addr) const;
   virtual SymbolEntry *findAfter(const Address &addr) const;
 
-  virtual void findByName(const string &name,vector<Symbol *> &res) const;
+  virtual void findByName(const std::string &name,std::vector<Symbol *> &res) const;
   virtual Funcdata *resolveExternalRefFunction(ExternRefSymbol *sym) const;
 
-  virtual string buildVariableName(const Address &addr,
+  virtual std::string buildVariableName(const Address &addr,
 				   const Address &pc,
 				   Datatype *ct,int4 &index,uint4 flags) const;
-  virtual string buildUndefinedName(void) const;
-  virtual string makeNameUnique(const string &nm) const;
-  virtual void saveXml(ostream &s) const;
+  virtual std::string buildUndefinedName(void) const;
+  virtual std::string makeNameUnique(const std::string &nm) const;
+  virtual void saveXml(std::ostream &s) const;
   virtual void restoreXml(const Element *el);
-  virtual void printEntries(ostream &s) const;
+  virtual void printEntries(std::ostream &s) const;
   virtual int4 getCategorySize(int4 cat) const;
   virtual Symbol *getCategorySymbol(int4 cat,int4 ind) const;
   virtual void setCategory(Symbol *sym,int4 cat,int4 ind);
-  static void savePathXml(ostream &s,const vector<string> &vec);	///< Save a path with \<val> tags
-  static void restorePathXml(vector<string> &vec,const Element *el);	///< Restore path from \<val> tags
+  static void savePathXml(std::ostream &s,const std::vector<std::string> &vec);	///< Save a path with \<val> tags
+  static void restorePathXml(std::vector<std::string> &vec,const Element *el);	///< Restore path from \<val> tags
 };
 
 /// \brief An Address range associated with the symbol Scope that owns it
 ///
-/// As part of a rangemap, this forms a map from addresses to
+/// As part of a rangemap, this forms a std::map from addresses to
 /// \e namespace Scopes so that the decompiler can quickly find
 /// the \e namespace Scope that holds the Symbol it sees accessed.
 class ScopeMapper {
@@ -794,7 +794,7 @@ public:
   Scope *getScope(void) const { return scope; }			///< Get the Scope owning this address range
   void initialize(const inittype &data) { scope = data; }	///< Initialize the range (with the owning Scope)
 };
-typedef rangemap<ScopeMapper> ScopeResolve;		///< A map from address to the owning Scope
+typedef rangemap<ScopeMapper> ScopeResolve;		///< A std::map from address to the owning Scope
 
 /// \brief A manager for symbol scopes for a whole executable
 ///
@@ -805,20 +805,20 @@ typedef rangemap<ScopeMapper> ScopeResolve;		///< A map from address to the owni
 ///
 /// A Scope object is initially registered via attachScope(), then it can looked up by name.
 /// This class maintains the cross Scope search by address capability, implemented as a
-/// map from an Address to the Scope that owns it.  For efficiency, this map is really
+/// std::map from an Address to the Scope that owns it.  For efficiency, this std::map is really
 /// only applied to \e namespace Scopes, the global Scope and function Scopes are not
-/// entered in the map.  This class also maintains a set of boolean properties that label
+/// entered in the std::map.  This class also maintains a std::set of boolean properties that label
 /// memory ranges.  This allows important properties like \e read-only and \e volatile to
 /// be put down even if the Symbols aren't yet known.
 class Database {
   Architecture *glb;			///< The Architecture to which this symbol table is attached
   Scope *globalscope;			///< A quick reference to the \e global Scope
-  ScopeResolve resolvemap;		///< The Address to \e namespace map
+  ScopeResolve resolvemap;		///< The Address to \e namespace std::map
   partmap<Address,uint4> flagbase;	///< Map of global properties
   void clearResolve(Scope *scope);	///< Clear the \e ownership ranges associated with the given Scope
   void clearResolveRecursive(Scope *scope);	///< Clear the \e ownership ranges of a given Scope and its children
-  void fillResolve(Scope *scope);	///< Add the \e ownership ranges of the given Scope to the map
-  static void parseParentTag(const Element *el,string &name,vector<string> &parnames);
+  void fillResolve(Scope *scope);	///< Add the \e ownership ranges of the given Scope to the std::map
+  static void parseParentTag(const Element *el,std::string &name,std::vector<std::string> &parnames);
 public:
   Database(Architecture *g) { glb=g; globalscope=(Scope *)0; flagbase.defaultValue() = 0; }	///< Constructor
   ~Database(void);						///< Destructor
@@ -831,15 +831,15 @@ public:
   void addRange(Scope *scope,AddrSpace *spc,uintb first,uintb last);	///< Add an address range to the \e ownership of a Scope
   void removeRange(Scope *scope,AddrSpace *spc,uintb first,uintb last);	///< Remove an address range from \e ownership of a Scope
   Scope *getGlobalScope(void) const { return globalscope; }	///< Get the global Scope
-  Scope *resolveScope(const vector<string> &subnames) const;	///< Look-up a Scope by name
-  Scope *resolveScopeSymbolName(const string &fullname,const string &delim,string &basename,Scope *start) const;
+  Scope *resolveScope(const std::vector<std::string> &subnames) const;	///< Look-up a Scope by name
+  Scope *resolveScopeSymbolName(const std::string &fullname,const std::string &delim,std::string &basename,Scope *start) const;
   const Scope *mapScope(const Scope *qpoint,const Address &addr,const Address &usepoint) const;
   Scope *mapScope(Scope *qpoint,const Address &addr,const Address &usepoint);
   uint4 getProperty(const Address &addr) const { return flagbase.getValue(addr); }	///< Get boolean properties at the given address
   void setPropertyRange(uint4 flags,const Range &range);	///< Set boolean properties over a given memory range
-  void setProperties(const partmap<Address,uint4> &newflags) { flagbase = newflags; }	///< Replace the property map
-  const partmap<Address,uint4> &getProperties(void) const { return flagbase; }	///< Get the entire property map
-  void saveXml(ostream &s) const;				///< Save the whole Database to an XML stream
+  void setProperties(const partmap<Address,uint4> &newflags) { flagbase = newflags; }	///< Replace the property std::map
+  const partmap<Address,uint4> &getProperties(void) const { return flagbase; }	///< Get the entire property std::map
+  void saveXml(std::ostream &s) const;				///< Save the whole Database to an XML stream
   void restoreXml(const Element *el);				///< Recover the whole database from XML
   void restoreXmlScope(const Element *el,Scope *new_scope);	///< Register and fill out a single Scope from XML
 };

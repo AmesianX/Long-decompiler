@@ -52,20 +52,20 @@ private:
   bool endofstream;
   bool endofstreamsent;
   istream *s;
-  string curidentifier;
+  std::string curidentifier;
   uintb curnum;
   void starttoken(void) { curtoken[0] = curchar; tokpos = 1; }
   void advancetoken(void) { curtoken[tokpos++] = curchar; }
   bool isIdent(char c) const { return (isalnum(c)||(c=='_')||(c=='.')); }
   bool isHex(char c) const { return isxdigit(c); }
   bool isDec(char c) const { return isdigit(c); }
-  int4 findIdentifier(const string &str) const;
+  int4 findIdentifier(const std::string &str) const;
   int4 moveState(void);
 public:
   PcodeLexer(void) { s = (istream *)0; }
   void initialize(istream *t);
   int4 getNextToken(void);
-  const string &getIdentifier(void) const { return curidentifier; }
+  const std::string &getIdentifier(void) const { return curidentifier; }
   uintb getNumber(void) const { return curnum; }
 };
 
@@ -75,7 +75,7 @@ class PcodeSnippet : public PcodeCompile {
   SymbolTree tree;		// Symbols in the local scope of the snippet  (temporaries)
   uintb tempbase;
   int4 errorcount;
-  string firsterror;
+  std::string firsterror;
   ConstructTpl *result;
   virtual uintb allocateTemp(void);
   virtual void addSymbol(SleighSymbol *sym);
@@ -84,15 +84,15 @@ public:
   void setResult(ConstructTpl *res) { result = res; }
   ConstructTpl *releaseResult(void) { ConstructTpl *res = result; result = (ConstructTpl *)0; return res; }
   virtual ~PcodeSnippet(void);
-  virtual void reportError(const string &msg);
+  virtual void reportError(const std::string &msg);
   bool hasErrors(void) const { return (errorcount != 0); }
-  const string getErrorMessage(void) const { return firsterror; }
+  const std::string getErrorMessage(void) const { return firsterror; }
   void setUniqueBase(uintb val) { tempbase = val; }
   uintb getUniqueBase(void) const { return tempbase; }
   void clear(void);
   int lex(void);
   bool parseStream(istream& s);
-  void addOperand(const string &name,int4 index);
+  void addOperand(const std::string &name,int4 index);
 };
 
 }

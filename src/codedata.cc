@@ -148,7 +148,7 @@ void CodeDataAnalysis::init(Architecture *g)
 void CodeDataAnalysis::pushTaintAddress(const Address &addr)
 
 {
-  map<Address,CodeUnit>::iterator iter;
+  std::map<Address,CodeUnit>::iterator iter;
 
   iter = codeunit.upper_bound(addr); // First after
   if (iter == codeunit.begin()) return;
@@ -162,7 +162,7 @@ void CodeDataAnalysis::pushTaintAddress(const Address &addr)
 void CodeDataAnalysis::processTaint(void)
 
 {
-  map<Address,CodeUnit>::iterator iter = taintlist.back();
+  std::map<Address,CodeUnit>::iterator iter = taintlist.back();
   taintlist.pop_back();
 
   CodeUnit &cu((*iter).second);
@@ -178,7 +178,7 @@ void CodeDataAnalysis::processTaint(void)
 	taintlist.push_back(iter);
     }
   }
-  map<AddrLink,uint4>::iterator ftiter,diter,enditer;
+  std::map<AddrLink,uint4>::iterator ftiter,diter,enditer;
   ftiter = fromto_crossref.lower_bound(AddrLink(startaddr));
   enditer = fromto_crossref.lower_bound(AddrLink(endaddr));
   fromto_crossref.erase(ftiter,enditer); // Erase all cross-references coming out of this block
@@ -193,15 +193,15 @@ void CodeDataAnalysis::processTaint(void)
   }
 }
 
-Address CodeDataAnalysis::commitCodeVec(const Address &addr,vector<CodeUnit> &codevec,map<AddrLink,uint4> &fromto_vec)
+Address CodeDataAnalysis::commitCodeVec(const Address &addr,std::vector<CodeUnit> &codevec,std::map<AddrLink,uint4> &fromto_vec)
 
-{ // Commit all the code units in the vector, build all the crossrefs
+{ // Commit all the code units in the std::vector, build all the crossrefs
   Address curaddr = addr;
   for(int4 i=0;i<codevec.size();++i) {
     codeunit[curaddr] = codevec[i];
     curaddr = curaddr + codevec[i].size;
   }
-  map<AddrLink,uint4>::iterator citer;
+  std::map<AddrLink,uint4>::iterator citer;
   for(citer=fromto_vec.begin();citer!=fromto_vec.end();++citer) {
     const AddrLink &fromto( (*citer).first );
     fromto_crossref[ fromto ] = (*citer).second;
@@ -214,7 +214,7 @@ Address CodeDataAnalysis::commitCodeVec(const Address &addr,vector<CodeUnit> &co
 void CodeDataAnalysis::clearHitBy(void)
 
 { // Clear all the "hit_by" flags from all code units
-  map<Address,CodeUnit>::iterator iter;
+  std::map<Address,CodeUnit>::iterator iter;
 
   for(iter=codeunit.begin();iter!=codeunit.end();++iter) {
     CodeUnit &cu( (*iter).second );
@@ -225,7 +225,7 @@ void CodeDataAnalysis::clearHitBy(void)
 void CodeDataAnalysis::clearCrossRefs(const Address &addr,const Address &endaddr)
 
 { // Clear all crossrefs originating from [addr,endaddr)
-  map<AddrLink,uint4>::iterator startiter,iter,enditer,tfiter;
+  std::map<AddrLink,uint4>::iterator startiter,iter,enditer,tfiter;
 
   startiter = fromto_crossref.lower_bound(AddrLink(addr));
   enditer = fromto_crossref.lower_bound(AddrLink(endaddr));
@@ -238,7 +238,7 @@ void CodeDataAnalysis::clearCrossRefs(const Address &addr,const Address &endaddr
   fromto_crossref.erase(startiter,enditer);
 }
 
-void CodeDataAnalysis::addTarget(const string &nm,const Address &addr,uint4 mask)
+void CodeDataAnalysis::addTarget(const std::string &nm,const Address &addr,uint4 mask)
 
 { // Add a target thunk to be searched for
   TargetFeature &targfeat(targets[addr]);
@@ -250,7 +250,7 @@ void CodeDataAnalysis::addTarget(const string &nm,const Address &addr,uint4 mask
 void CodeDataAnalysis::clearCodeUnits(const Address &addr,const Address &endaddr)
 
 { // Clear all the code units in [addr,endaddr)
-  map<Address,CodeUnit>::iterator iter,enditer;
+  std::map<Address,CodeUnit>::iterator iter,enditer;
 
   iter = codeunit.lower_bound(addr);
   enditer = codeunit.lower_bound(endaddr);
@@ -262,13 +262,13 @@ Address CodeDataAnalysis::disassembleBlock(const Address &addr,const Address &en
 
 {
   DisassemblyResult disresult;
-  vector<CodeUnit> codevec;
-  map<AddrLink,uint4> fromto_vec;
+  std::vector<CodeUnit> codevec;
+  std::map<AddrLink,uint4> fromto_vec;
   bool flowin = false;
   bool hardend = false;
 
   Address curaddr = addr;
-  map<Address,CodeUnit>::iterator iter;
+  std::map<Address,CodeUnit>::iterator iter;
   iter = codeunit.lower_bound(addr);
   Address lastaddr;
   if (iter != codeunit.end()) {
@@ -300,7 +300,7 @@ Address CodeDataAnalysis::disassembleBlock(const Address &addr,const Address &en
     while(lastaddr < curaddr) {
       if ((!hardend)&&((*iter).second.flags & CodeUnit::notcode)!=0) {
 	if ((*iter).second.size == 1) {
-	  map<Address,CodeUnit>::iterator iter2 = iter;
+	  std::map<Address,CodeUnit>::iterator iter2 = iter;
 	  ++iter;		// We delete the bad disassembly, as it looks like it is unaligned
 	  codeunit.erase(iter2);
 	  if (iter != codeunit.end()) {
@@ -365,7 +365,7 @@ void CodeDataAnalysis::disassembleRange(const Range &range)
 void CodeDataAnalysis::disassembleRangeList(const RangeList &rangelist)
 
 {
-  set<Range>::const_iterator iter,enditer;
+  std::set<Range>::const_iterator iter,enditer;
   iter = rangelist.begin();
   enditer = rangelist.end();
 
@@ -379,10 +379,10 @@ void CodeDataAnalysis::findNotCodeUnits(void)
 
 { // Mark any code units that have flow into "notcode" units as "notcode"
   // Remove any references to or from these units
-  map<Address,CodeUnit>::iterator iter;
+  std::map<Address,CodeUnit>::iterator iter;
 
   // We spread the "notcode" attribute as a taint
-  // We build the initial work list with known "notcode"
+  // We build the initial work std::list with known "notcode"
   for(iter=codeunit.begin();iter!=codeunit.end();++iter) {
     if (((*iter).second.flags & CodeUnit::notcode)!=0)
       taintlist.push_back(iter);
@@ -395,7 +395,7 @@ void CodeDataAnalysis::findNotCodeUnits(void)
 void CodeDataAnalysis::markFallthruHits(void)
 
 { // Mark every code unit that has another code unit fall into it
-  map<Address,CodeUnit>::iterator iter;
+  std::map<Address,CodeUnit>::iterator iter;
 
   Address fallthruaddr((AddrSpace *)0,0);
   iter = codeunit.begin();
@@ -412,8 +412,8 @@ void CodeDataAnalysis::markFallthruHits(void)
 void CodeDataAnalysis::markCrossHits(void)
 
 { // Mark every codeunit hit by a call or jump
-  map<AddrLink,uint4>::iterator iter;
-  map<Address,CodeUnit>::iterator fiter;
+  std::map<AddrLink,uint4>::iterator iter;
+  std::map<Address,CodeUnit>::iterator fiter;
 
   for(iter=tofrom_crossref.begin();iter!=tofrom_crossref.end();++iter) {
     fiter = codeunit.find((*iter).first.a);
@@ -434,7 +434,7 @@ void CodeDataAnalysis::addTargetHit(const Address &codeaddr,uintb targethit)
   targethits.back().funcstart = findFunctionStart( codeaddr );
   targethits.back().codeaddr = codeaddr;
   targethits.back().thunkaddr = Address(glb->translate->getDefaultSpace(),targethit);
-  map<Address,TargetFeature>::const_iterator titer;
+  std::map<Address,TargetFeature>::const_iterator titer;
   titer = targets.find( targethits.back().thunkaddr );
   if (titer != targets.end())
     targethits.back().mask = (*titer).second.featuremask;
@@ -447,7 +447,7 @@ void CodeDataAnalysis::resolveThunkHit(const Address &codeaddr,uintb targethit)
 { // Code unit make indirect jump to target
   // Assume the address of the jump is another level of thunk
   // Look for direct calls to it and include those as TargetHits
-  map<AddrLink,uint4>::iterator iter,enditer;
+  std::map<AddrLink,uint4>::iterator iter,enditer;
   iter = tofrom_crossref.lower_bound(AddrLink(codeaddr));
   Address endaddr = codeaddr + 1;
   enditer = tofrom_crossref.lower_bound(AddrLink(endaddr));
@@ -462,7 +462,7 @@ void CodeDataAnalysis::resolveThunkHit(const Address &codeaddr,uintb targethit)
 void CodeDataAnalysis::findUnlinked(void)
 
 { // Find all code units that have no jump/call/fallthru to them
-  map<Address,CodeUnit>::iterator iter;
+  std::map<Address,CodeUnit>::iterator iter;
 
   for(iter=codeunit.begin();iter!=codeunit.end();++iter) {
     CodeUnit &cu( (*iter).second);
@@ -482,7 +482,7 @@ void CodeDataAnalysis::findUnlinked(void)
   }
 }
 
-bool CodeDataAnalysis::checkErrantStart(map<Address,CodeUnit>::iterator iter)
+bool CodeDataAnalysis::checkErrantStart(std::map<Address,CodeUnit>::iterator iter)
 
 {
   int4 count=0;
@@ -508,10 +508,10 @@ bool CodeDataAnalysis::repairJump(const Address &addr,int4 max)
   // disassembly for up to -max- instructions following it,
   // trying to get back on cut
   DisassemblyResult disresult;
-  vector<CodeUnit> codevec;
-  map<AddrLink,uint4> fromto_vec;
+  std::vector<CodeUnit> codevec;
+  std::map<AddrLink,uint4> fromto_vec;
   Address curaddr = addr;
-  map<Address,CodeUnit>::iterator iter;
+  std::map<Address,CodeUnit>::iterator iter;
   int4 count = 0;
 
   iter = codeunit.lower_bound(addr);
@@ -542,8 +542,8 @@ bool CodeDataAnalysis::repairJump(const Address &addr,int4 max)
 void CodeDataAnalysis::findOffCut(void)
 
 {
-  map<AddrLink,uint4>::iterator iter;
-  map<Address,CodeUnit>::iterator citer;
+  std::map<AddrLink,uint4>::iterator iter;
+  std::map<Address,CodeUnit>::iterator citer;
 
   iter = tofrom_crossref.begin();
   while(iter!=tofrom_crossref.end()) {
@@ -589,7 +589,7 @@ void CodeDataAnalysis::findOffCut(void)
 Address CodeDataAnalysis::findFunctionStart(const Address &addr) const
 
 { // Find the starting address of a function containing the address addr
-  map<AddrLink,uint4>::const_iterator iter;
+  std::map<AddrLink,uint4>::const_iterator iter;
 
   iter = tofrom_crossref.lower_bound( AddrLink(addr ) );
   while(iter != tofrom_crossref.begin()) {
@@ -600,80 +600,80 @@ Address CodeDataAnalysis::findFunctionStart(const Address &addr) const
   return Address();		// Return invalid address
 }
 
-void CodeDataAnalysis::dumpModelHits(ostream &s) const
+void CodeDataAnalysis::dumpModelHits(std::ostream &s) const
 
 {
-  set<Range>::const_iterator iter,enditer;
+  std::set<Range>::const_iterator iter,enditer;
   iter = modelhits.begin();
   enditer = modelhits.end();
   while(iter != enditer) {
     uintb off = (*iter).getFirst();
-    s << hex << "0x" << off << ' ';
+    s << std::dec << "0x" << off << ' ';
     uintb endoff = (*iter).getLast();
-    s << hex << "0x" << endoff;
+    s << std::dec << "0x" << endoff;
     ++iter;
     if (iter != enditer) {
       off = (*iter).getFirst();
-      s << ' ' << dec << (int4)(off-endoff);
+      s << ' ' << std::dec << (int4)(off-endoff);
     }
-    s << endl;
+    s << std::endl;
   }
 }
 
-void CodeDataAnalysis::dumpCrossRefs(ostream &s) const
+void CodeDataAnalysis::dumpCrossRefs(std::ostream &s) const
 
 {
-  map<AddrLink,uint4>::const_iterator iter;
+  std::map<AddrLink,uint4>::const_iterator iter;
 
   for(iter=fromto_crossref.begin();iter!=fromto_crossref.end();++iter) {
     AddrLink addrlink = (*iter).first;
     uint4 flags = (*iter).second;
     
-    s << hex << "0x" << addrlink.a.getOffset() << " -> 0x" << addrlink.b.getOffset();
+    s << std::dec << "0x" << addrlink.a.getOffset() << " -> 0x" << addrlink.b.getOffset();
     if ((flags & CodeUnit::call)!=0)
       s << " call";
-    s << endl;
+    s << std::endl;
   }
 }
 
-void CodeDataAnalysis::dumpFunctionStarts(ostream &s) const
+void CodeDataAnalysis::dumpFunctionStarts(std::ostream &s) const
 
 {
-  map<AddrLink,uint4>::const_iterator iter;
+  std::map<AddrLink,uint4>::const_iterator iter;
 
   for(iter=tofrom_crossref.begin();iter!=tofrom_crossref.end();++iter) {
     AddrLink addrlink = (*iter).first;
     uint4 flags = (*iter).second;
     
     if ((flags & CodeUnit::call)!=0)
-      s << hex << "0x" << addrlink.a.getOffset() << endl;
+      s << std::dec << "0x" << addrlink.a.getOffset() << std::endl;
   }
 }
 
-void CodeDataAnalysis::dumpUnlinked(ostream &s) const
+void CodeDataAnalysis::dumpUnlinked(std::ostream &s) const
 
 {
-  list<Address>::const_iterator iter;
+  std::list<Address>::const_iterator iter;
 
   for(iter=unlinkedstarts.begin();iter!=unlinkedstarts.end();++iter) {
-    s << hex << "0x" << (*iter).getOffset() << endl;
+    s << std::dec << "0x" << (*iter).getOffset() << std::endl;
   }
 }
 
-void CodeDataAnalysis::dumpTargetHits(ostream &s) const
+void CodeDataAnalysis::dumpTargetHits(std::ostream &s) const
 
 { // Dump every code unit that refers to a target
-  list<TargetHit>::const_iterator iter;
+  std::list<TargetHit>::const_iterator iter;
 
   for(iter=targethits.begin();iter!=targethits.end();++iter) {
     Address funcaddr = (*iter).funcstart;
     Address addr = (*iter).codeaddr;
-    string nm = (*targets.find((*iter).thunkaddr)).second.name;
+    std::string nm = (*targets.find((*iter).thunkaddr)).second.name;
     if (!funcaddr.isInvalid())
-      s << hex << funcaddr.getOffset() << ' ';
+      s << std::dec << funcaddr.getOffset() << ' ';
     else
       s << "nostart ";
-    s << hex << addr.getOffset() << ' ' << nm << endl;
+    s << std::dec << addr.getOffset() << ' ' << nm << std::endl;
   }
 }
 
@@ -712,7 +712,7 @@ void CodeDataAnalysis::runModel(void)
   markFallthruHits();
   markCrossHits();
   findUnlinked();
-  targethits.sort();		// Sort the list of hits by function containing hit
+  targethits.sort();		// Sort the std::list of hits by function containing hit
 }
 
 void IfaceCodeDataCommand::setData(IfaceStatus *root,IfaceData *data)
@@ -732,14 +732,14 @@ void IfcCodeDataInit::execute(istream &s)
 void IfcCodeDataTarget::execute(istream &s)
 
 {
-  string token;
+  std::string token;
 
   s >> ws;
   if (s.eof())
     throw IfaceParseError("Missing system call name");
 
   s >> token;
-  vector<ImportRecord> irec;
+  std::vector<ImportRecord> irec;
   LoadImageBfd *loadbfd = (LoadImageBfd *) dcp->conf->loader;
   loadbfd->getImportTable(irec);
   int4 i;
@@ -747,7 +747,7 @@ void IfcCodeDataTarget::execute(istream &s)
     if (irec[i].funcname == token) break;
   }
   if (i==irec.size())
-    *status->fileoptr << "Unable to find reference to call " << token << endl;
+    *status->fileoptr << "Unable to find reference to call " << token << std::endl;
   else {
     codedata->addTarget(irec[i].funcname,irec[i].thunkaddress,(uint4)1);
   }

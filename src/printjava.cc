@@ -35,7 +35,7 @@ PrintLanguage *PrintJavaCapability::buildLanguage(Architecture *glb)
   return new PrintJava(glb,name);
 }
 
-PrintJava::PrintJava(Architecture *glb,const string &nm) : PrintC(glb,nm)
+PrintJava::PrintJava(Architecture *glb,const std::string &nm) : PrintC(glb,nm)
 
 {
   option_NULL = true;			// Automatically use 'null' token
@@ -82,7 +82,7 @@ void PrintJava::pushTypeStart(const Datatype *ct,bool noident)
 
   if (ct->getName().size()==0) {	// Check for anonymous type
     // We could support a struct or enum declaration here
-    string name = genericTypeName(ct);
+    std::string name = genericTypeName(ct);
     pushAtom(Atom(name,typetoken,EmitXml::type_color,ct));
   }
   else {
@@ -150,7 +150,7 @@ bool PrintJava::needZeroArray(const Varnode *vn)
   return true;
 }
 
-void PrintJava::printUnicode(ostream &s,int4 onechar) const
+void PrintJava::printUnicode(std::ostream &s,int4 onechar) const
 
 {
   if (unicodeNeedsEscape(onechar)) {
@@ -185,10 +185,10 @@ void PrintJava::printUnicode(ostream &s,int4 onechar) const
     }
     // Generic unicode escape
     if (onechar < 65536) {
-      s << "\\ux" << setfill('0') << setw(4) << hex << onechar;
+      s << "\\ux" << setfill('0') << setw(4) << std::dec << onechar;
     }
     else
-      s << "\\ux" << setfill('0') << setw(8) << hex << onechar;
+      s << "\\ux" << setfill('0') << setw(8) << std::dec << onechar;
     return;
   }
   writeUtf8(s, onechar);		// Emit normally
@@ -254,7 +254,7 @@ void PrintJava::opCpoolRefOp(const PcodeOp *op)
 {
   const Varnode *outvn = op->getOut();
   const Varnode *vn0 = op->getIn(0);
-  vector<uintb> refs;
+  std::vector<uintb> refs;
   for(int4 i=1;i<op->numInput();++i)
     refs.push_back(op->getIn(i)->getOffset());
   const CPoolRecord *rec = glb->cpool->getRecord(refs);
@@ -265,7 +265,7 @@ void PrintJava::opCpoolRefOp(const PcodeOp *op)
     switch(rec->getTag()) {
     case CPoolRecord::string_literal:
       {
-	ostringstream str;
+	std::ostringstream str;
 	int4 len = rec->getByteDataLength();
 	if (len > 2048)
 	  len = 2048;

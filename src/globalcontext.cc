@@ -32,19 +32,19 @@ ContextBitRange::ContextBitRange(int4 sbit,int4 ebit)
   mask = (~((uintm)0))>>(startbit+shift);
 }
 
-/// The register storage and value are serialized as a \<set> tag.
+/// The register storage and value are serialized as a \std::set tag.
 /// \param s is the output stream
 void TrackedContext::saveXml(std::ostream &s) const
 
 {
-  s << "<set";
+  s << "<std::set";
   loc.space->saveXmlAttributes(s,loc.offset,loc.size);
   a_v_u(s,"val",val);
   s << "/>\n";
 }
 
-/// Read a \<set> tag to fill in the storage and value details
-/// \param el is the root \<set> tag
+/// Read a \std::set tag to fill in the storage and value details
+/// \param el is the root \std::set tag
 /// \param manage is the manager used to decode address references
 void TrackedContext::restoreXml(const Element *el,const AddrSpaceManager *manage)
 
@@ -52,8 +52,8 @@ void TrackedContext::restoreXml(const Element *el,const AddrSpaceManager *manage
   int4 size;
   Address addr = Address::restoreXml(el,manage,size);
   
-  istringstream s(el->getAttributeValue("val"));
-  s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+  std::istringstream s(el->getAttributeValue("val"));
+  s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
   s >> val;
 
   loc.space = addr.getSpace();
@@ -67,7 +67,7 @@ void TrackedContext::restoreXml(const Element *el,const AddrSpaceManager *manage
 /// as a \<tracked_pointset> tag.
 /// \param s is the output stream
 /// \param addr is the specific address we have tracked values for
-/// \param vec is the list of tracked values
+/// \param vec is the std::list of tracked values
 void ContextDatabase::saveTracked(std::ostream &s,const Address &addr,
 				  const TrackedSet &vec)
 {
@@ -84,7 +84,7 @@ void ContextDatabase::saveTracked(std::ostream &s,const Address &addr,
 
 /// \brief Restore a sequence of tracked register values from an XML stream
 ///
-/// Given a root \<tracked_pointset> tag, decode each child in turn populating a list of
+/// Given a root \<tracked_pointset> tag, decode each child in turn populating a std::list of
 /// TrackedContext objects.
 /// \param el is the root tag
 /// \param manage is used to resolve address space references
@@ -108,7 +108,7 @@ void ContextDatabase::restoreTracked(const Element *el,const AddrSpaceManager *m
 /// The default value is returned for addresses that have not been overlaid with other values.
 /// \param nm is the name of the context variable
 /// \param val is the default value to establish
-void ContextDatabase::setVariableDefault(const string &nm,uintm val)
+void ContextDatabase::setVariableDefault(const std::string &nm,uintm val)
 
 {
   ContextBitRange &var( getVariable(nm) );
@@ -118,7 +118,7 @@ void ContextDatabase::setVariableDefault(const string &nm,uintm val)
 /// This will return the default value used for addresses that have not been overlaid with other values.
 /// \param nm is the name of the context variable
 /// \return the variable's default value
-uintm ContextDatabase::getDefaultValue(const string &nm) const
+uintm ContextDatabase::getDefaultValue(const std::string &nm) const
 
 {
   const ContextBitRange &var( getVariable(nm) );
@@ -129,26 +129,26 @@ uintm ContextDatabase::getDefaultValue(const string &nm) const
 /// point of change.
 /// \param nm is the name of the context variable
 /// \param addr is the given address
-/// \param value is the new value to set
-void ContextDatabase::setVariable(const string &nm,const Address &addr,
+/// \param value is the new value to std::set
+void ContextDatabase::setVariable(const std::string &nm,const Address &addr,
 			       uintm value)
 {
   const ContextBitRange &bitrange( getVariable(nm) );
   int4 num = bitrange.getWord();
   uintm mask = bitrange.getMask()<<bitrange.getShift();
 
-  vector<uintm *> contvec;
+  std::vector<uintm *> contvec;
   getRegionToChangePoint(contvec,addr,num,mask);
   for(uint4 i=0;i<contvec.size();++i)
     bitrange.setValue(contvec[i],value);
 }
 
-/// If a value has not been explicit set for an address range containing the given address,
+/// If a value has not been explicit std::set for an address range containing the given address,
 /// the default value for the variable is returned
 /// \param nm is the name of the context variable
 /// \param addr is the address for which the specific value is needed
 /// \return the context variable value for the address
-uintm ContextDatabase::getVariable(const string &nm,const Address &addr) const
+uintm ContextDatabase::getVariable(const std::string &nm,const Address &addr) const
 
 {
   const ContextBitRange &bitrange( getVariable(nm) );
@@ -165,11 +165,11 @@ uintm ContextDatabase::getVariable(const string &nm,const Address &addr) const
 /// \param addr is the given starting address
 /// \param num is the index of the word (within the context blob) of the context variable
 /// \param mask is the mask delimiting the context variable (within its word)
-/// \param value is the (already shifted) value being set
+/// \param value is the (already shifted) value being std::set
 void ContextDatabase::setContextChangePoint(const Address &addr,int4 num,uintm mask,uintm value)
 
 {
-  vector<uintm *> contvec;
+  std::vector<uintm *> contvec;
   getRegionToChangePoint(contvec,addr,num,mask);
   for(uint4 i=0;i<contvec.size();++i) {
     uintm *newcontext = contvec[i];
@@ -188,11 +188,11 @@ void ContextDatabase::setContextChangePoint(const Address &addr,int4 num,uintm m
 /// \param addr2 is the ending address of the given range
 /// \param num is the index of the word (within the context blob) of the context variable
 /// \param mask is the mask delimiting the context variable (within its word)
-/// \param value is the (already shifted) value being set
+/// \param value is the (already shifted) value being std::set
 void ContextDatabase::setContextRegion(const Address &addr1,const Address &addr2,
 				       int4 num,uintm mask,uintm value)
 {
-  vector<uintm *> vec;
+  std::vector<uintm *> vec;
   getRegionForSet(vec,addr1,addr2,num,mask);
   for(uint4 i=0;i<vec.size();++i)
     vec[i][num] = (vec[i][num] & ~mask) | value;
@@ -202,18 +202,18 @@ void ContextDatabase::setContextRegion(const Address &addr1,const Address &addr2
 ///
 /// The new value is \e painted over an explicit range of addresses. No other context variable is
 /// changed inside (or outside) the range.
-/// \param nm is the name of the context variable to set
+/// \param nm is the name of the context variable to std::set
 /// \param begad is the starting address of the given range
 /// \param endad is the ending address of the given range
-/// \param value is the new value to set
-void ContextDatabase::setVariableRegion(const string &nm,
+/// \param value is the new value to std::set
+void ContextDatabase::setVariableRegion(const std::string &nm,
 				     const Address &begad,
 				     const Address &endad,
 				     uintm value)
 {
   const ContextBitRange &bitrange( getVariable(nm) );
 
-  vector<uintm *> vec;
+  std::vector<uintm *> vec;
   getRegionForSet(vec,begad,endad,bitrange.getWord(),bitrange.getMask() << bitrange.getShift());
   for(int4 i=0;i<vec.size();++i)
     bitrange.setValue(vec[i],value);
@@ -310,7 +310,7 @@ ContextInternal::FreeArray &ContextInternal::FreeArray::operator=(const FreeArra
     mask = new uintm[size];
     for(int4 i=0;i<size;++i) {
       array[i] = op2.array[i];		// Copy value at split point
-      mask[i] = 0;			// but not fact that value is being set
+      mask[i] = 0;			// but not fact that value is being std::set
     }
   }
   return *this;
@@ -319,7 +319,7 @@ ContextInternal::FreeArray &ContextInternal::FreeArray::operator=(const FreeArra
 /// \brief Write out a single context block as an XML tag
 ///
 /// The blob is broken up into individual values and written out as a series
-/// of \<set> tags within a parent \<context_pointset> tag.
+/// of \std::set tags within a parent \<context_pointset> tag.
 /// \param s is the output stream
 /// \param addr is the address of the split point where the blob is valid
 /// \param vec is the array of words holding the blob values
@@ -329,10 +329,10 @@ void ContextInternal::saveContext(std::ostream &s,const Address &addr,
   s << "<context_pointset";
   addr.getSpace()->saveXmlAttributes(s,addr.getOffset() );
   s << ">\n";
-  map<string,ContextBitRange>::const_iterator iter;
+  std::map<std::string,ContextBitRange>::const_iterator iter;
   for(iter=variables.begin();iter!=variables.end();++iter) {
     uintm val = (*iter).second.getValue(vec);
-    s << "  <set";
+    s << "  <std::set";
     a_v(s,"name",(*iter).first);
     a_v_u(s,"val",val);
     s << "/>\n";
@@ -344,7 +344,7 @@ void ContextInternal::saveContext(std::ostream &s,const Address &addr,
 ///
 /// The tag can be either \<context_pointset> or \<context_set>. In either case,
 /// children are parsed to get context variable values.  Then a context blob is
-/// reconstructed from the values.  The new blob is added to the interval map based
+/// reconstructed from the values.  The new blob is added to the interval std::map based
 /// on the address range.  If the start address is invalid, the default value of
 /// the context variables are painted.  The second address can be invalid, if
 /// only a split point is known.
@@ -359,13 +359,13 @@ void ContextInternal::restoreContext(const Element *el,const Address &addr1,cons
 
   while(iter != list.end()) {
     const Element *subel = *iter;
-    istringstream s(subel->getAttributeValue("val"));
-    s.unsetf(std::ios::dec | std::ios::hex | std::ios::oct);
+    std::istringstream s(subel->getAttributeValue("val"));
+    s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
     uintm val;
     s >> val;
     ContextBitRange &var(getVariable(subel->getAttributeValue("name")));
-    vector<uintm *> vec;
-    if (addr1.isInvalid()) {		// Invalid addr1, indicates we should set default value
+    std::vector<uintm *> vec;
+    if (addr1.isInvalid()) {		// Invalid addr1, indicates we should std::set default value
       uintm *defaultBuffer = getDefaultValue();
       for(int4 i=0;i<size;++i)
 	defaultBuffer[i] = 0;
@@ -379,7 +379,7 @@ void ContextInternal::restoreContext(const Element *el,const Address &addr1,cons
   }
 }
 
-void ContextInternal::registerVariable(const string &nm,int4 sbit,int4 ebit)
+void ContextInternal::registerVariable(const std::string &nm,int4 sbit,int4 ebit)
 
 {
   if (!database.empty())
@@ -396,10 +396,10 @@ void ContextInternal::registerVariable(const string &nm,int4 sbit,int4 ebit)
   variables[nm] = bitrange;
 }
 
-ContextBitRange &ContextInternal::getVariable(const string &nm)
+ContextBitRange &ContextInternal::getVariable(const std::string &nm)
 
 {
-  map<string,ContextBitRange>::iterator iter;
+  std::map<std::string,ContextBitRange>::iterator iter;
 
   iter = variables.find(nm);
   if (iter == variables.end())
@@ -407,10 +407,10 @@ ContextBitRange &ContextInternal::getVariable(const string &nm)
   return (*iter).second;
 }
 
-const ContextBitRange &ContextInternal::getVariable(const string &nm) const
+const ContextBitRange &ContextInternal::getVariable(const std::string &nm) const
 
 {
-  map<string,ContextBitRange>::const_iterator iter;
+  std::map<std::string,ContextBitRange>::const_iterator iter;
 
   iter = variables.find(nm);
   if (iter == variables.end())
@@ -435,7 +435,7 @@ const uintm *ContextInternal::getContext(const Address &addr,
   return res;
 }
 
-void ContextInternal::getRegionForSet(vector<uintm *> &res,const Address &addr1,const Address &addr2,
+void ContextInternal::getRegionForSet(std::vector<uintm *> &res,const Address &addr1,const Address &addr2,
 				      int4 num,uintm mask)
 {
   database.split(addr1);
@@ -452,12 +452,12 @@ void ContextInternal::getRegionForSet(vector<uintm *> &res,const Address &addr1,
     uintm *context = (*aiter).second.array;
     uintm *maskPtr = (*aiter).second.mask;
     res.push_back(context);
-    maskPtr[num] |= mask;		// Mark that this value is being definitely set
+    maskPtr[num] |= mask;		// Mark that this value is being definitely std::set
     ++aiter;
   }
 }
 
-void ContextInternal::getRegionToChangePoint(vector<uintm *> &res,const Address &addr,int4 num,uintm mask)
+void ContextInternal::getRegionToChangePoint(std::vector<uintm *> &res,const Address &addr,int4 num,uintm mask)
 
 {
   database.split(addr);
@@ -475,7 +475,7 @@ void ContextInternal::getRegionToChangePoint(vector<uintm *> &res,const Address 
   while(aiter != biter) {
     vecArray = (*aiter).second.array;
     maskArray = (*aiter).second.mask;
-    if ((maskArray[num] & mask) != 0) break; // Reached point where this value was definitively set before
+    if ((maskArray[num] & mask) != 0) break; // Reached point where this value was definitively std::set before
     res.push_back(vecArray);
     ++aiter;
   }
@@ -594,12 +594,12 @@ void ContextCache::getContext(const Address &addr,uintm *buf) const
 
 /// \brief Change the value of a context variable at the given address with no bound
 ///
-/// The context value is set starting at the given address and \e paints memory up
+/// The context value is std::set starting at the given address and \e paints memory up
 /// to the next explicit change point.
 /// \param addr is the given starting address
 /// \param num is the word index of the context variable
 /// \param mask is the mask delimiting the context variable
-/// \param value is the (already shifted) value to set
+/// \param value is the (already shifted) value to std::set
 void ContextCache::setContext(const Address &addr,int4 num,uintm mask,uintm value)
 
 {
@@ -617,7 +617,7 @@ void ContextCache::setContext(const Address &addr,int4 num,uintm mask,uintm valu
 /// \param addr2 is the ending address of the given range
 /// \param num is the word index of the context variable
 /// \param mask is the mask delimiting the context variable
-/// \param value is the (already shifted) value to set
+/// \param value is the (already shifted) value to std::set
 void ContextCache::setContext(const Address &addr1,const Address &addr2,int4 num,uintm mask,uintm value)
 
 {

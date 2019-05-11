@@ -23,7 +23,7 @@ namespace GhidraDec {
 /// printed to stream.  This is suitable for a console mode or debug view
 /// of the state of control-flow structuring at any point during analysis.
 /// \param s is the output stream
-void Funcdata::printBlockTree(ostream &s) const
+void Funcdata::printBlockTree(std::ostream &s) const
 
 {
   if (sblocks.getSize() != 0)
@@ -41,8 +41,8 @@ void Funcdata::clearBlocks(void)
 void Funcdata::clearJumpTables(void)
 
 {
-  vector<JumpTable *> remain;
-  vector<JumpTable *>::iterator iter;
+  std::vector<JumpTable *> remain;
+  std::vector<JumpTable *>::iterator iter;
 
   for(iter=jumpvec.begin();iter!=jumpvec.end();++iter) {
     JumpTable *jt = *iter;
@@ -63,8 +63,8 @@ void Funcdata::clearJumpTables(void)
 void Funcdata::removeJumpTable(JumpTable *jt)
 
 {
-  vector<JumpTable *> remain;
-  vector<JumpTable *>::iterator iter;
+  std::vector<JumpTable *> remain;
+  std::vector<JumpTable *>::iterator iter;
   
   for(iter=jumpvec.begin();iter!=jumpvec.end();++iter)
     if ((*iter) != jt)
@@ -86,8 +86,8 @@ void Funcdata::pushMultiequals(BlockBasic *bb)
   BlockBasic *outblock;
   PcodeOp *origop,*replaceop;
   Varnode *origvn,*replacevn;
-  list<PcodeOp *>::iterator iter;
-  list<PcodeOp *>::const_iterator citer;
+  std::list<PcodeOp *>::iterator iter;
+  std::list<PcodeOp *>::const_iterator citer;
 
   if (bb->sizeOut()==0) return;
   if (bb->sizeOut()>1)
@@ -116,7 +116,7 @@ void Funcdata::pushMultiequals(BlockBasic *bb)
     }
     if (!needreplace) continue;
 				// Construct artificial MULTIEQUAL
-    vector<Varnode *> branches;
+    std::vector<Varnode *> branches;
     if (neednewunique)
       replacevn = newUnique(origvn->getSize());
     else
@@ -143,7 +143,7 @@ void Funcdata::pushMultiequals(BlockBasic *bb)
     // Replace obsolete origvn with replacevn
     int4 i;
     int4 outblock_ind = bb->getOutRevIndex(0);
-    list<PcodeOp *>::iterator titer = origvn->descend.begin();
+    std::list<PcodeOp *>::iterator titer = origvn->descend.begin();
     while(titer != origvn->descend.end()) {
       PcodeOp *op = *titer++;
       i = op->getSlot(origvn);
@@ -182,7 +182,7 @@ void Funcdata::branchRemoveInternal(BlockBasic *bb,int4 num)
 
 {
   BlockBasic *bbout;
-  list<PcodeOp *>::iterator iter;
+  std::list<PcodeOp *>::iterator iter;
   PcodeOp *op;
   int4 blocknum;
   
@@ -219,7 +219,7 @@ void Funcdata::removeBranch(BlockBasic *bb,int4 num)
 bool Funcdata::descendantsOutside(Varnode *vn)
 
 {
-  list<PcodeOp *>::const_iterator iter;
+  std::list<PcodeOp *>::const_iterator iter;
 
   for(iter=vn->beginDescend();iter!=vn->endDescend();++iter)
     if (!(*iter)->getParent()->isDead()) return true;
@@ -243,7 +243,7 @@ void Funcdata::blockRemoveInternal(BlockBasic *bb,bool unreachable)
   BlockBasic *bbout;
   Varnode *deadvn;
   PcodeOp *op,*deadop;
-  list<PcodeOp *>::iterator iter;
+  std::list<PcodeOp *>::iterator iter;
   int4 i,j,blocknum;
   bool desc_warning;
 
@@ -332,7 +332,7 @@ void Funcdata::removeDoNothingBlock(BlockBasic *bb)
 bool Funcdata::removeUnreachableBlocks(bool issuewarning,bool checkexistence)
 
 {
-  vector<FlowBlock *> list;
+  std::vector<FlowBlock *> std::list;
   uint4 i;
 
   if (checkexistence) { // Quick check for the existence of unreachable blocks
@@ -350,13 +350,13 @@ bool Funcdata::removeUnreachableBlocks(bool issuewarning,bool checkexistence)
 
   for(i=0;i<bblocks.getSize();++i) // Find entry point
     if (bblocks.getBlock(i)->isEntryPoint()) break;
-  bblocks.collectReachable(list,bblocks.getBlock(i),true); // Collect (un)reachable blocks
+  bblocks.collectReachable(std::list,bblocks.getBlock(i),true); // Collect (un)reachable blocks
 
-  for(int4 i=0;i<list.size();++i) {
-    list[i]->setDead();
+  for(int4 i=0;i<std::list.size();++i) {
+    std::list[i]->setDead();
     if (issuewarning) {
-      ostringstream s;
-      BlockBasic *bb = (BlockBasic *)list[i];
+      std::ostringstream s;
+      BlockBasic *bb = (BlockBasic *)std::list[i];
       s << "Removing unreachable block (";
       s << bb->getStart().getSpace()->getName();
       s << ',';
@@ -365,13 +365,13 @@ bool Funcdata::removeUnreachableBlocks(bool issuewarning,bool checkexistence)
       warningHeader(s.str());
     }
   }
-  for(int4 i=0;i<list.size();++i) {
-    BlockBasic *bb = (BlockBasic *)list[i];
+  for(int4 i=0;i<std::list.size();++i) {
+    BlockBasic *bb = (BlockBasic *)std::list[i];
     while(bb->sizeOut() > 0)
       branchRemoveInternal(bb,0);
   }
-  for(int4 i=0;i<list.size();++i) {
-    BlockBasic *bb = (BlockBasic *)list[i];
+  for(int4 i=0;i<std::list.size();++i) {
+    BlockBasic *bb = (BlockBasic *)std::list[i];
     blockRemoveInternal(bb,true);
   }
   structureReset();
@@ -412,7 +412,7 @@ void Funcdata::pushBranch(BlockBasic *bb,int4 slot,BlockBasic *bbnew)
 JumpTable *Funcdata::linkJumpTable(PcodeOp *op)
 
 {
-  vector<JumpTable *>::iterator iter;
+  std::vector<JumpTable *>::iterator iter;
   JumpTable *jt;
 
   for(iter=jumpvec.begin();iter!=jumpvec.end();++iter) {
@@ -431,7 +431,7 @@ JumpTable *Funcdata::linkJumpTable(PcodeOp *op)
 JumpTable *Funcdata::findJumpTable(const PcodeOp *op) const
 
 {
-  vector<JumpTable *>::const_iterator iter;
+  std::vector<JumpTable *>::const_iterator iter;
   JumpTable *jt;
 
   for(iter=jumpvec.begin();iter!=jumpvec.end();++iter) {
@@ -480,9 +480,9 @@ int4 Funcdata::stageJumpTable(JumpTable *jt,PcodeOp *op,FlowInfo *flow)
 
 {
   PcodeOp *partop = (PcodeOp *)0;
-  string oldactname;
+  std::string oldactname;
 
-  ostringstream s1;
+  std::ostringstream s1;
   s1 << name << "@@jump@";
   op->getAddr().printRaw(s1);
 
@@ -586,7 +586,7 @@ JumpTable *Funcdata::recoverJumpTable(PcodeOp *op,FlowInfo *flow,int4 &failuremo
 void Funcdata::switchOverJumpTables(const FlowInfo &flow)
 
 {
-  vector<JumpTable *>::iterator iter;
+  std::vector<JumpTable *>::iterator iter;
 
   for(iter=jumpvec.begin();iter!=jumpvec.end();++iter)
     (*iter)->switchOver(flow);
@@ -595,7 +595,7 @@ void Funcdata::switchOverJumpTables(const FlowInfo &flow)
 void Funcdata::installSwitchDefaults(void)
 
 {
-  vector<JumpTable *>::iterator iter;
+  std::vector<JumpTable *>::iterator iter;
   for(iter=jumpvec.begin();iter!=jumpvec.end();++iter) {
     JumpTable *jt = *iter;
     PcodeOp *indop = jt->getIndirectOp();
@@ -612,8 +612,8 @@ void Funcdata::installSwitchDefaults(void)
 void Funcdata::structureReset(void)
 
 {
-  vector<JumpTable *>::iterator iter;
-  vector<FlowBlock *> rootlist;
+  std::vector<JumpTable *>::iterator iter;
+  std::vector<FlowBlock *> rootlist;
 
   flags &= ~blocks_unreachable;	// Clear any old blocks flag
   bblocks.structureLoops(rootlist);
@@ -621,7 +621,7 @@ void Funcdata::structureReset(void)
   if (rootlist.size() > 1)
     flags |= blocks_unreachable;
   // Check for dead jumptables
-  vector<JumpTable *> alivejumps;
+  std::vector<JumpTable *> alivejumps;
   for(iter=jumpvec.begin();iter!=jumpvec.end();++iter) {
     JumpTable *jt = *iter;
     PcodeOp *indop = jt->getIndirectOp();
@@ -798,7 +798,7 @@ void Funcdata::nodeSplitRawDuplicate(BlockBasic *b,BlockBasic *bprime)
 
 {
   PcodeOp *b_op,*prime_op;
-  list<PcodeOp *>::iterator iter;
+  std::list<PcodeOp *>::iterator iter;
 
   for(iter=b->beginOp();iter!=b->endOp();++iter) {
     b_op = *iter;
@@ -822,13 +822,13 @@ void Funcdata::nodeSplitRawDuplicate(BlockBasic *b,BlockBasic *bprime)
 void Funcdata::nodeSplitInputPatch(BlockBasic *b,BlockBasic *bprime,int4 inedge)
 
 {
-  list<PcodeOp *>::iterator biter,piter;
+  std::list<PcodeOp *>::iterator biter,piter;
   PcodeOp *bop,*pop;
   Varnode *bvn,*pvn;
-  map<PcodeOp *,PcodeOp *> btop; // Map from b to bprime
-  vector<PcodeOp *> pind;	// pop needing b input
-  vector<PcodeOp *> bind;	// bop giving input
-  vector<int4> pslot;		// slot within pop needing b input
+  std::map<PcodeOp *,PcodeOp *> btop; // Map from b to bprime
+  std::vector<PcodeOp *> pind;	// pop needing b input
+  std::vector<PcodeOp *> bind;	// bop giving input
+  std::vector<int4> pslot;		// slot within pop needing b input
 
   biter = b->beginOp();
   piter = bprime->beginOp();
@@ -982,7 +982,7 @@ void Funcdata::spliceBlockBasic(BlockBasic *bl)
     if (firstop->code() == CPUI_MULTIEQUAL)
       throw LowlevelError("Splicing block with MULTIEQUAL");
     firstop->clearFlag(PcodeOp::startbasic);
-    list<PcodeOp *>::iterator iter;
+    std::list<PcodeOp *>::iterator iter;
     // Move ops into -bl-
     for(iter=outbl->beginOp();iter!=outbl->endOp();++iter) {
       PcodeOp *op = *iter;

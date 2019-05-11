@@ -22,7 +22,7 @@ namespace GhidraDec {
 /// \param el is the XML element
 /// \param name is used to pass back the parameter name
 /// \param size is used to pass back the parameter size
-void InjectPayload::readParameter(const Element *el,string &name,uint4 &size)
+void InjectPayload::readParameter(const Element *el,std::string &name,uint4 &size)
 
 {
   name = "";
@@ -32,8 +32,8 @@ void InjectPayload::readParameter(const Element *el,string &name,uint4 &size)
     if (el->getAttributeName(i) == "name")
       name = el->getAttributeValue(i);
     else if (el->getAttributeName(i) == "size") {
-      istringstream s(el->getAttributeValue(i));
-      s.unsetf(ios::dec | ios::hex | ios::oct);
+      std::istringstream s(el->getAttributeValue(i));
+      s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
       s >> size;
     }
   }
@@ -67,27 +67,27 @@ void InjectPayload::restoreXml(const Element *el)
   dynamic = false;
   int4 num = el->getNumAttributes();
   for(int4 i=0;i<num;++i) {
-    const string &elname(el->getAttributeName(i));
+    const std::string &elname(el->getAttributeName(i));
     if (elname == "paramshift") {
-      istringstream s(el->getAttributeValue(i));
-      s.unsetf(ios::dec | ios::hex | ios::oct);
+      std::istringstream s(el->getAttributeValue(i));
+      s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
       s >> paramshift;
     }
     else if (elname == "dynamic")
       dynamic = xml_readbool(el->getAttributeValue(i));
   }
-  const List &list(el->getChildren());
+  const List &std::list(el->getChildren());
   List::const_iterator iter;
-  for(iter=list.begin();iter!=list.end();++iter) {
+  for(iter=std::list.begin();iter!=std::list.end();++iter) {
     const Element *subel = *iter;
     if (subel->getName() == "input") {
-      string paramName;
+      std::string paramName;
       uint4 size;
       readParameter(subel,paramName,size);
       inputlist.push_back(InjectParameter(paramName,size));
     }
     else if (subel->getName() == "output") {
-      string paramName;
+      std::string paramName;
       uint4 size;
       readParameter(subel,paramName,size);
       output.push_back(InjectParameter(paramName,size));
@@ -97,9 +97,9 @@ void InjectPayload::restoreXml(const Element *el)
 }
 
 /// \param g is the Architecture owning \b snippet
-/// \param src is a string describing the \e source of the snippet
+/// \param src is a std::string describing the \e source of the snippet
 /// \param nm is the formal name of the snippet
-ExecutablePcode::ExecutablePcode(Architecture *g,const string &src,const string &nm)
+ExecutablePcode::ExecutablePcode(Architecture *g,const std::string &src,const std::string &nm)
   : InjectPayload(nm,EXECUTABLEPCODE_TYPE), emulator(g)
 {
   glb = g;
@@ -147,15 +147,15 @@ void ExecutablePcode::build(void)
   built = true;
 }
 
-/// The caller provides a list of concrete values that are assigned to the
+/// The caller provides a std::list of concrete values that are assigned to the
 /// input parameters.  The number of values and input parameters must match,
 /// and values are assigned in order. Input parameter order is determined either
 /// by the order of tags in the defining XML.  This method assumes there is
 /// exactly 1 relevant output parameter. Once the snippet is executed the
 /// value of this parameter is read from the emulator state and returned.
-/// \param input is the ordered list of input values to feed to \b this script
+/// \param input is the ordered std::list of input values to feed to \b this script
 /// \return the value of the output parameter after script execution
-uintb ExecutablePcode::evaluate(const vector<uintb> &input)
+uintb ExecutablePcode::evaluate(const std::vector<uintb> &input)
 
 {
   build();		// Build the PcodeOpRaws (if we haven't before)
@@ -174,7 +174,7 @@ uintb ExecutablePcode::evaluate(const vector<uintb> &input)
 PcodeInjectLibrary::~PcodeInjectLibrary(void)
 
 {
-  vector<InjectPayload *>::iterator iter;
+  std::vector<InjectPayload *>::iterator iter;
   for(iter=injection.begin();iter!=injection.end();++iter)
     delete *iter;
 }
@@ -183,11 +183,11 @@ PcodeInjectLibrary::~PcodeInjectLibrary(void)
 ///
 /// \param fixupName is the formal name of the call-fixup
 /// \param injectid is the integer id
-void PcodeInjectLibrary::registerCallFixup(const string &fixupName,int4 injectid/* , vector<string> targets */)
+void PcodeInjectLibrary::registerCallFixup(const std::string &fixupName,int4 injectid/* , vectorstd::string targets */)
 
 {
-  pair<map<string,int4>::iterator,bool> check;
-  check = callFixupMap.insert( pair<string,int4>(fixupName,injectid) );
+  pair<std::map<std::string,int4>::iterator,bool> check;
+  check = callFixupMap.insert( pair<std::string,int4>(fixupName,injectid) );
   if (!check.second)		// This symbol is already mapped
     throw LowlevelError("Duplicate <callfixup>: "+fixupName);
   while(callFixupNames.size() <= injectid)
@@ -199,11 +199,11 @@ void PcodeInjectLibrary::registerCallFixup(const string &fixupName,int4 injectid
 ///
 /// \param fixupName is the formal name of the callother-fixup
 /// \param injectid is the integer id
-void PcodeInjectLibrary::registerCallOtherFixup(const string &fixupName,int4 injectid)
+void PcodeInjectLibrary::registerCallOtherFixup(const std::string &fixupName,int4 injectid)
 
 {
-  pair<map<string,int4>::iterator,bool> check;
-  check = callOtherFixupMap.insert( pair<string,int4>(fixupName,injectid) );
+  pair<std::map<std::string,int4>::iterator,bool> check;
+  check = callOtherFixupMap.insert( pair<std::string,int4>(fixupName,injectid) );
   if (!check.second)		// This symbol is already mapped
     throw LowlevelError("Duplicate <callotherfixup>: "+fixupName);
   while(callOtherTarget.size() <= injectid)
@@ -215,11 +215,11 @@ void PcodeInjectLibrary::registerCallOtherFixup(const string &fixupName,int4 inj
 ///
 /// \param fixupName is the formal name of the call mechanism
 /// \param injectid is the integer id
-void PcodeInjectLibrary::registerCallMechanism(const string &fixupName,int4 injectid)
+void PcodeInjectLibrary::registerCallMechanism(const std::string &fixupName,int4 injectid)
 
 {
-  pair<map<string,int4>::iterator,bool> check;
-  check = callMechFixupMap.insert( pair<string,int4>(fixupName,injectid) );
+  pair<std::map<std::string,int4>::iterator,bool> check;
+  check = callMechFixupMap.insert( pair<std::string,int4>(fixupName,injectid) );
   if (!check.second)		// This symbol is already mapped
     throw LowlevelError("Duplicate <callmechanism>: "+fixupName);
   while(callMechTarget.size() <= injectid)
@@ -231,11 +231,11 @@ void PcodeInjectLibrary::registerCallMechanism(const string &fixupName,int4 inje
 ///
 /// \param scriptName is the formal name of the p-code script
 /// \param injectid is the integer id
-void PcodeInjectLibrary::registerExeScript(const string &scriptName,int4 injectid)
+void PcodeInjectLibrary::registerExeScript(const std::string &scriptName,int4 injectid)
 
 {
-  pair<map<string,int4>::iterator,bool> check;
-  check = scriptMap.insert( pair<string,int4>(scriptName,injectid) );
+  pair<std::map<std::string,int4>::iterator,bool> check;
+  check = scriptMap.insert( pair<std::string,int4>(scriptName,injectid) );
   if (!check.second)		// This symbol is already mapped
     throw LowlevelError("Duplicate <script>: "+scriptName);
   while(scriptNames.size() <= injectid)
@@ -248,10 +248,10 @@ void PcodeInjectLibrary::registerExeScript(const string &scriptName,int4 injecti
 /// \param type is the payload type
 /// \param nm is the formal name of the payload
 /// \return the payload id or -1 if there is no matching payload
-int4 PcodeInjectLibrary::getPayloadId(int4 type,const string &nm) const
+int4 PcodeInjectLibrary::getPayloadId(int4 type,const std::string &nm) const
 
 {
-  map<string,int4>::const_iterator iter;
+  std::map<std::string,int4>::const_iterator iter;
   if (type == InjectPayload::CALLFIXUP_TYPE) {
     iter = callFixupMap.find(nm);
     if (iter == callFixupMap.end())
@@ -276,8 +276,8 @@ int4 PcodeInjectLibrary::getPayloadId(int4 type,const string &nm) const
 }
 
 /// \param injectid is an integer id of a call-fixup payload
-/// \return the name of the payload or the empty string
-string PcodeInjectLibrary::getCallFixupName(int4 injectid) const
+/// \return the name of the payload or the empty std::string
+std::string PcodeInjectLibrary::getCallFixupName(int4 injectid) const
 
 {
   if ((injectid < 0)||(injectid >= callFixupNames.size()))
@@ -286,8 +286,8 @@ string PcodeInjectLibrary::getCallFixupName(int4 injectid) const
 }
 
 /// \param injectid is an integer id of a callother-fixup payload
-/// \return the name of the payload or the empty string
-string PcodeInjectLibrary::getCallOtherTarget(int4 injectid) const
+/// \return the name of the payload or the empty std::string
+std::string PcodeInjectLibrary::getCallOtherTarget(int4 injectid) const
 
 {
   if ((injectid < 0)||(injectid >= callOtherTarget.size()))
@@ -296,8 +296,8 @@ string PcodeInjectLibrary::getCallOtherTarget(int4 injectid) const
 }
 
 /// \param injectid is an integer id of a call mechanism payload
-/// \return the name of the payload or the empty string
-string PcodeInjectLibrary::getCallMechanismName(int4 injectid) const
+/// \return the name of the payload or the empty std::string
+std::string PcodeInjectLibrary::getCallMechanismName(int4 injectid) const
 
 {
   if ((injectid < 0)||(injectid >= callMechTarget.size()))
@@ -310,12 +310,12 @@ string PcodeInjectLibrary::getCallMechanismName(int4 injectid) const
 /// The root XML element describing the payload is given (\<pcode>, \<callfixup>
 /// \<callotherfixup>, etc.), the InjectPayload is allocated and then
 /// initialized using the element.  Then the InjectPayload is finalized with the library.
-/// \param src is a string describing the source of the payload being restored
+/// \param src is a std::string describing the source of the payload being restored
 /// \param nm is the name of the payload
 /// \param tp is the type of the payload (CALLFIXUP_TYPE, EXECUTABLEPCODE_TYPE, etc.)
 /// \param el is the given XML element
 /// \return the id of the newly registered payload
-int4 PcodeInjectLibrary::restoreXmlInject(const string &src,const string &nm,int4 tp,const Element *el)
+int4 PcodeInjectLibrary::restoreXmlInject(const std::string &src,const std::string &nm,int4 tp,const Element *el)
 
 {
   int4 injectid = allocateInject(src, nm, tp);

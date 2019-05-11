@@ -26,7 +26,7 @@ SleighBase::SleighBase(void)
 }
 
 /// Assuming the symbol table is populated, iterate through the table collecting
-/// registers (for the map), user-op names, and context fields.
+/// registers (for the std::map), user-op names, and context fields.
 void SleighBase::buildXrefs(void)
 
 {
@@ -34,13 +34,13 @@ void SleighBase::buildXrefs(void)
   SymbolTree::const_iterator iter;
   SleighSymbol *sym;
   int4 errors = 0;
-  ostringstream s;
+  std::ostringstream s;
 
   for(iter=glb->begin();iter!=glb->end();++iter) {
     sym = *iter;
     if (sym->getType() == SleighSymbol::varnode_symbol) {
-      pair<VarnodeData,string> ins(((VarnodeSymbol *)sym)->getFixedVarnode(),sym->getName());
-      pair<map<VarnodeData,string>::iterator,bool> res = varnode_xref.insert(ins);
+      pair<VarnodeData,std::string> ins(((VarnodeSymbol *)sym)->getFixedVarnode(),sym->getName());
+      pair<std::map<VarnodeData,std::string>::iterator,bool> res = varnode_xref.insert(ins);
       if (!res.second) {
 	s << "Duplicate (offset,size) pair for registers: ";
 	s << sym->getName() << " and " << (*(res.first)).second << '\n';
@@ -85,14 +85,14 @@ void SleighBase::reregisterContext(void)
   }
 }
 
-void SleighBase::addRegister(const string &nm,AddrSpace *base,uintb offset,int4 size)
+void SleighBase::addRegister(const std::string &nm,AddrSpace *base,uintb offset,int4 size)
 
 {
   VarnodeSymbol *sym = new VarnodeSymbol(nm,base,offset,size);
   symtab.addSymbol(sym);
 }
 
-const VarnodeData &SleighBase::getRegister(const string &nm) const
+const VarnodeData &SleighBase::getRegister(const std::string &nm) const
 
 {
   VarnodeSymbol *sym = (VarnodeSymbol *)findSymbol(nm);
@@ -103,14 +103,14 @@ const VarnodeData &SleighBase::getRegister(const string &nm) const
   return sym->getFixedVarnode();
 }
 
-string SleighBase::getRegisterName(AddrSpace *base,uintb off,int4 size) const
+std::string SleighBase::getRegisterName(AddrSpace *base,uintb off,int4 size) const
 
 {
   VarnodeData sym;
   sym.space = base;
   sym.offset = off;
   sym.size = size;
-  map<VarnodeData,string>::const_iterator iter = varnode_xref.upper_bound(sym); // First point greater than offset
+  std::map<VarnodeData,std::string>::const_iterator iter = varnode_xref.upper_bound(sym); // First point greater than offset
   if (iter == varnode_xref.begin()) return "";
   iter--;
   const VarnodeData &point((*iter).first);
@@ -129,21 +129,21 @@ string SleighBase::getRegisterName(AddrSpace *base,uintb off,int4 size) const
   return "";
 }
 
-void SleighBase::getAllRegisters(map<VarnodeData,string> &reglist) const
+void SleighBase::getAllRegisters(std::map<VarnodeData,std::string> &reglist) const
 
 {
   reglist = varnode_xref;
 }
 
-void SleighBase::getUserOpNames(vector<string> &res) const
+void SleighBase::getUserOpNames(vectorstd::string &res) const
 
 {
-  res = userop;		// Return list of all language defined user ops (with index)
+  res = userop;		// Return std::list of all language defined user ops (with index)
 }
 
 /// This does the bulk of the work of creating a .sla file
 /// \param s is the output stream
-void SleighBase::saveXml(ostream &s) const
+void SleighBase::saveXml(std::ostream &s) const
 
 {
   s << "<sleigh";
@@ -186,39 +186,39 @@ void SleighBase::restoreXml(const Element *el)
   numSections = 0;
   setBigEndian(xml_readbool(el->getAttributeValue("bigendian")));
   {
-    istringstream s(el->getAttributeValue("align"));
-    s.unsetf(ios::dec | ios::hex | ios::oct);
+    std::istringstream s(el->getAttributeValue("align"));
+    s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
     s >> alignment;
   }
   {
-    istringstream s(el->getAttributeValue("uniqbase"));
-    s.unsetf(ios::dec | ios::hex | ios::oct);
+    std::istringstream s(el->getAttributeValue("uniqbase"));
+    s.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
     uintm ubase;
     s >> ubase;
     setUniqueBase(ubase);
   }
   int4 numattr = el->getNumAttributes();
   for(int4 i=0;i<numattr;++i) {
-    const string &attrname( el->getAttributeName(i) );
+    const std::string &attrname( el->getAttributeName(i) );
     if (attrname == "maxdelay") {
-      istringstream s1(el->getAttributeValue(i));
-      s1.unsetf(ios::dec | ios::hex | ios::oct);
+      std::istringstream s1(el->getAttributeValue(i));
+      s1.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
       s1 >> maxdelayslotbytes;
     }
     else if (attrname == "uniqmask") {
-      istringstream s2(el->getAttributeValue(i));
-      s2.unsetf(ios::dec | ios::hex | ios::oct);
+      std::istringstream s2(el->getAttributeValue(i));
+      s2.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
       s2 >> unique_allocatemask;
     }
     else if (attrname == "numsections") {
-      istringstream s3(el->getAttributeValue(i));
-      s3.unsetf(ios::dec | ios::hex | ios::oct);
+      std::istringstream s3(el->getAttributeValue(i));
+      s3.unsetf(std::ios::dec | std::ios::dec | std::ios::oct);
       s3 >> numSections;
     }
   }
-  const List &list(el->getChildren());
+  const List &std::list(el->getChildren());
   List::const_iterator iter;
-  iter = list.begin();
+  iter = std::list.begin();
   while((*iter)->getName() == "floatformat") {
     floatformats.push_back(FloatFormat());
     floatformats.back().restoreXml(*iter);

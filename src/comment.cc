@@ -17,24 +17,24 @@
 #include "funcdata.hh"
 
 namespace GhidraDec {
-/// \param tp is the set of properties to associate with the comment (or 0 for no properties)
+/// \param tp is the std::set of properties to associate with the comment (or 0 for no properties)
 /// \param fad is the Address of the function containing the comment
 /// \param ad is the Address of the instruction associated with the comment
 /// \param uq is used internally to sub-sort comments at the same address
 /// \param txt is the body of the comment
 Comment::Comment(uint4 tp,const Address &fad,
 			     const Address &ad,int4 uq,
-			     const string &txt) :
+			     const std::string &txt) :
   type(tp), funcaddr(fad), addr(ad), uniq(uq), text(txt)
 {
 }
 
 /// The single comment is saved as a \<comment> tag.
 /// \param s is the output stream
-void Comment::saveXml(ostream &s) const
+void Comment::saveXml(std::ostream &s) const
 
 {
-  string tpname = Comment::decodeCommentType(type);
+  std::string tpname = Comment::decodeCommentType(type);
   s << "<comment";
   a_v(s,"type",tpname);
   s << ">\n";
@@ -58,21 +58,21 @@ void Comment::restoreXml(const Element *el,const AddrSpaceManager *manage)
 {
   type = 0;
   type = Comment::encodeCommentType(el->getAttributeValue("type"));
-  const List &list(el->getChildren());
+  const List &std::list(el->getChildren());
   List::const_iterator iter;
 
-  iter = list.begin();
+  iter = std::list.begin();
   funcaddr = Address::restoreXml(*iter,manage);
   ++iter;
   addr = Address::restoreXml(*iter,manage);
   ++iter;
-  if (iter != list.end())
+  if (iter != std::list.end())
     text = (*iter)->getContent();
 }
 
-/// \param name is a string representation of a single comment property
+/// \param name is a std::string representation of a single comment property
 /// \return the enumerated property type
-uint4 Comment::encodeCommentType(const string &name)
+uint4 Comment::encodeCommentType(const std::string &name)
 
 {
   if (name == "user1")
@@ -91,8 +91,8 @@ uint4 Comment::encodeCommentType(const string &name)
 }
 
 /// \param val is a single comment property
-/// \return the string representation of the property
-string Comment::decodeCommentType(uint4 val)
+/// \return the std::string representation of the property
+std::string Comment::decodeCommentType(uint4 val)
 
 {
   switch(val) {
@@ -175,7 +175,7 @@ void CommentDatabaseInternal::clearType(const Address &fad,uint4 tp)
 
 void CommentDatabaseInternal::addComment(uint4 tp,const Address &fad,
 					 const Address &ad,
-					 const string &txt)
+					 const std::string &txt)
 {
   Comment *newcom = new Comment(tp,fad,ad,65535,txt);
   // Find first element greater
@@ -192,7 +192,7 @@ void CommentDatabaseInternal::addComment(uint4 tp,const Address &fad,
 }
 
 bool CommentDatabaseInternal::addCommentNoDuplicate(uint4 tp,const Address &fad,
-						    const Address &ad,const string &txt)
+						    const Address &ad,const std::string &txt)
 {
   Comment *newcom = new Comment(tp,fad,ad,65535,txt);
 
@@ -237,7 +237,7 @@ CommentSet::const_iterator CommentDatabaseInternal::endComment(const Address &fa
   return commentset.lower_bound(&testcomm);
 }
 
-void CommentDatabaseInternal::saveXml(ostream &s) const
+void CommentDatabaseInternal::saveXml(std::ostream &s) const
 
 {
   CommentSet::const_iterator iter;
@@ -251,10 +251,10 @@ void CommentDatabaseInternal::saveXml(ostream &s) const
 void CommentDatabaseInternal::restoreXml(const Element *el,const AddrSpaceManager *manage)
 
 {
-  const List &list(el->getChildren());
+  const List &std::list(el->getChildren());
   List::const_iterator iter;
   
-  for(iter=list.begin();iter!=list.end();++iter) {
+  for(iter=std::list.begin();iter!=std::list.end();++iter) {
     Comment com;
     com.restoreXml(*iter,manage);
     addComment(com.getType(),com.getFuncAddr(),com.getAddr(),com.getText());
@@ -321,8 +321,8 @@ bool CommentSorter::findPosition(Subsort &subsort,Comment *comm,const Funcdata *
 
 /// \brief Collect and sort comments specific to the given function.
 ///
-/// Only keep comments matching one of a specific set of properties
-/// \param tp is the set of properties (may be zero)
+/// Only keep comments matching one of a specific std::set of properties
+/// \param tp is the std::set of properties (may be zero)
 /// \param fd is the given function
 /// \param db is the container of comments to collect from
 /// \param displayUnplaced is \b true if unplaced comments should be displayed in the header
