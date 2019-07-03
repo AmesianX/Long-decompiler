@@ -161,7 +161,7 @@ endif
 
 system = build_machine.system()
 arch_type = ''
-additional_flags = ''
+additional_flags = []
 if system == 'linux'
     if get_option('arch') == 'x86'
         arch_type = '-m32'
